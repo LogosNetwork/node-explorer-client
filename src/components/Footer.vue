@@ -3,15 +3,15 @@
     <b-container>
       <b-row>
         <b-col cols="12" sm="6" class="text-left">
-          <h4><b-link to="/">Logos Network</b-link></h4>
+          <h4><b-link to="/" v-t="'name'"></b-link></h4>
         </b-col>
         <b-col cols="12" sm="6">
           <b-row>
             <b-col cols="6" sm="4" offset-sm="3">
-              <b-link to="/" exact-active-class="is-active">Explore</b-link>
+              <b-link to="/" exact-active-class="is-active" v-t="'explore'"></b-link>
             </b-col>
             <b-col cols="6" sm="4">
-              <b-link to="/node" exact-active-class="is-active">Node</b-link>
+              <b-link to="/node" exact-active-class="is-active" v-t="'node'"></b-link>
             </b-col>
           </b-row>
         </b-col>

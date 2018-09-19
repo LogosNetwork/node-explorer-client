@@ -1,12 +1,12 @@
 <template>
   <div id="nav">
     <b-navbar toggleable="md" v-bind:type="dark == 'true' ? 'dark' : 'light'" v-bind:id="dark == 'true' ? 'dark' : 'light'">
-      <b-navbar-brand to="/">Logos Network</b-navbar-brand>
+      <b-navbar-brand to="/" v-t="'name'"></b-navbar-brand>
       <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
       <b-collapse is-nav id="nav_collapse">
         <b-navbar-nav class="ml-auto">
-          <b-nav-item to="/" exact-active-class="is-active">Explore</b-nav-item>
-          <b-nav-item to="/node" exact-active-class="is-active">Node</b-nav-item>
+          <b-nav-item to="/" exact-active-class="is-active">{{ $t('explore') }}</b-nav-item>
+          <b-nav-item to="/node" exact-active-class="is-active">{{ $t('node') }}</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
