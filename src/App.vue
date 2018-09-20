@@ -7,9 +7,24 @@
      ogLocale="en_US"
      keywords="Logos,Cryptocurrency,Node,Block,Explorer,Transaction"
     />
+    <Nav dark="false"/>
     <router-view/>
+    <Footer/>
   </div>
 </template>
+
+<script>
+// @ is an alias to /src
+import Nav from '@/components/Nav.vue'
+import Footer from '@/components/Footer.vue'
+export default {
+  name: 'app',
+  components: {
+    Nav,
+    Footer
+  }
+}
+</script>
 
 <style lang="scss">
 #app {
