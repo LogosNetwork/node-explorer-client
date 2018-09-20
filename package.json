@@ -1,67 +1,29 @@
 {
-  "name": "node-explorer",
-  "version": "0.1.0",
-  "private": true,
+  "name": "node-explorer-backend",
+  "version": "0.0.1",
+  "description": "Logos Network Node Explorer Backend",
+  "main": "server.js",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LogosNetwork/node-explorer.git"
+  },
+  "author": "Tyler Storm",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LogosNetwork/node-explorer/issues"
+  },
+  "homepage": "",
   "dependencies": {
-    "bootstrap-vue": "^2.0.0-rc.11",
-    "compression-webpack-plugin": "^2.0.0",
-    "vue": "^2.5.17",
-    "vue-awesome": "^3.1.2",
-    "vue-headful": "^2.0.1",
-    "vue-i18n": "^8.0.0",
-    "vue-router": "^3.0.1"
-  },
-  "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.0.3",
-    "@vue/cli-plugin-eslint": "^3.0.3",
-    "@vue/cli-service": "^3.0.3",
-    "@vue/eslint-config-standard": "^3.0.3",
-    "lint-staged": "^7.2.2",
-    "node-sass": "^4.9.0",
-    "sass-loader": "^7.0.1",
-    "vue-cli-plugin-i18n": "^0.5.0",
-    "vue-template-compiler": "^2.5.17"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "@vue/standard"
-    ],
-    "rules": {},
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
-  },
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
-  ],
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.js": [
-      "vue-cli-service lint",
-      "git add"
-    ],
-    "*.vue": [
-      "vue-cli-service lint",
-      "git add"
-    ]
+    "colog": "^1.0.4",
+    "connect-gzip-static": "^2.1.1",
+    "connect-history-api-fallback": "^1.5.0",
+    "express": "^4.16.2",
+    "moment": "^2.20.1",
+    "pg": "^6.4.2",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^4.27.0"
   }
 }
