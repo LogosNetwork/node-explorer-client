@@ -1,10 +1,12 @@
 <template>
-  <div id="primary" class="pt-5"></div>
+  <div id="primary" class="pt-5">
+
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'node',
+  name: 'Reps',
   components: {}
 }
 </script>

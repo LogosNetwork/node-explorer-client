@@ -1,5 +1,20 @@
 {
   "name": "Logos Network",
   "explore": "Explore",
-  "node": "Node"
+  "node": "Node",
+  "representatives": "Representatives",
+  "explore_cta": "Explore the Logos Network",
+  "searchPlaceholder": "Search for Addresses and Blocks",
+  "recent_transactions": "Recent Transactions",
+  "network_stats": {
+    "title": "Network Stats",
+    "tx-sec-1m": "TX/SEC (1 Min Avg)",
+    "tx-sec-30m": "TX/SEC (30 Min Avg)",
+    "market-cap": "Market Cap",
+    "change24hr": "Change (24H)",
+    "change7d": "Change (7D)",
+    "price-local": "Price (USD)",
+    "price-satoshi": "Price (BTC Satoshi)",
+    "volume24h": "24H Volume"
+  }
 }

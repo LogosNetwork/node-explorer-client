@@ -7,6 +7,7 @@
         <b-navbar-nav class="ml-auto">
           <b-nav-item to="/" exact-active-class="is-active">{{ $t('explore') }}</b-nav-item>
           <b-nav-item to="/node" exact-active-class="is-active">{{ $t('node') }}</b-nav-item>
+          <b-nav-item to="/representatives" exact-active-class="is-active">{{ $t('representatives') }}</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
@@ -24,10 +25,11 @@ export default {
 
 <style scoped lang="scss">
 #nav {
-  padding: 30px;
   position: relative;
   z-index: 2;
+  background:#FFF;
   font-weight: bold;
+  border-bottom:1px solid #ced4db;
 }
 #nav {
   #dark {

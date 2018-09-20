@@ -1,5 +1,5 @@
 <template>
-  <div id="footer" class="pt-5 pb-5">
+  <div id="footer">
     <b-container>
       <b-row>
         <b-col cols="12" sm="6" class="text-left">
@@ -7,11 +7,14 @@
         </b-col>
         <b-col cols="12" sm="6">
           <b-row>
-            <b-col cols="6" sm="4" offset-sm="3">
+            <b-col cols="6" sm="4">
               <b-link to="/" exact-active-class="is-active" v-t="'explore'"></b-link>
             </b-col>
             <b-col cols="6" sm="4">
               <b-link to="/node" exact-active-class="is-active" v-t="'node'"></b-link>
+            </b-col>
+            <b-col cols="6" sm="4">
+              <b-link to="/representatives" exact-active-class="is-active" v-t="'representatives'"></b-link>
             </b-col>
           </b-row>
         </b-col>
@@ -28,6 +31,8 @@ export default {
 
 <style scoped lang="scss">
 #footer {
+  padding:0.5rem 1rem;
+  background:#FFF;
   border-top:1px solid #ced4db;
   a {
     margin-right: 1rem;

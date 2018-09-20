@@ -19,6 +19,7 @@ import bLink from 'bootstrap-vue/es/components/link/link'
 import bContainer from 'bootstrap-vue/es/components/layout/container'
 import bRow from 'bootstrap-vue/es/components/layout/row'
 import bCol from 'bootstrap-vue/es/components/layout/col'
+import bTable from 'bootstrap-vue/es/components/table/table'
 
 // Icons
 import Icon from 'vue-awesome/components/Icon'
@@ -38,6 +39,7 @@ Vue.component('b-navbar-toggle', bNavbarToggle)
 Vue.component('b-navbar-nav', bNavbarNav)
 Vue.component('b-nav-item', bNavItem)
 Vue.component('b-collapse', bCollapse)
+Vue.component('b-table', bTable)
 Vue.component('vue-headful', vueHeadful)
 Vue.component('icon', Icon)
 

@@ -8,7 +8,7 @@
      keywords="Logos,Cryptocurrency,Node,Block,Explorer,Transaction"
     />
     <Nav dark="false"/>
-    <router-view/>
+    <router-view id="content"/>
     <Footer/>
   </div>
 </template>
@@ -34,7 +34,13 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color:#525f7f;
-  overflow:hidden;
+  background:#F5F5F5;
   position: relative;
+  min-height: 100vh;
+  flex-direction: column;
+  display: flex;
+}
+#content {
+  flex: 1;
 }
 </style>
