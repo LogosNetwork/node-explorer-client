@@ -7,14 +7,17 @@
         </b-col>
         <b-col cols="12" sm="6">
           <b-row>
-            <b-col cols="6" sm="4">
+            <b-col>
               <b-link to="/" exact-active-class="is-active" v-t="'explore'"></b-link>
             </b-col>
-            <b-col cols="6" sm="4">
+            <b-col>
               <b-link to="/node" exact-active-class="is-active" v-t="'node'"></b-link>
             </b-col>
-            <b-col cols="6" sm="4">
+            <b-col>
               <b-link to="/representatives" exact-active-class="is-active" v-t="'representatives'"></b-link>
+            </b-col>
+            <b-col>
+              <b-link to="/workbench" exact-active-class="is-active" v-t="'workbench'"></b-link>
             </b-col>
           </b-row>
         </b-col>
@@ -37,6 +40,7 @@ export default {
   a {
     margin-right: 1rem;
     color:#8898aa;
+    padding-top:6px;
   }
   a:hover {
     color:#32325d;

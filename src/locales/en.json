@@ -1,9 +1,11 @@
 {
   "name": "Logos Network",
   "explore": "Explore",
+  "workbench": "Workbench",
   "node": "Node",
   "representatives": "Representatives",
   "explore_cta": "Explore the Logos Network",
+  "build_api_cta": "Interact with the Logos Network from your browser",
   "searchPlaceholder": "Search for Addresses and Blocks",
   "recent_transactions": "Recent Transactions",
   "network_stats": {

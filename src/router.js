@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Explore from './views/Explore.vue'
 import Reps from './views/Representatives.vue'
+import Workbench from './views/Workbench.vue'
 import Node from './views/Node.vue'
 
 Vue.use(Router)
@@ -24,6 +25,11 @@ export default new Router({
       path: '/representatives',
       name: 'reps',
       component: Reps
+    },
+    {
+      path: '/workbench',
+      name: 'workbench',
+      component: Workbench
     }
   ],
   scrollBehavior (to, from, savedPosition) {

@@ -15,6 +15,10 @@ import bNavbarNav from 'bootstrap-vue/es/components/navbar/navbar-nav'
 import bNavItem from 'bootstrap-vue/es/components/nav/nav-item'
 import bCollapse from 'bootstrap-vue/es/components/collapse/collapse'
 import bButton from 'bootstrap-vue/es/components/button/button'
+import bTabs from 'bootstrap-vue/es/components/tabs/tabs'
+import bTab from 'bootstrap-vue/es/components/tabs/tab'
+import bCard from 'bootstrap-vue/es/components/card/card'
+import bFormSelect from 'bootstrap-vue/es/components/form-select/form-select'
 import bLink from 'bootstrap-vue/es/components/link/link'
 import bContainer from 'bootstrap-vue/es/components/layout/container'
 import bRow from 'bootstrap-vue/es/components/layout/row'
@@ -32,6 +36,10 @@ Vue.component('b-row', bRow)
 Vue.component('b-col', bCol)
 Vue.component('b-link', bLink)
 Vue.component('b-button', bButton)
+Vue.component('b-tabs', bTabs)
+Vue.component('b-tab', bTab)
+Vue.component('b-card', bCard)
+Vue.component('b-form-select', bFormSelect)
 Vue.component('b-img-lazy', bImgLazy)
 Vue.component('b-navbar', bNavbar)
 Vue.component('b-navbar-brand', bNavbarBrand)

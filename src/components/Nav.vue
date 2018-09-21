@@ -8,6 +8,7 @@
           <b-nav-item to="/" exact-active-class="is-active">{{ $t('explore') }}</b-nav-item>
           <b-nav-item to="/node" exact-active-class="is-active">{{ $t('node') }}</b-nav-item>
           <b-nav-item to="/representatives" exact-active-class="is-active">{{ $t('representatives') }}</b-nav-item>
+          <b-nav-item to="/workbench" exact-active-class="is-active">{{ $t('workbench') }}</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
