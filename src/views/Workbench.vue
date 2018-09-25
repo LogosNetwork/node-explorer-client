@@ -16,7 +16,20 @@
                     <b-button class="float-right mb-3" variant="primary">Execute</b-button>
                 </b-tab>
                 <b-tab title="Accounts">
-
+                   <b-form-select v-model="selectedAccounts" :options="labels[1]" class="mb-5" />
+                    <div class="text-left" v-for="(param, index) in options[1][selectedAccounts].params" :key="index">
+                        <p v-if="!param.type || param.type === 'text'" class="card-text text-left">{{param.label}}
+                            {{param.type}}
+                            <b-input :placeholder="param.name" v-model="param.value" class="mb-3" />
+                        </p>
+                        <b-form-checkbox v-if="param.type && param.type === 'boolean'"
+                            v-model="param.value"
+                            value="true"
+                            unchecked-value="false">
+                            {{param.label}}
+                        </b-form-checkbox>
+                    </div>
+                    <b-button class="float-right mb-3" variant="primary">Execute</b-button>
                 </b-tab>
                 <b-tab title="Keys">
                     <b-form-select v-model="selectedKeys" :options="labels[2]" class="mb-5" />
@@ -158,8 +171,136 @@ const accountOptions = [
   }
 ]
 
-const accountsOptions = []
-const accountsLabels = []
+const accountsOptions = [
+  {
+    'action': 'account_get',
+    'params': [
+      {
+        'name': 'publicKey',
+        'label': `Public Key`,
+        'required': true
+      }
+    ]
+  },
+  {
+    'action': 'account_balance',
+    'params': [
+      {
+        'name': 'account',
+        'label': `Account Id`,
+        'required': true
+      }
+    ]
+  },
+  {
+    'action': 'account_balance',
+    'params': [
+      {
+        'name': 'account',
+        'label': `Account Id`,
+        'required': true
+      }
+    ]
+  },
+  {
+    'action': 'accounts_balances',
+    'params': [
+      {
+        'name': 'accounts',
+        'label': `Account Ids Comma Seperated`,
+        'required': true
+      }
+    ]
+  },
+  {
+    'action': 'account_history',
+    'params': [
+      {
+        'name': 'account',
+        'label': `Account Id`,
+        'required': true
+      },
+      {
+        'name': 'count',
+        'label': `Number of blocks you wish to see`,
+        'required': true
+      }
+    ]
+  },
+  {
+    'action': 'account_info',
+    'params': [
+      {
+        'name': 'account',
+        'label': `Account Id`,
+        'required': true
+      }
+    ]
+  },
+  {
+    'action': 'account_key',
+    'params': [
+      {
+        'name': 'account',
+        'label': `Account Id`,
+        'required': true
+      }
+    ]
+  },
+  {
+    'action': 'ledger',
+    'params': [
+      {
+        'name': 'account',
+        'label': `Account Id`,
+        'required': true
+      },
+      {
+        'name': 'count',
+        'label': `Number of blocks to retrieve`,
+        'required': false
+      },
+      {
+        'name': 'details',
+        'type': 'boolean',
+        'label': `Show full block details`,
+        'required': false
+      }
+    ]
+  },
+  {
+    'action': 'account_representative',
+    'params': [
+      {
+        'name': 'account',
+        'label': `Account Id`,
+        'required': true
+      }
+    ]
+  },
+  {
+    'action': 'account_weight',
+    'params': [
+      {
+        'name': 'account',
+        'label': `Account Id`,
+        'required': true
+      }
+    ]
+  }
+]
+const accountsLabels = [
+  { value: 0, text: 'Get the account name from public key' },
+  { value: 1, text: 'Account Balance in Reason' },
+  { value: 2, text: 'Account Balance in Logos' },
+  { value: 3, text: 'Accounts Balance' },
+  { value: 4, text: 'History of an account' },
+  { value: 5, text: 'Account info' },
+  { value: 6, text: 'Get public key from account name' },
+  { value: 7, text: 'Get ledger information of an account' },
+  { value: 8, text: 'Get Representative of an account' },
+  { value: 9, text: 'Get Voting weight of an account' }
+]
 
 const keyOptions = [
   {
