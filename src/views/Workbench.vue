@@ -13,7 +13,7 @@
                             <b-input :placeholder="param.name" v-model="param.value" class="mb-3" />
                         </p>
                     </div>
-                    <b-button class="float-right mb-3" variant="primary">Execute</b-button>
+                    <b-button v-on:click="start" class="float-right mb-3" variant="primary">Execute</b-button>
                 </b-tab>
                 <b-tab title="Accounts">
                    <b-form-select v-model="selectedAccounts" :options="labels[1]" class="mb-5" />
@@ -81,6 +81,9 @@
 </template>
 
 <script>
+
+import Vue from 'vue'
+import Logos from '../vue-logos'
 
 const accountLabels = [
   { value: 0, text: 'Create a Send' },
@@ -513,6 +516,7 @@ const labels = [
   blockLabels,
   otherLabels
 ]
+Vue.use(Logos, { url: 'http://52.215.106.54:7076' })
 
 export default {
   name: 'workbench',
@@ -528,6 +532,11 @@ export default {
       selectedWork: 0,
       selectedBlocks: 0,
       selectedOther: 0
+    }
+  },
+  methods: {
+    start () {
+      console.log(this.$Logos)
     }
   }
 }
