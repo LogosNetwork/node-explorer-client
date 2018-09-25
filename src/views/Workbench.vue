@@ -37,7 +37,20 @@
                     <b-button class="float-right mb-3" variant="primary">Execute</b-button>
                 </b-tab>
                 <b-tab title="Blocks">
-                    <br>Block Actions
+                    <b-form-select v-model="selectedBlocks" :options="labels[4]" class="mb-5" />
+                    <div class="text-left" v-for="(param, index) in options[4][selectedBlocks].params" :key="index">
+                        <p v-if="!param.type || param.type === 'text'" class="card-text text-left">{{param.label}}
+                            {{param.type}}
+                            <b-input :placeholder="param.name" v-model="param.value" class="mb-3" />
+                        </p>
+                        <b-form-checkbox v-if="param.type && param.type === 'boolean'"
+                            v-model="param.value"
+                            value="true"
+                            unchecked-value="false">
+                            {{param.label}}
+                        </b-form-checkbox>
+                    </div>
+                    <b-button class="float-right mb-3" variant="primary">Execute</b-button>
                 </b-tab>
                 <b-tab title="Other">
                     <b-form-select v-model="selectedOther" :options="labels[5]" class="mb-5" />
@@ -235,6 +248,61 @@ const blockOptions = [
         'name': 'count',
         'label': `Number of predecessors to retrieve`,
         'required': false
+      }
+    ]
+  },
+  {
+    'action': 'successors',
+    'params': [
+      {
+        'name': 'hash',
+        'label': `Hash of the block you want to know the successors to`,
+        'required': true
+      },
+      {
+        'name': 'count',
+        'label': `Number of successors to retrieve`,
+        'required': false
+      }
+    ]
+  },
+  {
+    'action': 'blocks_info',
+    'params': [
+      {
+        'name': 'hash',
+        'label': `Hash of the block you want to know about`,
+        'required': true
+      }
+    ]
+  },
+  {
+    'action': 'block_create',
+    'params': [
+      {
+        'name': 'sendBlock',
+        'label': `JSON representation of the send block`,
+        'required': true
+      }
+    ]
+  },
+  {
+    'action': 'block_create',
+    'params': [
+      {
+        'name': 'changeBlock',
+        'label': `JSON representation of the change block`,
+        'required': true
+      }
+    ]
+  },
+  {
+    'action': 'process',
+    'params': [
+      {
+        'name': 'block',
+        'label': `JSON representation of the block you want broadcasted`,
+        'required': true
       }
     ]
   }
