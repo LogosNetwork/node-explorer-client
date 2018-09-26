@@ -516,7 +516,7 @@ const labels = [
   blockLabels,
   otherLabels
 ]
-Vue.use(Logos, { rpcClient: 'http://34.201.126.140:7076', debug: true })
+Vue.use(Logos, { url: 'http://34.201.126.140:7076', debug: true })
 
 export default {
   name: 'workbench',
