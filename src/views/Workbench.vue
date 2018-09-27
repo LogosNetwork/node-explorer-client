@@ -516,7 +516,7 @@ const labels = [
   blockLabels,
   otherLabels
 ]
-Vue.use(Logos, { url: 'http://34.201.126.140:7076', debug: true })
+Vue.use(Logos, { url: 'http://52.215.106.54:55000', debug: true })
 
 export default {
   name: 'workbench',
@@ -536,8 +536,7 @@ export default {
   },
   methods: {
     start () {
-      console.log(this.$Logos)
-      console.log(this.$Logos.accounts.logosBalance('lgs_1ak3wpww1qhhmqkd7nafuxa1ujfh14pwmoogit5gurwp9qxfkh3mherj7746'))
+      console.log(this.$Logos.accounts.info('lgs_1ak3wpww1qhhmqkd7nafuxa1ujfh14pwmoogit5gurwp9qxfkh3mherj7746'))
     }
   }
 }
