@@ -76,6 +76,8 @@
                 </b-tab>
             </b-tabs>
         </b-card>
+        <h5 class="text-left mt-3" v-if='editor.length > 0' v-t="'workbench_output'"></h5>
+        <codepad id='editor' class="text-left mb-3" v-if='editor.length > 0' :code='editor'/>
     </b-container>
   </div>
 </template>
@@ -84,11 +86,14 @@
 
 import Vue from 'vue'
 import Logos from '../vue-logos'
+import codepad from '@/components/codepad.vue'
 Vue.use(Logos, { url: 'http://52.215.106.54:55000', debug: true })
 
 export default {
   name: 'workbench',
-  components: {},
+  components: {
+    codepad
+  },
   data () {
     let $this = this
     const accountLabels = [
@@ -109,8 +114,9 @@ export default {
         'action': function (params) {
           let nanoAmount = params[0].value
           let address = params[1].value
+          $this.editor += `Sending ${nanoAmount} to ${address}....\n`
           $this.$Logos.account($this.key).send(nanoAmount, address).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -129,8 +135,9 @@ export default {
       {
         'action': function (params) {
           let representative = params[0].value
+          $this.editor += `Changing Represenative to ${representative}....\n`
           $this.$Logos.account($this.key).change(representative).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -143,25 +150,27 @@ export default {
       },
       {
         'action': function () {
-          console.log($this.key)
+          $this.editor += `Checking my balance in reason....\n`
           $this.$Logos.account($this.key).reasonBalance().then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': []
       },
       {
         'action': function () {
+          $this.editor += `Checking my balance in logos....\n`
           $this.$Logos.account($this.key).logosBalance().then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': []
       },
       {
         'action': function () {
+          $this.editor += `Retreiving the sum of transactions in my account....\n`
           $this.$Logos.account($this.key).blockCount().then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': []
@@ -169,8 +178,9 @@ export default {
       {
         'action': function (params) {
           let count = params[0].value
+          $this.editor += `Retreiving the last ${count} transactions in my account....\n`
           $this.$Logos.account($this.key).history(count).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -183,16 +193,18 @@ export default {
       },
       {
         'action': function () {
+          $this.editor += `Retreiving the account info of my account....\n`
           $this.$Logos.account($this.key).info().then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': []
       },
       {
         'action': function () {
+          $this.editor += `Retreiving the public key for my account....\n`
           $this.$Logos.account($this.key).publicKey().then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': []
@@ -201,8 +213,9 @@ export default {
         'action': function (params) {
           let count = params[0].value
           let details = params[1].value
+          $this.editor += `Retreiving the ledger of my account up to ${count} transactions....\n`
           $this.$Logos.account($this.key).ledger(count, details).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -215,16 +228,18 @@ export default {
       },
       {
         'action': function () {
+          $this.editor += `Retreiving the representative of my account....\n`
           $this.$Logos.account($this.key).representative().then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': []
       },
       {
         'action': function () {
+          $this.editor += `Retreiving the weight of my account....\n`
           $this.$Logos.account($this.key).weight().then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': []
@@ -234,8 +249,10 @@ export default {
     const accountsOptions = [
       {
         'action': function (params) {
-          $this.$Logos.accounts.get(params[0].value).then((val) => {
-            console.log(val)
+          let publicKey = params[0].value
+          $this.editor += `Fetching the account id for ${publicKey}....\n`
+          $this.$Logos.accounts.get(publicKey).then((val) => {
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -248,8 +265,10 @@ export default {
       },
       {
         'action': function (params) {
-          $this.$Logos.accounts.reasonBalance(params[0].value).then((val) => {
-            console.log(val)
+          let accountId = params[0].value
+          $this.editor += `Checking reason balance for account id ${accountId}....\n`
+          $this.$Logos.accounts.reasonBalance(accountId).then((val) => {
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -262,8 +281,10 @@ export default {
       },
       {
         'action': function (params) {
-          $this.$Logos.accounts.logosBalance(params[0].value).then((val) => {
-            console.log(val)
+          let accountId = params[0].value
+          $this.editor += `Checking logos balance for account id ${accountId}....\n`
+          $this.$Logos.accounts.logosBalance(accountId).then((val) => {
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -277,8 +298,9 @@ export default {
       {
         'action': function (params) {
           let tarAccounts = params[0].value.split(',')
+          $this.editor += `Checking balances for accounts ${tarAccounts}....\n`
           $this.$Logos.accounts.balances(tarAccounts).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -291,8 +313,11 @@ export default {
       },
       {
         'action': function (params) {
+          let accountId = params[0].value
+          let count = params[1].value
+          $this.editor += `Checking last ${count} transactions for account ${accountId}....\n`
           $this.$Logos.accounts.history(params[0].value, params[1].value).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -310,8 +335,10 @@ export default {
       },
       {
         'action': function (params) {
+          let accountId = params[0].value
+          $this.editor += `Getting info for account ${accountId}....\n`
           $this.$Logos.accounts.info(params[0].value).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -324,8 +351,10 @@ export default {
       },
       {
         'action': function (params) {
-          $this.$Logos.accounts.key(params[0].value).then((val) => {
-            console.log(val)
+          let accountId = params[0].value
+          $this.editor += `Getting public key for account ${accountId}....\n`
+          $this.$Logos.accounts.key(accountId).then((val) => {
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -338,11 +367,12 @@ export default {
       },
       {
         'action': function (params) {
-          let account = params[0].value
+          let accountId = params[0].value
           let count = params[1].value
           let details = params[2].value
-          $this.$Logos.accounts.ledger(account, count, details).then((val) => {
-            console.log(val)
+          $this.editor += `Getting ledger for account ${accountId} for the last ${count} transactions....\n`
+          $this.$Logos.accounts.ledger(accountId, count, details).then((val) => {
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -366,9 +396,10 @@ export default {
       },
       {
         'action': function (params) {
-          let account = params[0].value
-          $this.$Logos.accounts.representative(account).then((val) => {
-            console.log(val)
+          let accountId = params[0].value
+          $this.editor += `Getting representative for account ${accountId}....\n`
+          $this.$Logos.accounts.representative(accountId).then((val) => {
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -381,9 +412,10 @@ export default {
       },
       {
         'action': function (params) {
-          let account = params[0].value
-          $this.$Logos.accounts.weight(account).then((val) => {
-            console.log(val)
+          let accountId = params[0].value
+          $this.editor += `Getting weight for account ${accountId}....\n`
+          $this.$Logos.accounts.weight(accountId).then((val) => {
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -411,8 +443,9 @@ export default {
     const keyOptions = [
       {
         'action': function (params) {
+          $this.editor += `Creating a new keypair....\n`
           $this.$Logos.key.create().then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': []
@@ -420,8 +453,9 @@ export default {
       {
         'action': function (params) {
           let privateKey = params[0].value
+          $this.editor += `Expanding the private key ${privateKey} into a keypair....\n`
           $this.$Logos.key.expand(privateKey).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -442,8 +476,9 @@ export default {
       {
         'action': function (params) {
           let hash = params[0].value
+          $this.editor += `Generating work for ${hash}....\n`
           $this.$Logos.work.generate(hash).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -458,8 +493,9 @@ export default {
         'action': function (params) {
           let work = params[0].value
           let hash = params[1].value
+          $this.editor += `Validating the work ${work} for the hash ${hash}....\n`
           $this.$Logos.work.validate(work, hash).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -485,8 +521,9 @@ export default {
       {
         'action': function (params) {
           let hash = params[0].value
+          $this.editor += `Fetching account who published the transaction with the hash ${hash}....\n`
           $this.$Logos.blocks.account(hash).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -500,8 +537,9 @@ export default {
       {
         'action': function (params) {
           let type = params[0].value
+          $this.editor += `Fetching transaction counts....\n`
           $this.$Logos.blocks.count(type).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -517,8 +555,9 @@ export default {
         'action': function (params) {
           let hash = params[0].value
           let count = params[1].value
+          $this.editor += `Fetching ${count} predecessors to the transaciton ${hash}....\n`
           $this.$Logos.blocks.chain(hash, count).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -538,8 +577,9 @@ export default {
         'action': function (params) {
           let hash = params[0].value
           let count = params[1].value
+          $this.editor += `Fetching ${count} sucessors to the transaciton ${hash}....\n`
           $this.$Logos.blocks.history(hash, count).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -558,8 +598,9 @@ export default {
       {
         'action': function (params) {
           let hash = params[0].value.split(',')
+          $this.editor += `Fetching transacitons of ${hash}....\n`
           $this.$Logos.blocks.info(hash).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -579,8 +620,9 @@ export default {
       {
         'action': function (params) {
           let block = params[0].value
+          $this.editor += `Creating a send transaciton \n ${JSON.stringify(block)} \n`
           $this.$Logos.blocks.createSend(block).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -594,8 +636,9 @@ export default {
       {
         'action': function (params) {
           let block = params[0].value
+          $this.editor += `Creating a change transaciton \n ${JSON.stringify(block)} \n`
           $this.$Logos.blocks.createChange(block).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -609,8 +652,9 @@ export default {
       {
         'action': function (params) {
           let block = params[0].value
+          $this.editor += `Publishing a transaciton \n ${JSON.stringify(block)} \n`
           $this.$Logos.blocks.publish(block).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -636,16 +680,18 @@ export default {
     const otherOptions = [
       {
         'action': function () {
+          $this.editor += `Fetching total amount of Logos....\n`
           $this.$Logos.available().then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': []
       },
       {
         'action': function () {
+          $this.editor += `Fetching top representatives....\n`
           $this.$Logos.representatives().then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': []
@@ -654,8 +700,10 @@ export default {
         'action': function (params) {
           let seed = params[0].value
           let index = params[1].value
+          $this.editor += `Generating the ${index} index keypair to ${seed}....\n`
+
           $this.$Logos.deterministicKey(seed, index).then((val) => {
-            console.log(val)
+            $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
@@ -699,6 +747,7 @@ export default {
     return {
       key: null,
       options: options,
+      editor: '',
       labels: labels,
       selectedAccount: 0,
       selectedAccounts: 0,
@@ -714,5 +763,9 @@ export default {
 <style scoped lang="scss">
     .nav-link {
         color:#6b7c93;
+    }
+    #editor {
+      max-height: 400px;
+      overflow-y: scroll
     }
 </style>

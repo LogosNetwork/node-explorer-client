@@ -13,6 +13,7 @@
     "logos-rpc-client": "git+https://github.com/LogosNetwork/rpc-client.git",
     "vue": "^2.5.17",
     "vue-awesome": "^3.1.2",
+    "vue-codemirror": "^4.0.5",
     "vue-headful": "^2.0.1",
     "vue-i18n": "^8.0.0",
     "vue-router": "^3.0.1",
