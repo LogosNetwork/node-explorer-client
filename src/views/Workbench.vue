@@ -116,7 +116,7 @@ export default {
           let address = params[1].value
           $this.editor += `Sending ${nanoAmount} to ${address}....\n`
           $this.$Logos.account($this.key).send(nanoAmount, address).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -137,7 +137,7 @@ export default {
           let representative = params[0].value
           $this.editor += `Changing Represenative to ${representative}....\n`
           $this.$Logos.account($this.key).change(representative).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -152,7 +152,7 @@ export default {
         'action': function () {
           $this.editor += `Checking my balance in reason....\n`
           $this.$Logos.account($this.key).reasonBalance().then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': []
@@ -161,7 +161,7 @@ export default {
         'action': function () {
           $this.editor += `Checking my balance in logos....\n`
           $this.$Logos.account($this.key).logosBalance().then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': []
@@ -170,7 +170,7 @@ export default {
         'action': function () {
           $this.editor += `Retreiving the sum of transactions in my account....\n`
           $this.$Logos.account($this.key).blockCount().then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': []
@@ -180,7 +180,7 @@ export default {
           let count = params[0].value
           $this.editor += `Retreiving the last ${count} transactions in my account....\n`
           $this.$Logos.account($this.key).history(count).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -195,7 +195,7 @@ export default {
         'action': function () {
           $this.editor += `Retreiving the account info of my account....\n`
           $this.$Logos.account($this.key).info().then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': []
@@ -204,7 +204,7 @@ export default {
         'action': function () {
           $this.editor += `Retreiving the public key for my account....\n`
           $this.$Logos.account($this.key).publicKey().then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': []
@@ -215,7 +215,7 @@ export default {
           let details = params[1].value
           $this.editor += `Retreiving the ledger of my account up to ${count} transactions....\n`
           $this.$Logos.account($this.key).ledger(count, details).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -230,7 +230,7 @@ export default {
         'action': function () {
           $this.editor += `Retreiving the representative of my account....\n`
           $this.$Logos.account($this.key).representative().then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': []
@@ -239,7 +239,7 @@ export default {
         'action': function () {
           $this.editor += `Retreiving the weight of my account....\n`
           $this.$Logos.account($this.key).weight().then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': []
@@ -252,7 +252,7 @@ export default {
           let publicKey = params[0].value
           $this.editor += `Fetching the account id for ${publicKey}....\n`
           $this.$Logos.accounts.get(publicKey).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -268,7 +268,7 @@ export default {
           let accountId = params[0].value
           $this.editor += `Checking reason balance for account id ${accountId}....\n`
           $this.$Logos.accounts.reasonBalance(accountId).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -284,7 +284,7 @@ export default {
           let accountId = params[0].value
           $this.editor += `Checking logos balance for account id ${accountId}....\n`
           $this.$Logos.accounts.logosBalance(accountId).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -300,7 +300,7 @@ export default {
           let tarAccounts = params[0].value.split(',')
           $this.editor += `Checking balances for accounts ${tarAccounts}....\n`
           $this.$Logos.accounts.balances(tarAccounts).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -317,7 +317,7 @@ export default {
           let count = params[1].value
           $this.editor += `Checking last ${count} transactions for account ${accountId}....\n`
           $this.$Logos.accounts.history(params[0].value, params[1].value).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -338,7 +338,7 @@ export default {
           let accountId = params[0].value
           $this.editor += `Getting info for account ${accountId}....\n`
           $this.$Logos.accounts.info(params[0].value).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -354,7 +354,7 @@ export default {
           let accountId = params[0].value
           $this.editor += `Getting public key for account ${accountId}....\n`
           $this.$Logos.accounts.key(accountId).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -372,7 +372,7 @@ export default {
           let details = params[2].value
           $this.editor += `Getting ledger for account ${accountId} for the last ${count} transactions....\n`
           $this.$Logos.accounts.ledger(accountId, count, details).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -399,7 +399,7 @@ export default {
           let accountId = params[0].value
           $this.editor += `Getting representative for account ${accountId}....\n`
           $this.$Logos.accounts.representative(accountId).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -415,7 +415,7 @@ export default {
           let accountId = params[0].value
           $this.editor += `Getting weight for account ${accountId}....\n`
           $this.$Logos.accounts.weight(accountId).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -445,7 +445,7 @@ export default {
         'action': function (params) {
           $this.editor += `Creating a new keypair....\n`
           $this.$Logos.key.create().then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': []
@@ -455,7 +455,7 @@ export default {
           let privateKey = params[0].value
           $this.editor += `Expanding the private key ${privateKey} into a keypair....\n`
           $this.$Logos.key.expand(privateKey).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -478,7 +478,7 @@ export default {
           let hash = params[0].value
           $this.editor += `Generating work for ${hash}....\n`
           $this.$Logos.work.generate(hash).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -495,7 +495,7 @@ export default {
           let hash = params[1].value
           $this.editor += `Validating the work ${work} for the hash ${hash}....\n`
           $this.$Logos.work.validate(work, hash).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -523,7 +523,7 @@ export default {
           let hash = params[0].value
           $this.editor += `Fetching account who published the transaction with the hash ${hash}....\n`
           $this.$Logos.blocks.account(hash).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -539,7 +539,7 @@ export default {
           let type = params[0].value
           $this.editor += `Fetching transaction counts....\n`
           $this.$Logos.blocks.count(type).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -557,7 +557,7 @@ export default {
           let count = params[1].value
           $this.editor += `Fetching ${count} predecessors to the transaciton ${hash}....\n`
           $this.$Logos.blocks.chain(hash, count).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -579,7 +579,7 @@ export default {
           let count = params[1].value
           $this.editor += `Fetching ${count} sucessors to the transaciton ${hash}....\n`
           $this.$Logos.blocks.history(hash, count).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -600,7 +600,7 @@ export default {
           let hash = params[0].value.split(',')
           $this.editor += `Fetching transacitons of ${hash}....\n`
           $this.$Logos.blocks.info(hash).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -622,7 +622,7 @@ export default {
           let transaction = params[0].value
           $this.editor += `Creating a send transaciton \n ${JSON.stringify(transaction)} \n`
           $this.$Logos.blocks.createSend(transaction).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -638,7 +638,7 @@ export default {
           let transaction = params[0].value
           $this.editor += `Creating a change transaciton \n ${JSON.stringify(transaction)} \n`
           $this.$Logos.blocks.createChange(transaction).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -654,7 +654,7 @@ export default {
           let transaction = params[0].value
           $this.editor += `Publishing a transaciton \n ${JSON.stringify(transaction)} \n`
           $this.$Logos.blocks.publish(transaction).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -682,7 +682,7 @@ export default {
         'action': function () {
           $this.editor += `Fetching total amount of Logos....\n`
           $this.$Logos.available().then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': []
@@ -691,7 +691,7 @@ export default {
         'action': function () {
           $this.editor += `Fetching top representatives....\n`
           $this.$Logos.representatives().then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': []
@@ -703,7 +703,7 @@ export default {
           $this.editor += `Generating the ${index} index keypair to ${seed}....\n`
 
           $this.$Logos.deterministicKey(seed, index).then((val) => {
-            $this.editor += JSON.stringify(val) + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
