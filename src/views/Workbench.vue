@@ -620,38 +620,6 @@ export default {
       {
         'action': function (params) {
           let transaction = params[0].value
-          $this.editor += `Creating a send transaciton \n ${JSON.stringify(transaction)} \n`
-          $this.$Logos.blocks.createSend(transaction).then((val) => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-          })
-        },
-        'params': [
-          {
-            'name': 'sendTransaction',
-            'label': `JSON representation of the send transaction`,
-            'required': true
-          }
-        ]
-      },
-      {
-        'action': function (params) {
-          let transaction = params[0].value
-          $this.editor += `Creating a change transaciton \n ${JSON.stringify(transaction)} \n`
-          $this.$Logos.blocks.createChange(transaction).then((val) => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-          })
-        },
-        'params': [
-          {
-            'name': 'changeTransaction',
-            'label': `JSON representation of the change transaction`,
-            'required': true
-          }
-        ]
-      },
-      {
-        'action': function (params) {
-          let transaction = params[0].value
           $this.editor += `Publishing a transaciton \n ${JSON.stringify(transaction)} \n`
           $this.$Logos.blocks.publish(transaction).then((val) => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
@@ -666,15 +634,32 @@ export default {
         ]
       }
     ]
+    /*
+      | Field Name |Size| Description |
+      | --- | -------------| ----------------- |
+      | Version | 1 - Byte| Logos Core Protocol version|
+      | Message Type| 1 - Byte| Type of message|
+      | Account  | 32-Byte | Account address |
+      | Sequence Number  | 4-Byte | Number of sends, increment only |
+      | Previous | 32-Byte | Previous head block on account|
+      | Number of transactions | 1-Byte | 1-8|
+      | Target Address [0] | 32-Byte | Multipurpose Field, up to an array of 8 addresses; <br/>See Table below for additional clarification<br/>Must have the same number of elements as transaction amount |
+      | Transaction Amount [0]   | 16-Byte | Amount to send, up to an array of 8 elements. 0 if *change rep* <br/>Must have the same number of elements as target address |
+      |...|
+      | Target Address [7] | 32-Byte | Multipurpose Field, up to an array of 8 addresses; <br/>See Table below for additional clarification<br/>Must have the same number of elements as transaction amount |
+      | Transaction Amount [7]   | 16-Byte | Amount to send, up to an array of 8 elements. <br/>Must have the same number of elements as target address |
+      | Transaction Fee | 8 - Byte| Transaction Fee for this transaction|
+      | Signature | 64 - Byte | EdDSA signature |
+      | Work      | 8-Byte  |Proof of Work Nonce |
+    */
+
     const transactionLabels = [
       { value: 0, text: 'Lookup account by transaction' },
       { value: 1, text: 'Get number of transactions' },
       { value: 2, text: 'Retrieve chain up to transaction' },
       { value: 3, text: 'Retrieve chain after a transaction' },
       { value: 4, text: 'Transaction Info' },
-      { value: 5, text: 'Create Send' },
-      { value: 6, text: 'Create Change' },
-      { value: 7, text: 'Publish transaction' }
+      { value: 5, text: 'Publish transaction' }
     ]
 
     const otherOptions = [
