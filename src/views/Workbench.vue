@@ -49,9 +49,9 @@
                     </div>
                     <b-button class="float-right mb-3" variant="primary" v-on:click="options[3][selectedWork].action(options[3][selectedWork].params)">Execute</b-button>
                 </b-tab>
-                <b-tab title="Blocks">
-                    <b-form-select v-model="selectedBlocks" :options="labels[4]" class="mb-5" />
-                    <div class="text-left" v-for="(param, index) in options[4][selectedBlocks].params" :key="index">
+                <b-tab title="Transactions">
+                    <b-form-select v-model="selectedTransactions" :options="labels[4]" class="mb-5" />
+                    <div class="text-left" v-for="(param, index) in options[4][selectedTransactions].params" :key="index">
                         <p v-if="!param.type || param.type === 'text'" class="card-text text-left">{{param.label}}
                             {{param.type}}
                             <b-input :placeholder="param.name" v-model="param.value" class="mb-3" />
@@ -63,7 +63,7 @@
                             {{param.label}}
                         </b-form-checkbox>
                     </div>
-                    <b-button class="float-right mb-3" variant="primary" v-on:click="options[4][selectedBlocks].action(options[4][selectedBlocks].params)">Execute</b-button>
+                    <b-button class="float-right mb-3" variant="primary" v-on:click="options[4][selectedTransactions].action(options[4][selectedTransactions].params)">Execute</b-button>
                 </b-tab>
                 <b-tab title="Other">
                     <b-form-select v-model="selectedOther" :options="labels[5]" class="mb-5" />
@@ -101,7 +101,7 @@ export default {
       { value: 1, text: 'Change Representative' },
       { value: 2, text: 'Check balance in Reason' },
       { value: 3, text: 'Check balance in Logos' },
-      { value: 4, text: 'Lookup total block count' },
+      { value: 4, text: 'Lookup total transaction count' },
       { value: 5, text: 'Pull account history' },
       { value: 6, text: 'Info' },
       { value: 7, text: 'Lookup Public Key' },
@@ -186,7 +186,7 @@ export default {
         'params': [
           {
             'name': 'count',
-            'label': `The number of blocks you want to fetch`,
+            'label': `The number of transactions you want to fetch`,
             'required': false
           }
         ]
@@ -221,7 +221,7 @@ export default {
         'params': [
           {
             'name': 'count',
-            'label': `The number of blocks you want to fetch`,
+            'label': `The number of transactions you want to fetch`,
             'required': false
           }
         ]
@@ -328,7 +328,7 @@ export default {
           },
           {
             'name': 'count',
-            'label': `Number of blocks you wish to see`,
+            'label': `Number of transactions you wish to see`,
             'required': true
           }
         ]
@@ -383,13 +383,13 @@ export default {
           },
           {
             'name': 'count',
-            'label': `Number of blocks to retrieve`,
+            'label': `Number of transactions to retrieve`,
             'required': false
           },
           {
             'name': 'details',
             'type': 'boolean',
-            'label': `Show full block details`,
+            'label': `Show full transaction details`,
             'required': false
           }
         ]
@@ -484,7 +484,7 @@ export default {
         'params': [
           {
             'name': 'hash',
-            'label': `Hash of the block you are requesting work for`,
+            'label': `Hash of the transaction you are requesting work for`,
             'required': true
           }
         ]
@@ -506,7 +506,7 @@ export default {
           },
           {
             'name': 'hash',
-            'label': `Hash of the block you are checking the work for`,
+            'label': `Hash of the transaction you are checking the work for`,
             'required': true
           }
         ]
@@ -517,7 +517,7 @@ export default {
       { value: 1, text: 'Validate work' }
     ]
 
-    const blockOptions = [
+    const transactionOptions = [
       {
         'action': function (params) {
           let hash = params[0].value
@@ -529,7 +529,7 @@ export default {
         'params': [
           {
             'name': 'hash',
-            'label': `Hash of the block you want to know who published`,
+            'label': `Hash of the transaction you want to know who published`,
             'required': true
           }
         ]
@@ -546,7 +546,7 @@ export default {
           {
             'name': 'hash',
             'type': `boolean`,
-            'label': `Split block count by block type`,
+            'label': `Split transaction count by transaction type`,
             'required': true
           }
         ]
@@ -563,7 +563,7 @@ export default {
         'params': [
           {
             'name': 'hash',
-            'label': `Hash of the block you want to know the predecessors to`,
+            'label': `Hash of the transaction you want to know the predecessors to`,
             'required': true
           },
           {
@@ -585,7 +585,7 @@ export default {
         'params': [
           {
             'name': 'hash',
-            'label': `Hash of the block you want to know the successors to`,
+            'label': `Hash of the transaction you want to know the successors to`,
             'required': true
           },
           {
@@ -606,75 +606,75 @@ export default {
         'params': [
           {
             'name': 'hash',
-            'label': `Comma seperated Hashes of the blocks you want to know about`,
+            'label': `Comma seperated Hashes of the transactions you want to know about`,
             'required': true
           },
           {
             'name': 'details',
             'type': 'boolean',
-            'label': `Show full block details`,
+            'label': `Show full transaction details`,
             'required': false
           }
         ]
       },
       {
         'action': function (params) {
-          let block = params[0].value
-          $this.editor += `Creating a send transaciton \n ${JSON.stringify(block)} \n`
-          $this.$Logos.blocks.createSend(block).then((val) => {
+          let transaction = params[0].value
+          $this.editor += `Creating a send transaciton \n ${JSON.stringify(transaction)} \n`
+          $this.$Logos.blocks.createSend(transaction).then((val) => {
             $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
           {
-            'name': 'sendBlock',
-            'label': `JSON representation of the send block`,
+            'name': 'sendTransaction',
+            'label': `JSON representation of the send transaction`,
             'required': true
           }
         ]
       },
       {
         'action': function (params) {
-          let block = params[0].value
-          $this.editor += `Creating a change transaciton \n ${JSON.stringify(block)} \n`
-          $this.$Logos.blocks.createChange(block).then((val) => {
+          let transaction = params[0].value
+          $this.editor += `Creating a change transaciton \n ${JSON.stringify(transaction)} \n`
+          $this.$Logos.blocks.createChange(transaction).then((val) => {
             $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
           {
-            'name': 'changeBlock',
-            'label': `JSON representation of the change block`,
+            'name': 'changeTransaction',
+            'label': `JSON representation of the change transaction`,
             'required': true
           }
         ]
       },
       {
         'action': function (params) {
-          let block = params[0].value
-          $this.editor += `Publishing a transaciton \n ${JSON.stringify(block)} \n`
-          $this.$Logos.blocks.publish(block).then((val) => {
+          let transaction = params[0].value
+          $this.editor += `Publishing a transaciton \n ${JSON.stringify(transaction)} \n`
+          $this.$Logos.blocks.publish(transaction).then((val) => {
             $this.editor += JSON.stringify(val) + '\n\n'
           })
         },
         'params': [
           {
-            'name': 'block',
-            'label': `JSON representation of the block you want broadcasted`,
+            'name': 'transaction',
+            'label': `JSON representation of the transaction you want broadcasted`,
             'required': true
           }
         ]
       }
     ]
-    const blockLabels = [
-      { value: 0, text: 'Lookup account by block' },
-      { value: 1, text: 'Get number of blocks' },
-      { value: 2, text: 'Retrieve chain up to block' },
-      { value: 3, text: 'Retrieve chain after a block' },
-      { value: 4, text: 'Block Info' },
+    const transactionLabels = [
+      { value: 0, text: 'Lookup account by transaction' },
+      { value: 1, text: 'Get number of transactions' },
+      { value: 2, text: 'Retrieve chain up to transaction' },
+      { value: 3, text: 'Retrieve chain after a transaction' },
+      { value: 4, text: 'Transaction Info' },
       { value: 5, text: 'Create Send' },
       { value: 6, text: 'Create Change' },
-      { value: 7, text: 'Publish Block' }
+      { value: 7, text: 'Publish transaction' }
     ]
 
     const otherOptions = [
@@ -731,7 +731,7 @@ export default {
       accountsOptions,
       keyOptions,
       workOptions,
-      blockOptions,
+      transactionOptions,
       otherOptions
     ]
 
@@ -740,7 +740,7 @@ export default {
       accountsLabels,
       keyLabels,
       workLabels,
-      blockLabels,
+      transactionLabels,
       otherLabels
     ]
 
@@ -753,7 +753,7 @@ export default {
       selectedAccounts: 0,
       selectedKeys: 0,
       selectedWork: 0,
-      selectedBlocks: 0,
+      selectedTransactions: 0,
       selectedOther: 0
     }
   }
