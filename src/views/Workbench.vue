@@ -5,7 +5,7 @@
         <b-card no-body>
             <b-tabs pills card vertical>
                 <b-tab title="My Account" active>
-                    <p class="card-text">Private Key is required for account actions</p>
+                    <p class="card-text text-left">Private Key is required for account actions</p>
                     <b-input id="pkey" placeholder="Private Key" v-model="key" class="mb-3" />
                     <b-form-select v-model="selectedAccount" :options="labels[0]" class="mb-5" />
                     <div v-for="(param, index) in options[0][selectedAccount].params" :key="index">
@@ -52,16 +52,16 @@
                 <b-tab title="Transactions">
                     <b-form-select v-model="selectedTransactions" :options="labels[4]" class="mb-5" />
                     <div class="text-left" v-for="(param, index) in options[4][selectedTransactions].params" :key="index">
-                        <p v-if="!param.type || param.type === 'text'" class="card-text text-left">{{param.label}}
-                            {{param.type}}
-                            <b-input :placeholder="param.name" v-model="param.value" class="mb-3" />
-                        </p>
-                        <b-form-checkbox v-if="param.type && param.type === 'boolean'"
-                            v-model="param.value"
-                            value="true"
-                            unchecked-value="false">
-                            {{param.label}}
-                        </b-form-checkbox>
+                      <p v-if="!param.type || param.type === 'text'" class="card-text text-left">{{param.label}}
+                          {{param.type}}
+                          <b-input :placeholder="param.name" v-model="param.value" class="mb-3" />
+                      </p>
+                      <b-form-checkbox v-if="param.type && param.type === 'boolean'"
+                          v-model="param.value"
+                          value="true"
+                          unchecked-value="false">
+                          {{param.label}}
+                      </b-form-checkbox>
                     </div>
                     <b-button class="float-right mb-3" variant="primary" v-on:click="options[4][selectedTransactions].action(options[4][selectedTransactions].params)">Execute</b-button>
                 </b-tab>
@@ -621,38 +621,67 @@ export default {
       },
       {
         'action': function (params) {
-          let transaction = params[0].value
-          $this.editor += `Publishing a transaciton \n ${JSON.stringify(transaction)} \n`
-          $this.$Logos.blocks.publish(transaction).then((val) => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+          let wallet = new $this.Wallet()
+          let blk = new $this.Block()
+          let recipientAddress = params[0].value
+          let amount = params[1].value
+          let publicKey = null
+          let accountId = null
+          let lastHash = null
+          $this.editor += `Retreiving the public key for my account....\n`
+          $this.$Logos.account($this.key).publicKey().then((val) => {
+            publicKey = val.key
+            $this.editor += `Fetching the account id for ${publicKey}....\n`
+            $this.$Logos.accounts.get(publicKey).then((val) => {
+              $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+              accountId = val.account
+              $this.editor += `Retreiving the account info of my account....\n`
+              $this.$Logos.account($this.key).info().then((val) => {
+                $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+                lastHash = val.frontier
+                blk.setSendParameters(lastHash, recipientAddress, amount)
+                blk.build()
+                blk.setSignature($this.LogosFunctions.uint8_hex(wallet.sign(blk, $this.key)))
+                blk.setAccount(accountId)
+                blk.setWork('0000000000000000') // TODO
+                let transaction = blk.getJSONBlock()
+                $this.editor += `Publishing a transaction \n ${JSON.stringify(transaction)} \n`
+                $this.$Logos.blocks.publish(transaction).then((val) => {
+                  $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+                })
+              })
+            })
           })
         },
         'params': [
           {
             'name': 'amount',
-            'label': `Amount you want to send in Logos`,
+            'label': `Transaction Amount you want to send in RAW`,
             'required': true
           },
           {
-            'name': 'amount',
-            'label': `Amount you want to send in Logos`,
-            'required': true
-          },
-          {
-            'name': 'intent',
-            'label': 'Type of Block',
-            'options': [
-              'send',
-              'recieve'
-            ],
-            'type': 'select'
-          },
-          {
-            'name': 'privateKey',
-            'label': `Private Key`,
+            'name': 'destination',
+            'label': `Target Address`,
             'required': true
           }
-
+        ]
+      },
+      {
+        'action': function (params) {
+          // TODO
+        },
+        'params': [
+          {
+            'name': 'hash',
+            'label': `Comma seperated Hashes of the transactions you want to know about`,
+            'required': true
+          },
+          {
+            'name': 'details',
+            'type': 'boolean',
+            'label': `Show full transaction details`,
+            'required': false
+          }
         ]
       }
     ]
@@ -678,7 +707,8 @@ export default {
       { value: 2, text: 'Retrieve chain up to transaction' },
       { value: 3, text: 'Retrieve chain after a transaction' },
       { value: 4, text: 'Transaction Info' },
-      { value: 5, text: 'Publish transaction' }
+      { value: 5, text: 'Publish Send Transaction' },
+      { value: 6, text: 'Publish Change Transaction' }
     ]
 
     const otherOptions = [
