@@ -11,6 +11,7 @@
     "bootstrap-vue": "^2.0.0-rc.11",
     "compression-webpack-plugin": "^2.0.0",
     "logos-rpc-client": "git+https://github.com/LogosNetwork/rpc-client.git",
+    "logos-webwallet-sdk": "git+https://github.com/LogosNetwork/logos-webwallet-sdk.git",
     "vue": "^2.5.17",
     "vue-awesome": "^3.1.2",
     "vue-codemirror": "^4.0.5",

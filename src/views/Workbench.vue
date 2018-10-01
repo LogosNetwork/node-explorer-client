@@ -85,9 +85,11 @@
 <script>
 
 import Vue from 'vue'
-import Logos from '../vue-logos'
+import Logos from '../logosPackages/rpc'
+import LogosWallet from '../logosPackages/wallet'
 import codepad from '@/components/codepad.vue'
 Vue.use(Logos, { url: 'http://52.215.106.54:55000', debug: true })
+Vue.use(LogosWallet)
 
 export default {
   name: 'workbench',
@@ -627,10 +629,30 @@ export default {
         },
         'params': [
           {
-            'name': 'transaction',
-            'label': `JSON representation of the transaction you want broadcasted`,
+            'name': 'amount',
+            'label': `Amount you want to send in Logos`,
+            'required': true
+          },
+          {
+            'name': 'amount',
+            'label': `Amount you want to send in Logos`,
+            'required': true
+          },
+          {
+            'name': 'intent',
+            'label': 'Type of Block',
+            'options': [
+              'send',
+              'recieve'
+            ],
+            'type': 'select'
+          },
+          {
+            'name': 'privateKey',
+            'label': `Private Key`,
             'required': true
           }
+
         ]
       }
     ]
@@ -645,12 +667,9 @@ export default {
       | Number of transactions | 1-Byte | 1-8|
       | Target Address [0] | 32-Byte | Multipurpose Field, up to an array of 8 addresses; <br/>See Table below for additional clarification<br/>Must have the same number of elements as transaction amount |
       | Transaction Amount [0]   | 16-Byte | Amount to send, up to an array of 8 elements. 0 if *change rep* <br/>Must have the same number of elements as target address |
-      |...|
-      | Target Address [7] | 32-Byte | Multipurpose Field, up to an array of 8 addresses; <br/>See Table below for additional clarification<br/>Must have the same number of elements as transaction amount |
-      | Transaction Amount [7]   | 16-Byte | Amount to send, up to an array of 8 elements. <br/>Must have the same number of elements as target address |
-      | Transaction Fee | 8 - Byte| Transaction Fee for this transaction|
       | Signature | 64 - Byte | EdDSA signature |
       | Work      | 8-Byte  |Proof of Work Nonce |
+      | Type      | Send or Change  | What is this transaction |
     */
 
     const transactionLabels = [
