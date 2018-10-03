@@ -621,39 +621,56 @@ export default {
       },
       {
         'action': function (params) {
-          let wallet = new $this.Wallet()
-          let blk = new $this.Block()
-          let recipientAddress = params[0].value
+          let wallet = new $this.$Wallet()
+          let blk = new $this.$Block()
+          let pk = params[0].value
           let amount = params[1].value
+          let recipientAddress = params[2].value
           let publicKey = null
           let accountId = null
           let lastHash = null
           $this.editor += `Retreiving the public key for my account....\n`
-          $this.$Logos.account($this.key).publicKey().then((val) => {
+          $this.$Logos.account(pk).publicKey().then((val) => {
             publicKey = val.key
             $this.editor += `Fetching the account id for ${publicKey}....\n`
             $this.$Logos.accounts.get(publicKey).then((val) => {
               $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
               accountId = val.account
               $this.editor += `Retreiving the account info of my account....\n`
-              $this.$Logos.account($this.key).info().then((val) => {
+              $this.$Logos.account(pk).info().then((val) => {
                 $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
                 lastHash = val.frontier
                 blk.setSendParameters(lastHash, recipientAddress, amount)
-                blk.build()
-                blk.setSignature($this.LogosFunctions.uint8_hex(wallet.sign(blk, $this.key)))
                 blk.setAccount(accountId)
-                blk.setWork('0000000000000000') // TODO
-                let transaction = blk.getJSONBlock()
-                $this.editor += `Publishing a transaction \n ${JSON.stringify(transaction)} \n`
-                $this.$Logos.blocks.publish(transaction).then((val) => {
+                if (val.representative_block) {
+                  blk.setRepresentative(val.representative_block)
+                } else {
+                  blk.setRepresentative(accountId)
+                }
+                blk.build()
+                let hash = blk.getHash()
+                let uint8PK = $this.$LogosFunctions.hex_uint8(pk)
+                blk.setSignature($this.$LogosFunctions.uint8_hex(wallet.sign(hash, uint8PK)))
+                $this.editor += `Generating work for ${lastHash}....\n`
+                $this.$Logos.work.generate(lastHash).then((val) => {
                   $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+                  blk.setWork(val.work)
+                  let transaction = blk.getJSONBlock()
+                  $this.editor += `Publishing a transaction \n ${JSON.stringify(transaction, null, ' ')} \n`
+                  $this.$Logos.blocks.publish(transaction).then((val) => {
+                    $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+                  })
                 })
               })
             })
           })
         },
         'params': [
+          {
+            'name': 'privateKey',
+            'label': `Private Key used to sign the message`,
+            'required': true
+          },
           {
             'name': 'amount',
             'label': `Transaction Amount you want to send in RAW`,
