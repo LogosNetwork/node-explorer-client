@@ -33,9 +33,10 @@ export default new Router({
       component: Workbench
     },
     {
-      path: '/:address(xrb_[13456789abcdefghijkmnopqrstuwxyz]{60}|lgs_[13456789abcdefghijkmnopqrstuwxyz]{60})',
+      path: '/:account(xrb_[13456789abcdefghijkmnopqrstuwxyz]{60}|lgs_[13456789abcdefghijkmnopqrstuwxyz]{60})',
       name: 'account',
-      component: Account
+      component: Account,
+      props: true
     }
   ],
   scrollBehavior (to, from, savedPosition) {
