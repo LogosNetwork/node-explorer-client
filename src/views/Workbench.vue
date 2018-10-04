@@ -2,6 +2,7 @@
   <div id="primary">
     <b-container class="pt-5">
         <h5 class="text-left" v-t="'build_api_cta'"></h5>
+        <b-input placeholder="http://52.215.106.54:55000" v-model="nodeURL" class="mb-3" />
         <b-card no-body>
             <b-tabs pills card vertical>
                 <b-tab title="My Account" active>
@@ -794,6 +795,7 @@ export default {
       key: null,
       options: options,
       editor: '',
+      nodeURL: 'http://52.215.106.54:55000',
       labels: labels,
       selectedAccount: 0,
       selectedAccounts: 0,
@@ -801,6 +803,11 @@ export default {
       selectedWork: 0,
       selectedTransactions: 0,
       selectedOther: 0
+    }
+  },
+  watch: {
+    nodeURL: function (val) {
+      this.$Logos.changeServer(val)
     }
   }
 }
