@@ -5,7 +5,7 @@
       <h2 class="d-none d-sm-block" v-t="'explore_cta'"></h2>
       <b-form id="addressForm" class="mb-2">
         <label class="sr-only" for="address" v-t="'searchPlaceholder'"></label>
-        <b-input id="address" :placeholder="$t('searchPlaceholder')" v-model="address" />
+        <b-input @keydown.native="test_keydown_handler" id="address" :placeholder="$t('searchPlaceholder')" v-model="address" />
       </b-form>
       <b-row class="text-left pt-5">
         <b-col cols="12" md="6" class="mb-5">
@@ -103,6 +103,14 @@ export default {
       address: '',
       transactions: transactions,
       fields: fields
+    }
+  },
+  methods: {
+    test_keydown_handler (event) {
+      if (event.which === 13) {
+        event.preventDefault()
+        window.location.href = '/' + this.address
+      }
     }
   }
 }
