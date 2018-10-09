@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
+import VueMoment from 'vue-moment'
 import router from './router'
 import i18n from './i18n'
 import 'bootstrap/dist/css/bootstrap.css'
@@ -52,6 +53,7 @@ Vue.component('b-table', bTable)
 Vue.component('b-form-checkbox', bFormCheckbox)
 Vue.component('vue-headful', vueHeadful)
 Vue.component('icon', Icon)
+Vue.use(VueMoment)
 
 new Vue({
   router,

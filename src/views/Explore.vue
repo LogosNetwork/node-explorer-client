@@ -12,7 +12,7 @@
           <h5 class="text-left" v-t="'recent_transactions'"></h5>
             <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="transactions">
               <template slot="account" slot-scope="data">
-                <div class="text-truncate">{{data.item.account}}</div>
+                <div class="text-truncate"><a :href="'/'+data.item.account">{{data.item.account}}</a></div>
               </template>
               <template slot="hash" slot-scope="data">
                 <div class="text-truncate">{{data.item.hash}}</div>
@@ -82,11 +82,11 @@
 
 <script>
 let transactions = [
-  { account: 'xrb_1o5nz16jcu1inbmtdutfu9rkfmj3o5k5tqbi65wyrmh4bynee3mcbinkdtbi', hash: 'B438CB5A7C3284E054939CA3B780BA86BE8CF3EAB2777D86293CAE1A90F70934', amount: '0.000001' },
-  { account: 'xrb_1o5nz16jcu1inbmtdutfu9rkfmj3o5k5tqbi65wyrmh4bynee3mcbinkdtbi', hash: 'B438CB5A7C3284E054939CA3B780BA86BE8CF3EAB2777D86293CAE1A90F70934', amount: '0.000001' },
-  { account: 'xrb_1o5nz16jcu1inbmtdutfu9rkfmj3o5k5tqbi65wyrmh4bynee3mcbinkdtbi', hash: 'B438CB5A7C3284E054939CA3B780BA86BE8CF3EAB2777D86293CAE1A90F70934', amount: '0.000001' },
-  { account: 'xrb_1o5nz16jcu1inbmtdutfu9rkfmj3o5k5tqbi65wyrmh4bynee3mcbinkdtbi', hash: 'B438CB5A7C3284E054939CA3B780BA86BE8CF3EAB2777D86293CAE1A90F70934', amount: '0.000001' },
-  { account: 'xrb_1o5nz16jcu1inbmtdutfu9rkfmj3o5k5tqbi65wyrmh4bynee3mcbinkdtbi', hash: 'B438CB5A7C3284E054939CA3B780BA86BE8CF3EAB2777D86293CAE1A90F70934', amount: '0.000001' }
+  { account: 'lgs_3eo3ikcgw6kdhd87o3a1sbqy1mouzyx3dc81c51btngijj33ptr78fty33rk', hash: 'B438CB5A7C3284E054939CA3B780BA86BE8CF3EAB2777D86293CAE1A90F70934', amount: '0.000001' },
+  { account: 'lgs_3eo3ikcgw6kdhd87o3a1sbqy1mouzyx3dc81c51btngijj33ptr78fty33rk', hash: 'B438CB5A7C3284E054939CA3B780BA86BE8CF3EAB2777D86293CAE1A90F70934', amount: '0.000001' },
+  { account: 'lgs_3eo3ikcgw6kdhd87o3a1sbqy1mouzyx3dc81c51btngijj33ptr78fty33rk', hash: 'B438CB5A7C3284E054939CA3B780BA86BE8CF3EAB2777D86293CAE1A90F70934', amount: '0.000001' },
+  { account: 'lgs_3eo3ikcgw6kdhd87o3a1sbqy1mouzyx3dc81c51btngijj33ptr78fty33rk', hash: 'B438CB5A7C3284E054939CA3B780BA86BE8CF3EAB2777D86293CAE1A90F70934', amount: '0.000001' },
+  { account: 'lgs_3eo3ikcgw6kdhd87o3a1sbqy1mouzyx3dc81c51btngijj33ptr78fty33rk', hash: 'B438CB5A7C3284E054939CA3B780BA86BE8CF3EAB2777D86293CAE1A90F70934', amount: '0.000001' }
 ]
 
 let fields = [

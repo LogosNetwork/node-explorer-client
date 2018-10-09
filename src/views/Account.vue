@@ -3,7 +3,7 @@
     <b-container>
       <b-row class="text-left pt-5">
         <b-col cols="12" md="8" class="mb-5">
-          <h4 class="text-left" v-t="'Account'"></h4>
+          <h4 class="text-left" v-t="'account'"></h4>
           <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
           <h3 v-if="!error" class="pt-3" style="color:green">{{balance}} LOGOS</h3>
           <h4 v-if="error" class="pt-3" style="color:red">This account has not been opened yet</h4>
@@ -14,9 +14,9 @@
       </b-row>
       <b-row v-if="!error">
         <b-col cols="12" class="text-left">
-            <p>Representaive: <a :href="'/'+representaive">{{representaive}}</a></p>
-            <p>Last Transaction: <a :href="'/'+frontier">{{frontier}}</a></p>
-            <p>Last Modified: {{lastModified}}</p>
+            <p class="text-truncate">Representaive: <a :href="'/'+representaive">{{representaive}}</a></p>
+            <p class="text-truncate">Last Transaction: <a :href="'/'+frontier">{{frontier}}</a></p>
+            <p class="text-truncate">Last Modified: <span>{{ lastModified | moment("MMM Do, h:mm:ss a") }}</span></p>
             <p>Total block count: {{blockCount}}</p>
         </b-col>
       </b-row>
@@ -53,7 +53,7 @@ export default {
         })
         this.balance = val.balance
         this.blockCount = val.block_count
-        this.lastModified = val.modified_timestamp
+        this.lastModified = parseInt(val.modified_timestamp)
       } else {
         this.error = val.error
       }
