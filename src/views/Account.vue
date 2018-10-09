@@ -51,7 +51,7 @@ export default {
         this.$Logos.accounts.get(val.representative_block).then(val => {
           this.representaive = val.account.replace('xrb_', 'lgs_')
         })
-        this.balance = val.balance
+        this.balance = parseFloat(this.$Logos.convert.fromReason(val.balance, 'LOGOS'), 4)
         this.blockCount = val.block_count
         this.lastModified = parseInt(val.modified_timestamp)
       } else {
