@@ -121,7 +121,9 @@ export default {
     submitSearch (event) {
       if (event.which === 13) {
         event.preventDefault()
-        window.location.href = '/' + this.address
+        if (this.address.match(/xrb_[13456789abcdefghijkmnopqrstuwxyz]{60}|lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}/) !== null || this.address.match(/[0-9a-fA-F]{64}/) !== null) {
+          window.location.href = '/' + this.address
+        }
       }
     }
   }
