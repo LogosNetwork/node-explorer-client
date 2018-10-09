@@ -5,7 +5,10 @@
       <h2 class="d-none d-sm-block" v-t="'explore_cta'"></h2>
       <b-form id="addressForm" class="mb-2">
         <label class="sr-only" for="address" v-t="'searchPlaceholder'"></label>
-        <b-input @keydown.native="submitSearch" id="address" :placeholder="$t('searchPlaceholder')" v-model="address" />
+        <b-input @keydown.native="submitSearch" id="address" type="text" :state="searchState" aria-describedby="inputLiveFeedback" :placeholder="$t('searchPlaceholder')" v-model="address" />
+        <b-form-invalid-feedback id="inputLiveFeedback">
+          Enter a Logos address or a transactions hash.
+        </b-form-invalid-feedback>
       </b-form>
       <b-row class="text-left pt-5">
         <b-col cols="12" md="6" class="mb-5">
@@ -98,6 +101,15 @@ let fields = [
 export default {
   name: 'explore',
   components: {},
+  computed: {
+    searchState () {
+      if (this.address.length === 0) {
+        return null
+      } else {
+        return this.address.match(/xrb_[13456789abcdefghijkmnopqrstuwxyz]{60}|lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}/) !== null || this.address.match(/[0-9a-fA-F]{64}/) !== null
+      }
+    }
+  },
   data () {
     return {
       address: '',

@@ -8,6 +8,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import vueHeadful from 'vue-headful'
 import bForm from 'bootstrap-vue/es/components/form/form'
 import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
+import bFormInvalidFeedback from 'bootstrap-vue/es/components/form/form-invalid-feedback'
 import bImgLazy from 'bootstrap-vue/es/components/image/img-lazy'
 import bNavbar from 'bootstrap-vue/es/components/navbar/navbar'
 import bNavbarBrand from 'bootstrap-vue/es/components/navbar/navbar-brand'
@@ -42,6 +43,7 @@ Vue.component('b-tabs', bTabs)
 Vue.component('b-tab', bTab)
 Vue.component('b-card', bCard)
 Vue.component('b-form-select', bFormSelect)
+Vue.component('b-form-invalid-feedback', bFormInvalidFeedback)
 Vue.component('b-img-lazy', bImgLazy)
 Vue.component('b-navbar', bNavbar)
 Vue.component('b-navbar-brand', bNavbarBrand)
