@@ -16,7 +16,7 @@
         <b-col cols="12" class="text-left">
             <p class="text-truncate">Representaive: <a :href="'/'+representaive">{{representaive}}</a></p>
             <p class="text-truncate">Last Transaction: <a :href="'/'+frontier">{{frontier}}</a></p>
-            <p class="text-truncate">Last Modified: <span>{{ lastModified | moment("MMM Do, h:mm:ss a") }}</span></p>
+            <p class="text-truncate">Last Modified: <span>{{ lastModified | moment("MMM Do, YYYY h:mm:ss a") }}</span></p>
             <p>Total block count: {{blockCount}}</p>
         </b-col>
       </b-row>
