@@ -319,7 +319,7 @@ export default {
           let accountId = params[0].value.replace('lgs_', 'xrb_')
           let count = params[1].value
           $this.editor += `Checking last ${count} transactions for account ${accountId}....\n`
-          $this.$Logos.accounts.history(params[0].value, params[1].value).then((val) => {
+          $this.$Logos.accounts.history(accountId, count).then((val) => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
@@ -340,7 +340,7 @@ export default {
         'action': function (params) {
           let accountId = params[0].value.replace('lgs_', 'xrb_')
           $this.editor += `Getting info for account ${accountId}....\n`
-          $this.$Logos.accounts.info(params[0].value).then((val) => {
+          $this.$Logos.accounts.info(accountId).then((val) => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
