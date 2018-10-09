@@ -4,6 +4,7 @@ import Explore from './views/Explore.vue'
 import Reps from './views/Representatives.vue'
 import Workbench from './views/Workbench.vue'
 import Transaction from './views/Transaction.vue'
+import notFound from './views/404.vue'
 import Account from './views/Account.vue'
 import Node from './views/Node.vue'
 
@@ -44,6 +45,11 @@ export default new Router({
       name: 'transaction',
       component: Transaction,
       props: true
+    },
+    {
+      path: '*',
+      name: '404',
+      component: notFound
     }
   ],
   scrollBehavior (to, from, savedPosition) {
