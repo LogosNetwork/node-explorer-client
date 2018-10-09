@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Explore from './views/Explore.vue'
 import Reps from './views/Representatives.vue'
 import Workbench from './views/Workbench.vue'
+import Transaction from './views/Transaction.vue'
 import Account from './views/Account.vue'
 import Node from './views/Node.vue'
 
@@ -36,6 +37,12 @@ export default new Router({
       path: '/:account(xrb_[13456789abcdefghijkmnopqrstuwxyz]{60}|lgs_[13456789abcdefghijkmnopqrstuwxyz]{60})',
       name: 'account',
       component: Account,
+      props: true
+    },
+    {
+      path: '/:transaction([0-9a-fA-F]{64})',
+      name: 'transaction',
+      component: Transaction,
       props: true
     }
   ],
