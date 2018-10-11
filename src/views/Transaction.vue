@@ -15,14 +15,21 @@
           <p><a :href="details.link_as_account">{{details.link_as_account}}</a></p>
           <h4 class="text-left" v-t="'amount'"></h4>
           <p>{{details.amount}} Logos</p>
-          <h4 class="text-left" v-t="'prevTransaction'"></h4>
-          <p><a :href="details.previous">{{details.previous}}</a></p>
+          <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000'">
+            <h4 class="text-left" v-t="'prevSend'"></h4>
+            <p><a :href="details.previous">{{details.previous}}</a></p>
+          </div>
         </b-col>
       </b-row>
       <b-row v-if="!error && details !== null">
         <b-col cols="12" class="text-left">
           <h4 class="text-left" v-t="'prettyTransaction'"></h4>
           <codepad id='editor' class="text-left mb-3" v-if='details' :code='prettyDetails'/>
+        </b-col>
+      </b-row>
+      <b-row v-if="error">
+        <b-col cols="12" class="text-left">
+          <h4 style="color:red">This transaction does not exist</h4>
         </b-col>
       </b-row>
     </b-container>
@@ -53,7 +60,7 @@ export default {
         this.details.link_as_account = this.details.link_as_account.replace('xrb_', 'lgs_')
         this.prettyDetails = JSON.stringify(this.details, null, ' ')
       } else {
-        if (val && val.error) { this.error = val.error }
+        if (val && val.error) { this.error = val.error } else { this.error = '404' }
       }
     })
   },

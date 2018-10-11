@@ -7,6 +7,7 @@
   "to": "To",
   "amount": "Amount",
   "prevTransaction": "Previous Transaction Hash",
+  "prevSend": "Previous Send Transaction Hash",
   "prettyTransaction": "JSON Representation of the Transaction",
   "account": "Account",
   "transaction": "Transaction",
