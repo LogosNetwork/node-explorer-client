@@ -6,12 +6,23 @@
           <h4 class="text-left" v-t="'transaction'"></h4>
           <code style="background-color:#FFF;color:#ff3860;padding:6px">{{transaction}}</code>
         </b-col>
-        <b-col cols="12" md="4" class="mb-5">
+      </b-row>
+      <b-row v-if="!error && details !== null" class="mb-5">
+        <b-col cols="12" class="text-left">
+          <h4 class="text-left" v-t="'from'"></h4>
+          <p><a :href="details.account">{{details.account}}</a></p>
+          <h4 class="text-left" v-t="'to'"></h4>
+          <p><a :href="details.link_as_account">{{details.link_as_account}}</a></p>
+          <h4 class="text-left" v-t="'amount'"></h4>
+          <p>{{details.amount}} Logos</p>
+          <h4 class="text-left" v-t="'prevTransaction'"></h4>
+          <p><a :href="details.previous">{{details.previous}}</a></p>
         </b-col>
       </b-row>
-      <b-row v-if="!error">
+      <b-row v-if="!error && details !== null">
         <b-col cols="12" class="text-left">
-            <p class="text-truncate">Stuff</p>
+          <h4 class="text-left" v-t="'prettyTransaction'"></h4>
+          <codepad id='editor' class="text-left mb-3" v-if='details' :code='prettyDetails'/>
         </b-col>
       </b-row>
     </b-container>
@@ -21,18 +32,26 @@
 <script>
 import Vue from 'vue'
 import Logos from '../logosPackages/rpc'
-Vue.use(Logos, { url: 'http://52.215.106.54:55000', debug: true })
+import codepad from '@/components/codepad.vue'
+Vue.use(Logos, { url: 'http://18.212.15.104:55000', debug: true })
 
 let transaction = null
+let details = null
+let prettyDetails = null
 let error = null
 export default {
   name: 'transaction',
-  components: {},
+  components: {
+    codepad
+  },
   created: function () {
-    console.log(transaction)
     this.$Logos.blocks.info(transaction).then(val => {
       if (val && !val.error) {
-        console.log(val)
+        this.details = JSON.parse(val)
+        this.details.amount = parseFloat(this.$Logos.convert.fromReason(this.details.amount, 'LOGOS'), 4)
+        this.details.account = this.details.account.replace('xrb_', 'lgs_')
+        this.details.link_as_account = this.details.link_as_account.replace('xrb_', 'lgs_')
+        this.prettyDetails = JSON.stringify(this.details, null, ' ')
       } else {
         if (val && val.error) { this.error = val.error }
       }
@@ -42,6 +61,8 @@ export default {
     transaction = this.$route.params.transaction
     return {
       transaction: transaction,
+      details: details,
+      prettyDetails: prettyDetails,
       error: error
     }
   }

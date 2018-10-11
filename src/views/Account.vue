@@ -29,7 +29,7 @@
 import Vue from 'vue'
 import Logos from '../logosPackages/rpc'
 import VueQrcode from '@xkeshi/vue-qrcode'
-Vue.use(Logos, { url: 'http://52.215.106.54:55000', debug: true })
+Vue.use(Logos, { url: 'http://18.212.15.104:55000', debug: true })
 Vue.component(VueQrcode.name, VueQrcode)
 
 let frontier = null

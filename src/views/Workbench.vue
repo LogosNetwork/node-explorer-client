@@ -2,7 +2,7 @@
   <div id="primary">
     <b-container class="pt-5">
         <h5 class="text-left" v-t="'build_api_cta'"></h5>
-        <b-input placeholder="http://52.215.106.54:55000" v-model="nodeURL" class="mb-3" />
+        <b-input placeholder="http://18.212.15.104:55000" v-model="nodeURL" class="mb-3" />
         <b-card no-body>
             <b-tabs pills card vertical>
                 <b-tab title="My Account" active>
@@ -89,7 +89,7 @@ import Vue from 'vue'
 import Logos from '../logosPackages/rpc'
 import LogosWallet from '../logosPackages/wallet'
 import codepad from '@/components/codepad.vue'
-Vue.use(Logos, { url: 'http://52.215.106.54:55000', debug: true })
+Vue.use(Logos, { url: 'http://18.212.15.104:55000', debug: true })
 Vue.use(LogosWallet)
 
 export default {
@@ -600,10 +600,16 @@ export default {
       },
       {
         'action': function (params) {
-          let hash = params[0].value.split(',')
+          let hash = params[0].value
+          if (hash.indexOf(',') !== -1) {
+            hash = hash.split(',')
+          }
+          let details = params[1].value
+          console.log(hash)
+          console.log(details)
           $this.editor += `Fetching transacitons of ${hash}....\n`
-          $this.$Logos.blocks.info(hash).then((val) => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+          $this.$Logos.blocks.info(hash, details).then((val) => {
+            $this.editor += JSON.stringify(JSON.parse(val), null, ' ') + '\n\n'
           })
         },
         'params': [
@@ -795,7 +801,7 @@ export default {
       key: null,
       options: options,
       editor: '',
-      nodeURL: 'http://52.215.106.54:55000',
+      nodeURL: 'http://18.212.15.104:55000',
       labels: labels,
       selectedAccount: 0,
       selectedAccounts: 0,
