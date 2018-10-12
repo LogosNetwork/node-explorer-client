@@ -18,7 +18,7 @@
             <p class="text-truncate" v-if="frontier !== '0000000000000000000000000000000000000000000000000000000000000000'">
               Last Transaction: <a :href="'/'+frontier">{{frontier}}</a>
             </p>
-            <p class="text-truncate">Last Modified: <span>{{ lastModified | moment("MM/DD/YY h:mm:ssa") }}</span></p>
+            <p class="text-truncate">Last Modified: <span v-if="lastModified">{{ lastModified | moment("MM/DD/YY h:mm:ssa") }}</span></p>
             <p>Total block count: {{blockCount}}</p>
         </b-col>
       </b-row>
@@ -34,7 +34,7 @@
               <div class="text-truncate">{{data.item.type}}</div>
             </template>
             <template slot="timestamp" slot-scope="data">
-              <div class="text-truncate">{{ data.item.timestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
+              <div class="text-truncate" v-if="data.item.timestamp">{{ data.item.timestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
             </template>
             <template slot="account" slot-scope="data">
               <div class="text-truncate"><a :href="'/'+data.item.account">{{data.item.account}}</a></div>
@@ -67,7 +67,7 @@ let balance = 0
 let count = 50
 let transactions = null
 let fields = [
-  { key: 'timestamp', label: 'Timestamp' },
+  { key: 'timestamp', label: 'Time' },
   { key: 'account', label: 'Account' },
   { key: 'amount', label: 'Amount' },
   { key: 'hash', label: 'Hash' },
@@ -97,7 +97,6 @@ export default {
     })
     this.$Logos.accounts.history(account.replace('lgs_', 'xrb_'), this.count).then(val => {
       if (!val.error) {
-        console.log(val)
         for (let trans of val) {
           trans.amount = parseFloat(Number(this.$Logos.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
           trans.timestamp = parseInt(trans.timestamp)

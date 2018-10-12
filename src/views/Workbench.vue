@@ -605,8 +605,6 @@ export default {
             hash = hash.split(',')
           }
           let details = params[1].value
-          console.log(hash)
-          console.log(details)
           $this.editor += `Fetching transacitons of ${hash}....\n`
           $this.$Logos.blocks.info(hash, details).then((val) => {
             $this.editor += JSON.stringify(JSON.parse(val), null, ' ') + '\n\n'
