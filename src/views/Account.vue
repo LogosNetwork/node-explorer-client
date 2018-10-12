@@ -15,12 +15,40 @@
       <b-row v-if="!error">
         <b-col cols="12" class="text-left">
             <p class="text-truncate">Representaive: <a :href="'/'+representaive">{{representaive}}</a></p>
-            <p class="text-truncate">Last Transaction: <a :href="'/'+frontier">{{frontier}}</a></p>
-            <p class="text-truncate">Last Modified: <span>{{ lastModified | moment("MMM Do, YYYY h:mm:ss a") }}</span></p>
+            <p class="text-truncate" v-if="frontier !== '0000000000000000000000000000000000000000000000000000000000000000'">
+              Last Transaction: <a :href="'/'+frontier">{{frontier}}</a>
+            </p>
+            <p class="text-truncate">Last Modified: <span>{{ lastModified | moment("MM/DD/YY h:mm:ssa") }}</span></p>
             <p>Total block count: {{blockCount}}</p>
         </b-col>
       </b-row>
-
+      <b-row v-if="transactions && transactions.length > 0" class="pt-5">
+        <b-col cols="12" class="mb-5">
+          <h5 class="text-left">
+            <span v-t="'recent_transactions'"></span>
+            <small v-if='transactions.length === count'> (showing last {{count}})</small>
+            <small v-if='transactions.length < count'> (showing all {{transactions.length}})</small>
+          </h5>
+          <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="transactions">
+            <template slot="type" slot-scope="data">
+              <div class="text-truncate">{{data.item.type}}</div>
+            </template>
+            <template slot="timestamp" slot-scope="data">
+              <div class="text-truncate">{{ data.item.timestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
+            </template>
+            <template slot="account" slot-scope="data">
+              <div class="text-truncate"><a :href="'/'+data.item.account">{{data.item.account}}</a></div>
+            </template>
+            <template slot="hash" slot-scope="data">
+              <div class="text-truncate"><a :href="'/'+data.item.hash">{{data.item.hash}}</a></div>
+            </template>
+            <template slot="amount" slot-scope="data">
+              <div class="text-truncate" v-if='data.item.type === "receive"'><span class="text-success">+{{data.item.amount}}</span></div>
+              <div class="text-truncate" v-if='data.item.type === "send"'><span class="text-danger">-{{data.item.amount}}</span></div>
+            </template>
+          </b-table>
+        </b-col>
+      </b-row>
     </b-container>
   </div>
 </template>
@@ -36,6 +64,15 @@ let frontier = null
 let openBlock = null
 let representaive = null
 let balance = 0
+let count = 50
+let transactions = null
+let fields = [
+  { key: 'timestamp', label: 'Timestamp' },
+  { key: 'account', label: 'Account' },
+  { key: 'amount', label: 'Amount' },
+  { key: 'hash', label: 'Hash' },
+  { key: 'type', label: 'Type' }
+]
 let account = null
 let error = null
 let blockCount = 0
@@ -51,22 +88,37 @@ export default {
         this.$Logos.accounts.get(val.representative_block).then(val => {
           this.representaive = val.account.replace('xrb_', 'lgs_')
         })
-        this.balance = parseFloat(this.$Logos.convert.fromReason(val.balance, 'LOGOS'), 4)
+        this.balance = parseFloat(Number(this.$Logos.convert.fromReason(val.balance, 'LOGOS')).toFixed(5))
         this.blockCount = val.block_count
         this.lastModified = parseInt(val.modified_timestamp)
       } else {
         this.error = val.error
       }
     })
+    this.$Logos.accounts.history(account.replace('lgs_', 'xrb_'), this.count).then(val => {
+      if (!val.error) {
+        console.log(val)
+        for (let trans of val) {
+          trans.amount = parseFloat(Number(this.$Logos.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+          trans.timestamp = parseInt(trans.timestamp)
+        }
+        this.transactions = val
+      } else {
+        this.error = val.error
+      }
+    })
   },
   data () {
-    account = this.$route.params.account
+    account = this.$route.params.account.replace('xrb_', 'lgs_')
     return {
       frontier: frontier,
       error: error,
       openBlock: openBlock,
       representaive: representaive,
       balance: balance,
+      transactions: transactions,
+      fields: fields,
+      count: count,
       blockCount: blockCount,
       lastModified: lastModified,
       account: account

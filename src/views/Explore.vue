@@ -13,17 +13,17 @@
       <b-row class="text-left pt-5">
         <b-col cols="12" md="6" class="mb-5">
           <h5 class="text-left" v-t="'recent_transactions'"></h5>
-            <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="transactions">
-              <template slot="account" slot-scope="data">
-                <div class="text-truncate"><a :href="'/'+data.item.account">{{data.item.account}}</a></div>
-              </template>
-              <template slot="hash" slot-scope="data">
-                <div class="text-truncate">{{data.item.hash}}</div>
-              </template>
-              <template slot="amount" slot-scope="data">
-                <div class="text-truncate">{{data.item.amount}}</div>
-              </template>
-            </b-table>
+          <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="transactions">
+            <template slot="account" slot-scope="data">
+              <div class="text-truncate"><a :href="'/'+data.item.account">{{data.item.account}}</a></div>
+            </template>
+            <template slot="hash" slot-scope="data">
+              <div class="text-truncate">{{data.item.hash}}</div>
+            </template>
+            <template slot="amount" slot-scope="data">
+              <div class="text-truncate">{{data.item.amount}}</div>
+            </template>
+          </b-table>
         </b-col>
         <b-col cols="12" md="6" class="mb-5">
           <h5 class="text-left" v-t="'network_stats.title'"></h5>

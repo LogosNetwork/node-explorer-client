@@ -10,13 +10,19 @@
       <b-row v-if="!error && details !== null" class="mb-5">
         <b-col cols="12" class="text-left">
           <h4 class="text-left" v-t="'from'"></h4>
-          <p><a :href="details.account">{{details.account}}</a></p>
+          <p v-if="details.type === 'send'"><a :href="details.account">{{details.account}}</a></p>
+          <p v-if="details.type === 'receive'"><a :href="details.link_as_account">{{details.link_as_account}}</a></p>
           <h4 class="text-left" v-t="'to'"></h4>
-          <p><a :href="details.link_as_account">{{details.link_as_account}}</a></p>
+          <p v-if="details.type === 'send'"><a :href="details.link_as_account">{{details.link_as_account}}</a></p>
+          <p v-if="details.type === 'receive'"><a :href="details.account">{{details.account}}</a></p>
           <h4 class="text-left" v-t="'amount'"></h4>
           <p>{{details.amount}} Logos</p>
-          <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000'">
+          <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && details.type === 'send'">
             <h4 class="text-left" v-t="'prevSend'"></h4>
+            <p><a :href="details.previous">{{details.previous}}</a></p>
+          </div>
+          <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && details.type === 'receive'">
+            <h4 class="text-left" v-t="'prevReceive'"></h4>
             <p><a :href="details.previous">{{details.previous}}</a></p>
           </div>
         </b-col>
@@ -54,11 +60,19 @@ export default {
   created: function () {
     this.$Logos.blocks.info(transaction).then(val => {
       if (val && !val.error) {
-        this.details = JSON.parse(val)
-        this.details.amount = parseFloat(this.$Logos.convert.fromReason(this.details.amount, 'LOGOS'), 4)
+        this.details = JSON.parse(val.contents)
+        this.details.type = val.type
+        if (this.details.type === 'receive') {
+          this.$Logos.blocks.info(this.details.link).then(val => {
+            this.details.link_as_account = JSON.parse(val.contents).account.replace('xrb_', 'lgs_')
+            this.prettyDetails = JSON.stringify(this.details, null, ' ')
+          })
+        } else {
+          this.details.link_as_account = this.details.link_as_account.replace('xrb_', 'lgs_')
+          this.prettyDetails = JSON.stringify(this.details, null, ' ')
+        }
+        this.details.amount = parseFloat(Number(this.$Logos.convert.fromReason(this.details.amount, 'LOGOS')).toFixed(5))
         this.details.account = this.details.account.replace('xrb_', 'lgs_')
-        this.details.link_as_account = this.details.link_as_account.replace('xrb_', 'lgs_')
-        this.prettyDetails = JSON.stringify(this.details, null, ' ')
       } else {
         if (val && val.error) { this.error = val.error } else { this.error = '404' }
       }
