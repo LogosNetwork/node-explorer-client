@@ -20,12 +20,6 @@
               </h4>
               <p class="text-truncate"><a :href="'/'+representaive">{{representaive}}</a></p>
             </div>
-            <div v-if="frontier !== '0000000000000000000000000000000000000000000000000000000000000000'">
-              <h4>
-                Last Transaction
-              </h4>
-              <p class="text-truncate"><a :href="'/'+frontier">{{frontier}}</a></p>
-            </div>
         </b-col>
       </b-row>
       <b-row v-if="transactions && transactions.length > 0">
@@ -36,7 +30,7 @@
             <small v-if='transactions.length === count'> (showing last {{count}})</small>
             <small v-if='transactions.length < count'> (showing all {{transactions.length}})</small>
           </h4>
-          <p class="text-left" v-t="'lastUpdated'"> <strong v-if="lastModified"> {{ lastModified | moment("MMMM DD, YYYY h:mm:ss A") }}</strong></p>
+          <p class="text-left" v-if="lastModified"><span v-t="'lastUpdated'"></span> <strong> {{ lastModified | moment("MMMM DD, YYYY h:mm:ss A") }}</strong></p>
           <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="transactions">
             <template slot="type" slot-scope="data">
               <div class="text-truncate">{{data.item.type}}</div>
