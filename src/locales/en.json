@@ -12,6 +12,8 @@
   "prettyTransaction": "JSON Representation of the Transaction",
   "account": "Account",
   "transaction": "Transaction",
+  "transactions": "Transactions",
+  "lastUpdated": "This account was last updated",
   "representatives": "Representatives",
   "explore_cta": "Explore the Logos Network",
   "build_api_cta": "Interact with the Logos Network from your browser",

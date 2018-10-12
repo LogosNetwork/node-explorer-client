@@ -2,33 +2,41 @@
   <div id="primary">
     <b-container>
       <b-row class="text-left pt-5">
-        <b-col cols="12" md="8" class="mb-5">
+        <b-col cols="12" md="8" class="mb-3">
           <h4 class="text-left" v-t="'account'"></h4>
           <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
           <h3 v-if="!error" class="pt-3" style="color:green">{{balance}} LOGOS</h3>
           <h4 v-if="error" class="pt-3" style="color:red">This account has not been opened yet</h4>
         </b-col>
-        <b-col cols="12" md="4" class="mb-5">
-            <qrcode :value="'lgs:'+account" :options="{ size: 200 }"></qrcode>
+        <b-col cols="12" md="4" class="mb-3" id="qrHolder">
+            <qrcode :value="'lgs:'+account" :options="{ size: 110 }"></qrcode>
         </b-col>
       </b-row>
-      <b-row v-if="!error">
+      <b-row v-if="!error" class="mb-3">
         <b-col cols="12" class="text-left">
-            <p class="text-truncate">Representaive: <a :href="'/'+representaive">{{representaive}}</a></p>
-            <p class="text-truncate" v-if="frontier !== '0000000000000000000000000000000000000000000000000000000000000000'">
-              Last Transaction: <a :href="'/'+frontier">{{frontier}}</a>
-            </p>
-            <p class="text-truncate">Last Modified: <span v-if="lastModified">{{ lastModified | moment("MM/DD/YY h:mm:ssa") }}</span></p>
-            <p>Total block count: {{blockCount}}</p>
+            <div>
+              <h4>
+                Representaive
+              </h4>
+              <p class="text-truncate"><a :href="'/'+representaive">{{representaive}}</a></p>
+            </div>
+            <div v-if="frontier !== '0000000000000000000000000000000000000000000000000000000000000000'">
+              <h4>
+                Last Transaction
+              </h4>
+              <p class="text-truncate"><a :href="'/'+frontier">{{frontier}}</a></p>
+            </div>
         </b-col>
       </b-row>
-      <b-row v-if="transactions && transactions.length > 0" class="pt-5">
-        <b-col cols="12" class="mb-5">
-          <h5 class="text-left">
-            <span v-t="'recent_transactions'"></span>
+      <b-row v-if="transactions && transactions.length > 0">
+        <b-col cols="12" class="mb-3">
+          <h4 class="text-left">
+            <span>{{blockCount}} </span>
+            <span v-t="'transactions'"></span>
             <small v-if='transactions.length === count'> (showing last {{count}})</small>
             <small v-if='transactions.length < count'> (showing all {{transactions.length}})</small>
-          </h5>
+          </h4>
+          <p class="text-left" v-t="'lastUpdated'"> <strong v-if="lastModified"> {{ lastModified | moment("MMMM DD, YYYY h:mm:ss A") }}</strong></p>
           <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="transactions">
             <template slot="type" slot-scope="data">
               <div class="text-truncate">{{data.item.type}}</div>
@@ -100,6 +108,7 @@ export default {
         for (let trans of val) {
           trans.amount = parseFloat(Number(this.$Logos.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
           trans.timestamp = parseInt(trans.timestamp)
+          trans.account = trans.account.replace('xrb_', 'lgs_')
         }
         this.transactions = val
       } else {
@@ -127,4 +136,12 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  #qrHolder {
+    text-align: center;
+  }
+  @media (min-width: 768px) {
+    #qrHolder {
+      text-align: right;
+    }
+  }
 </style>
