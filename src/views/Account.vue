@@ -58,10 +58,11 @@
 <script>
 import Vue from 'vue'
 import Logos from '../logosPackages/rpc'
+import MQTT from '../logosPackages/mqtt'
 import VueQrcode from '@xkeshi/vue-qrcode'
-Vue.use(Logos, { url: 'http://18.212.15.104:55000', debug: true })
+Vue.use(Logos, { url: 'https://18.212.15.104:55000', debug: true })
+Vue.use(MQTT)
 Vue.component(VueQrcode.name, VueQrcode)
-
 let frontier = null
 let openBlock = null
 let representaive = null
@@ -83,6 +84,21 @@ export default {
   name: 'account',
   components: {},
   created: function () {
+    let client = this.$Mqtt.connect('tcp://localhost:1883')
+    console.log(account)
+    client.on('connect', function () {
+      console.log('connected')
+      client.subscribe(`broadcast/${account.replace('xrb_', 'lgs_')}`, function (err) {
+        if (!err) {
+          console.log(`subscribed to broadcast/${account.replace('xrb_', 'lgs_')}`)
+        } else {
+          console.log(err)
+        }
+      })
+    })
+    client.on('message', function (topic, message) {
+      console.log(message.toString())
+    })
     this.$Logos.accounts.info(account.replace('lgs_', 'xrb_')).then(val => {
       if (!val.error) {
         this.frontier = val.frontier

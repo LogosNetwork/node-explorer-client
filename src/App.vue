@@ -1,11 +1,11 @@
 <template>
   <div id="app">
     <vue-headful
-     title="Logos Node Explorer"
-     description="Detailed information on node actions on the logos network aswell as providing and interface to interact and explore the logos network"
-     lang="en-US"
-     ogLocale="en_US"
-     keywords="Logos,Cryptocurrency,Node,Block,Explorer,Transaction"
+      title="Logos Node Explorer"
+      description="Access detailed information on the logos network and interface with the logos network"
+      lang="en-US"
+      ogLocale="en_US"
+      keywords="Logos,Cryptocurrency,Node,Block,Explorer,Transaction,Workbench"
     />
     <Nav dark="false"/>
     <router-view id="content"/>
