@@ -254,7 +254,7 @@ export default {
         'action': function (params) {
           let publicKey = params[0].value
           $this.editor += `Fetching the account id for ${publicKey}....\n`
-          $this.$Logos.accounts.get(publicKey).then((val) => {
+          $this.$Logos.accounts.toAddress(publicKey).then((val) => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },

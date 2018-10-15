@@ -87,7 +87,7 @@ export default {
       if (!val.error) {
         this.frontier = val.frontier
         this.openBlock = val.open_block
-        this.$Logos.accounts.get(val.representative_block).then(val => {
+        this.$Logos.accounts.toAddress(val.representative_block).then(val => {
           if (val.account) {
             this.representaive = val.account.replace('xrb_', 'lgs_')
           }
