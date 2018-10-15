@@ -13,7 +13,7 @@
         </b-col>
       </b-row>
       <b-row v-if="!error" class="mb-3">
-        <b-col cols="12" class="text-left">
+        <b-col v-if="representaive" cols="12" class="text-left">
             <div>
               <h4>
                 Representaive
@@ -88,7 +88,9 @@ export default {
         this.frontier = val.frontier
         this.openBlock = val.open_block
         this.$Logos.accounts.get(val.representative_block).then(val => {
-          this.representaive = val.account.replace('xrb_', 'lgs_')
+          if (val.account) {
+            this.representaive = val.account.replace('xrb_', 'lgs_')
+          }
         })
         this.balance = parseFloat(Number(this.$Logos.convert.fromReason(val.balance, 'LOGOS')).toFixed(5))
         this.blockCount = val.block_count
