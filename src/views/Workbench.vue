@@ -86,8 +86,8 @@
 <script>
 
 import Vue from 'vue'
-import Logos from '../logosPackages/rpc'
-import LogosWallet from '../logosPackages/wallet'
+import Logos from '../api/rpc'
+import LogosWallet from '../api/wallet'
 import codepad from '@/components/codepad.vue'
 Vue.use(Logos, { url: 'http://18.212.15.104:55000', debug: true })
 Vue.use(LogosWallet)

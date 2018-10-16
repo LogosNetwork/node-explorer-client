@@ -44,7 +44,7 @@
 
 <script>
 import Vue from 'vue'
-import Logos from '../logosPackages/rpc'
+import Logos from '../api/rpc'
 import codepad from '@/components/codepad.vue'
 Vue.use(Logos, { url: 'http://18.212.15.104:55000', debug: true })
 

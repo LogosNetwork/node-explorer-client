@@ -3,6 +3,7 @@ import App from './App.vue'
 import VueMoment from 'vue-moment'
 import router from './router'
 import i18n from './i18n'
+import store from './store/index'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import vueHeadful from 'vue-headful'
@@ -60,5 +61,6 @@ Vue.use(VueMoment)
 new Vue({
   router,
   i18n,
+  store,
   render: h => h(App)
 }).$mount('#app')
