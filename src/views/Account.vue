@@ -84,8 +84,7 @@ export default {
   name: 'account',
   components: {},
   created: function () {
-    let client = this.$Mqtt.connect('tcp://localhost:1883')
-    console.log(account)
+    let client = this.$Mqtt.connect('mqtt:127.0.0.1:8883/mqtt')
     client.on('connect', function () {
       console.log('connected')
       client.subscribe(`broadcast/${account.replace('xrb_', 'lgs_')}`, function (err) {
