@@ -57,11 +57,10 @@
 
 <script>
 import Vue from 'vue'
+import { mapActions } from 'vuex'
 import Logos from '../api/rpc'
-import Mqtt from '../api/mqtt'
 import VueQrcode from '@xkeshi/vue-qrcode'
 Vue.use(Logos, { url: 'https://18.212.15.104:55000', debug: true })
-Vue.use(Mqtt)
 Vue.component(VueQrcode.name, VueQrcode)
 let frontier = null
 let openBlock = null
@@ -85,20 +84,7 @@ export default {
   name: 'account',
   components: {},
   created: function () {
-    this.client = this.$Mqtt.connect('mqtt:127.0.0.1:8883/mqtt')
-    this.client.on('connect', () => {
-      console.log('connected')
-    })
-    this.client.subscribe(`broadcast/${account.replace('xrb_', 'lgs_')}`, (err) => {
-      if (!err) {
-        console.log(`subscribed to broadcast/${account.replace('xrb_', 'lgs_')}`)
-      } else {
-        console.log(err)
-      }
-    })
-    this.client.on('message', function (topic, message) {
-      console.log(message.toString())
-    })
+    this.initalize({ url: 'mqtt:127.0.0.1:8883/mqtt', topic: `account/${this.$route.params.account.replace('xrb_', 'lgs_')}` })
     this.$Logos.accounts.info(account.replace('lgs_', 'xrb_')).then(val => {
       if (!val.error) {
         this.frontier = val.frontier
@@ -128,6 +114,9 @@ export default {
       }
     })
   },
+  methods: mapActions('mqtt', [
+    'initalize'
+  ]),
   destroyed: function () {
     this.client.end()
   },

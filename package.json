@@ -14,6 +14,7 @@
     "logos-rpc-client": "git+https://github.com/LogosNetwork/rpc-client.git",
     "logos-webwallet-sdk": "git+https://github.com/LogosNetwork/logos-webwallet-sdk.git",
     "mqtt": "^2.18.8",
+    "mqtt-regex": "^1.0.5",
     "vue": "^2.5.17",
     "vue-awesome": "^3.1.2",
     "vue-codemirror": "^4.0.5",
