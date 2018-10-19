@@ -102,7 +102,10 @@ const mutations = {
       state.lastModified = blockData.message.timestamp
       state.blockCount++
       state.frontier = blockData.message.hash
-      // TODO HANDLE BALANCE CHANGES
+      // Maybe do math instead of querying
+      rpcClient.accounts.reasonBalance(state.account.replace('lgs_', 'xrb_')).then(val => {
+        state.balance = parseFloat(Number(rpcClient.convert.fromReason(val.balance, 'LOGOS')).toFixed(5))
+      })
     }
   }
 }
