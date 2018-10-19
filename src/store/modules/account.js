@@ -6,7 +6,7 @@ const state = {
   openBlock: null,
   representaive: null,
   error: null,
-  balance: 0,
+  balance: null,
   count: 50,
   transactions: [],
   blockCount: 0,
@@ -57,6 +57,9 @@ const actions = {
         commit('setError', 'null')
       }
     })
+  },
+  reset: ({ commit }) => {
+    commit('reset')
   }
 }
 
@@ -90,6 +93,18 @@ const mutations = {
   },
   setAccount (state, account) {
     state.account = account.replace('xrb_', 'lgs_')
+  },
+  reset (state) {
+    state.account = null
+    state.frontier = null
+    state.openBlock = null
+    state.representaive = null
+    state.error = null
+    state.balance = null
+    state.count = 50
+    state.transactions = []
+    state.blockCount = 0
+    state.lastModified = 0
   },
   addBlock (state, blockData) {
     blockData.message = JSON.parse(blockData.message)
