@@ -57,17 +57,9 @@
 
 <script>
 import Vue from 'vue'
-import { mapActions } from 'vuex'
-import Logos from '../api/rpc'
+import { mapActions, mapState } from 'vuex'
 import VueQrcode from '@xkeshi/vue-qrcode'
-Vue.use(Logos, { url: 'https://18.212.15.104:55000', debug: true })
 Vue.component(VueQrcode.name, VueQrcode)
-let frontier = null
-let openBlock = null
-let representaive = null
-let balance = 0
-let count = 50
-let transactions = null
 let fields = [
   { key: 'timestamp', label: 'Time' },
   { key: 'account', label: 'Account' },
@@ -75,66 +67,40 @@ let fields = [
   { key: 'hash', label: 'Hash' },
   { key: 'type', label: 'Type' }
 ]
-let account = null
-let error = null
-let client = null
-let blockCount = 0
-let lastModified = 0
 export default {
-  name: 'account',
-  components: {},
+  computed: {
+    ...mapState('account', {
+      account: state => state.account,
+      frontier: state => state.frontier,
+      openBlock: state => state.openBlock,
+      representaive: state => state.representaive,
+      error: state => state.error,
+      balance: state => state.balance,
+      transactions: state => state.transactions,
+      blockCount: state => state.blockCount,
+      count: state => state.count,
+      lastModified: state => state.lastModified
+    })
+  },
   created: function () {
     this.initalize({ url: 'mqtt:127.0.0.1:8883/mqtt', topic: `account/${this.$route.params.account.replace('xrb_', 'lgs_')}` })
-    this.$Logos.accounts.info(account.replace('lgs_', 'xrb_')).then(val => {
-      if (!val.error) {
-        this.frontier = val.frontier
-        this.openBlock = val.open_block
-        this.$Logos.accounts.toAddress(val.representative_block).then(val => {
-          if (val.account) {
-            this.representaive = val.account.replace('xrb_', 'lgs_')
-          }
-        })
-        this.balance = parseFloat(Number(this.$Logos.convert.fromReason(val.balance, 'LOGOS')).toFixed(5))
-        this.blockCount = val.block_count
-        this.lastModified = parseInt(val.modified_timestamp)
-      } else {
-        this.error = val.error
-      }
-    })
-    this.$Logos.accounts.history(account.replace('lgs_', 'xrb_'), this.count).then(val => {
-      if (!val.error) {
-        for (let trans of val) {
-          trans.amount = parseFloat(Number(this.$Logos.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
-          trans.timestamp = parseInt(trans.timestamp)
-          trans.account = trans.account.replace('xrb_', 'lgs_')
-        }
-        this.transactions = val
-      } else {
-        this.error = val.error
-      }
-    })
+    this.getAccountInfo(this.$route.params.account)
   },
-  methods: mapActions('mqtt', [
-    'initalize'
-  ]),
+  methods: {
+    ...mapActions('mqtt', [
+      'initalize',
+      'unsubscribe'
+    ]),
+    ...mapActions('account', [
+      'getAccountInfo'
+    ])
+  },
   destroyed: function () {
-    this.client.end()
+    this.unsubscribe(`account/${this.$route.params.account.replace('xrb_', 'lgs_')}`)
   },
   data () {
-    account = this.$route.params.account.replace('xrb_', 'lgs_')
     return {
-      frontier: frontier,
-      error: error,
-      openBlock: openBlock,
-      representaive: representaive,
-      balance: balance,
-      transactions: transactions,
-      fields: fields,
-      count: count,
-      blockCount: blockCount,
-      lastModified: lastModified,
-      client: client,
-      account: account
+      fields: fields
     }
   }
 }
