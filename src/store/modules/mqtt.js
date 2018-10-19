@@ -26,7 +26,7 @@ const actions = {
         if (params) {
           // TODO anyway to optimize this delivery?
           commit('account/addBlock', { account: params.account, message: message }, { root: true })
-          // commit('explorer/addBlock', { message: message })
+          commit('explorer/addBlock', { message: message }, { root: true })
         }
       })
       client.on('connect', () => {

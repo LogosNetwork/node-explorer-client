@@ -11,21 +11,21 @@
         </b-form-invalid-feedback>
       </b-form>
       <b-row class="text-left pt-5">
-        <b-col cols="12" md="6" class="mb-5">
+        <b-col cols="12" class="mb-5">
           <h5 class="text-left" v-t="'recent_transactions'"></h5>
           <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="transactions">
             <template slot="account" slot-scope="data">
               <div class="text-truncate"><router-link :to="'/'+data.item.account">{{data.item.account}}</router-link></div>
             </template>
             <template slot="hash" slot-scope="data">
-              <div class="text-truncate">{{data.item.hash}}</div>
+              <div class="text-truncate"><router-link :to="'/'+data.item.hash">{{data.item.hash}}</router-link></div>
             </template>
             <template slot="amount" slot-scope="data">
-              <div class="text-truncate">{{data.item.amount}}</div>
+              <div class="text-truncate"><span class="text-success">+{{data.item.amount}}</span></div>
             </template>
           </b-table>
         </b-col>
-        <b-col cols="12" md="6" class="mb-5">
+        <b-col v-if="false" cols="12" md="6" class="mb-5">
           <h5 class="text-left" v-t="'network_stats.title'"></h5>
           <b-row>
             <b-col cols="6">
@@ -84,20 +84,12 @@
 </template>
 
 <script>
-let transactions = [
-  { account: 'lgs_3eo3ikcgw6kdhd87o3a1sbqy1mouzyx3dc81c51btngijj33ptr78fty33rk', hash: 'B438CB5A7C3284E054939CA3B780BA86BE8CF3EAB2777D86293CAE1A90F70934', amount: '0.000001' },
-  { account: 'lgs_3eo3ikcgw6kdhd87o3a1sbqy1mouzyx3dc81c51btngijj33ptr78fty33rk', hash: 'B438CB5A7C3284E054939CA3B780BA86BE8CF3EAB2777D86293CAE1A90F70934', amount: '0.000001' },
-  { account: 'lgs_3eo3ikcgw6kdhd87o3a1sbqy1mouzyx3dc81c51btngijj33ptr78fty33rk', hash: 'B438CB5A7C3284E054939CA3B780BA86BE8CF3EAB2777D86293CAE1A90F70934', amount: '0.000001' },
-  { account: 'lgs_3eo3ikcgw6kdhd87o3a1sbqy1mouzyx3dc81c51btngijj33ptr78fty33rk', hash: 'B438CB5A7C3284E054939CA3B780BA86BE8CF3EAB2777D86293CAE1A90F70934', amount: '0.000001' },
-  { account: 'lgs_3eo3ikcgw6kdhd87o3a1sbqy1mouzyx3dc81c51btngijj33ptr78fty33rk', hash: 'B438CB5A7C3284E054939CA3B780BA86BE8CF3EAB2777D86293CAE1A90F70934', amount: '0.000001' }
-]
-
+import { mapActions, mapState } from 'vuex'
 let fields = [
   { key: 'account', label: 'Account' },
   { key: 'hash', label: 'Hash' },
   { key: 'amount', label: 'Amount' }
 ]
-
 export default {
   name: 'explore',
   components: {},
@@ -108,12 +100,19 @@ export default {
       } else {
         return this.address.match(/xrb_[13456789abcdefghijkmnopqrstuwxyz]{60}|lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}/) !== null || this.address.match(/[0-9a-fA-F]{64}/) !== null
       }
-    }
+    },
+    ...mapState('explorer', {
+      error: state => state.error,
+      transactions: state => state.transactions
+    })
+  },
+  created: function () {
+    this.initalize({ url: 'mqtt:127.0.0.1:8883/mqtt', topic: `account/+` })
+    this.getRecentTransactions()
   },
   data () {
     return {
       address: '',
-      transactions: transactions,
       fields: fields
     }
   },
@@ -125,7 +124,17 @@ export default {
           window.location.href = '/' + this.address
         }
       }
-    }
+    },
+    ...mapActions('mqtt', [
+      'initalize',
+      'unsubscribe'
+    ]),
+    ...mapActions('explorer', [
+      'getRecentTransactions'
+    ])
+  },
+  destroyed: function () {
+    this.unsubscribe(`account/+`)
   }
 }
 </script>
