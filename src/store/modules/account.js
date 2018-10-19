@@ -93,8 +93,20 @@ const mutations = {
   },
   addBlock (state, blockData) {
     blockData.message = JSON.parse(blockData.message)
-    if (blockData.account.replace('xrb_', 'lgs_') === state.account ||
-        blockData.message.link_as_account.replace('xrb_', 'lgs_') === state.account) {
+    if (blockData.message.account.replace('xrb_', 'lgs_') === state.account) {
+      blockData.message.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.message.amount, 'LOGOS')).toFixed(5))
+      blockData.message.timestamp = parseInt(blockData.message.timestamp)
+      blockData.message.account = blockData.message.account.replace('xrb_', 'lgs_')
+      state.transactions.unshift(blockData.message)
+      state.lastModified = blockData.message.timestamp
+      state.blockCount++
+      state.frontier = blockData.message.hash
+      // Maybe do math instead of querying
+      rpcClient.accounts.reasonBalance(state.account.replace('lgs_', 'xrb_')).then(val => {
+        state.balance = parseFloat(Number(rpcClient.convert.fromReason(val.balance, 'LOGOS')).toFixed(5))
+      })
+    } else if (blockData.message.link_as_account.replace('xrb_', 'lgs_') === state.account) {
+      blockData.message.type = 'receive'
       blockData.message.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.message.amount, 'LOGOS')).toFixed(5))
       blockData.message.timestamp = parseInt(blockData.message.timestamp)
       blockData.message.account = blockData.message.account.replace('xrb_', 'lgs_')
