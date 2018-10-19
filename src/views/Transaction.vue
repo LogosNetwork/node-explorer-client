@@ -10,20 +10,20 @@
       <b-row v-if="!error && details !== null" class="mb-5">
         <b-col cols="12" class="text-left">
           <h4 class="text-left" v-t="'from'"></h4>
-          <p v-if="details.type === 'send'"><a :href="details.account">{{details.account}}</a></p>
-          <p v-if="details.type === 'receive'"><a :href="details.link_as_account">{{details.link_as_account}}</a></p>
+          <p v-if="details.type === 'send'"><router-link :to="details.account">{{details.account}}</router-link></p>
+          <p v-if="details.type === 'receive'"><router-link :to="details.link_as_account">{{details.link_as_account}}</router-link></p>
           <h4 class="text-left" v-t="'to'"></h4>
-          <p v-if="details.type === 'send'"><a :href="details.link_as_account">{{details.link_as_account}}</a></p>
-          <p v-if="details.type === 'receive'"><a :href="details.account">{{details.account}}</a></p>
+          <p v-if="details.type === 'send'"><router-link :to="details.link_as_account">{{details.link_as_account}}</router-link></p>
+          <p v-if="details.type === 'receive'"><router-link :to="details.account">{{details.account}}</router-link></p>
           <h4 class="text-left" v-t="'amount'"></h4>
           <p>{{details.amount}} Logos</p>
           <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && details.type === 'send'">
             <h4 class="text-left" v-t="'prevSend'"></h4>
-            <p><a :href="details.previous">{{details.previous}}</a></p>
+            <p><router-link :to="details.previous">{{details.previous}}</router-link></p>
           </div>
           <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && details.type === 'receive'">
             <h4 class="text-left" v-t="'prevReceive'"></h4>
-            <p><a :href="details.previous">{{details.previous}}</a></p>
+            <p><router-link :to="details.previous">{{details.previous}}</router-link></p>
           </div>
         </b-col>
       </b-row>

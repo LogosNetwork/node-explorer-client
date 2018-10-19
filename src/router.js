@@ -38,10 +38,7 @@ export default new Router({
       path: '/:account(xrb_[13456789abcdefghijkmnopqrstuwxyz]{60}|lgs_[13456789abcdefghijkmnopqrstuwxyz]{60})',
       name: 'account',
       component: Account,
-      props: true,
-      beforeEnter: (to, from, next) => {
-        next()
-      }
+      props: true
     },
     {
       path: '/:transaction([0-9a-fA-F]{64})',

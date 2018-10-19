@@ -15,7 +15,7 @@
           <h5 class="text-left" v-t="'recent_transactions'"></h5>
           <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="transactions">
             <template slot="account" slot-scope="data">
-              <div class="text-truncate"><a :href="'/'+data.item.account">{{data.item.account}}</a></div>
+              <div class="text-truncate"><router-link :to="'/'+data.item.account">{{data.item.account}}</router-link></div>
             </template>
             <template slot="hash" slot-scope="data">
               <div class="text-truncate">{{data.item.hash}}</div>

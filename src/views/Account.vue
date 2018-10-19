@@ -18,7 +18,7 @@
               <h4>
                 Representaive
               </h4>
-              <p class="text-truncate"><a :href="'/'+representaive">{{representaive}}</a></p>
+              <p class="text-truncate"><router-link :to="'/'+representaive">{{representaive}}</router-link></p>
             </div>
         </b-col>
       </b-row>
@@ -39,10 +39,10 @@
               <div class="text-truncate" v-if="data.item.timestamp">{{ data.item.timestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
             </template>
             <template slot="account" slot-scope="data">
-              <div class="text-truncate"><a :href="'/'+data.item.account">{{data.item.account}}</a></div>
+              <div class="text-truncate"><router-link :to="'/'+data.item.account">{{data.item.account}}</router-link></div>
             </template>
             <template slot="hash" slot-scope="data">
-              <div class="text-truncate"><a :href="'/'+data.item.hash">{{data.item.hash}}</a></div>
+              <div class="text-truncate"><router-link :to="'/'+data.item.hash">{{data.item.hash}}</router-link></div>
             </template>
             <template slot="amount" slot-scope="data">
               <div class="text-truncate" v-if='data.item.type === "receive"'><span class="text-success">+{{data.item.amount}}</span></div>
@@ -96,12 +96,18 @@ export default {
     ])
   },
   destroyed: function () {
-    this.unsubscribe(`account/${this.$route.params.account.replace('xrb_', 'lgs_')}`)
+    this.unsubscribe(`account/${this.account}`)
   },
   data () {
     return {
       fields: fields
     }
+  },
+  beforeRouteUpdate (to, from, next) {
+    this.unsubscribe(`account/${this.account}`)
+    this.initalize({ url: 'mqtt:127.0.0.1:8883/mqtt', topic: `account/${to.params.account.replace('xrb_', 'lgs_')}` })
+    this.getAccountInfo(to.params.account)
+    next()
   }
 }
 </script>
