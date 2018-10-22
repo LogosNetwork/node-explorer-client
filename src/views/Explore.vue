@@ -108,7 +108,7 @@ export default {
   },
   created: function () {
     this.initalize({ url: 'mqtt:127.0.0.1:8883/mqtt', topic: `account/+` })
-    this.getRecentTransactions()
+    // this.getRecentTransactions()
   },
   data () {
     return {

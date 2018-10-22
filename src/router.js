@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Explore from './views/Explore.vue'
-import Reps from './views/Representatives.vue'
+import Governance from './views/Governance.vue'
 import Workbench from './views/Workbench.vue'
 import Transaction from './views/Transaction.vue'
 import notFound from './views/404.vue'
 import Account from './views/Account.vue'
-import Node from './views/Node.vue'
+import Chains from './views/Chains.vue'
 
 Vue.use(Router)
 
@@ -20,14 +20,14 @@ export default new Router({
       component: Explore
     },
     {
-      path: '/node',
-      name: 'node',
-      component: Node
+      path: '/chains',
+      name: 'chains',
+      component: Chains
     },
     {
-      path: '/representatives',
-      name: 'reps',
-      component: Reps
+      path: '/Governance',
+      name: 'governance',
+      component: Governance
     },
     {
       path: '/workbench',

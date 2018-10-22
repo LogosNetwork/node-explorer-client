@@ -6,8 +6,8 @@
       <b-collapse is-nav id="nav_collapse">
         <b-navbar-nav class="ml-auto">
           <b-nav-item to="/" exact-active-class="is-active">{{ $t('explore') }}</b-nav-item>
-          <b-nav-item to="/node" exact-active-class="is-active">{{ $t('node') }}</b-nav-item>
-          <b-nav-item to="/representatives" exact-active-class="is-active">{{ $t('representatives') }}</b-nav-item>
+          <b-nav-item to="/chains" exact-active-class="is-active">{{ $t('chains') }}</b-nav-item>
+          <b-nav-item to="/governance" exact-active-class="is-active">{{ $t('governance') }}</b-nav-item>
           <b-nav-item to="/workbench" exact-active-class="is-active">{{ $t('workbench') }}</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
