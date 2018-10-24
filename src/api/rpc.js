@@ -1,4 +1,4 @@
-import Logos from 'logos-rpc-client'
+import Logos from '@logosnetwork/logos-rpc-client'
 
 export { Logos }
 

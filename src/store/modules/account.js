@@ -1,4 +1,4 @@
-import Logos from 'logos-rpc-client'
+import Logos from '@logosnetwork/logos-rpc-client'
 const rpcClient = new Logos({ url: 'http://18.212.15.104:55000', debug: true })
 const state = {
   account: null,

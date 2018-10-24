@@ -1,4 +1,4 @@
-import LogosWallet from 'logos-webwallet-sdk'
+import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
 
 export { LogosWallet }
 
