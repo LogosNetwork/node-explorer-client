@@ -6,6 +6,9 @@
         <b-tabs card>
           <b-tab :title="$t('batch_state_blocks')" active>
             <b-table style="background:#FFF" bordered small fixed :fields="batchStateBlockFields" :items="batchStateBlocks">
+              <template slot="delegate" slot-scope="data">
+                <div class="text-truncate" v-if="data.item.delegate">{{ data.item.delegate }}</div>
+              </template>
               <template slot="time" slot-scope="data">
                 <div class="text-truncate" v-if="data.item.time">{{ data.item.time | moment("MM/DD/YY h:mm:ssa") }}</div>
               </template>
@@ -49,22 +52,26 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 let batchStateBlockFields = [
+  { key: 'delegate', label: 'Delegate' },
   { key: 'time', label: 'Time' },
   { key: 'hash', label: 'Hash' },
   { key: 'transactions', label: '# Transactions' }
 ]
 let fakeBatchStateBlocks = [
   {
+    'delegate': 'lgs_3e3j5tkog48pnny9dmfzj1r16pg8t1e76dz5tmac6iq689wyjfpiij4txtdo',
     'time': 1539999610676,
     'hash': 'B785D56473DE6330AC9A2071F19BD44BCAF1DE5C200A826B4BBCC85E588620FB',
     'transactions': '1'
   },
   {
+    'delegate': 'lgs_3e3j5tkog48pnny9dmfzj1r16pg8t1e76dz5tmac6iq689wyjfpiij4txtdo',
     'time': 1539999910676,
     'hash': 'B785D56473DE6330AC9A2071F19BD44BCAF1DE5C200A826B4BBCC85E588620FB',
     'transactions': '3'
   },
   {
+    'delegate': 'lgs_3e3j5tkog48pnny9dmfzj1r16pg8t1e76dz5tmac6iq689wyjfpiij4txtdo',
     'time': 1540029610676,
     'hash': 'B785D56473DE6330AC9A2071F19BD44BCAF1DE5C200A826B4BBCC85E588620FB',
     'transactions': '10'
