@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 let batchStateBlockFields = [
   { key: 'time', label: 'Time' },
   { key: 'hash', label: 'Hash' },
@@ -113,6 +114,39 @@ let epochFields = [
 export default {
   name: 'explore',
   components: {},
+  computed: {
+    ...mapState('chains', {
+      batchStateBlocks: state => state.batchStateBlocks,
+      microEpochs: state => state.microEpochs,
+      epochs: state => state.epochs
+    })
+  },
+  created: function () {
+    this.reset()
+    this.initalize({ url: 'mqtt:127.0.0.1:8883/mqtt',
+      cb: () => {
+        this.subscribe(`batchStateBlocks/+`)
+        this.subscribe(`microEpochs/+`)
+        this.subscribe(`epochs/+`)
+      } })
+    this.getRecentBlocks()
+  },
+  methods: {
+    ...mapActions('mqtt', [
+      'initalize',
+      'unsubscribe',
+      'subscribe'
+    ]),
+    ...mapActions('chains', [
+      'getRecentBlocks',
+      'reset'
+    ])
+  },
+  destroyed: function () {
+    this.unsubscribe(`batchStateBlocks/+`)
+    this.unsubscribe(`microEpochs/+`)
+    this.unsubscribe(`epochs/+`)
+  },
   data () {
     return {
       epochFields,

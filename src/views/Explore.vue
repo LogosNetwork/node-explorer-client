@@ -107,7 +107,10 @@ export default {
     })
   },
   created: function () {
-    this.initalize({ url: 'mqtt:127.0.0.1:8883/mqtt', topic: `account/+` })
+    this.initalize({ url: 'mqtt:127.0.0.1:8883/mqtt',
+      cb: () => {
+        this.subscribe(`account/+`)
+      } })
     // this.getRecentTransactions()
   },
   data () {
@@ -127,7 +130,8 @@ export default {
     },
     ...mapActions('mqtt', [
       'initalize',
-      'unsubscribe'
+      'unsubscribe',
+      'subscribe'
     ]),
     ...mapActions('explorer', [
       'getRecentTransactions'

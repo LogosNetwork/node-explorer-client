@@ -12,7 +12,7 @@ const getters = {
 }
 
 const actions = {
-  initalize ({ commit, state, dispatch }, data) {
+  initalize ({ commit, state }, data) {
     if (!state.connected) {
       client = Mqtt.connect(data.url)
       client.on('close', () => {
@@ -32,10 +32,10 @@ const actions = {
       client.on('connect', () => {
         console.log('connected')
         commit('setConnectionStatus', true)
-        if (data.topic) { dispatch('subscribe', data.topic) }
+        data.cb()
       })
-    } else if (data.topic) {
-      dispatch('subscribe', data.topic)
+    } else {
+      data.cb()
     }
   },
   subscribe ({ state }, topic) {

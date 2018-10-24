@@ -84,13 +84,17 @@ export default {
   },
   created: function () {
     this.reset()
-    this.initalize({ url: 'mqtt:127.0.0.1:8883/mqtt', topic: `account/${this.$route.params.account.replace('xrb_', 'lgs_')}` })
+    this.initalize({ url: 'mqtt:127.0.0.1:8883/mqtt',
+      cb: () => {
+        this.subscribe(`account/${this.$route.params.account.replace('xrb_', 'lgs_')}`)
+      } })
     this.getAccountInfo(this.$route.params.account)
   },
   methods: {
     ...mapActions('mqtt', [
       'initalize',
-      'unsubscribe'
+      'unsubscribe',
+      'subscribe'
     ]),
     ...mapActions('account', [
       'getAccountInfo',
@@ -108,7 +112,10 @@ export default {
   beforeRouteUpdate (to, from, next) {
     this.unsubscribe(`account/${this.account}`)
     this.reset()
-    this.initalize({ url: 'mqtt:127.0.0.1:8883/mqtt', topic: `account/${to.params.account.replace('xrb_', 'lgs_')}` })
+    this.initalize({ url: 'mqtt:127.0.0.1:8883/mqtt',
+      cb: () => {
+        this.subscribe(`account/${to.params.account.replace('xrb_', 'lgs_')}`)
+      } })
     this.getAccountInfo(to.params.account)
     next()
   }
