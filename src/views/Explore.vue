@@ -107,7 +107,7 @@ export default {
     })
   },
   created: function () {
-    this.initalize({ url: 'mqtt:127.0.0.1:8883/mqtt',
+    this.initalize({ url: `mqtt:${window.location.hostname}:8883/mqtt`,
       cb: () => {
         this.subscribe(`account/+`)
       } })
