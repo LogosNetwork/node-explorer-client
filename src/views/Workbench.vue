@@ -69,9 +69,16 @@
                 <b-tab title="Other">
                     <b-form-select v-model="selectedOther" :options="labels[5]" class="mb-5" />
                     <div v-for="(param, index) in options[5][selectedOther].params" :key="index">
-                        <p class="card-text text-left">{{param.label}}
-                            <b-input :placeholder="param.name" v-model="param.value" class="mb-3" />
-                        </p>
+                      <p v-if="!param.type || param.type === 'text'" class="card-text text-left">{{param.label}}
+                          {{param.type}}
+                          <b-input :placeholder="param.name" v-model="param.value" class="mb-3" />
+                      </p>
+                      <b-form-checkbox v-if="param.type && param.type === 'boolean'"
+                          v-model="param.value"
+                          value="true"
+                          unchecked-value="false">
+                          {{param.label}}
+                      </b-form-checkbox>
                     </div>
                     <b-button class="float-right mb-3" variant="primary" v-on:click="options[5][selectedOther].action(options[5][selectedOther].params)">Execute</b-button>
                 </b-tab>
@@ -769,12 +776,30 @@ export default {
             'required': false
           }
         ]
+      },
+      {
+        'action': function (params) {
+          let epoch = params[0].value
+          $this.editor += `Fetching transaction counts....\n`
+          $this.$Logos.generateMicroBlock(epoch).then((val) => {
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+          })
+        },
+        'params': [
+          {
+            'name': 'epoch',
+            'type': 'boolean',
+            'label': `Generate Epoch also`,
+            'required': false
+          }
+        ]
       }
     ]
     const otherLabels = [
       { value: 0, text: 'Total Available Supply' },
       { value: 1, text: 'Representative List' },
-      { value: 2, text: 'Deterministic Key' }
+      { value: 2, text: 'Deterministic Key' },
+      { value: 3, text: 'Force Micro Epoch and Epoch to occur' }
     ]
 
     const options = [
