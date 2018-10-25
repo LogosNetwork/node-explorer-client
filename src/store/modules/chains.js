@@ -34,8 +34,14 @@ const mutations = {
     state.microEpochs = []
     state.epochs = []
   },
-  addBlock (state, blockData) {
-
+  addBatchStateBlock (state, data) {
+    state.batchStateBlocks.unshift(data.message)
+  },
+  addMicroEpoch (state, data) {
+    state.microEpochs.unshift(data.message)
+  },
+  addEpoch (state, data) {
+    state.Epochs.unshift(data.message)
   }
 }
 

@@ -607,7 +607,7 @@ export default {
           let details = params[1].value
           $this.editor += `Fetching transacitons of ${hash}....\n`
           $this.$Logos.blocks.info(hash, details).then((val) => {
-            $this.editor += JSON.stringify(JSON.parse(val), null, ' ') + '\n\n'
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         'params': [
