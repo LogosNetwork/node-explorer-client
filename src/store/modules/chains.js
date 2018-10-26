@@ -2,9 +2,10 @@ import Logos from '@logosnetwork/logos-rpc-client'
 const rpcClient = new Logos({ url: 'http://18.212.15.104:55000', debug: true })
 const state = {
   count: 50,
-  batchStateBlocks: [],
+  batchBlocks: [],
   microEpochs: [],
-  epochs: []
+  epochs: [],
+  error: null
 }
 
 const getters = {
@@ -13,11 +14,10 @@ const getters = {
 
 const actions = {
   getRecentBlocks: ({ state, commit }) => {
-    rpcClient.batchStateBlocks.history(50, 0).then(val => {
+    rpcClient.batchBlocks.history(50, 0).then(val => {
       if (val) {
         if (!val.error) {
-          console.log(val.batch_state_blocks)
-          commit('setBatchStateBlocks', val.batch_state_blocks)
+          commit('setBatchBlocks', val.batch_blocks)
         } else {
           commit('setError', val.error)
         }
@@ -28,7 +28,6 @@ const actions = {
     rpcClient.microEpochs.history(50, 0).then(val => {
       if (val) {
         if (!val.error) {
-          console.log(val)
           commit('setMicroEpochs', val.micro_blocks)
         } else {
           commit('setError', val.error)
@@ -40,7 +39,6 @@ const actions = {
     rpcClient.epochs.history(50, 0).then(val => {
       if (val) {
         if (!val.error) {
-          console.log(val)
           commit('setEpochs', val.epochs)
         } else {
           commit('setError', val.error)
@@ -56,8 +54,8 @@ const actions = {
 }
 
 const mutations = {
-  setBatchStateBlocks (state, batchStateBlocks) {
-    state.batchStateBlocks = batchStateBlocks
+  setBatchBlocks (state, batchBlocks) {
+    state.batchBlocks = batchBlocks
   },
   setMicroEpochs (state, microEpochs) {
     state.microEpochs = microEpochs
@@ -67,18 +65,21 @@ const mutations = {
   },
   reset (state) {
     state.count = 50
-    state.batchStateBlocks = []
+    state.batchBlocks = []
     state.microEpochs = []
     state.epochs = []
   },
-  addBatchStateBlock (state, data) {
-    state.batchStateBlocks.unshift(data.message)
+  addBatchBlock (state, data) {
+    state.batchBlocks.unshift(data.message)
   },
   addMicroEpoch (state, data) {
     state.microEpochs.unshift(data.message)
   },
   addEpoch (state, data) {
     state.Epochs.unshift(data.message)
+  },
+  setError (state, error) {
+    state.error = error
   }
 }
 

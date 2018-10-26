@@ -4,13 +4,11 @@
       <h2 class="text-left d-block" v-t="'blockchains'"></h2>
       <b-card no-body>
         <b-tabs card>
-          <b-tab :title="$t('batch_state_blocks')" active>
-            <b-table style="background:#FFF" bordered small fixed :fields="batchStateBlockFields" :items="batchStateBlocks">
-              <template slot="delegate" slot-scope="data">
-                <div class="text-truncate" v-if="data.item.delegate">{{ data.item.delegate }}</div>
-              </template>
+          <b-tab :title="$t('batch_blocks')" active>
+            <b-table style="background:#FFF" bordered small fixed :fields="batchBlockFields" :items="batchBlocks">
               <template slot="time" slot-scope="data">
-                <div class="text-truncate" v-if="data.item.timestamp">{{ parseInt(data.item.timestamp) | moment("MM/DD/YY h:mm:ssa") }}</div>
+                <div class="text-truncate" v-if="data.item.timestamp !== '0'">{{ parseInt(data.item.timestamp) | moment("MM/DD/YY h:mm:ssa") }}</div>
+                <div class="text-truncate" v-if="data.item.timestamp === '0'">Genesis</div>
               </template>
               <template slot="hash" slot-scope="data">
                 <div class="text-truncate">{{data.item.hash}}</div>
@@ -23,7 +21,8 @@
           <b-tab :title="$t('micro_epoch_blocks')">
             <b-table style="background:#FFF" bordered small fixed :fields="microEpochFields" :items="microEpochs">
               <template slot="time" slot-scope="data">
-                <div class="text-truncate" v-if="data.item.timestamp">{{ parseInt(data.item.timestamp) | moment("MM/DD/YY h:mm:ssa") }}</div>
+                <div class="text-truncate" v-if="data.item.timestamp !== '0'">{{ parseInt(data.item.timestamp) | moment("MM/DD/YY h:mm:ssa") }}</div>
+                <div class="text-truncate" v-if="data.item.timestamp === '0'">Genesis</div>
               </template>
               <template slot="hash" slot-scope="data">
                 <div class="text-truncate">{{data.item.hash}}</div>
@@ -36,7 +35,8 @@
           <b-tab :title="$t('epoch_blocks')">
             <b-table style="background:#FFF" bordered small fixed :fields="epochFields" :items="epochs">
               <template slot="time" slot-scope="data">
-                <div class="text-truncate" v-if="data.item.timestamp">{{ data.item.timestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
+                <div class="text-truncate" v-if="data.item.timestamp !== '0'">{{ parseInt(data.item.timestamp) | moment("MM/DD/YY h:mm:ssa") }}</div>
+                <div class="text-truncate" v-if="data.item.timestamp === '0'">Genesis</div>
               </template>
               <template slot="hash" slot-scope="data">
                 <div class="text-truncate">{{data.item.hash}}</div>
@@ -54,8 +54,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-let batchStateBlockFields = [
-  { key: 'delegate', label: 'Delegate' },
+let batchBlockFields = [
   { key: 'time', label: 'Time' },
   { key: 'hash', label: 'Hash' },
   { key: 'transactions', label: '# Transactions' }
@@ -75,7 +74,7 @@ export default {
   components: {},
   computed: {
     ...mapState('chains', {
-      batchStateBlocks: state => state.batchStateBlocks,
+      batchBlocks: state => state.batchBlocks,
       microEpochs: state => state.microEpochs,
       epochs: state => state.epochs
     })
@@ -84,7 +83,7 @@ export default {
     this.reset()
     this.initalize({ url: `mqtt:${window.location.hostname}:8883/mqtt`,
       cb: () => {
-        this.subscribe(`batchStateBlocks/+`)
+        this.subscribe(`batchBlocks/+`)
         this.subscribe(`microEpochs/+`)
         this.subscribe(`epochs/+`)
       } })
@@ -102,7 +101,7 @@ export default {
     ])
   },
   destroyed: function () {
-    this.unsubscribe(`batchStateBlocks/+`)
+    this.unsubscribe(`batchBlocks/+`)
     this.unsubscribe(`microEpochs/+`)
     this.unsubscribe(`epochs/+`)
   },
@@ -110,7 +109,7 @@ export default {
     return {
       epochFields,
       microEpochFields,
-      batchStateBlockFields
+      batchBlockFields
     }
   }
 }

@@ -8,7 +8,7 @@
   "amount": "Amount",
   "chains": "Chains",
   "blockchains": "Blockchains",
-  "batch_state_blocks": "Batch State Blocks",
+  "batch_blocks": "Batch Blocks",
   "micro_epoch_blocks": "Micro Epoch Blocks",
   "epoch_blocks": "Epoch Blocks",
   "prevTransaction": "Previous Transaction Hash",
