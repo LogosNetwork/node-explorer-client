@@ -31,6 +31,7 @@ import bFormCheckbox from 'bootstrap-vue/es/components/form-checkbox/form-checkb
 
 // Icons
 import Icon from 'vue-awesome/components/Icon'
+import 'vue-awesome/icons/chevron-down'
 
 Vue.config.productionTip = false
 Vue.component('b-form', bForm)
