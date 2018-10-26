@@ -546,6 +546,27 @@ export default {
     const blockOptions = [
       {
         'action': function (params) {
+          let hash = params[0].value
+          if (hash.indexOf(',') !== -1) {
+            hash = hash.split(',')
+          } else {
+            hash = [hash]
+          }
+          $this.editor += `Fetching batch block of ${hash}....\n`
+          $this.$Logos.batchStateBlocks.get(hash).then((val) => {
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+          })
+        },
+        'params': [
+          {
+            'name': 'hash',
+            'label': `Comma seperated Hashes of the batch blocks you want to know about`,
+            'required': true
+          }
+        ]
+      },
+      {
+        'action': function (params) {
           let count = params[0].value
           let delegateId = params[1].value
           $this.editor += `Fetching ${count} of the most recent batch state blocks from delegate ${delegateId}....\n`
@@ -568,6 +589,27 @@ export default {
       },
       {
         'action': function (params) {
+          let hash = params[0].value
+          if (hash.indexOf(',') !== -1) {
+            hash = hash.split(',')
+          } else {
+            hash = [hash]
+          }
+          $this.editor += `Fetching micro epochs of ${hash}....\n`
+          $this.$Logos.microEpochs.get(hash).then((val) => {
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+          })
+        },
+        'params': [
+          {
+            'name': 'hash',
+            'label': `Comma seperated Hashes of the micro epochs you want to know about`,
+            'required': true
+          }
+        ]
+      },
+      {
+        'action': function (params) {
           let count = params[0].value
           $this.editor += `Fetching ${count} of the most recent micro epochs....\n`
           $this.$Logos.microEpochs.history(count).then((val) => {
@@ -579,6 +621,27 @@ export default {
             'name': 'count',
             'label': `Number of most recent micro epochs you wish to retreive`,
             'required': false
+          }
+        ]
+      },
+      {
+        'action': function (params) {
+          let hash = params[0].value
+          if (hash.indexOf(',') !== -1) {
+            hash = hash.split(',')
+          } else {
+            hash = [hash]
+          }
+          $this.editor += `Fetching epochs of ${hash}....\n`
+          $this.$Logos.epochs.get(hash).then((val) => {
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+          })
+        },
+        'params': [
+          {
+            'name': 'hash',
+            'label': `Comma seperated Hashes of the epoch you want to know about`,
+            'required': true
           }
         ]
       },
@@ -601,9 +664,12 @@ export default {
     ]
 
     const blockLabels = [
-      { value: 0, text: 'Recent Batch State Blocks' },
-      { value: 1, text: 'Recent Micro Epochs' },
-      { value: 2, text: 'Recent Epochs' }
+      { value: 0, text: 'Lookup Batch Blocks by hash' },
+      { value: 1, text: 'Recent Batch Blocks' },
+      { value: 2, text: 'Lookup Micro Epochs by hash' },
+      { value: 3, text: 'Recent Micro Epochs' },
+      { value: 4, text: 'Lookup Epochs by hash' },
+      { value: 5, text: 'Recent Epochs' }
     ]
 
     const transactionOptions = [
