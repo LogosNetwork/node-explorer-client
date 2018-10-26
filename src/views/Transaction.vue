@@ -58,12 +58,12 @@ export default {
     codepad
   },
   created: function () {
-    this.$Logos.blocks.info(transaction).then(val => {
+    this.$Logos.transactions.info(transaction).then(val => {
       if (val && !val.error) {
         this.details = val
         this.details.type = val.type
         if (this.details.type === 'receive') {
-          this.$Logos.blocks.info(this.details.link).then(val => {
+          this.$Logos.transactions.info(this.details.link).then(val => {
             this.details.link_as_account = val.account.replace('xrb_', 'lgs_')
             this.prettyDetails = JSON.stringify(this.details, null, ' ')
           })

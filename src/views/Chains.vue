@@ -10,36 +10,39 @@
                 <div class="text-truncate" v-if="data.item.delegate">{{ data.item.delegate }}</div>
               </template>
               <template slot="time" slot-scope="data">
-                <div class="text-truncate" v-if="data.item.time">{{ data.item.time | moment("MM/DD/YY h:mm:ssa") }}</div>
+                <div class="text-truncate" v-if="data.item.timestamp">{{ parseInt(data.item.timestamp) | moment("MM/DD/YY h:mm:ssa") }}</div>
               </template>
               <template slot="hash" slot-scope="data">
                 <div class="text-truncate">{{data.item.hash}}</div>
               </template>
               <template slot="transactions" slot-scope="data">
-                <div class="text-truncate">{{data.item.transactions}}</div>
+                <div class="text-truncate">{{data.item.block_count}}</div>
               </template>
             </b-table>
           </b-tab>
           <b-tab :title="$t('micro_epoch_blocks')">
             <b-table style="background:#FFF" bordered small fixed :fields="microEpochFields" :items="microEpochs">
               <template slot="time" slot-scope="data">
-                <div class="text-truncate" v-if="data.item.time">{{ data.item.time | moment("MM/DD/YY h:mm:ssa") }}</div>
+                <div class="text-truncate" v-if="data.item.timestamp">{{ parseInt(data.item.timestamp) | moment("MM/DD/YY h:mm:ssa") }}</div>
               </template>
               <template slot="hash" slot-scope="data">
                 <div class="text-truncate">{{data.item.hash}}</div>
               </template>
               <template slot="batches" slot-scope="data">
-                <div class="text-truncate">{{data.item.batches}}</div>
+                <div class="text-truncate">{{data.item.number_batch_blocks}}</div>
               </template>
             </b-table>
           </b-tab>
           <b-tab :title="$t('epoch_blocks')">
-            <b-table style="background:#FFF" bordered small fixed :fields="epochFields" :items="epochBlocks">
+            <b-table style="background:#FFF" bordered small fixed :fields="epochFields" :items="epochs">
               <template slot="time" slot-scope="data">
-                <div class="text-truncate" v-if="data.item.time">{{ data.item.time | moment("MM/DD/YY h:mm:ssa") }}</div>
+                <div class="text-truncate" v-if="data.item.timestamp">{{ data.item.timestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
+              </template>
+              <template slot="hash" slot-scope="data">
+                <div class="text-truncate">{{data.item.hash}}</div>
               </template>
               <template slot="height" slot-scope="data">
-                <div class="text-truncate">{{data.item.height}}</div>
+                <div class="text-truncate">{{data.item.epoch_number}}</div>
               </template>
             </b-table>
           </b-tab>
@@ -57,58 +60,6 @@ let batchStateBlockFields = [
   { key: 'hash', label: 'Hash' },
   { key: 'transactions', label: '# Transactions' }
 ]
-let fakeBatchStateBlocks = [
-  {
-    'delegate': 'lgs_3e3j5tkog48pnny9dmfzj1r16pg8t1e76dz5tmac6iq689wyjfpiij4txtdo',
-    'time': 1539999610676,
-    'hash': 'B785D56473DE6330AC9A2071F19BD44BCAF1DE5C200A826B4BBCC85E588620FB',
-    'transactions': '1'
-  },
-  {
-    'delegate': 'lgs_3e3j5tkog48pnny9dmfzj1r16pg8t1e76dz5tmac6iq689wyjfpiij4txtdo',
-    'time': 1539999910676,
-    'hash': 'B785D56473DE6330AC9A2071F19BD44BCAF1DE5C200A826B4BBCC85E588620FB',
-    'transactions': '3'
-  },
-  {
-    'delegate': 'lgs_3e3j5tkog48pnny9dmfzj1r16pg8t1e76dz5tmac6iq689wyjfpiij4txtdo',
-    'time': 1540029610676,
-    'hash': 'B785D56473DE6330AC9A2071F19BD44BCAF1DE5C200A826B4BBCC85E588620FB',
-    'transactions': '10'
-  }
-]
-let fakeMicroEpochBlocks = [
-  {
-    'time': 1539999610676,
-    'hash': 'B785D56473DE6330AC9A2071F19BD44BCAF1DE5C200A826B4BBCC85E588620FB',
-    'batches': '12'
-  },
-  {
-    'time': 1539999910676,
-    'hash': 'B785D56473DE6330AC9A2071F19BD44BCAF1DE5C200A826B4BBCC85E588620FB',
-    'batches': '400'
-  },
-  {
-    'time': 1540029610676,
-    'hash': 'B785D56473DE6330AC9A2071F19BD44BCAF1DE5C200A826B4BBCC85E588620FB',
-    'batches': '1000'
-  }
-]
-let fakeEpochBlocks = [
-  {
-    'time': 1539999610676,
-    'height': '3'
-  },
-  {
-    'time': 1539999910676,
-    'height': '2'
-  },
-  {
-    'time': 1540029610676,
-    'height': '1'
-  }
-]
-
 let microEpochFields = [
   { key: 'time', label: 'Time' },
   { key: 'hash', label: 'Hash' },
@@ -116,6 +67,7 @@ let microEpochFields = [
 ]
 let epochFields = [
   { key: 'time', label: 'Time' },
+  { key: 'hash', label: 'Hash' },
   { key: 'height', label: 'Height' }
 ]
 export default {
@@ -158,10 +110,7 @@ export default {
     return {
       epochFields,
       microEpochFields,
-      batchStateBlockFields,
-      batchStateBlocks: fakeBatchStateBlocks,
-      microEpochs: fakeMicroEpochBlocks,
-      epochBlocks: fakeEpochBlocks
+      batchStateBlockFields
     }
   }
 }

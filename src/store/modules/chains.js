@@ -1,3 +1,5 @@
+import Logos from '@logosnetwork/logos-rpc-client'
+const rpcClient = new Logos({ url: 'http://18.212.15.104:55000', debug: true })
 const state = {
   count: 50,
   batchStateBlocks: [],
@@ -11,7 +13,42 @@ const getters = {
 
 const actions = {
   getRecentBlocks: ({ state, commit }) => {
-    // TODO
+    rpcClient.batchStateBlocks.history(50, 0).then(val => {
+      if (val) {
+        if (!val.error) {
+          console.log(val.batch_state_blocks)
+          commit('setBatchStateBlocks', val.batch_state_blocks)
+        } else {
+          commit('setError', val.error)
+        }
+      } else {
+        commit('setError', 'null')
+      }
+    })
+    rpcClient.microEpochs.history(50, 0).then(val => {
+      if (val) {
+        if (!val.error) {
+          console.log(val)
+          commit('setMicroEpochs', val.micro_blocks)
+        } else {
+          commit('setError', val.error)
+        }
+      } else {
+        commit('setError', 'null')
+      }
+    })
+    rpcClient.epochs.history(50, 0).then(val => {
+      if (val) {
+        if (!val.error) {
+          console.log(val)
+          commit('setEpochs', val.epochs)
+        } else {
+          commit('setError', val.error)
+        }
+      } else {
+        commit('setError', 'null')
+      }
+    })
   },
   reset: ({ commit }) => {
     commit('reset')

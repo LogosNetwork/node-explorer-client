@@ -611,7 +611,7 @@ export default {
         'action': function (params) {
           let hash = params[0].value
           $this.editor += `Fetching account who published the transaction with the hash ${hash}....\n`
-          $this.$Logos.blocks.account(hash).then((val) => {
+          $this.$Logos.transactions.account(hash).then((val) => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
@@ -627,7 +627,7 @@ export default {
         'action': function (params) {
           let type = params[0].value
           $this.editor += `Fetching transaction counts....\n`
-          $this.$Logos.blocks.count(type).then((val) => {
+          $this.$Logos.transactions.count(type).then((val) => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
@@ -645,7 +645,7 @@ export default {
           let hash = params[0].value
           let count = params[1].value
           $this.editor += `Fetching ${count} predecessors to the transaciton ${hash}....\n`
-          $this.$Logos.blocks.chain(hash, count).then((val) => {
+          $this.$Logos.transactions.chain(hash, count).then((val) => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
@@ -667,7 +667,7 @@ export default {
           let hash = params[0].value
           let count = params[1].value
           $this.editor += `Fetching ${count} sucessors to the transaciton ${hash}....\n`
-          $this.$Logos.blocks.history(hash, count).then((val) => {
+          $this.$Logos.transactions.history(hash, count).then((val) => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
@@ -692,7 +692,7 @@ export default {
           }
           let details = params[1].value
           $this.editor += `Fetching transacitons of ${hash}....\n`
-          $this.$Logos.blocks.info(hash, details).then((val) => {
+          $this.$Logos.transactions.info(hash, details).then((val) => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
@@ -740,7 +740,7 @@ export default {
               blk.setWork(val.work)
               let transaction = blk.getJSONBlock()
               $this.editor += `Publishing a transaction \n ${JSON.stringify(transaction, null, ' ')} \n`
-              $this.$Logos.blocks.publish(transaction).then((val) => {
+              $this.$Logos.transactions.publish(transaction).then((val) => {
                 $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
               })
             })
