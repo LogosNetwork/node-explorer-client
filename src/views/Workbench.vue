@@ -66,6 +66,22 @@
                     </div>
                     <b-button class="float-right mb-3" variant="primary" v-on:click="options[4][selectedTransactions].action(options[4][selectedTransactions].params)">Execute</b-button>
                 </b-tab>
+                <b-tab title="Blocks">
+                    <b-form-select v-model="selectedBlocks" :options="labels[6]" class="mb-5" />
+                    <div class="text-left" v-for="(param, index) in options[6][selectedBlocks].params" :key="index">
+                      <p v-if="!param.type || param.type === 'text'" class="card-text text-left">{{param.label}}
+                          {{param.type}}
+                          <b-input :placeholder="param.name" v-model="param.value" class="mb-3" />
+                      </p>
+                      <b-form-checkbox v-if="param.type && param.type === 'boolean'"
+                          v-model="param.value"
+                          value="true"
+                          unchecked-value="false">
+                          {{param.label}}
+                      </b-form-checkbox>
+                    </div>
+                    <b-button class="float-right mb-3" variant="primary" v-on:click="options[6][selectedBlocks].action(options[6][selectedBlocks].params)">Execute</b-button>
+                </b-tab>
                 <b-tab title="Other">
                     <b-form-select v-model="selectedOther" :options="labels[5]" class="mb-5" />
                     <div v-for="(param, index) in options[5][selectedOther].params" :key="index">
@@ -527,6 +543,69 @@ export default {
       { value: 1, text: 'Validate work' }
     ]
 
+    const blockOptions = [
+      {
+        'action': function (params) {
+          let count = params[0].value
+          let delegateId = params[1].value
+          $this.editor += `Fetching ${count} of the most recent batch state blocks from delegate ${delegateId}....\n`
+          $this.$Logos.batchStateBlocks.history(count, delegateId).then((val) => {
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+          })
+        },
+        'params': [
+          {
+            'name': 'count',
+            'label': `Number of most recent batch state blocks you wish to retreive`,
+            'required': false
+          },
+          {
+            'name': 'delegate_id',
+            'label': `ID of the delegate you wish to lookup their batch state block chain`,
+            'required': false
+          }
+        ]
+      },
+      {
+        'action': function (params) {
+          let count = params[0].value
+          $this.editor += `Fetching ${count} of the most recent micro epochs....\n`
+          $this.$Logos.microEpochs.history(count).then((val) => {
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+          })
+        },
+        'params': [
+          {
+            'name': 'count',
+            'label': `Number of most recent micro epochs you wish to retreive`,
+            'required': false
+          }
+        ]
+      },
+      {
+        'action': function (params) {
+          let count = params[0].value
+          $this.editor += `Fetching ${count} of the most recent epoch blocks....\n`
+          $this.$Logos.epochs.history(count).then((val) => {
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+          })
+        },
+        'params': [
+          {
+            'name': 'count',
+            'label': `Number of most recent epoch blocks you wish to retreive`,
+            'required': false
+          }
+        ]
+      }
+    ]
+
+    const blockLabels = [
+      { value: 0, text: 'Recent Batch State Blocks' },
+      { value: 1, text: 'Recent Micro Epochs' },
+      { value: 2, text: 'Recent Epochs' }
+    ]
+
     const transactionOptions = [
       {
         'action': function (params) {
@@ -709,21 +788,6 @@ export default {
         ]
       }
     ]
-    /*
-      | Field Name |Size| Description |
-      | --- | -------------| ----------------- |
-      | Version | 1 - Byte| Logos Core Protocol version|
-      | Message Type| 1 - Byte| Type of message|
-      | Account  | 32-Byte | Account address |
-      | Sequence Number  | 4-Byte | Number of sends, increment only |
-      | Previous | 32-Byte | Previous head block on account|
-      | Number of transactions | 1-Byte | 1-8|
-      | Target Address [0] | 32-Byte | Multipurpose Field, up to an array of 8 addresses; <br/>See Table below for additional clarification<br/>Must have the same number of elements as transaction amount |
-      | Transaction Amount [0]   | 16-Byte | Amount to send, up to an array of 8 elements. 0 if *change rep* <br/>Must have the same number of elements as target address |
-      | Signature | 64 - Byte | EdDSA signature |
-      | Work      | 8-Byte  |Proof of Work Nonce |
-      | Type      | Send or Change  | What is this transaction |
-    */
 
     const transactionLabels = [
       { value: 0, text: 'Lookup account by transaction' },
@@ -808,7 +872,8 @@ export default {
       keyOptions,
       workOptions,
       transactionOptions,
-      otherOptions
+      otherOptions,
+      blockOptions
     ]
 
     const labels = [
@@ -817,7 +882,8 @@ export default {
       keyLabels,
       workLabels,
       transactionLabels,
-      otherLabels
+      otherLabels,
+      blockLabels
     ]
 
     return {
@@ -831,7 +897,8 @@ export default {
       selectedKeys: 0,
       selectedWork: 0,
       selectedTransactions: 0,
-      selectedOther: 0
+      selectedOther: 0,
+      selectedBlocks: 0
     }
   },
   watch: {
