@@ -62,7 +62,7 @@ export default new Router({
       props: true
     },
     {
-      path: '/epoch/:id',
+      path: '/epoch/:hash([0-9a-fA-F]{64})',
       name: 'epoch',
       component: epoch,
       props: true

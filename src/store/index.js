@@ -5,6 +5,8 @@ import account from './modules/account'
 import explorer from './modules/explorer'
 import chains from './modules/chains'
 import batchBlock from './modules/batchBlock'
+import microEpoch from './modules/microEpoch'
+import epoch from './modules/epoch'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -13,7 +15,9 @@ export default new Vuex.Store({
     explorer,
     account,
     chains,
-    batchBlock
+    batchBlock,
+    microEpoch,
+    epoch
   },
   strict: true
 })

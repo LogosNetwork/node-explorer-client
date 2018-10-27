@@ -25,7 +25,7 @@ const actions = {
         commit('setError', 'null')
       }
     })
-    rpcClient.microEpochs.history(50, 0).then(val => {
+    rpcClient.microEpochs.history(null, 0).then(val => {
       if (val) {
         if (!val.error) {
           commit('setMicroEpochs', val.micro_blocks)

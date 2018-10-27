@@ -3,7 +3,7 @@
     <b-container>
       <b-row class="text-left pt-5">
         <b-col cols="12" md="8" class="mb-5">
-          <h4 class="text-left" v-t="'transaction'"></h4>
+          <h3 class="text-left" v-t="'transaction'"></h3>
           <code style="background-color:#FFF;color:#ff3860;padding:6px">{{transaction}}</code>
         </b-col>
       </b-row>

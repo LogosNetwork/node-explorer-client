@@ -3,7 +3,7 @@
     <b-container>
       <b-row class="text-left pt-5">
         <b-col cols="12" md="8" class="mb-3">
-          <h4 class="text-left" v-t="'account'"></h4>
+          <h3 class="text-left" v-t="'account'"></h3>
           <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
           <h3 v-if="!error && balance" class="pt-3" style="color:green">{{balance}} LOGOS</h3>
           <h4 v-if="error" class="pt-3" style="color:red">This account has not been opened yet</h4>

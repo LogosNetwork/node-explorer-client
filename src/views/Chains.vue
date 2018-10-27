@@ -80,7 +80,7 @@
         </b-tab>
         <b-tab :title="$t('epochs')">
           <div :key="epoch.hash" v-for="epoch in epochs">
-            <b-link class="cardLink" :to="'/epoch/'+epoch.epoch_number">
+            <b-link class="cardLink" :to="'/epoch/'+epoch.hash">
               <b-card class="mt-3 mb-3 text-left">
                 <b-row>
                   <b-col>
@@ -96,7 +96,7 @@
                 </b-row>
                 <b-row class="mb-2">
                   <b-col class="text-truncate">
-                    Hash: <b-link :to="'/epoch/'+epoch.epoch_number">{{epoch.hash}}</b-link>
+                    Hash: <b-link :to="'/epoch/'+epoch.hash">{{epoch.hash}}</b-link>
                   </b-col>
                 </b-row>
                 <b-row v-if="epoch.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-2">
