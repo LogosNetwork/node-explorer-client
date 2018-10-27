@@ -4,6 +4,7 @@ import mqtt from './modules/mqtt'
 import account from './modules/account'
 import explorer from './modules/explorer'
 import chains from './modules/chains'
+import batchBlock from './modules/batchBlock'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -11,7 +12,8 @@ export default new Vuex.Store({
     mqtt,
     explorer,
     account,
-    chains
+    chains,
+    batchBlock
   },
   strict: true
 })

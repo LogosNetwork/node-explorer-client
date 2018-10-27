@@ -4,6 +4,9 @@ import Explore from './views/Explore.vue'
 import Governance from './views/Governance.vue'
 import Workbench from './views/Workbench.vue'
 import Transaction from './views/Transaction.vue'
+import microEpoch from './views/MicroEpoch.vue'
+import batchBlock from './views/BatchBlock.vue'
+import epoch from './views/Epoch.vue'
 import notFound from './views/404.vue'
 import Account from './views/Account.vue'
 import Chains from './views/Chains.vue'
@@ -44,6 +47,24 @@ export default new Router({
       path: '/:transaction([0-9a-fA-F]{64})',
       name: 'transaction',
       component: Transaction,
+      props: true
+    },
+    {
+      path: '/microEpoch/:hash([0-9a-fA-F]{64})',
+      name: 'microEpoch',
+      component: microEpoch,
+      props: true
+    },
+    {
+      path: '/batchBlock/:hash([0-9a-fA-F]{64})',
+      name: 'batchBlock',
+      component: batchBlock,
+      props: true
+    },
+    {
+      path: '/epoch/:id',
+      name: 'epoch',
+      component: epoch,
       props: true
     },
     {

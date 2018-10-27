@@ -553,7 +553,7 @@ export default {
             hash = [hash]
           }
           $this.editor += `Fetching batch block of ${hash}....\n`
-          $this.$Logos.batchStateBlocks.get(hash).then((val) => {
+          $this.$Logos.batchBlocks.get(hash).then((val) => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
@@ -570,7 +570,7 @@ export default {
           let count = params[0].value
           let delegateId = params[1].value
           $this.editor += `Fetching ${count} of the most recent batch state blocks from delegate ${delegateId}....\n`
-          $this.$Logos.batchStateBlocks.history(count, delegateId).then((val) => {
+          $this.$Logos.batchBlocks.history(count, delegateId).then((val) => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
