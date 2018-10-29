@@ -3,14 +3,84 @@
     <b-container class="pt-5">
       <h5 class="text-left d-block d-sm-none" v-t="'explore_cta'"></h5>
       <h2 class="d-none d-sm-block" v-t="'explore_cta'"></h2>
-      <b-form id="addressForm" class="mb-2">
+      <b-form id="addressForm" class="mb-3">
         <label class="sr-only" for="address" v-t="'searchPlaceholder'"></label>
         <b-input @keydown.native="submitSearch" id="address" type="text" :state="searchState" aria-describedby="inputLiveFeedback" :placeholder="$t('searchPlaceholder')" v-model="address" />
         <b-form-invalid-feedback id="inputLiveFeedback">
           Enter a Logos address or a transactions hash.
         </b-form-invalid-feedback>
       </b-form>
-      <b-row class="text-left pt-5">
+      <b-row class="text-left">
+        <b-col cols="12" md="4" class="mb-3">
+          <h5>Latest Batch Block</h5>
+          <b-link v-if="batchBlock" class="cardLink" :to="'/batchBlock/'+batchBlock.hash">
+            <b-card>
+              <b-row>
+                <b-col class="text-truncate">
+                  <b-link :to="'/batchBlock/'+batchBlock.hash">{{batchBlock.hash}}</b-link>
+                </b-col>
+              </b-row>
+              <b-row>
+                <b-col>
+                  <span> {{parseInt(batchBlock.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</span>
+                </b-col>
+              </b-row>
+              <b-row>
+                <b-col>
+                  Contains {{batchBlock.block_count}} Transactions
+                </b-col>
+              </b-row>
+            </b-card>
+          </b-link>
+        </b-col>
+        <b-col cols="12" md="4" class="mb-3">
+          <h5>Current Micro Epoch</h5>
+           <b-link v-if="microEpoch" class="cardLink" :to="'/microEpoch/'+microEpoch.hash">
+              <b-card>
+                <b-row>
+                  <b-col class="text-truncate">
+                    <b-link :to="'/microEpoch/'+microEpoch.hash" v-if="microEpoch.timestamp !== '0'">Micro Epoch #{{microEpoch.micro_block_number}}</b-link>
+                  </b-col>
+                </b-row>
+                <b-row>
+                  <b-col>
+                    <span v-if="microEpoch.timestamp !== '0'"> {{parseInt(microEpoch.timestamp) | moment('ddd, D MMM YYYY h:mma')}}</span>
+                    <span v-if="microEpoch.timestamp === '0'"> Genesis Micro Epoch</span>
+                  </b-col>
+                </b-row>
+                <b-row>
+                  <b-col>
+                    Contains {{microEpoch.number_batch_blocks}} Batch Blocks
+                  </b-col>
+                </b-row>
+              </b-card>
+            </b-link>
+        </b-col>
+        <b-col cols="12" md="4" class="mb-3">
+          <h5>Current Epoch</h5>
+          <b-link v-if="epoch" class="cardLink" :to="'/epoch/'+epoch.hash">
+              <b-card>
+                <b-row>
+                  <b-col class="text-truncate">
+                    <b-link :to="'/epoch/'+epoch.hash">Epoch #{{epoch.epoch_number}}</b-link>
+                  </b-col>
+                </b-row>
+                <b-row>
+                  <b-col>
+                    <span v-if="epoch.timestamp !== '0'"> {{parseInt(epoch.timestamp) | moment('ddd, D MMM YYYY h:mma')}}</span>
+                    <span v-if="epoch.timestamp === '0'"> Genesis Epoch</span>
+                  </b-col>
+                </b-row>
+                <b-row>
+                  <b-col>
+                    Fee Reward: {{epoch.transaction_fee_pool}}
+                  </b-col>
+                </b-row>
+              </b-card>
+            </b-link>
+        </b-col>
+      </b-row>
+      <b-row class="text-left">
         <b-col cols="12" class="mb-5">
           <h5 class="text-left" v-t="'recent_transactions'"></h5>
           <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="transactions">
@@ -103,15 +173,18 @@ export default {
     },
     ...mapState('explorer', {
       error: state => state.error,
-      transactions: state => state.transactions
+      transactions: state => state.transactions,
+      microEpoch: state => state.microEpoch,
+      batchBlock: state => state.batchBlock,
+      epoch: state => state.epoch
     })
   },
   created: function () {
-    this.initalize({ url: `mqtt:${window.location.hostname}:8883/mqtt`,
+    this.initalize({ url: `mqtt:18.235.68.120:8883/mqtt`,
       cb: () => {
-        this.subscribe(`account/+`)
+        this.subscribe(`#`)
       } })
-    // this.getRecentTransactions()
+    this.getRecentTransactions()
   },
   data () {
     return {
@@ -144,5 +217,18 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
+  .cardLink {
+    color:#525f7f;
+  }
+  .cardLink:hover {
+    text-decoration: none;
+  }
+  .cardLink > .card {
+    -webkit-transition: all .3s;
+    -o-transition: all .3s;
+    transition: all .3s;
+  }
+  .cardLink:hover > .card {
+    box-shadow: 0 10px 30px -5px rgba(10,16,34,.2);
+  }
 </style>

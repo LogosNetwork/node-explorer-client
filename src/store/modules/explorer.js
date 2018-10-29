@@ -2,7 +2,10 @@ import Logos from '@logosnetwork/logos-rpc-client'
 const rpcClient = new Logos({ url: 'http://18.212.15.104:55000', debug: true })
 const state = {
   transactions: [],
-  error: null
+  error: null,
+  epoch: null,
+  microEpoch: null,
+  batchBlock: null
 }
 
 const getters = {
@@ -11,11 +14,37 @@ const getters = {
 
 const actions = {
   getRecentTransactions: ({ commit }) => {
-    rpcClient.rpc('confirmation_history').then(val => {
-      if (!val.error) {
-        console.log(val)
+    rpcClient.batchBlocks.history(1, 0).then(val => {
+      if (val) {
+        if (!val.error) {
+          commit('setBatchBlock', val.batch_blocks)
+        } else {
+          commit('setError', val.error)
+        }
       } else {
-        commit('setError', val.error)
+        commit('setError', 'null')
+      }
+    })
+    rpcClient.microEpochs.history(1, 0).then(val => {
+      if (val) {
+        if (!val.error) {
+          commit('setMicroEpoch', val.micro_blocks)
+        } else {
+          commit('setError', val.error)
+        }
+      } else {
+        commit('setError', 'null')
+      }
+    })
+    rpcClient.epochs.history(1, 0).then(val => {
+      if (val) {
+        if (!val.error) {
+          commit('setEpoch', val.epochs)
+        } else {
+          commit('setError', val.error)
+        }
+      } else {
+        commit('setError', 'null')
       }
     })
   },
@@ -30,6 +59,15 @@ const mutations = {
   },
   setTransactions (state, transactions) {
     state.transactions = transactions
+  },
+  setBatchBlock (state, batchBlocks) {
+    state.batchBlock = batchBlocks[0]
+  },
+  setMicroEpoch (state, microEpochs) {
+    state.microEpoch = microEpochs[0]
+  },
+  setEpoch (state, epochs) {
+    state.epoch = epochs[0]
   },
   addBlock (state, blockData) {
     blockData.message = JSON.parse(blockData.message)
