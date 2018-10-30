@@ -211,7 +211,7 @@ export default {
     ])
   },
   destroyed: function () {
-    this.unsubscribe(`account/+`)
+    this.unsubscribe(`#`)
   }
 }
 </script>

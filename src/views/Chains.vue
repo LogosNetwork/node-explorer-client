@@ -138,9 +138,9 @@ export default {
     this.reset()
     this.initalize({ url: `mqtt:18.235.68.120:8883/mqtt`,
       cb: () => {
-        this.subscribe(`batchBlocks/+`)
-        this.subscribe(`microEpochs/+`)
-        this.subscribe(`epochs/+`)
+        this.subscribe(`batchBlock`)
+        this.subscribe(`microEpoch`)
+        this.subscribe(`epoch`)
       } })
     this.getRecentBlocks()
   },
@@ -156,9 +156,9 @@ export default {
     ])
   },
   destroyed: function () {
-    this.unsubscribe(`batchBlocks/+`)
-    this.unsubscribe(`microEpochs/+`)
-    this.unsubscribe(`epochs/+`)
+    this.unsubscribe(`batchBlock`)
+    this.unsubscribe(`microEpoch`)
+    this.unsubscribe(`epoch`)
   }
 }
 </script>

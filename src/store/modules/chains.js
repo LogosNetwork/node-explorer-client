@@ -25,7 +25,7 @@ const actions = {
         commit('setError', 'null')
       }
     })
-    rpcClient.microEpochs.history(null, 0).then(val => {
+    rpcClient.microEpochs.history(50, 0).then(val => {
       if (val) {
         if (!val.error) {
           commit('setMicroEpochs', val.micro_blocks)
@@ -70,13 +70,13 @@ const mutations = {
     state.epochs = []
   },
   addBatchBlock (state, data) {
-    state.batchBlocks.unshift(data.message)
+    state.batchBlocks.unshift(data)
   },
   addMicroEpoch (state, data) {
-    state.microEpochs.unshift(data.message)
+    state.microEpochs.unshift(data)
   },
   addEpoch (state, data) {
-    state.epochs.unshift(data.message)
+    state.epochs.unshift(data)
   },
   setError (state, error) {
     state.error = error
