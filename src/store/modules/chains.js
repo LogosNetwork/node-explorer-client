@@ -76,7 +76,7 @@ const mutations = {
     state.microEpochs.unshift(data.message)
   },
   addEpoch (state, data) {
-    state.Epochs.unshift(data.message)
+    state.epochs.unshift(data.message)
   },
   setError (state, error) {
     state.error = error

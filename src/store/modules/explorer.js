@@ -17,7 +17,7 @@ const actions = {
     rpcClient.batchBlocks.history(1, 0).then(val => {
       if (val) {
         if (!val.error) {
-          commit('setBatchBlock', val.batch_blocks)
+          commit('setBatchBlock', val.batch_blocks[0])
         } else {
           commit('setError', val.error)
         }
@@ -28,7 +28,7 @@ const actions = {
     rpcClient.microEpochs.history(1, 0).then(val => {
       if (val) {
         if (!val.error) {
-          commit('setMicroEpoch', val.micro_blocks)
+          commit('setMicroEpoch', val.micro_blocks[0])
         } else {
           commit('setError', val.error)
         }
@@ -39,7 +39,7 @@ const actions = {
     rpcClient.epochs.history(1, 0).then(val => {
       if (val) {
         if (!val.error) {
-          commit('setEpoch', val.epochs)
+          commit('setEpoch', val.epochs[0])
         } else {
           commit('setError', val.error)
         }
@@ -60,14 +60,14 @@ const mutations = {
   setTransactions (state, transactions) {
     state.transactions = transactions
   },
-  setBatchBlock (state, batchBlocks) {
-    state.batchBlock = batchBlocks[0]
+  setBatchBlock (state, batchBlock) {
+    state.batchBlock = batchBlock
   },
-  setMicroEpoch (state, microEpochs) {
-    state.microEpoch = microEpochs[0]
+  setMicroEpoch (state, microEpoch) {
+    state.microEpoch = microEpoch
   },
-  setEpoch (state, epochs) {
-    state.epoch = epochs[0]
+  setEpoch (state, epoch) {
+    state.epoch = epoch
   },
   addBlock (state, blockData) {
     blockData.message = JSON.parse(blockData.message)

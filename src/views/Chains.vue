@@ -136,7 +136,7 @@ export default {
   },
   created: function () {
     this.reset()
-    this.initalize({ url: `mqtt:${window.location.hostname}:8883/mqtt`,
+    this.initalize({ url: `mqtt:18.235.68.120:8883/mqtt`,
       cb: () => {
         this.subscribe(`batchBlocks/+`)
         this.subscribe(`microEpochs/+`)

@@ -84,7 +84,7 @@ export default {
   },
   created: function () {
     this.reset()
-    this.initalize({ url: `mqtt:${window.location.hostname}:8883/mqtt`,
+    this.initalize({ url: `mqtt:18.235.68.120:8883/mqtt`,
       cb: () => {
         this.subscribe(`account/${this.$route.params.account.replace('xrb_', 'lgs_')}`)
       } })
@@ -112,7 +112,7 @@ export default {
   beforeRouteUpdate (to, from, next) {
     this.unsubscribe(`account/${this.account}`)
     this.reset()
-    this.initalize({ url: `mqtt:${window.location.hostname}:8883/mqtt`,
+    this.initalize({ url: `mqtt:18.235.68.120:8883/mqtt`,
       cb: () => {
         this.subscribe(`account/${to.params.account.replace('xrb_', 'lgs_')}`)
       } })

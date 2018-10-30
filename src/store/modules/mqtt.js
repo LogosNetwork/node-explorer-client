@@ -22,16 +22,21 @@ const actions = {
       const accountMqttRegex = mqttRegex('account/+account').exec
       client.on('message', (topic, message) => {
         message = message.toString()
+        console.log(topic)
+        console.log(message)
         // TODO Eventually validate the signatures of the blocks to be "trustless"
         if (topic === 'microEpoch') {
           // Type is Micro Epoch
           commit('chains/addMicroEpoch', { message: message }, { root: true })
+          commit('explorer/setMicroEpoch', JSON.parse(message), { root: true })
         } else if (topic === 'epoch') {
           // Type is Epoch
           commit('chains/addEpoch', { message: message }, { root: true })
+          commit('explorer/setEpoch', JSON.parse(message), { root: true })
         } else if (topic === 'batchStateBlock') {
           // Type is BSB
           commit('chains/addBatchStateBlock', { message: message }, { root: true })
+          commit('explorer/setBatchBlock', JSON.parse(message), { root: true })
         } else {
           // Type is Transactional
           let params = accountMqttRegex(topic)
