@@ -70,11 +70,10 @@ const mutations = {
     state.epoch = epoch
   },
   addBlock (state, blockData) {
-    blockData.message = JSON.parse(blockData.message)
-    if (blockData.message.type === 'send') {
-      blockData.message.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.message.amount, 'LOGOS')).toFixed(5))
-      blockData.message.account = blockData.message.account.replace('xrb_', 'lgs_')
-      state.transactions.unshift(blockData.message)
+    if (blockData.type === 'send') {
+      blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
+      blockData.account = blockData.account.replace('xrb_', 'lgs_')
+      state.transactions.unshift(blockData)
     }
   }
 }

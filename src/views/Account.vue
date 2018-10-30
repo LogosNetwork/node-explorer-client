@@ -28,25 +28,26 @@
             <span>{{blockCount}} </span>
             <span v-t="'transactions'"></span>
             <small v-if='transactions.length === count'> (showing last {{count}})</small>
+            <small v-if='transactions.length > count'> (showing last {{transactions.length}})</small>
             <small v-if='transactions.length < count'> (showing all {{transactions.length}})</small>
           </h4>
           <p class="text-left" v-if="lastModified"><span v-t="'lastUpdated'"></span> <strong> {{ lastModified | moment("MMMM DD, YYYY h:mm:ss A") }}</strong></p>
           <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="transactions">
-            <template slot="type" slot-scope="data">
-              <div class="text-truncate">{{data.item.type}}</div>
-            </template>
             <template slot="timestamp" slot-scope="data">
               <div class="text-truncate" v-if="data.item.timestamp">{{ data.item.timestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
             </template>
             <template slot="account" slot-scope="data">
               <div class="text-truncate"><router-link :to="'/'+data.item.account">{{data.item.account}}</router-link></div>
             </template>
-            <template slot="hash" slot-scope="data">
-              <div class="text-truncate"><router-link :to="'/'+data.item.hash">{{data.item.hash}}</router-link></div>
-            </template>
             <template slot="amount" slot-scope="data">
               <div class="text-truncate" v-if='data.item.type === "receive"'><span class="text-success">+{{data.item.amount}}</span></div>
               <div class="text-truncate" v-if='data.item.type === "send"'><span class="text-danger">-{{data.item.amount}}</span></div>
+            </template>
+            <template slot="hash" slot-scope="data">
+              <div class="text-truncate"><router-link :to="'/'+data.item.hash">{{data.item.hash}}</router-link></div>
+            </template>
+            <template slot="type" slot-scope="data">
+              <div class="text-truncate">{{data.item.type}}</div>
             </template>
           </b-table>
         </b-col>

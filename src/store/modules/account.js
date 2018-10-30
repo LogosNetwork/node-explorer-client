@@ -1,4 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
+import bigInt from 'big-integer'
 const rpcClient = new Logos({ url: 'http://18.212.15.104:55000', debug: true })
 const state = {
   account: null,
@@ -7,6 +8,7 @@ const state = {
   representaive: null,
   error: null,
   balance: null,
+  rawBalance: null,
   count: 50,
   transactions: [],
   blockCount: 0,
@@ -26,6 +28,7 @@ const actions = {
         if (!val.error) {
           commit('setFrontier', val.frontier)
           commit('setOpenBlock', val.open_block)
+          commit('setRawBalance', val.balance)
           commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(val.balance, 'LOGOS')).toFixed(5)))
           commit('setBlockCount', val.block_count)
           commit('setLastModified', parseInt(val.modified_timestamp))
@@ -76,6 +79,9 @@ const mutations = {
   setBalance (state, balance) {
     state.balance = balance
   },
+  setRawBalance (state, balance) {
+    state.rawBalance = balance
+  },
   setBlockCount (state, blockCount) {
     state.blockCount = blockCount
   },
@@ -107,24 +113,28 @@ const mutations = {
     state.lastModified = 0
   },
   addBlock (state, blockData) {
-    blockData.message = JSON.parse(blockData.message)
-    if (blockData.message.account.replace('xrb_', 'lgs_') === state.account) {
-      blockData.message.type = 'send'
-      blockData.message.account = blockData.message.link_as_account.replace('xrb_', 'lgs_')
-    } else if (blockData.message.link_as_account.replace('xrb_', 'lgs_') === state.account) {
-      blockData.message.type = 'receive'
-      blockData.message.account = blockData.message.account.replace('xrb_', 'lgs_')
+    if (blockData.account.replace('xrb_', 'lgs_') === state.account) {
+      state.blockCount++
+      state.frontier = blockData.hash
+      state.rawBalance = bigInt(state.rawBalance).minus(blockData.amount).toString()
+      state.balance = parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5))
+      blockData.account = blockData.link_as_account.replace('xrb_', 'lgs_')
+      blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
+      blockData.timestamp = parseInt(blockData.timestamp)
+      state.lastModified = blockData.timestamp
+      state.transactions.unshift(blockData)
+    } else if (blockData.link_as_account.replace('xrb_', 'lgs_') === state.account) {
+      state.blockCount++
+      state.frontier = blockData.hash
+      state.rawBalance = bigInt(state.rawBalance).plus(blockData.amount).toString()
+      state.balance = parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5))
+      blockData.type = 'receive'
+      blockData.account = blockData.account.replace('xrb_', 'lgs_')
+      blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
+      blockData.timestamp = parseInt(blockData.timestamp)
+      state.lastModified = blockData.timestamp
+      state.transactions.unshift(blockData)
     }
-    blockData.message.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.message.amount, 'LOGOS')).toFixed(5))
-    blockData.message.timestamp = parseInt(blockData.message.timestamp)
-    state.transactions.unshift(blockData.message)
-    state.lastModified = blockData.message.timestamp
-    state.blockCount++
-    state.frontier = blockData.message.hash
-    // Maybe do math instead of querying
-    rpcClient.accounts.reasonBalance(state.account.replace('lgs_', 'xrb_')).then(val => {
-      state.balance = parseFloat(Number(rpcClient.convert.fromReason(val.balance, 'LOGOS')).toFixed(5))
-    })
   }
 }
 

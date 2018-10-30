@@ -21,28 +21,21 @@ const actions = {
       })
       const accountMqttRegex = mqttRegex('account/+account').exec
       client.on('message', (topic, message) => {
-        message = message.toString()
-        console.log(topic)
-        console.log(message)
+        message = JSON.parse(message.toString())
         // TODO Eventually validate the signatures of the blocks to be "trustless"
         if (topic === 'microEpoch') {
-          // Type is Micro Epoch
-          commit('chains/addMicroEpoch', JSON.parse(message), { root: true })
-          commit('explorer/setMicroEpoch', JSON.parse(message), { root: true })
+          commit('chains/addMicroEpoch', message, { root: true })
+          commit('explorer/setMicroEpoch', message, { root: true })
         } else if (topic === 'epoch') {
-          // Type is Epoch
-          commit('chains/addEpoch', JSON.parse(message), { root: true })
-          commit('explorer/setEpoch', JSON.parse(message), { root: true })
-        } else if (topic === 'batchStateBlock') {
-          // Type is BSB
-          commit('chains/addBatchStateBlock', JSON.parse(message), { root: true })
-          commit('explorer/setBatchBlock', JSON.parse(message), { root: true })
+          commit('chains/addEpoch', message, { root: true })
+          commit('explorer/setEpoch', message, { root: true })
+        } else if (topic === 'batchBlock') {
+          commit('chains/addBatchBlock', message, { root: true })
+          commit('explorer/setBatchBlock', message, { root: true })
         } else {
-          // Type is Transactional
           let params = accountMqttRegex(topic)
           if (params) {
-            commit('account/addBlock', { account: params.account, message: message }, { root: true })
-            commit('explorer/addBlock', { message: message }, { root: true })
+            commit('account/addBlock', message, { root: true })
           }
         }
       })

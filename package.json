@@ -11,6 +11,7 @@
     "@logosnetwork/logos-rpc-client": "^1.0.23",
     "@logosnetwork/logos-webwallet-sdk": "^0.0.1",
     "@xkeshi/vue-qrcode": "^1.0.0",
+    "big-integer": "^1.6.36",
     "bootstrap-vue": "^2.0.0-rc.11",
     "compression-webpack-plugin": "^2.0.0",
     "mqtt": "^2.18.8",
