@@ -84,8 +84,14 @@
         <b-col cols="12" class="mb-5">
           <h5 class="text-left" v-t="'recent_transactions'"></h5>
           <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="transactions">
+            <template slot="timestamp" slot-scope="data">
+              <div class="text-truncate" v-if="data.item.timestamp">{{ data.item.timestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
+            </template>
             <template slot="account" slot-scope="data">
               <div class="text-truncate"><router-link :to="'/'+data.item.account">{{data.item.account}}</router-link></div>
+            </template>
+            <template slot="link_as_account" slot-scope="data">
+              <div class="text-truncate"><router-link :to="'/'+data.item.link_as_account">{{data.item.link_as_account}}</router-link></div>
             </template>
             <template slot="hash" slot-scope="data">
               <div class="text-truncate"><router-link :to="'/'+data.item.hash">{{data.item.hash}}</router-link></div>
@@ -156,8 +162,10 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 let fields = [
-  { key: 'account', label: 'Account' },
+  { key: 'timestamp', label: 'Time' },
   { key: 'hash', label: 'Hash' },
+  { key: 'account', label: 'From' },
+  { key: 'link_as_account', label: 'To' },
   { key: 'amount', label: 'Amount' }
 ]
 export default {

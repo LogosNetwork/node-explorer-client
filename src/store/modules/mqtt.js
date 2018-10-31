@@ -36,6 +36,7 @@ const actions = {
           let params = accountMqttRegex(topic)
           if (params) {
             commit('account/addBlock', message, { root: true })
+            commit('explorer/addBlock', message, { root: true })
           }
         }
       })

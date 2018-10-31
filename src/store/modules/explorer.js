@@ -1,4 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
+import cloneDeep from 'lodash/cloneDeep'
 const rpcClient = new Logos({ url: 'http://18.212.15.104:55000', debug: true })
 const state = {
   transactions: [],
@@ -69,10 +70,13 @@ const mutations = {
   setEpoch (state, epoch) {
     state.epoch = epoch
   },
-  addBlock (state, blockData) {
+  addBlock (state, block) {
+    let blockData = cloneDeep(block)
     if (blockData.type === 'send') {
       blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
       blockData.account = blockData.account.replace('xrb_', 'lgs_')
+      blockData.timestamp = parseInt(blockData.timestamp)
+      blockData.link_as_account = blockData.link_as_account.replace('xrb_', 'lgs_')
       state.transactions.unshift(blockData)
     }
   }

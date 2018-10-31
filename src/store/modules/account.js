@@ -1,5 +1,6 @@
 import Logos from '@logosnetwork/logos-rpc-client'
 import bigInt from 'big-integer'
+import cloneDeep from 'lodash/cloneDeep'
 const rpcClient = new Logos({ url: 'http://18.212.15.104:55000', debug: true })
 const state = {
   account: null,
@@ -112,7 +113,8 @@ const mutations = {
     state.blockCount = 0
     state.lastModified = 0
   },
-  addBlock (state, blockData) {
+  addBlock (state, block) {
+    let blockData = cloneDeep(block)
     if (blockData.account.replace('xrb_', 'lgs_') === state.account) {
       state.blockCount++
       state.frontier = blockData.hash
