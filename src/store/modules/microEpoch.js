@@ -1,5 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
-const rpcClient = new Logos({ url: 'http://18.212.15.104:55000', debug: true })
+const rpcClient = new Logos({ url: 'http://34.230.59.175:55000', debug: true })
 const state = {
   hash: null,
   microEpoch: null,

@@ -1,6 +1,6 @@
 import Logos from '@logosnetwork/logos-rpc-client'
 import cloneDeep from 'lodash/cloneDeep'
-const rpcClient = new Logos({ url: 'http://18.212.15.104:55000', debug: true })
+const rpcClient = new Logos({ url: 'http://34.230.59.175:55000', debug: true })
 const state = {
   transactions: [],
   error: null,

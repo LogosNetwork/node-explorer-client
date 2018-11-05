@@ -46,7 +46,7 @@
 import Vue from 'vue'
 import Logos from '../api/rpc'
 import codepad from '@/components/codepad.vue'
-Vue.use(Logos, { url: 'http://18.212.15.104:55000', debug: true })
+Vue.use(Logos, { url: 'http://34.230.59.175:55000', debug: true })
 
 let transaction = null
 let details = null

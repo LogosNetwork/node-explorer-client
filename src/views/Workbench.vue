@@ -2,7 +2,7 @@
   <div id="primary">
     <b-container class="pt-5">
         <h5 class="text-left" v-t="'build_api_cta'"></h5>
-        <b-input placeholder="http://18.212.15.104:55000" v-model="nodeURL" class="mb-3" />
+        <b-input placeholder="http://34.230.59.175:55000" v-model="nodeURL" class="mb-3" />
         <b-card no-body>
             <b-tabs pills card vertical>
                 <b-tab title="My Account" active>
@@ -112,7 +112,7 @@ import Vue from 'vue'
 import Logos from '../api/rpc'
 import LogosWallet from '../api/wallet'
 import codepad from '@/components/codepad.vue'
-Vue.use(Logos, { url: 'http://18.212.15.104:55000', debug: true })
+Vue.use(Logos, { url: 'http://34.230.59.175:55000', debug: true })
 Vue.use(LogosWallet)
 
 export default {
@@ -956,7 +956,7 @@ export default {
       key: null,
       options: options,
       editor: '',
-      nodeURL: 'http://18.212.15.104:55000',
+      nodeURL: 'http://34.230.59.175:55000',
       labels: labels,
       selectedAccount: 0,
       selectedAccounts: 0,

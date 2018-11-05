@@ -41,6 +41,9 @@
             <template slot="amount" slot-scope="data">
               <div class="text-truncate"><span class="text-success">+{{data.item.amount}}</span></div>
             </template>
+            <template slot="hash" slot-scope="data">
+              <div class="text-truncate"><router-link :to="'/'+data.item.hash">{{data.item.hash}}</router-link></div>
+            </template>
           </b-table>
         </b-col>
       </b-row>
