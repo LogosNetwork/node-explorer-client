@@ -93,11 +93,11 @@
             <template slot="link_as_account" slot-scope="data">
               <div class="text-truncate"><router-link :to="'/'+data.item.link_as_account">{{data.item.link_as_account}}</router-link></div>
             </template>
-            <template slot="hash" slot-scope="data">
-              <div class="text-truncate"><router-link :to="'/'+data.item.hash">{{data.item.hash}}</router-link></div>
-            </template>
             <template slot="amount" slot-scope="data">
               <div class="text-truncate"><span class="text-success">+{{data.item.amount}}</span></div>
+            </template>
+            <template slot="hash" slot-scope="data">
+              <div class="text-truncate"><router-link :to="'/'+data.item.hash">{{data.item.hash}}</router-link></div>
             </template>
           </b-table>
         </b-col>
@@ -163,10 +163,10 @@
 import { mapActions, mapState } from 'vuex'
 let fields = [
   { key: 'timestamp', label: 'Time' },
-  { key: 'hash', label: 'Hash' },
   { key: 'account', label: 'From' },
   { key: 'link_as_account', label: 'To' },
-  { key: 'amount', label: 'Amount' }
+  { key: 'amount', label: 'Amount' },
+  { key: 'hash', label: 'Hash' }
 ]
 export default {
   name: 'explore',
