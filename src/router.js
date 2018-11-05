@@ -38,7 +38,7 @@ export default new Router({
       component: Workbench
     },
     {
-      path: '/:account(xrb_[13456789abcdefghijkmnopqrstuwxyz]{60}|lgs_[13456789abcdefghijkmnopqrstuwxyz]{60})',
+      path: '/:account(lgs_[13456789abcdefghijkmnopqrstuwxyz]{60})',
       name: 'account',
       component: Account,
       props: true

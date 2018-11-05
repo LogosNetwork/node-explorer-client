@@ -87,7 +87,7 @@ export default {
     this.reset()
     this.initalize({ url: `mqtt:18.235.68.120:8883/mqtt`,
       cb: () => {
-        this.subscribe(`account/${this.$route.params.account.replace('xrb_', 'lgs_')}`)
+        this.subscribe(`account/${this.$route.params.account}`)
       } })
     this.getAccountInfo(this.$route.params.account)
   },
@@ -115,7 +115,7 @@ export default {
     this.reset()
     this.initalize({ url: `mqtt:18.235.68.120:8883/mqtt`,
       cb: () => {
-        this.subscribe(`account/${to.params.account.replace('xrb_', 'lgs_')}`)
+        this.subscribe(`account/${to.params.account}`)
       } })
     this.getAccountInfo(to.params.account)
     next()

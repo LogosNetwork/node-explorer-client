@@ -36,7 +36,7 @@
               <div class="text-truncate"><router-link :to="'/'+data.item.account">{{data.item.account}}</router-link></div>
             </template>
             <template slot="to" slot-scope="data">
-              <div class="text-truncate"><router-link :to="'/'+data.item.link_as_account.replace('xrb_','lgs_')">{{data.item.link_as_account.replace('xrb_','lgs_')}}</router-link></div>
+              <div class="text-truncate"><router-link :to="'/'+data.item.link_as_account">{{data.item.link_as_account}}</router-link></div>
             </template>
             <template slot="amount" slot-scope="data">
               <div class="text-truncate"><span class="text-success">+{{data.item.amount}}</span></div>

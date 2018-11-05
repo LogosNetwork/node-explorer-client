@@ -65,15 +65,15 @@ export default {
         this.details.type = val.type
         if (this.details.type === 'receive') {
           this.$Logos.transactions.info(this.details.link).then(val => {
-            this.details.link_as_account = val.account.replace('xrb_', 'lgs_')
+            this.details.link_as_account = val.account
             this.prettyDetails = JSON.stringify(this.details, null, ' ')
           })
         } else {
-          this.details.link_as_account = this.details.link_as_account.replace('xrb_', 'lgs_')
+          this.details.link_as_account = this.details.link_as_account
           this.prettyDetails = JSON.stringify(this.details, null, ' ')
         }
         this.details.amount = parseFloat(Number(this.$Logos.convert.fromReason(this.details.amount, 'LOGOS')).toFixed(5))
-        this.details.account = this.details.account.replace('xrb_', 'lgs_')
+        this.details.account = this.details.account
       } else {
         if (val && val.error) { this.error = val.error } else { this.error = '404' }
       }
@@ -95,15 +95,15 @@ export default {
         this.details.type = val.type
         if (this.details.type === 'receive') {
           this.$Logos.transactions.info(this.details.link).then(val => {
-            this.details.link_as_account = val.account.replace('xrb_', 'lgs_')
+            this.details.link_as_account = val.account
             this.prettyDetails = JSON.stringify(this.details, null, ' ')
           })
         } else {
-          this.details.link_as_account = this.details.link_as_account.replace('xrb_', 'lgs_')
+          this.details.link_as_account = this.details.link_as_account
           this.prettyDetails = JSON.stringify(this.details, null, ' ')
         }
         this.details.amount = parseFloat(Number(this.$Logos.convert.fromReason(this.details.amount, 'LOGOS')).toFixed(5))
-        this.details.account = this.details.account.replace('xrb_', 'lgs_')
+        this.details.account = this.details.account
       } else {
         if (val && val.error) { this.error = val.error } else { this.error = '404' }
       }

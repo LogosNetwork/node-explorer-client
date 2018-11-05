@@ -176,7 +176,7 @@ export default {
       if (this.address.length === 0) {
         return null
       } else {
-        return this.address.match(/xrb_[13456789abcdefghijkmnopqrstuwxyz]{60}|lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}/) !== null || this.address.match(/[0-9a-fA-F]{64}/) !== null
+        return this.address.match(/lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}/) !== null || this.address.match(/[0-9a-fA-F]{64}/) !== null
       }
     },
     ...mapState('explorer', {
@@ -204,7 +204,7 @@ export default {
     submitSearch (event) {
       if (event.which === 13) {
         event.preventDefault()
-        if (this.address.match(/xrb_[13456789abcdefghijkmnopqrstuwxyz]{60}|lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}/) !== null || this.address.match(/[0-9a-fA-F]{64}/) !== null) {
+        if (this.address.match(/lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}/) !== null || this.address.match(/[0-9a-fA-F]{64}/) !== null) {
           window.location.href = '/' + this.address
         }
       }

@@ -74,9 +74,9 @@ const mutations = {
     let blockData = cloneDeep(block)
     if (blockData.type === 'send') {
       blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
-      blockData.account = blockData.account.replace('xrb_', 'lgs_')
+      blockData.account = blockData.account
       blockData.timestamp = parseInt(blockData.timestamp)
-      blockData.link_as_account = blockData.link_as_account.replace('xrb_', 'lgs_')
+      blockData.link_as_account = blockData.link_as_account
       state.transactions.unshift(blockData)
     }
   }

@@ -22,7 +22,6 @@ const getters = {
 
 const actions = {
   getAccountInfo: ({ state, commit }, account) => {
-    account = account.replace('lgs_', 'xrb_')
     commit('setAccount', account)
     rpcClient.accounts.info(account).then(val => {
       if (val) {
@@ -35,7 +34,7 @@ const actions = {
           commit('setLastModified', parseInt(val.modified_timestamp))
           rpcClient.accounts.toAddress(val.representative_block).then(val => {
             if (val.account) {
-              commit('setRepresentative', val.account.replace('xrb_', 'lgs_'))
+              commit('setRepresentative', val.account)
             }
           })
         } else {
@@ -51,7 +50,7 @@ const actions = {
           for (let trans of val) {
             trans.amount = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
             trans.timestamp = parseInt(trans.timestamp)
-            trans.account = trans.account.replace('xrb_', 'lgs_')
+            trans.account = trans.account
           }
           commit('setTransactions', val)
         } else {
@@ -99,7 +98,7 @@ const mutations = {
     state.transactions = transactions
   },
   setAccount (state, account) {
-    state.account = account.replace('xrb_', 'lgs_')
+    state.account = account
   },
   reset (state) {
     state.account = null
@@ -115,23 +114,23 @@ const mutations = {
   },
   addBlock (state, block) {
     let blockData = cloneDeep(block)
-    if (blockData.account.replace('xrb_', 'lgs_') === state.account) {
+    if (blockData.account === state.account) {
       state.blockCount++
       state.frontier = blockData.hash
       state.rawBalance = bigInt(state.rawBalance).minus(blockData.amount).toString()
       state.balance = parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5))
-      blockData.account = blockData.link_as_account.replace('xrb_', 'lgs_')
+      blockData.account = blockData.link_as_account
       blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
       blockData.timestamp = parseInt(blockData.timestamp)
       state.lastModified = blockData.timestamp
       state.transactions.unshift(blockData)
-    } else if (blockData.link_as_account.replace('xrb_', 'lgs_') === state.account) {
+    } else if (blockData.link_as_account === state.account) {
       state.blockCount++
       state.frontier = blockData.hash
       state.rawBalance = bigInt(state.rawBalance).plus(blockData.amount).toString()
       state.balance = parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5))
       blockData.type = 'receive'
-      blockData.account = blockData.account.replace('xrb_', 'lgs_')
+      blockData.account = blockData.account
       blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
       blockData.timestamp = parseInt(blockData.timestamp)
       state.lastModified = blockData.timestamp
