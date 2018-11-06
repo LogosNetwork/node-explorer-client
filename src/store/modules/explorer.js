@@ -16,7 +16,7 @@ const getters = {
 
 const actions = {
   getRecentTransactions: ({ commit }) => {
-    rpcClient.batchBlocks.history(50, 0).then(val => {
+    rpcClient.batchBlocks.history(1, 0).then(val => {
       if (val) {
         if (!val.error) {
           commit('setBatchBlock', val.batch_blocks[0])
@@ -41,7 +41,7 @@ const actions = {
         commit('setError', 'null')
       }
     })
-    rpcClient.microEpochs.history(1, 0).then(val => {
+    rpcClient.microEpochs.history(1).then(val => {
       if (val) {
         if (!val.error) {
           commit('setMicroEpoch', val.micro_blocks[0])
@@ -52,7 +52,7 @@ const actions = {
         commit('setError', 'null')
       }
     })
-    rpcClient.epochs.history(1, 0).then(val => {
+    rpcClient.epochs.history(1).then(val => {
       if (val) {
         if (!val.error) {
           commit('setEpoch', val.epochs[0])

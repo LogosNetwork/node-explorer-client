@@ -13,7 +13,7 @@ const getters = {
 }
 
 const actions = {
-  getRecentBlocks: ({ state, commit }) => {
+  getRecentBlocks: ({ commit }) => {
     rpcClient.batchBlocks.history(50, 0).then(val => {
       if (val) {
         if (!val.error) {
@@ -25,7 +25,7 @@ const actions = {
         commit('setError', 'null')
       }
     })
-    rpcClient.microEpochs.history(50, 0).then(val => {
+    rpcClient.microEpochs.history(50).then(val => {
       if (val) {
         if (!val.error) {
           commit('setMicroEpochs', val.micro_blocks)
@@ -36,7 +36,7 @@ const actions = {
         commit('setError', 'null')
       }
     })
-    rpcClient.epochs.history(50, 0).then(val => {
+    rpcClient.epochs.history(50).then(val => {
       if (val) {
         if (!val.error) {
           commit('setEpochs', val.epochs)
@@ -47,6 +47,29 @@ const actions = {
         commit('setError', 'null')
       }
     })
+  },
+  loadMicroEpochs: ({ state, commit }, cb) => {
+    let savedMicroEpochs = [...state.microEpochs]
+    if (savedMicroEpochs && savedMicroEpochs.length > 0) {
+      let lastHash = savedMicroEpochs[savedMicroEpochs.length - 1].hash
+      console.log(`Pulling next 50 microEpochs starting from ${lastHash}`)
+      rpcClient.microEpochs.history(50, lastHash).then(val => {
+        if (val) {
+          if (!val.error) {
+            for (let microEpoch of val.micro_blocks) {
+              commit('pushMicroEpoch', microEpoch)
+            }
+            cb()
+          } else {
+            commit('setError', val.error)
+          }
+        } else {
+          commit('setError', 'null')
+        }
+      })
+    } else {
+      cb()
+    }
   },
   reset: ({ commit }) => {
     commit('reset')
@@ -74,6 +97,9 @@ const mutations = {
   },
   addMicroEpoch (state, data) {
     state.microEpochs.unshift(data)
+  },
+  pushMicroEpoch (state, data) {
+    state.microEpochs.push(data)
   },
   addEpoch (state, data) {
     state.epochs.unshift(data)

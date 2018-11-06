@@ -37,7 +37,7 @@
             <icon v-if="batchBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" scale="2" name="chevron-down"></icon>
           </div>
         </b-tab>
-        <b-tab :title="$t('micro_epochs')">
+        <b-tab :title="$t('micro_epochs')" v-infinite-scroll="loadMoreMicroEpochs" infinite-scroll-disabled="busy" infinite-scroll-distance="10">
           <div :key="microEpoch.hash" v-for="microEpoch in microEpochs">
             <b-link class="cardLink" :to="'/microEpoch/'+microEpoch.hash">
               <b-card class="mt-3 mb-3 text-left">
@@ -121,7 +121,10 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import infiniteScroll from 'vue-infinite-scroll'
+import Vue from 'vue'
 import codepad from '@/components/codepad.vue'
+Vue.use(infiniteScroll)
 export default {
   name: 'explore',
   components: {
@@ -133,6 +136,11 @@ export default {
       microEpochs: state => state.microEpochs,
       epochs: state => state.epochs
     })
+  },
+  data: function () {
+    return {
+      busy: false
+    }
   },
   created: function () {
     this.reset()
@@ -152,8 +160,15 @@ export default {
     ]),
     ...mapActions('chains', [
       'getRecentBlocks',
+      'loadMicroEpochs',
       'reset'
-    ])
+    ]),
+    loadMoreMicroEpochs: function () {
+      this.busy = true
+      this.loadMicroEpochs(() => {
+        this.busy = false
+      })
+    }
   },
   destroyed: function () {
     this.unsubscribe(`batchBlock`)
