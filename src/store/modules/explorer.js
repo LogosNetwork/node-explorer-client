@@ -51,7 +51,12 @@ const actions = {
     })
     axios.get('/blocks/transactions')
       .then((res) => {
-        commit('setTransactions', res.data.transactions)
+        for (var i = 0; i < res.data.data.transactions.length; i++) {
+          res.data.data.transactions[i].timestamp = parseInt(res.data.data.transactions[i].timestamp)
+          if (i === res.data.data.transactions.length - 1) {
+            commit('setTransactions', res.data.data.transactions)
+          }
+        }
       })
       .catch((err) => {
         commit('setError', err)
