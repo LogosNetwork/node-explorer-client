@@ -52,12 +52,45 @@ const actions = {
     let savedMicroEpochs = [...state.microEpochs]
     if (savedMicroEpochs && savedMicroEpochs.length > 0) {
       let lastHash = savedMicroEpochs[savedMicroEpochs.length - 1].hash
-      console.log(`Pulling next 50 microEpochs starting from ${lastHash}`)
       rpcClient.microEpochs.history(50, lastHash).then(val => {
         if (val) {
           if (!val.error) {
             for (let microEpoch of val.micro_blocks) {
-              commit('pushMicroEpoch', microEpoch)
+              if (microEpoch.hash !== lastHash) { commit('pushMicroEpoch', microEpoch) }
+            }
+            if (val.micro_blocks.length <= 1) {
+              let error = 'out of content'
+              cb(error)
+            } else {
+              cb()
+            }
+          } else {
+            commit('setError', val.error)
+          }
+        } else {
+          commit('setError', 'null')
+        }
+      })
+    } else {
+      cb()
+    }
+  },
+  loadEpochs: ({ state, commit }, cb) => {
+    let savedEpochs = [...state.epochs]
+    let status = null
+    if (savedEpochs && savedEpochs.length > 0) {
+      let lastHash = savedEpochs[savedEpochs.length - 1].hash
+      rpcClient.epochs.history(50, lastHash).then(val => {
+        if (val) {
+          if (!val.error) {
+            for (let epoch of val.epochs) {
+              if (epoch.hash !== lastHash) { commit('pushEpoch', epoch) }
+            }
+            if (val.epochs.length <= 1) {
+              status = 'out of content'
+              cb(status)
+            } else {
+              cb(status)
             }
             cb()
           } else {
@@ -68,7 +101,7 @@ const actions = {
         }
       })
     } else {
-      cb()
+      cb(status)
     }
   },
   reset: ({ commit }) => {
@@ -103,6 +136,9 @@ const mutations = {
   },
   addEpoch (state, data) {
     state.epochs.unshift(data)
+  },
+  pushEpoch (state, data) {
+    state.epochs.push(data)
   },
   setError (state, error) {
     state.error = error

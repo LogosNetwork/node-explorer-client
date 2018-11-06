@@ -37,7 +37,7 @@
             <icon v-if="batchBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" scale="2" name="chevron-down"></icon>
           </div>
         </b-tab>
-        <b-tab :title="$t('micro_epochs')" v-infinite-scroll="loadMoreMicroEpochs" infinite-scroll-disabled="busy" infinite-scroll-distance="10">
+        <b-tab :title="$t('micro_epochs')" v-infinite-scroll="loadMoreMicroEpochs" infinite-scroll-disabled="microEpochsBusy" infinite-scroll-distance="10">
           <div :key="microEpoch.hash" v-for="microEpoch in microEpochs">
             <b-link class="cardLink" :to="'/microEpoch/'+microEpoch.hash">
               <b-card class="mt-3 mb-3 text-left">
@@ -78,7 +78,7 @@
             <icon v-if="microEpoch.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" scale="2" name="chevron-down"></icon>
           </div>
         </b-tab>
-        <b-tab :title="$t('epochs')">
+        <b-tab :title="$t('epochs')" v-infinite-scroll="loadMoreEpochs" infinite-scroll-disabled="epochsBusy" infinite-scroll-distance="10">
           <div :key="epoch.hash" v-for="epoch in epochs">
             <b-link class="cardLink" :to="'/epoch/'+epoch.hash">
               <b-card class="mt-3 mb-3 text-left">
@@ -139,7 +139,8 @@ export default {
   },
   data: function () {
     return {
-      busy: false
+      microEpochsBusy: false,
+      epochsBusy: false
     }
   },
   created: function () {
@@ -161,12 +162,23 @@ export default {
     ...mapActions('chains', [
       'getRecentBlocks',
       'loadMicroEpochs',
+      'loadEpochs',
       'reset'
     ]),
     loadMoreMicroEpochs: function () {
-      this.busy = true
-      this.loadMicroEpochs(() => {
-        this.busy = false
+      this.microEpochsBusy = true
+      this.loadMicroEpochs((err) => {
+        if (!err) { this.microEpochsBusy = false }
+      })
+    },
+    loadMoreEpochs: function () {
+      this.epochsBusy = true
+      this.loadEpochs((err) => {
+        if (err === 'out of content') {
+          this.epochsBusy = true
+        } else if (err === 'success') {
+          this.epochsBusy = false
+        }
       })
     }
   },
