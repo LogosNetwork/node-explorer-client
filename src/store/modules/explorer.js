@@ -1,4 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
+import axios from 'axios'
 import cloneDeep from 'lodash/cloneDeep'
 const rpcClient = new Logos({ url: 'http://34.230.59.175:55000', debug: true })
 const state = {
@@ -48,6 +49,13 @@ const actions = {
         commit('setError', 'null')
       }
     })
+    axios.get('/blocks/transactions')
+      .then((res) => {
+        commit('setTransactions', res.data.transactions)
+      })
+      .catch((err) => {
+        commit('setError', err)
+      })
   },
   reset: ({ commit }) => {
     commit('reset')
