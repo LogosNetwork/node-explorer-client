@@ -53,6 +53,7 @@ const actions = {
       .then((res) => {
         for (var i = 0; i < res.data.data.transactions.length; i++) {
           res.data.data.transactions[i].timestamp = parseInt(res.data.data.transactions[i].timestamp)
+          res.data.data.transactions[i].amount = parseFloat(Number(rpcClient.convert.fromReason(res.data.data.transactions[i].amount, 'LOGOS')).toFixed(5))
           if (i === res.data.data.transactions.length - 1) {
             commit('setTransactions', res.data.data.transactions)
           }
