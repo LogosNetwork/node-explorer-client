@@ -2,7 +2,7 @@
   <div id="primary">
     <b-container class="pt-5">
       <h2 class="text-left d-block" v-t="'blockchains'"></h2>
-      <b-tabs>
+      <b-tabs v-model="tabIndex">
         <b-tab :title="$t('batch_blocks')" active>
           <div :key="batchBlock.hash" v-for="batchBlock in batchBlocks">
             <b-link class="cardLink" :to="'/batchBlock/'+batchBlock.hash">
@@ -37,7 +37,7 @@
             <icon v-if="batchBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" scale="2" name="chevron-down"></icon>
           </div>
         </b-tab>
-        <b-tab :title="$t('micro_epochs')" v-infinite-scroll="loadMoreMicroEpochs" infinite-scroll-disabled="microEpochsBusy" infinite-scroll-distance="10">
+        <b-tab :title="$t('micro_epochs')" v-infinite-scroll="loadMoreMicroEpochs" infinite-scroll-distance="500">
           <div :key="microEpoch.hash" v-for="microEpoch in microEpochs">
             <b-link class="cardLink" :to="'/microEpoch/'+microEpoch.hash">
               <b-card class="mt-3 mb-3 text-left">
@@ -78,7 +78,7 @@
             <icon v-if="microEpoch.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" scale="2" name="chevron-down"></icon>
           </div>
         </b-tab>
-        <b-tab :title="$t('epochs')" v-infinite-scroll="loadMoreEpochs" infinite-scroll-disabled="epochsBusy" infinite-scroll-distance="10">
+        <b-tab :title="$t('epochs')" v-infinite-scroll="loadMoreEpochs" infinite-scroll-distance="500">
           <div :key="epoch.hash" v-for="epoch in epochs">
             <b-link class="cardLink" :to="'/epoch/'+epoch.hash">
               <b-card class="mt-3 mb-3 text-left">
@@ -139,8 +139,9 @@ export default {
   },
   data: function () {
     return {
-      microEpochsBusy: false,
-      epochsBusy: false
+      microEpochsBusy: true,
+      epochsBusy: true,
+      tabIndex: 0
     }
   },
   created: function () {
@@ -151,7 +152,10 @@ export default {
         this.subscribe(`microEpoch`)
         this.subscribe(`epoch`)
       } })
-    this.getRecentBlocks()
+    this.getRecentBlocks(() => {
+      this.microEpochsBusy = false
+      this.epochsBusy = false
+    })
   },
   methods: {
     ...mapActions('mqtt', [
@@ -166,20 +170,28 @@ export default {
       'reset'
     ]),
     loadMoreMicroEpochs: function () {
-      this.microEpochsBusy = true
-      this.loadMicroEpochs((err) => {
-        if (!err) { this.microEpochsBusy = false }
-      })
+      if (!this.microEpochsBusy && this.tabIndex === 1) {
+        this.microEpochsBusy = true
+        this.loadMicroEpochs((err) => {
+          if (err === 'out of content') {
+            this.microEpochsBusy = true
+          } else if (err === 'success') {
+            this.microEpochsBusy = false
+          }
+        })
+      }
     },
     loadMoreEpochs: function () {
-      this.epochsBusy = true
-      this.loadEpochs((err) => {
-        if (err === 'out of content') {
-          this.epochsBusy = true
-        } else if (err === 'success') {
-          this.epochsBusy = false
-        }
-      })
+      if (!this.epochsBusy && this.tabIndex === 2) {
+        this.epochsBusy = true
+        this.loadEpochs((err) => {
+          if (err === 'out of content') {
+            this.epochsBusy = true
+          } else if (err === 'success') {
+            this.epochsBusy = false
+          }
+        })
+      }
     }
   },
   destroyed: function () {

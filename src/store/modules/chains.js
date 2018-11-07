@@ -1,5 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
-const rpcClient = new Logos({ url: 'http://34.230.59.175:55000', debug: true })
+const rpcClient = new Logos({ url: 'http://34.230.59.175:55000' })
 const state = {
   count: 50,
   batchBlocks: [],
@@ -13,11 +13,14 @@ const getters = {
 }
 
 const actions = {
-  getRecentBlocks: ({ commit }) => {
+  getRecentBlocks: ({ commit }, cb) => {
+    let count = 0
     rpcClient.batchBlocks.history(50, 0).then(val => {
+      count++
       if (val) {
         if (!val.error) {
           commit('setBatchBlocks', val.batch_blocks)
+          if (count === 3) cb()
         } else {
           commit('setError', val.error)
         }
@@ -26,9 +29,11 @@ const actions = {
       }
     })
     rpcClient.microEpochs.history(50).then(val => {
+      count++
       if (val) {
         if (!val.error) {
           commit('setMicroEpochs', val.micro_blocks)
+          if (count === 3) cb()
         } else {
           commit('setError', val.error)
         }
@@ -37,9 +42,11 @@ const actions = {
       }
     })
     rpcClient.epochs.history(50).then(val => {
+      count++
       if (val) {
         if (!val.error) {
           commit('setEpochs', val.epochs)
+          if (count === 3) cb()
         } else {
           commit('setError', val.error)
         }
@@ -50,6 +57,7 @@ const actions = {
   },
   loadMicroEpochs: ({ state, commit }, cb) => {
     let savedMicroEpochs = [...state.microEpochs]
+    let status = 'success'
     if (savedMicroEpochs && savedMicroEpochs.length > 0) {
       let lastHash = savedMicroEpochs[savedMicroEpochs.length - 1].hash
       rpcClient.microEpochs.history(50, lastHash).then(val => {
@@ -59,10 +67,10 @@ const actions = {
               if (microEpoch.hash !== lastHash) { commit('pushMicroEpoch', microEpoch) }
             }
             if (val.micro_blocks.length <= 1) {
-              let error = 'out of content'
-              cb(error)
+              status = 'out of content'
+              cb(status)
             } else {
-              cb()
+              cb(status)
             }
           } else {
             commit('setError', val.error)
@@ -72,12 +80,13 @@ const actions = {
         }
       })
     } else {
-      cb()
+      status = 'out of content'
+      cb(status)
     }
   },
   loadEpochs: ({ state, commit }, cb) => {
     let savedEpochs = [...state.epochs]
-    let status = null
+    let status = 'success'
     if (savedEpochs && savedEpochs.length > 0) {
       let lastHash = savedEpochs[savedEpochs.length - 1].hash
       rpcClient.epochs.history(50, lastHash).then(val => {
@@ -101,6 +110,7 @@ const actions = {
         }
       })
     } else {
+      status = 'out of content'
       cb(status)
     }
   },
