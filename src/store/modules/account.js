@@ -1,7 +1,6 @@
 import Logos from '@logosnetwork/logos-rpc-client'
 import bigInt from 'big-integer'
 import cloneDeep from 'lodash/cloneDeep'
-const rpcClient = new Logos({ url: 'http://34.230.59.175:55000', debug: true })
 const state = {
   account: null,
   frontier: null,
@@ -21,7 +20,8 @@ const getters = {
 }
 
 const actions = {
-  getAccountInfo: ({ state, commit }, account) => {
+  getAccountInfo: ({ state, commit, rootState }, account) => {
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
     commit('setAccount', account)
     rpcClient.accounts.info(account).then(val => {
       if (val) {
@@ -112,8 +112,10 @@ const mutations = {
     state.blockCount = 0
     state.lastModified = 0
   },
-  addBlock (state, block) {
+  addBlock ({ state, rootState }, block) {
     let blockData = cloneDeep(block)
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
+    // TODO FIX
     if (blockData.account === state.account) {
       state.blockCount++
       state.frontier = blockData.hash

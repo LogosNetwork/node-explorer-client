@@ -179,6 +179,9 @@ export default {
         return this.address.match(/lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}/) !== null || this.address.match(/[0-9a-fA-F]{64}/) !== null
       }
     },
+    ...mapState('settings', {
+      mqttHost: state => state.mqttHost
+    }),
     ...mapState('explorer', {
       error: state => state.error,
       transactions: state => state.transactions,
@@ -188,7 +191,7 @@ export default {
     })
   },
   created: function () {
-    this.initalize({ url: `mqtt:18.235.68.120:8883/mqtt`,
+    this.initalize({ url: this.mqttHost,
       cb: () => {
         this.subscribe(`#`)
       } })

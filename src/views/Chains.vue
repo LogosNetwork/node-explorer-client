@@ -131,6 +131,9 @@ export default {
     codepad
   },
   computed: {
+    ...mapState('settings', {
+      mqttHost: state => state.mqttHost
+    }),
     ...mapState('chains', {
       batchBlocks: state => state.batchBlocks,
       microEpochs: state => state.microEpochs,
@@ -146,7 +149,7 @@ export default {
   },
   created: function () {
     this.reset()
-    this.initalize({ url: `mqtt:18.235.68.120:8883/mqtt`,
+    this.initalize({ url: this.mqttHost,
       cb: () => {
         this.subscribe(`batchBlock`)
         this.subscribe(`microEpoch`)

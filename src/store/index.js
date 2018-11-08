@@ -7,6 +7,7 @@ import chains from './modules/chains'
 import batchBlock from './modules/batchBlock'
 import microEpoch from './modules/microEpoch'
 import epoch from './modules/epoch'
+import settings from './modules/settings'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -17,7 +18,8 @@ export default new Vuex.Store({
     chains,
     batchBlock,
     microEpoch,
-    epoch
+    epoch,
+    settings
   },
   strict: true
 })

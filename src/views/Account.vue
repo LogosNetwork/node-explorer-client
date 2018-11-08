@@ -70,6 +70,9 @@ let fields = [
 ]
 export default {
   computed: {
+    ...mapState('settings', {
+      mqttHost: state => state.mqttHost
+    }),
     ...mapState('account', {
       account: state => state.account,
       frontier: state => state.frontier,
@@ -82,10 +85,11 @@ export default {
       count: state => state.count,
       lastModified: state => state.lastModified
     })
+
   },
   created: function () {
     this.reset()
-    this.initalize({ url: `mqtt:18.235.68.120:8883/mqtt`,
+    this.initalize({ url: this.mqttHost,
       cb: () => {
         this.subscribe(`account/${this.$route.params.account}`)
       } })
@@ -113,7 +117,7 @@ export default {
   beforeRouteUpdate (to, from, next) {
     this.unsubscribe(`account/${this.account}`)
     this.reset()
-    this.initalize({ url: `mqtt:18.235.68.120:8883/mqtt`,
+    this.initalize({ url: this.mqttHost,
       cb: () => {
         this.subscribe(`account/${to.params.account}`)
       } })
