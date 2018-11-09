@@ -207,8 +207,25 @@ export default {
     submitSearch (event) {
       if (event.which === 13) {
         event.preventDefault()
-        if (this.address.match(/lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}/) !== null || this.address.match(/[0-9a-fA-F]{64}/) !== null) {
-          window.location.href = '/' + this.address
+        if (this.address.match(/lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}/) !== null) {
+          this.$router.push({ name: 'account', params: { account: this.address } })
+        } else {
+          if (this.address.match(/[0-9a-fA-F]{64}/) !== null) {
+            this.getBlockType({ hash: this.address,
+              cb: (blockType) => {
+                if (blockType === 'transaction') {
+                  this.$router.push({ name: 'transaction', params: { transaction: this.address } })
+                } else if (blockType === 'batchBlock') {
+                  this.$router.push({ name: 'batchBlock', params: { hash: this.address } })
+                } else if (blockType === 'epoch') {
+                  this.$router.push({ name: 'epoch', params: { hash: this.address } })
+                } else if (blockType === 'microEpoch') {
+                  this.$router.push({ name: 'microEpoch', params: { hash: this.address } })
+                } else {
+                  alert('Invalid Block 404')
+                }
+              } })
+          }
         }
       }
     },
@@ -218,7 +235,8 @@ export default {
       'subscribe'
     ]),
     ...mapActions('explorer', [
-      'getRecentTransactions'
+      'getRecentTransactions',
+      'getBlockType'
     ])
   },
   destroyed: function () {

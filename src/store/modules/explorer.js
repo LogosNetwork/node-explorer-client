@@ -77,6 +77,34 @@ const actions = {
         commit('setError', err)
       })
   },
+  getBlockType ({ rootState }, data) {
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
+    rpcClient.transactions.info(data.hash, false).then((val) => {
+      if (!val.error) {
+        data.cb('transaction')
+      } else {
+        rpcClient.batchBlocks.get([data.hash]).then((val) => {
+          if (!val.error) {
+            data.cb('batchBlock')
+          } else {
+            rpcClient.epochs.get([data.hash]).then((val) => {
+              if (!val.error) {
+                data.cb('epoch')
+              } else {
+                rpcClient.microEpochs.get([data.hash]).then((val) => {
+                  if (!val.error) {
+                    data.cb('microEpoch')
+                  } else {
+                    data.cb(null)
+                  }
+                })
+              }
+            })
+          }
+        })
+      }
+    })
+  },
   addBlock ({ commit, rootState }, block) {
     let blockData = cloneDeep(block)
     if (blockData.type === 'send') {
