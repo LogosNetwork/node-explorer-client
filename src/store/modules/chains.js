@@ -1,5 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
-const rpcClient = new Logos({ url: 'http://34.230.59.175:55000' })
+
 const state = {
   count: 50,
   batchBlocks: [],
@@ -13,7 +13,8 @@ const getters = {
 }
 
 const actions = {
-  getRecentBlocks: ({ commit }, cb) => {
+  getRecentBlocks: ({ commit, rootState }, cb) => {
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
     let count = 0
     rpcClient.batchBlocks.history(50, 0).then(val => {
       count++
@@ -55,7 +56,8 @@ const actions = {
       }
     })
   },
-  loadMicroEpochs: ({ state, commit }, cb) => {
+  loadMicroEpochs: ({ state, commit, rootState }, cb) => {
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
     let savedMicroEpochs = [...state.microEpochs]
     let status = 'success'
     if (savedMicroEpochs && savedMicroEpochs.length > 0) {
@@ -84,7 +86,8 @@ const actions = {
       cb(status)
     }
   },
-  loadEpochs: ({ state, commit }, cb) => {
+  loadEpochs: ({ state, commit, rootState }, cb) => {
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
     let savedEpochs = [...state.epochs]
     let status = 'success'
     if (savedEpochs && savedEpochs.length > 0) {

@@ -8,6 +8,7 @@ import batchBlock from './modules/batchBlock'
 import microEpoch from './modules/microEpoch'
 import epoch from './modules/epoch'
 import settings from './modules/settings'
+import transaction from './modules/transaction'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -19,7 +20,8 @@ export default new Vuex.Store({
     batchBlock,
     microEpoch,
     epoch,
-    settings
+    settings,
+    transaction
   },
   strict: true
 })

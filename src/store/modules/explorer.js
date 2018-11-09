@@ -1,7 +1,6 @@
 import Logos from '@logosnetwork/logos-rpc-client'
 import axios from 'axios'
 import cloneDeep from 'lodash/cloneDeep'
-const rpcClient = new Logos({ url: 'http://34.230.59.175:55000', debug: true })
 const state = {
   transactions: [],
   error: null,
@@ -15,7 +14,8 @@ const getters = {
 }
 
 const actions = {
-  getRecentTransactions: ({ commit }) => {
+  getRecentTransactions: ({ commit, rootState }) => {
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
     rpcClient.batchBlocks.history(1, 0).then(val => {
       if (val) {
         if (!val.error) {
@@ -77,6 +77,15 @@ const actions = {
         commit('setError', err)
       })
   },
+  addBlock ({ commit, rootState }, block) {
+    let blockData = cloneDeep(block)
+    if (blockData.type === 'send') {
+      let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
+      blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
+      blockData.timestamp = parseInt(blockData.timestamp)
+      commit('unshiftTransaction', blockData)
+    }
+  },
   reset: ({ commit }) => {
     commit('reset')
   }
@@ -89,6 +98,9 @@ const mutations = {
   setTransactions (state, transactions) {
     state.transactions = transactions
   },
+  unshiftTransaction (state, transaction) {
+    state.transactions.unshift(transaction)
+  },
   setBatchBlock (state, batchBlock) {
     state.batchBlock = batchBlock
   },
@@ -97,14 +109,6 @@ const mutations = {
   },
   setEpoch (state, epoch) {
     state.epoch = epoch
-  },
-  addBlock (state, block) {
-    let blockData = cloneDeep(block)
-    if (blockData.type === 'send') {
-      blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
-      blockData.timestamp = parseInt(blockData.timestamp)
-      state.transactions.unshift(blockData)
-    }
   }
 }
 

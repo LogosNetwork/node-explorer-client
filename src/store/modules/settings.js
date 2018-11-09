@@ -1,6 +1,8 @@
+import config from '../../../config'
+
 const state = {
-  rpcHost: 'http://34.230.59.175:55000',
-  mqttHost: 'ws:18.235.68.120:8883/mqtt'
+  rpcHost: config.rpcHost,
+  mqttHost: config.mqttHost
 }
 
 const getters = {

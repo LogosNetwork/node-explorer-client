@@ -43,71 +43,36 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import Logos from '../api/rpc'
+import { mapActions, mapState } from 'vuex'
 import codepad from '@/components/codepad.vue'
-Vue.use(Logos, { url: 'http://34.230.59.175:55000', debug: true })
 
-let transaction = null
-let details = null
-let prettyDetails = null
-let error = null
 export default {
-  name: 'transaction',
   components: {
     codepad
   },
-  created: function () {
-    this.transaction = this.$route.params.transaction
-    this.$Logos.transactions.info(this.transaction).then(val => {
-      if (val && !val.error) {
-        this.details = val
-        this.details.type = val.type
-        if (this.details.type === 'receive') {
-          this.$Logos.transactions.info(this.details.link).then(val => {
-            this.details.link_as_account = val.account
-            this.prettyDetails = JSON.stringify(this.details, null, ' ')
-          })
-        } else {
-          this.details.link_as_account = this.details.link_as_account
-          this.prettyDetails = JSON.stringify(this.details, null, ' ')
-        }
-        this.details.amount = parseFloat(Number(this.$Logos.convert.fromReason(this.details.amount, 'LOGOS')).toFixed(5))
-        this.details.account = this.details.account
-      } else {
-        if (val && val.error) { this.error = val.error } else { this.error = '404' }
-      }
+  computed: {
+    ...mapState('settings', {
+      mqttHost: state => state.mqttHost
+    }),
+    ...mapState('transaction', {
+      transaction: state => state.transaction,
+      details: state => state.details,
+      prettyDetails: state => state.prettyDetails,
+      error: state => state.error
     })
   },
-  data () {
-    return {
-      transaction: transaction,
-      details: details,
-      prettyDetails: prettyDetails,
-      error: error
-    }
+  methods: {
+    ...mapActions('transaction', [
+      'getTransactionInfo',
+      'reset'
+    ])
+  },
+  created: function () {
+    this.getTransactionInfo(this.$route.params.transaction)
   },
   beforeRouteUpdate (to, from, next) {
-    this.transaction = to.params.transaction
-    this.$Logos.transactions.info(this.transaction).then(val => {
-      if (val && !val.error) {
-        this.details = val
-        this.details.type = val.type
-        if (this.details.type === 'receive') {
-          this.$Logos.transactions.info(this.details.link).then(val => {
-            this.details.link_as_account = val.account
-            this.prettyDetails = JSON.stringify(this.details, null, ' ')
-          })
-        } else {
-          this.details.link_as_account = this.details.link_as_account
-          this.prettyDetails = JSON.stringify(this.details, null, ' ')
-        }
-        this.details.amount = parseFloat(Number(this.$Logos.convert.fromReason(this.details.amount, 'LOGOS')).toFixed(5))
-        this.details.account = this.details.account
-      } else {
-        if (val && val.error) { this.error = val.error } else { this.error = '404' }
-      }
-    })
+    this.reset()
+    this.getTransactionInfo(to.params.transaction)
     next()
   }
 }

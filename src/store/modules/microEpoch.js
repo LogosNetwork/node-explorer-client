@@ -1,5 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
-const rpcClient = new Logos({ url: 'http://34.230.59.175:55000', debug: true })
+
 const state = {
   hash: null,
   microEpoch: null,
@@ -11,7 +11,7 @@ const getters = {
 }
 
 const actions = {
-  getMicroEpoch: ({ commit }, hash) => {
+  getMicroEpoch: ({ commit, rootState }, hash) => {
     commit('setHash', hash)
     let searchHashes = null
     if (hash.indexOf(',') !== -1) {
@@ -19,6 +19,7 @@ const actions = {
     } else {
       searchHashes = [hash]
     }
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
     rpcClient.microEpochs.get(searchHashes).then(val => {
       if (val) {
         if (!val.error) {

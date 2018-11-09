@@ -1,5 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
-const rpcClient = new Logos({ url: 'http://34.230.59.175:55000', debug: true })
+
 const state = {
   hash: null,
   batchBlock: null,
@@ -11,7 +11,8 @@ const getters = {
 }
 
 const actions = {
-  getBatchBlock: ({ commit }, hash) => {
+  getBatchBlock: ({ commit, rootState }, hash) => {
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
     commit('setHash', hash)
     let searchHashes = null
     if (hash.indexOf(',') !== -1) {
