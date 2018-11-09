@@ -61,6 +61,32 @@ const actions = {
       }
     })
   },
+  addBlock ({ state, commit, rootState }, block) {
+    let blockData = cloneDeep(block)
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
+    if (blockData.account === state.account) {
+      commit('incrementBlockCount')
+      commit('setFrontier', blockData.hash)
+      commit('setRawBalance', bigInt(state.rawBalance).minus(blockData.amount).toString())
+      commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5)))
+      blockData.account = blockData.link_as_account
+      blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
+      blockData.timestamp = parseInt(blockData.timestamp)
+      commit('setLastModified', blockData.timestamp)
+      commit('unshiftTransaction', blockData)
+    } else if (blockData.link_as_account === state.account) {
+      commit('incrementBlockCount')
+      commit('setFrontier', blockData.hash)
+      commit('setRawBalance', bigInt(state.rawBalance).minus(blockData.amount).toString())
+      commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5)))
+      blockData.type = 'receive'
+      blockData.account = blockData.account
+      blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
+      blockData.timestamp = parseInt(blockData.timestamp)
+      commit('setLastModified', blockData.timestamp)
+      commit('unshiftTransaction', blockData)
+    }
+  },
   reset: ({ commit }) => {
     commit('reset')
   }
@@ -85,6 +111,9 @@ const mutations = {
   setBlockCount (state, blockCount) {
     state.blockCount = blockCount
   },
+  incrementBlockCount (state) {
+    state.blockCount++
+  },
   setCount (state, count) {
     state.count = count
   },
@@ -96,6 +125,9 @@ const mutations = {
   },
   setTransactions (state, transactions) {
     state.transactions = transactions
+  },
+  unshiftTransaction (state, transaction) {
+    state.transactions.unshift(transaction)
   },
   setAccount (state, account) {
     state.account = account
@@ -111,33 +143,6 @@ const mutations = {
     state.transactions = []
     state.blockCount = 0
     state.lastModified = 0
-  },
-  addBlock ({ state, rootState }, block) {
-    let blockData = cloneDeep(block)
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
-    // TODO FIX
-    if (blockData.account === state.account) {
-      state.blockCount++
-      state.frontier = blockData.hash
-      state.rawBalance = bigInt(state.rawBalance).minus(blockData.amount).toString()
-      state.balance = parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5))
-      blockData.account = blockData.link_as_account
-      blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
-      blockData.timestamp = parseInt(blockData.timestamp)
-      state.lastModified = blockData.timestamp
-      state.transactions.unshift(blockData)
-    } else if (blockData.link_as_account === state.account) {
-      state.blockCount++
-      state.frontier = blockData.hash
-      state.rawBalance = bigInt(state.rawBalance).plus(blockData.amount).toString()
-      state.balance = parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5))
-      blockData.type = 'receive'
-      blockData.account = blockData.account
-      blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
-      blockData.timestamp = parseInt(blockData.timestamp)
-      state.lastModified = blockData.timestamp
-      state.transactions.unshift(blockData)
-    }
   }
 }
 

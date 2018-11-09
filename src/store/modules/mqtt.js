@@ -12,7 +12,7 @@ const getters = {
 }
 
 const actions = {
-  initalize ({ commit, state }, data) {
+  initalize ({ commit, state, dispatch }, data) {
     if (!state.connected) {
       client = Mqtt.connect(data.url)
       client.on('close', () => {
@@ -35,7 +35,7 @@ const actions = {
         } else {
           let params = accountMqttRegex(topic)
           if (params) {
-            commit('account/addBlock', message, { root: true })
+            dispatch('account/addBlock', message, { root: true })
             commit('explorer/addBlock', message, { root: true })
           }
         }
