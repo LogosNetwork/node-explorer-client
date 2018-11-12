@@ -9,7 +9,7 @@
 
 <script>
 export default {
-  name: 'Reps',
+  name: '404',
   components: {}
 }
 </script>
