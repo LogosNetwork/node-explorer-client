@@ -23,5 +23,5 @@ export default new Vuex.Store({
     settings,
     transaction
   },
-  strict: true
+  strict: process.env.NODE_ENV !== 'production'
 })
