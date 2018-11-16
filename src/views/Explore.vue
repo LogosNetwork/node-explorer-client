@@ -39,7 +39,7 @@
               <b-card>
                 <b-row>
                   <b-col class="text-truncate">
-                    <b-link :to="'/microEpoch/'+microEpoch.hash" v-if="microEpoch.timestamp !== '0'">Micro Epoch #{{microEpoch.micro_block_number}}</b-link>
+                    <b-link :to="'/microEpoch/'+microEpoch.hash" v-if="microEpoch.timestamp !== '0'">Micro Epoch #{{microEpoch.sequence}}</b-link>
                   </b-col>
                 </b-row>
                 <b-row>
