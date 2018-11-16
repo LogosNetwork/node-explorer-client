@@ -7,7 +7,7 @@
         <b-navbar-nav class="ml-auto">
           <b-nav-item to="/" exact-active-class="is-active">{{ $t('explore') }}</b-nav-item>
           <b-nav-item to="/chains" exact-active-class="is-active">{{ $t('chains') }}</b-nav-item>
-          <b-nav-item to="/governance" exact-active-class="is-active">{{ $t('governance') }}</b-nav-item>
+          <!-- <b-nav-item to="/governance" exact-active-class="is-active">{{ $t('governance') }}</b-nav-item> -->
           <b-nav-item to="/workbench" exact-active-class="is-active">{{ $t('workbench') }}</b-nav-item>
         </b-navbar-nav>
       </b-collapse>

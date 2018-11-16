@@ -14,7 +14,7 @@
               <b-link to="/chains" exact-active-class="is-active" v-t="'chains'"></b-link>
             </b-col>
             <b-col>
-              <b-link to="/governance" exact-active-class="is-active" v-t="'governance'"></b-link>
+              <!-- <b-link to="/governance" exact-active-class="is-active" v-t="'governance'"></b-link> -->
             </b-col>
             <b-col>
               <b-link to="/workbench" exact-active-class="is-active" v-t="'workbench'"></b-link>

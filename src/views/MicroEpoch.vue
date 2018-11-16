@@ -3,7 +3,7 @@
     <b-container v-if="microEpoch">
       <b-row class="text-left pt-5">
         <b-col cols="12" class="mb-3">
-          <h3 class="text-left">Micro Epoch #{{microEpoch.micro_block_number}}</h3>
+          <h3 class="text-left">Micro Epoch #{{microEpoch.sequence}}</h3>
           <code style="background-color:#FFF;color:#ff3860;padding:6px">{{microEpoch.hash}}</code>
           <h4 v-if="error" class="pt-3" style="color:red">This micro epoch does not exist</h4>
         </b-col>
@@ -34,7 +34,7 @@
               <h4>
                 Delegate
               </h4>
-              <p class="text-truncate"><router-link :to="'/delegate/'+microEpoch.delegate">{{microEpoch.delegate}}</router-link></p>
+              <p class="text-truncate"><router-link :to="'/delegate/'+microEpoch.account">{{microEpoch.account}}</router-link></p>
             </div>
         </b-col>
       </b-row>
