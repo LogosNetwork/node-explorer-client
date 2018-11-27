@@ -23,6 +23,7 @@ import bTab from 'bootstrap-vue/es/components/tabs/tab'
 import bCard from 'bootstrap-vue/es/components/card/card'
 import bFormSelect from 'bootstrap-vue/es/components/form-select/form-select'
 import bLink from 'bootstrap-vue/es/components/link/link'
+import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
 import bContainer from 'bootstrap-vue/es/components/layout/container'
 import bRow from 'bootstrap-vue/es/components/layout/row'
 import bCol from 'bootstrap-vue/es/components/layout/col'
@@ -32,8 +33,10 @@ import bFormCheckbox from 'bootstrap-vue/es/components/form-checkbox/form-checkb
 // Icons
 import Icon from 'vue-awesome/components/Icon'
 import 'vue-awesome/icons/chevron-down'
+import 'vue-awesome/icons/qrcode'
 
 Vue.config.productionTip = false
+Vue.directive('b-tooltip', vBTooltip)
 Vue.component('b-form', bForm)
 Vue.component('b-input', bFormInput)
 Vue.component('b-container', bContainer)

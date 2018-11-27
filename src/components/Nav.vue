@@ -15,8 +15,11 @@
         </b-collapse>
       </b-navbar>
     </div>
-    <div class="alert alert-warning" role="alert">
-      This is the permissioned testnet we will be periodically reseting the network. If your funds are gone please obtain more from the facuet.
+    <div v-if="showAlert" class="alert alert-warning alert-dismissible fade show" role="alert">
+      This is the permissioned testnet, we will be periodically reseting the network. If your funds are gone please obtain more from the faucet.
+      <button type="button" class="close" v-on:click="showAlert=false" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
     </div>
   </div>
 </template>
@@ -26,6 +29,11 @@ export default {
   name: 'Nav',
   props: {
     dark: String
+  },
+  data () {
+    return {
+      showAlert: true
+    }
   }
 }
 </script>
