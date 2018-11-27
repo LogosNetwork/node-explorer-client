@@ -10,6 +10,7 @@ import epoch from './views/Epoch.vue'
 import notFound from './views/404.vue'
 import Account from './views/Account.vue'
 import Chains from './views/Chains.vue'
+import Faucet from './views/Faucet.vue'
 import Password from './views/Password.vue'
 import axios from 'axios'
 import config from '../config'
@@ -83,6 +84,11 @@ const router = new Router({
       path: '/password',
       name: 'password',
       component: Password
+    },
+    {
+      path: '/faucet',
+      name: 'faucet',
+      component: Faucet
     },
     {
       path: '*',

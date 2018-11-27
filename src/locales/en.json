@@ -5,6 +5,7 @@
   "node": "Node",
   "from": "From",
   "to": "To",
+  "faucet": "Faucet",
   "amount": "Amount",
   "chains": "Chains",
   "blockchains": "Blockchains",
