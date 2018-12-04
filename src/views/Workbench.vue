@@ -2,17 +2,24 @@
   <div id="primary">
     <b-container class="pt-5">
         <h5 class="text-left" v-t="'build_api_cta'"></h5>
-        <b-input placeholder="http://34.230.59.175:55000" v-model="nodeURL" class="mb-3" />
+        <b-input placeholder="http://52.90.87.111:55000" v-model="nodeURL" class="mb-3" />
         <b-card no-body>
             <b-tabs pills card vertical>
                 <b-tab title="My Account" active>
                     <p class="card-text text-left">Private Key is required for account actions</p>
                     <b-input id="pkey" placeholder="Private Key" v-model="key" class="mb-3" />
                     <b-form-select v-model="selectedAccount" :options="labels[0]" class="mb-5" />
-                    <div v-for="(param, index) in options[0][selectedAccount].params" :key="index">
-                        <p class="card-text text-left">{{param.label}}
-                            <b-input :placeholder="param.name" v-model="param.value" class="mb-3" />
-                        </p>
+                    <div class="text-left" v-for="(param, index) in options[0][selectedAccount].params" :key="index">
+                      <p v-if="!param.type || param.type === 'text'" class="card-text text-left">{{param.label}}
+                          {{param.type}}
+                          <b-input :placeholder="param.name" v-model="param.value" class="mb-3" />
+                      </p>
+                      <b-form-checkbox v-if="param.type && param.type === 'boolean'"
+                          v-model="param.value"
+                          value="true"
+                          unchecked-value="false">
+                          {{param.label}}
+                      </b-form-checkbox>
                     </div>
                     <b-button class="float-right mb-3" variant="primary" v-on:click="options[0][selectedAccount].action(options[0][selectedAccount].params)">Execute</b-button>
                 </b-tab>
@@ -112,7 +119,8 @@ import Vue from 'vue'
 import Logos from '../api/rpc'
 import LogosWallet from '../api/wallet'
 import codepad from '@/components/codepad.vue'
-Vue.use(Logos, { url: 'http://34.230.59.175:55000', debug: true })
+import config from '../../config'
+Vue.use(Logos, { url: 'http://52.90.87.111:55000', debug: true })
 Vue.use(LogosWallet)
 
 export default {
@@ -124,26 +132,52 @@ export default {
     let $this = this
     const accountLabels = [
       { value: 0, text: 'Create a Send' },
-      { value: 1, text: 'Change Representative' },
-      { value: 2, text: 'Check balance in Reason' },
-      { value: 3, text: 'Check balance in Logos' },
-      { value: 4, text: 'Lookup total transaction count' },
-      { value: 5, text: 'Pull account history' },
-      { value: 6, text: 'Info' },
-      { value: 7, text: 'Lookup Public Key' },
-      { value: 8, text: 'Ledger' },
-      { value: 9, text: 'Representative' },
-      { value: 10, text: 'Weight' }
+      { value: 1, text: 'Check balance in Reason' },
+      { value: 2, text: 'Check balance in Logos' },
+      { value: 3, text: 'Lookup total transaction count' },
+      { value: 4, text: 'Pull account history' },
+      { value: 5, text: 'Info' },
+      { value: 6, text: 'Lookup Public Key' },
+      { value: 7, text: 'Ledger' }
     ]
     const accountOptions = [
       {
         'action': function (params) {
-          let nanoAmount = params[0].value
+          let logosAmount = params[0].value
           let address = params[1].value
-          $this.editor += `Sending ${nanoAmount} to ${address}....\n`
-          $this.$Logos.account($this.key).send(nanoAmount, address).then((val) => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-          })
+          let forceDelegate = params[2].value
+          if (!forceDelegate) {
+            $this.$Logos.account($this.key).info().then((val) => {
+              let lastHash = val.frontier
+              let delegateId = null
+              if (lastHash === '0000000000000000000000000000000000000000000000000000000000000000') {
+                $this.$Logos.account($this.key).publicKey().then((data) => {
+                  delegateId = parseInt(data.key.slice(-2), 16) % 32
+                  $this.delegateNodeUrl = config.delegates[delegateId]
+                  $this.$Logos.changeServer(`http://${$this.delegateNodeUrl}:55000`)
+                  $this.editor += `Sending ${logosAmount} to ${address} using delegate:${delegateId}@${$this.delegateNodeUrl}....\n`
+                  $this.$Logos.account($this.key).send(logosAmount, address).then((val) => {
+                    $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+                    $this.$Logos.changeServer($this.nodeURL)
+                  })
+                })
+              } else {
+                delegateId = parseInt(val.frontier.slice(-2), 16) % 32
+                $this.delegateNodeUrl = config.delegates[delegateId]
+                $this.$Logos.changeServer(`http://${$this.delegateNodeUrl}:55000`)
+                $this.editor += `Sending ${logosAmount} to ${address} using delegate:${delegateId}@${$this.delegateNodeUrl}....\n`
+                $this.$Logos.account($this.key).send(logosAmount, address).then((val) => {
+                  $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+                  $this.$Logos.changeServer($this.nodeURL)
+                })
+              }
+            })
+          } else {
+            $this.editor += `Sending ${logosAmount} to ${address}....\n`
+            $this.$Logos.account($this.key).send(logosAmount, address).then((val) => {
+              $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+            })
+          }
         },
         'params': [
           {
@@ -155,21 +189,11 @@ export default {
             'name': 'address',
             'label': `The address of the account you wish to send to`,
             'required': true
-          }
-        ]
-      },
-      {
-        'action': function (params) {
-          let representative = params[0].value
-          $this.editor += `Changing Represenative to ${representative}....\n`
-          $this.$Logos.account($this.key).change(representative).then((val) => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-          })
-        },
-        'params': [
+          },
           {
-            'name': 'account',
-            'label': `The address of the account you wish to set as your representative`,
+            'name': 'details',
+            'type': 'boolean',
+            'label': `Force transaction to be processed by your selected node this will incur a 5 second delay on your transaction`,
             'required': true
           }
         ]
@@ -251,24 +275,6 @@ export default {
             'required': false
           }
         ]
-      },
-      {
-        'action': function () {
-          $this.editor += `Retreiving the representative of my account....\n`
-          $this.$Logos.account($this.key).representative().then((val) => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-          })
-        },
-        'params': []
-      },
-      {
-        'action': function () {
-          $this.editor += `Retreiving the weight of my account....\n`
-          $this.$Logos.account($this.key).weight().then((val) => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-          })
-        },
-        'params': []
       }
     ]
 
@@ -419,38 +425,6 @@ export default {
             'required': false
           }
         ]
-      },
-      {
-        'action': function (params) {
-          let accountId = params[0].value
-          $this.editor += `Getting representative for account ${accountId}....\n`
-          $this.$Logos.accounts.representative(accountId).then((val) => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-          })
-        },
-        'params': [
-          {
-            'name': 'account',
-            'label': `Account Id`,
-            'required': true
-          }
-        ]
-      },
-      {
-        'action': function (params) {
-          let accountId = params[0].value
-          $this.editor += `Getting weight for account ${accountId}....\n`
-          $this.$Logos.accounts.weight(accountId).then((val) => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-          })
-        },
-        'params': [
-          {
-            'name': 'account',
-            'label': `Account Id`,
-            'required': true
-          }
-        ]
       }
     ]
     const accountsLabels = [
@@ -461,9 +435,7 @@ export default {
       { value: 4, text: 'History of an account' },
       { value: 5, text: 'Account info' },
       { value: 6, text: 'Get public key from account name' },
-      { value: 7, text: 'Get ledger information of an account' },
-      { value: 8, text: 'Get Representative of an account' },
-      { value: 9, text: 'Get Voting weight of an account' }
+      { value: 7, text: 'Get ledger information of an account' }
     ]
 
     const keyOptions = [
@@ -782,10 +754,32 @@ export default {
           let blk = new $this.$Block()
           let pk = params[0].value
           let accountId = params[1].value
-          let amount = params[2].value
+          let amountLogos = params[2].value
           let recipientAddress = params[3].value
+          let forceDelegate = params[4].value
           let lastHash = null
+          let delegateId = null
+          let workAndProcess = function () {
+            $this.$Logos.work.generate(lastHash).then((val) => {
+              $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+              blk.setWork(val.work)
+              let transaction = blk.getJSONBlock()
+              console.log(transaction)
+              if (!forceDelegate) {
+                $this.editor += `Publishing a transaction sending ${amount} to ${recipientAddress} using delegate:${delegateId}@${$this.delegateNodeUrl} \n ${JSON.stringify(transaction, null, ' ')} \n`
+              } else {
+                $this.editor += `Publishing a transaction sending ${amount} to ${recipientAddress} using forced delegate of ${$this.nodeURL} \n ${JSON.stringify(transaction, null, ' ')} \n`
+              }
+              $this.$Logos.transactions.publish(transaction).then((val) => {
+                $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+                if (!forceDelegate) {
+                  $this.$Logos.changeServer($this.nodeURL)
+                }
+              })
+            })
+          }
           $this.editor += `Retreiving the account info of my account....\n`
+          let amount = $this.$Logos.convert.toReason(amountLogos, 'LOGOS')
           $this.$Logos.accounts.info(accountId).then((val) => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
             lastHash = val.frontier
@@ -801,15 +795,23 @@ export default {
             let uint8PK = $this.$LogosFunctions.hex_uint8(pk)
             blk.setSignature($this.$LogosFunctions.uint8_hex(wallet.sign(hash, uint8PK)))
             $this.editor += `Generating work for ${lastHash}....\n`
-            $this.$Logos.work.generate(lastHash).then((val) => {
-              $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-              blk.setWork(val.work)
-              let transaction = blk.getJSONBlock()
-              $this.editor += `Publishing a transaction \n ${JSON.stringify(transaction, null, ' ')} \n`
-              $this.$Logos.transactions.publish(transaction).then((val) => {
-                $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-              })
-            })
+            if (!forceDelegate) {
+              if (lastHash === '0000000000000000000000000000000000000000000000000000000000000000') {
+                $this.$Logos.accounts.key(accountId).then((data) => {
+                  delegateId = parseInt(data.key.slice(-2), 16) % 32
+                  $this.delegateNodeUrl = config.delegates[delegateId]
+                  $this.$Logos.changeServer(`http://${$this.delegateNodeUrl}:55000`)
+                  workAndProcess()
+                })
+              } else {
+                delegateId = parseInt(val.frontier.slice(-2), 16) % 32
+                $this.delegateNodeUrl = config.delegates[delegateId]
+                $this.$Logos.changeServer(`http://${$this.delegateNodeUrl}:55000`)
+                workAndProcess()
+              }
+            } else {
+              workAndProcess()
+            }
           })
         },
         'params': [
@@ -825,31 +827,19 @@ export default {
           },
           {
             'name': 'amount',
-            'label': `Transaction Amount you want to send in RAW`,
+            'label': `Transaction Amount you want to send in Logos`,
             'required': true
           },
           {
             'name': 'destination',
             'label': `Target Address`,
             'required': true
-          }
-        ]
-      },
-      {
-        'action': function (params) {
-          // TODO
-        },
-        'params': [
-          {
-            'name': 'hash',
-            'label': `Comma seperated Hashes of the transactions you want to know about`,
-            'required': true
           },
           {
             'name': 'details',
             'type': 'boolean',
-            'label': `Show full transaction details`,
-            'required': false
+            'label': `Force transaction to be processed by your selected node this will incur a 5 second delay on your transaction`,
+            'required': true
           }
         ]
       }
@@ -861,8 +851,7 @@ export default {
       { value: 2, text: 'Retrieve chain up to transaction' },
       { value: 3, text: 'Retrieve chain after a transaction' },
       { value: 4, text: 'Transaction Info' },
-      { value: 5, text: 'Publish Send Transaction' },
-      { value: 6, text: 'Publish Change Transaction' }
+      { value: 5, text: 'Publish Send Transaction' }
     ]
 
     const otherOptions = [
@@ -870,15 +859,6 @@ export default {
         'action': function () {
           $this.editor += `Fetching total amount of Logos....\n`
           $this.$Logos.available().then((val) => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-          })
-        },
-        'params': []
-      },
-      {
-        'action': function () {
-          $this.editor += `Fetching top representatives....\n`
-          $this.$Logos.representatives().then((val) => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
@@ -927,9 +907,8 @@ export default {
     ]
     const otherLabels = [
       { value: 0, text: 'Total Available Supply' },
-      { value: 1, text: 'Representative List' },
-      { value: 2, text: 'Deterministic Key' },
-      { value: 3, text: 'Force Micro Epoch and Epoch to occur' }
+      { value: 1, text: 'Deterministic Key' }
+      // { value: 2, text: 'Force Micro Epoch and Epoch to occur' }
     ]
 
     const options = [
@@ -956,7 +935,8 @@ export default {
       key: null,
       options: options,
       editor: '',
-      nodeURL: 'http://34.230.59.175:55000',
+      nodeURL: 'http://52.90.87.111:55000',
+      delegateNodeUrl: null,
       labels: labels,
       selectedAccount: 0,
       selectedAccounts: 0,
