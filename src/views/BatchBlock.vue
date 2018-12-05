@@ -30,7 +30,7 @@
               <div class="text-truncate">{{data.item.type}}</div>
             </template>
             <template slot="timestamp" slot-scope="data">
-              <div class="text-truncate" v-if="data.item.timestamp">{{ data.item.timestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
+              <div class="text-truncate" v-if="data.item.fakeTimestamp">{{ data.item.fakeTimestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
             </template>
             <template slot="from" slot-scope="data">
               <div class="text-truncate"><router-link :to="'/'+data.item.account">{{data.item.account}}</router-link></div>
@@ -39,7 +39,7 @@
               <div class="text-truncate"><router-link :to="'/'+data.item.link_as_account">{{data.item.link_as_account}}</router-link></div>
             </template>
             <template slot="amount" slot-scope="data">
-              <div class="text-truncate"><span class="text-success">+{{data.item.amount}}</span></div>
+              <div class="text-truncate"><span class="text-success">+{{data.item.fakeLogosAmount}}</span></div>
             </template>
             <template slot="hash" slot-scope="data">
               <div class="text-truncate"><router-link :to="'/'+data.item.hash">{{data.item.hash}}</router-link></div>
@@ -50,7 +50,8 @@
     <b-row v-if="!error">
         <b-col cols="12" class="text-left">
           <h4 class="text-left" v-t="'batchJSON'"></h4>
-          <codepad id='editor' class="text-left mb-3" :code="JSON.stringify(batchBlock, null, ' ')"/>
+          <codepad id='editor' class="text-left" :code="JSON.stringify(batchBlock, null, ' ')"/>
+          <small class="mb-3">* Fields that begin in fake are not present on the actual blockchain</small>
         </b-col>
       </b-row>
     </b-container>

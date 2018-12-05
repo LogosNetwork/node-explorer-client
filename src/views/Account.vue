@@ -80,6 +80,7 @@ export default {
       representaive: state => state.representaive,
       error: state => state.error,
       balance: state => state.balance,
+      rawBalance: state => state.rawBalance,
       transactions: state => state.transactions,
       blockCount: state => state.blockCount,
       count: state => state.count,

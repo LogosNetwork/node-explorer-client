@@ -24,9 +24,8 @@ const actions = {
       if (val) {
         if (!val.error) {
           for (let trans of val.blocks[0].blocks) {
-            trans.amount = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
-            trans.timestamp = parseInt(trans.timestamp)
-            trans.account = trans.account
+            trans.fakeLogosAmount = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+            trans.fakeTimestamp = parseInt(trans.timestamp)
           }
           commit('setBatchBlock', val.blocks[0])
         } else {
