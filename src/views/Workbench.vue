@@ -119,7 +119,7 @@ import Logos from '../api/rpc'
 import LogosWallet from '../api/wallet'
 import codepad from '@/components/codepad.vue'
 import config from '../../config'
-Vue.use(Logos, { url: 'http://107.21.165.224:55000', debug: true })
+Vue.use(Logos, { url: 'http://107.21.165.224:55000', proxyURL: 'https://pla.bs/rpc', debug: true })
 Vue.use(LogosWallet)
 
 export default {

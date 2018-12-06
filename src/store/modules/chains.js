@@ -14,7 +14,7 @@ const getters = {
 
 const actions = {
   getRecentBlocks: ({ commit, rootState }, cb) => {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     let count = 0
     rpcClient.batchBlocks.history(50, 0).then(val => {
       count++
@@ -57,7 +57,7 @@ const actions = {
     })
   },
   loadMicroEpochs: ({ state, commit, rootState }, cb) => {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     let savedMicroEpochs = [...state.microEpochs]
     let status = 'success'
     if (savedMicroEpochs && savedMicroEpochs.length > 0) {
@@ -87,7 +87,7 @@ const actions = {
     }
   },
   loadEpochs: ({ state, commit, rootState }, cb) => {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     let savedEpochs = [...state.epochs]
     let status = 'success'
     if (savedEpochs && savedEpochs.length > 0) {

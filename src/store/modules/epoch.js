@@ -12,7 +12,7 @@ const getters = {
 
 const actions = {
   getEpoch: ({ commit, rootState }, hash) => {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     commit('setHash', hash)
     let searchHashes = null
     if (hash.indexOf(',') !== -1) {

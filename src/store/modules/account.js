@@ -21,7 +21,7 @@ const getters = {
 
 const actions = {
   getAccountInfo: ({ state, commit, rootState }, account) => {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     commit('setAccount', account)
     rpcClient.accounts.info(account).then(val => {
       if (val) {
@@ -63,7 +63,7 @@ const actions = {
   },
   addBlock ({ state, commit, rootState }, block) {
     let blockData = cloneDeep(block)
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     if (blockData.account === state.account) {
       commit('incrementBlockCount')
       commit('setFrontier', blockData.hash)

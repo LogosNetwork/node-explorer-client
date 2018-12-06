@@ -13,7 +13,7 @@ const getters = {
 const actions = {
   getTransactionInfo: ({ commit, rootState }, transaction) => {
     commit('setTransaction', transaction)
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     rpcClient.transactions.info(transaction).then(val => {
       if (val && !val.error) {
         let details = val

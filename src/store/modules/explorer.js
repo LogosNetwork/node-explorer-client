@@ -15,7 +15,7 @@ const getters = {
 
 const actions = {
   getRecentTransactions: ({ commit, rootState }) => {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     rpcClient.batchBlocks.history(1, 0).then(val => {
       if (val) {
         if (!val.error) {
@@ -78,7 +78,7 @@ const actions = {
       })
   },
   getBlockType ({ rootState }, data) {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     rpcClient.transactions.info(data.hash, false).then((val) => {
       if (!val.error) {
         data.cb('transaction')
@@ -108,7 +108,7 @@ const actions = {
   addBlock ({ commit, rootState }, block) {
     let blockData = cloneDeep(block)
     if (blockData.type === 'send') {
-      let rpcClient = new Logos({ url: rootState.settings.rpcHost, debug: true })
+      let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
       blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
       blockData.timestamp = parseInt(blockData.timestamp)
       commit('unshiftTransaction', blockData)
