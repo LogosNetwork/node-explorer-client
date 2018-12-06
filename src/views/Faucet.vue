@@ -76,7 +76,7 @@ export default {
     },
     requestFaucet () {
       if (this.address.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
-        axios.post('http://localhost:3000/faucet', {
+        axios.post('/faucet', {
           address: this.address
         })
           .then((res) => {
