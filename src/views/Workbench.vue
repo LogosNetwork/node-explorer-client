@@ -171,7 +171,6 @@ export default {
             .info()
             .then(val => {
               let delegateId = null
-              const transactionFee = '10000000000000000000000'
               if (
                 lastHash ===
                 '0000000000000000000000000000000000000000000000000000000000000000'
@@ -190,7 +189,7 @@ export default {
                     }....\n`
                     $this.$Logos
                       .account($this.key)
-                      .send(logosAmount, address, transactionFee)
+                      .send(logosAmount, address)
                       .then(val => {
                         $this.editor +=
                           JSON.stringify(val, null, ' ') + '\n\n'
@@ -208,7 +207,7 @@ export default {
                 }....\n`
                 $this.$Logos
                   .account($this.key)
-                  .send(logosAmount, address, transactionFee)
+                  .send(logosAmount, address)
                   .then(val => {
                     $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
                     $this.$Logos.changeServer($this.nodeURL)
@@ -216,11 +215,10 @@ export default {
               }
             })
         } else {
-          const transactionFee = '10000000000000000000000'
           $this.editor += `Using forced delegate:${this.nodeURL}....\n`
           $this.$Logos
             .account($this.key)
-            .send(logosAmount, address, transactionFee)
+            .send(logosAmount, address)
             .then(val => {
               $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
             })

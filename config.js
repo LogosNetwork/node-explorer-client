@@ -3,8 +3,8 @@ let config
 if (process.env.NODE_ENV === 'production') {
   config = {
     rpcHost: 'http://107.21.165.224:55000',
-    rpcProxy: 'https://pla.bs/rpc',
-    mqttHost: 'wss:18.235.68.120:8883/mqtt',
+    rpcProxy: 'https://pla.bs',
+    mqttHost: 'wss:18.235.68.120:8443/mqtt',
     requiresAuth: true,
     delegates: {
       0: '107.21.165.224',
@@ -44,7 +44,7 @@ if (process.env.NODE_ENV === 'production') {
 } else {
   config = {
     rpcHost: 'http://107.21.165.224:55000',
-    rpcProxy: 'https://pla.bs/rpc',
+    rpcProxy: 'https://pla.bs',
     mqttHost: 'ws:18.235.68.120:8883/mqtt',
     requiresAuth: false,
     delegates: {
