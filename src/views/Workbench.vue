@@ -144,6 +144,7 @@ export default {
           for (let i = 0; i < Object.keys(config.delegates).length; i++) {
             $this.delegateNodeUrl = config.delegates[i]
             $this.$Logos.changeServer(
+              'https://pla.bs',
               `http://${$this.delegateNodeUrl}:55000`
             )
             $this.$Logos
@@ -163,7 +164,7 @@ export default {
         return new Promise(resolve => setTimeout(resolve, ms))
       }
       abort = await shouldAbort()
-      $this.$Logos.changeServer($this.nodeURL)
+      $this.$Logos.changeServer('https://pla.bs', $this.nodeURL)
       if (!abort) {
         if (!forceDelegate || forceDelegate === 'false') {
           $this.$Logos
@@ -182,6 +183,7 @@ export default {
                     delegateId = parseInt(data.key.slice(-2), 16) % 32
                     $this.delegateNodeUrl = config.delegates[delegateId]
                     $this.$Logos.changeServer(
+                      'https://pla.bs',
                       `http://${$this.delegateNodeUrl}:55000`
                     )
                     $this.editor += `Using delegate:${delegateId}@${
@@ -193,13 +195,14 @@ export default {
                       .then(val => {
                         $this.editor +=
                           JSON.stringify(val, null, ' ') + '\n\n'
-                        $this.$Logos.changeServer($this.nodeURL)
+                        $this.$Logos.changeServer('https://pla.bs', $this.nodeURL)
                       })
                   })
               } else {
                 delegateId = parseInt(val.frontier.slice(-2), 16) % 32
                 $this.delegateNodeUrl = config.delegates[delegateId]
                 $this.$Logos.changeServer(
+                  'https://pla.bs',
                   `http://${$this.delegateNodeUrl}:55000`
                 )
                 $this.editor += `Using delegate:${delegateId}@${
@@ -210,7 +213,7 @@ export default {
                   .send(logosAmount, address)
                   .then(val => {
                     $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-                    $this.$Logos.changeServer($this.nodeURL)
+                    $this.$Logos.changeServer('https://pla.bs', $this.nodeURL)
                   })
               }
             })
@@ -248,6 +251,7 @@ export default {
           for (let i = 0; i < Object.keys(config.delegates).length; i++) {
             $this.delegateNodeUrl = config.delegates[i]
             $this.$Logos.changeServer(
+              'https://pla.bs',
               `http://${$this.delegateNodeUrl}:55000`
             )
             $this.$Logos.accounts.info(accountId)
@@ -281,13 +285,13 @@ export default {
           $this.$Logos.transactions.publish(transaction).then(val => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
             if (!forceDelegate || forceDelegate === 'false') {
-              $this.$Logos.changeServer($this.nodeURL)
+              $this.$Logos.changeServer('https://pla.bs', $this.nodeURL)
             }
           })
         })
       }
       abort = await shouldAbort()
-      $this.$Logos.changeServer($this.nodeURL)
+      $this.$Logos.changeServer('https://pla.bs', $this.nodeURL)
       if (!abort) {
         $this.editor += `Retreiving the account info of my account....\n`
         let amount = $this.$Logos.convert.toReason(amountLogos, 'LOGOS')
@@ -317,6 +321,7 @@ export default {
                 delegateId = parseInt(data.key.slice(-2), 16) % 32
                 $this.delegateNodeUrl = config.delegates[delegateId]
                 $this.$Logos.changeServer(
+                  'https://pla.bs',
                   `http://${$this.delegateNodeUrl}:55000`
                 )
                 workAndProcess()
@@ -325,6 +330,7 @@ export default {
               delegateId = parseInt(val.frontier.slice(-2), 16) % 32
               $this.delegateNodeUrl = config.delegates[delegateId]
               $this.$Logos.changeServer(
+                'https://pla.bs',
                 `http://${$this.delegateNodeUrl}:55000`
               )
               workAndProcess()
@@ -1081,7 +1087,7 @@ export default {
   },
   watch: {
     nodeURL: function (val) {
-      this.$Logos.changeServer(val)
+      this.$Logos.changeServer('https://pla.bs', val)
     }
   }
 }
