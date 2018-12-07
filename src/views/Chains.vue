@@ -43,7 +43,7 @@
               <b-card class="mt-3 mb-3 text-left">
                 <b-row>
                   <b-col>
-                    <h3 v-if="microEpoch.timestamp !== '0'">Micro Epoch #{{microEpoch.micro_block_number}}</h3>
+                    <h3 v-if="microEpoch.timestamp !== '0'">Micro Epoch #{{microEpoch.sequence}}</h3>
                     <h3 v-if="microEpoch.timestamp === '0'">Genesis Micro Epoch</h3>
                   </b-col>
                   <b-col class="text-right">
@@ -65,7 +65,7 @@
                 </b-row>
                 <b-row class="mb-2">
                   <b-col class="text-truncate">
-                    Proposed by delegate: <b-link :to="'/delegate/'+microEpoch.delegate">{{microEpoch.delegate}}</b-link>
+                    Proposed by delegate: <b-link :to="'/delegate/'+microEpoch.delegate">{{microEpoch.account}}</b-link>
                   </b-col>
                 </b-row>
                 <b-row>

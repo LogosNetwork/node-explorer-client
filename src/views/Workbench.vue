@@ -218,7 +218,7 @@ export default {
               }
             })
         } else {
-          $this.editor += `Using forced delegate:${this.nodeURL}....\n`
+          $this.editor += `Using forced delegate:${$this.nodeURL}....\n`
           $this.$Logos
             .account($this.key)
             .send(logosAmount, address)
