@@ -2,7 +2,7 @@
   <div id="primary">
     <b-container class="pt-5">
         <h5 class="text-left" v-t="'build_api_cta'"></h5>
-        <b-input placeholder="http://107.21.165.224:55000" v-model="nodeURL" class="mb-3" />
+        <b-input :placeholder="config.rpcHost" v-model="nodeURL" class="mb-3" />
         <b-card no-body>
             <b-tabs pills card vertical>
                 <b-tab title="My Account" active>
@@ -119,7 +119,7 @@ import Logos from '../api/rpc'
 import LogosWallet from '../api/wallet'
 import codepad from '@/components/codepad.vue'
 import config from '../../config'
-Vue.use(Logos, { url: 'http://107.21.165.224:55000', proxyURL: 'https://pla.bs', debug: true })
+Vue.use(Logos, { url: config.rpcHost, proxyURL: config.rpcProxy, debug: true })
 Vue.use(LogosWallet)
 
 export default {
@@ -143,10 +143,17 @@ export default {
           let results = []
           for (let i = 0; i < Object.keys(config.delegates).length; i++) {
             $this.delegateNodeUrl = config.delegates[i]
-            $this.$Logos.changeServer(
-              'https://pla.bs',
-              `http://${$this.delegateNodeUrl}:55000`
-            )
+            if (config.rpcProxy) {
+              $this.$Logos.changeServer(
+                config.rpcProxy,
+                `http://${$this.delegateNodeUrl}:55000`
+              )
+            } else {
+              $this.$Logos.changeServer(
+                `http://${$this.delegateNodeUrl}:55000`
+              )
+            }
+
             $this.$Logos
               .account($this.key)
               .info()
@@ -164,7 +171,11 @@ export default {
         return new Promise(resolve => setTimeout(resolve, ms))
       }
       abort = await shouldAbort()
-      $this.$Logos.changeServer('https://pla.bs', $this.nodeURL)
+      if (config.rpcProxy) {
+        $this.$Logos.changeServer(config.rpcProxy, $this.nodeURL)
+      } else {
+        $this.$Logos.changeServer($this.nodeURL)
+      }
       if (!abort) {
         if (!forceDelegate || forceDelegate === 'false') {
           $this.$Logos
@@ -172,48 +183,70 @@ export default {
             .info()
             .then(val => {
               let delegateId = null
-              if (
-                lastHash ===
-                '0000000000000000000000000000000000000000000000000000000000000000'
-              ) {
+              if (lastHash === '0000000000000000000000000000000000000000000000000000000000000000') {
                 $this.$Logos
                   .account($this.key)
                   .publicKey()
                   .then(data => {
                     delegateId = parseInt(data.key.slice(-2), 16) % 32
                     $this.delegateNodeUrl = config.delegates[delegateId]
-                    $this.$Logos.changeServer(
-                      'https://pla.bs',
-                      `http://${$this.delegateNodeUrl}:55000`
-                    )
-                    $this.editor += `Using delegate:${delegateId}@${
-                      $this.delegateNodeUrl
-                    }....\n`
+                    if (config.rpcProxy) {
+                      $this.$Logos.changeServer(
+                        config.rpcProxy,
+                        `http://${$this.delegateNodeUrl}:55000`
+                      )
+                    } else {
+                      $this.$Logos.changeServer(
+                        `http://${$this.delegateNodeUrl}:55000`
+                      )
+                    }
+                    $this.editor += `Using delegate:${delegateId}@${$this.delegateNodeUrl}....\n`
                     $this.$Logos
                       .account($this.key)
                       .send(logosAmount, address)
                       .then(val => {
-                        $this.editor +=
-                          JSON.stringify(val, null, ' ') + '\n\n'
-                        $this.$Logos.changeServer('https://pla.bs', $this.nodeURL)
+                        $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+                        if (config.rpcProxy) {
+                          $this.$Logos.changeServer(
+                            config.rpcProxy,
+                            $this.nodeURL
+                          )
+                        } else {
+                          $this.$Logos.changeServer($this.nodeURL)
+                        }
                       })
                   })
               } else {
                 delegateId = parseInt(val.frontier.slice(-2), 16) % 32
                 $this.delegateNodeUrl = config.delegates[delegateId]
-                $this.$Logos.changeServer(
-                  'https://pla.bs',
-                  `http://${$this.delegateNodeUrl}:55000`
-                )
-                $this.editor += `Using delegate:${delegateId}@${
-                  $this.delegateNodeUrl
-                }....\n`
+                if (config.rpcProxy) {
+                  $this.$Logos.changeServer(
+                    config.rpcProxy,
+                    `http://${$this.delegateNodeUrl}:55000`
+                  )
+                } else {
+                  $this.$Logos.changeServer(
+                    `http://${$this.delegateNodeUrl}:55000`
+                  )
+                }
+                $this.editor += `Using delegate:${delegateId}@${$this.delegateNodeUrl}....\n`
                 $this.$Logos
                   .account($this.key)
                   .send(logosAmount, address)
                   .then(val => {
                     $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-                    $this.$Logos.changeServer('https://pla.bs', $this.nodeURL)
+                    if (config.rpcProxy) {
+                      $this.$Logos.changeServer(config.rpcProxy, $this.nodeURL)
+                    } else {
+                      if (config.rpcProxy) {
+                        $this.$Logos.changeServer(
+                          config.rpcProxy,
+                          $this.nodeURL
+                        )
+                      } else {
+                        $this.$Logos.changeServer($this.nodeURL)
+                      }
+                    }
                   })
               }
             })
@@ -250,18 +283,23 @@ export default {
           let results = []
           for (let i = 0; i < Object.keys(config.delegates).length; i++) {
             $this.delegateNodeUrl = config.delegates[i]
-            $this.$Logos.changeServer(
-              'https://pla.bs',
-              `http://${$this.delegateNodeUrl}:55000`
-            )
-            $this.$Logos.accounts.info(accountId)
-              .then(val => {
-                results.push(val.frontier)
-                if (results.length === 32) {
-                  let status = results.every((val, i, arr) => val === arr[0])
-                  resolve(!status)
-                }
-              })
+            if (config.rpcProxy) {
+              $this.$Logos.changeServer(
+                config.rpcProxy,
+                `http://${$this.delegateNodeUrl}:55000`
+              )
+            } else {
+              $this.$Logos.changeServer(
+                `http://${$this.delegateNodeUrl}:55000`
+              )
+            }
+            $this.$Logos.accounts.info(accountId).then(val => {
+              results.push(val.frontier)
+              if (results.length === 32) {
+                let status = results.every((val, i, arr) => val === arr[0])
+                resolve(!status)
+              }
+            })
           }
         })
       }
@@ -274,24 +312,28 @@ export default {
           blk.setWork(val.work)
           let transaction = blk.getJSONBlock()
           if (!forceDelegate || forceDelegate === 'false') {
-            $this.editor += `Using delegate:${delegateId}@${
-              $this.delegateNodeUrl
-            } \n ${JSON.stringify(transaction, null, ' ')} \n`
+            $this.editor += `Using delegate:${delegateId}@${$this.delegateNodeUrl} \n ${JSON.stringify(transaction, null, ' ')} \n`
           } else {
-            $this.editor += `Using forced delegate of ${
-              $this.nodeURL
-            } \n ${JSON.stringify(transaction, null, ' ')} \n`
+            $this.editor += `Using forced delegate of ${$this.nodeURL} \n ${JSON.stringify(transaction, null, ' ')} \n`
           }
           $this.$Logos.transactions.publish(transaction).then(val => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
             if (!forceDelegate || forceDelegate === 'false') {
-              $this.$Logos.changeServer('https://pla.bs', $this.nodeURL)
+              if (config.rpcProxy) {
+                $this.$Logos.changeServer(config.rpcProxy, $this.nodeURL)
+              } else {
+                $this.$Logos.changeServer($this.nodeURL)
+              }
             }
           })
         })
       }
       abort = await shouldAbort()
-      $this.$Logos.changeServer('https://pla.bs', $this.nodeURL)
+      if (config.rpcProxy) {
+        $this.$Logos.changeServer(config.rpcProxy, $this.nodeURL)
+      } else {
+        $this.$Logos.changeServer($this.nodeURL)
+      }
       if (!abort) {
         $this.editor += `Retreiving the account info of my account....\n`
         let amount = $this.$Logos.convert.toReason(amountLogos, 'LOGOS')
@@ -313,26 +355,35 @@ export default {
           )
           $this.editor += `Generating work for ${lastHash}....\n`
           if (!forceDelegate || forceDelegate === 'false') {
-            if (
-              lastHash ===
-              '0000000000000000000000000000000000000000000000000000000000000000'
-            ) {
+            if (lastHash === '0000000000000000000000000000000000000000000000000000000000000000') {
               $this.$Logos.accounts.key(accountId).then(data => {
                 delegateId = parseInt(data.key.slice(-2), 16) % 32
                 $this.delegateNodeUrl = config.delegates[delegateId]
-                $this.$Logos.changeServer(
-                  'https://pla.bs',
-                  `http://${$this.delegateNodeUrl}:55000`
-                )
+                if (config.rpcProxy) {
+                  $this.$Logos.changeServer(
+                    config.rpcProxy,
+                    `http://${$this.delegateNodeUrl}:55000`
+                  )
+                } else {
+                  $this.$Logos.changeServer(
+                    `http://${$this.delegateNodeUrl}:55000`
+                  )
+                }
                 workAndProcess()
               })
             } else {
               delegateId = parseInt(val.frontier.slice(-2), 16) % 32
               $this.delegateNodeUrl = config.delegates[delegateId]
-              $this.$Logos.changeServer(
-                'https://pla.bs',
-                `http://${$this.delegateNodeUrl}:55000`
-              )
+              if (config.rpcProxy) {
+                $this.$Logos.changeServer(
+                  config.rpcProxy,
+                  `http://${$this.delegateNodeUrl}:55000`
+                )
+              } else {
+                $this.$Logos.changeServer(
+                  `http://${$this.delegateNodeUrl}:55000`
+                )
+              }
               workAndProcess()
             }
           } else {
@@ -1021,8 +1072,9 @@ export default {
     return {
       key: null,
       options: options,
+      config: config,
       editor: '',
-      nodeURL: 'http://107.21.165.224:55000',
+      nodeURL: config.rpcHost,
       delegateNodeUrl: null,
       labels: labels,
       selectedAccount: 0,
@@ -1036,7 +1088,11 @@ export default {
   },
   watch: {
     nodeURL: function (val) {
-      this.$Logos.changeServer('https://pla.bs', val)
+      if (config.rpcProxy) {
+        this.$Logos.changeServer(config.rpcProxy, val)
+      } else {
+        this.$Logos.changeServer(val)
+      }
     }
   }
 }
