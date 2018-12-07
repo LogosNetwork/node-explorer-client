@@ -351,8 +351,7 @@ export default {
       { value: 3, text: 'Lookup total transaction count' },
       { value: 4, text: 'Pull account history' },
       { value: 5, text: 'Info' },
-      { value: 6, text: 'Lookup Public Key' },
-      { value: 7, text: 'Ledger' }
+      { value: 6, text: 'Lookup Public Key' }
     ]
     const accountOptions = [
       {
@@ -454,26 +453,6 @@ export default {
             })
         },
         params: []
-      },
-      {
-        action: function (params) {
-          let count = params[0].value
-          let details = params[1].value
-          $this.editor += `Retreiving the ledger of my account up to ${count} transactions....\n`
-          $this.$Logos
-            .account($this.key)
-            .ledger(count, details)
-            .then(val => {
-              $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-            })
-        },
-        params: [
-          {
-            name: 'count',
-            label: `The number of transactions you want to fetch`,
-            required: false
-          }
-        ]
       }
     ]
 
@@ -595,35 +574,6 @@ export default {
             required: true
           }
         ]
-      },
-      {
-        action: function (params) {
-          let accountId = params[0].value
-          let count = params[1].value
-          let details = params[2].value
-          $this.editor += `Getting ledger for account ${accountId} for the last ${count} transactions....\n`
-          $this.$Logos.accounts.ledger(accountId, count, details).then(val => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-          })
-        },
-        params: [
-          {
-            name: 'account',
-            label: `Account Id`,
-            required: true
-          },
-          {
-            name: 'count',
-            label: `Number of transactions to retrieve`,
-            required: false
-          },
-          {
-            name: 'details',
-            type: 'boolean',
-            label: `Show full transaction details`,
-            required: false
-          }
-        ]
       }
     ]
     const accountsLabels = [
@@ -633,8 +583,7 @@ export default {
       { value: 3, text: 'Accounts Balance' },
       { value: 4, text: 'History of an account' },
       { value: 5, text: 'Account info' },
-      { value: 6, text: 'Get public key from account name' },
-      { value: 7, text: 'Get ledger information of an account' }
+      { value: 6, text: 'Get public key from account name' }
     ]
 
     const keyOptions = [
@@ -742,9 +691,9 @@ export default {
       {
         action: function (params) {
           let count = params[0].value
-          let delegateId = params[1].value
-          $this.editor += `Fetching ${count} of the most recent batch state blocks from delegate ${delegateId}....\n`
-          $this.$Logos.batchBlocks.history(count, delegateId).then(val => {
+          let delegateIndex = params[1].value
+          $this.editor += `Fetching ${count} of the most recent batch state blocks from delegate ${delegateIndex}....\n`
+          $this.$Logos.batchBlocks.history(count, delegateIndex).then(val => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
@@ -755,8 +704,8 @@ export default {
             required: false
           },
           {
-            name: 'delegate_id',
-            label: `ID of the delegate you wish to lookup their batch state block chain`,
+            name: 'delegateIndex',
+            label: `Index of the delegate you wish to lookup their batch state block chain`,
             required: false
           }
         ]

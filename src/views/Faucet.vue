@@ -4,7 +4,10 @@
       <div v-if="showSuccess" id="success">
         <div class="alert alert-success text-left alert-dismissible fade show" role="alert">
           <h4 class="alert-heading">Logos was sent!</h4>
-          <p>{{successMessage}}</p>
+          <p>
+            {{successMessage}} <br>
+            <a v-if="successHash" :href="'/'+successHash">{{successHash}}</a>
+          </p>
           <button type="button" class="close" v-on:click="showSuccess=false" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -24,7 +27,7 @@
                 </b-button>
               </div>
             </div>
-            <small id="addressHelp" class="form-text text-muted">If you don't have an address you should download our iPhone app here???</small>
+            <small id="addressHelp" class="form-text text-muted">If you don't have an address you should download our iPhone app or visit the workbench to generate a keypair.</small>
           </div>
           <button type="submit" v-on:click="requestFaucet()" class="btn btn-primary">Send me some Logos</button>
           <div v-if="scanQR" class="mt-3">
@@ -60,6 +63,7 @@ export default {
       address: '',
       scanQR: false,
       successMessage: '',
+      successHash: null,
       showSuccess: false,
       errorMessage: null
     }
@@ -80,11 +84,9 @@ export default {
           address: this.address
         })
           .then((res) => {
-            this.successMessage = res.data
+            this.successMessage = res.data.msg
+            this.successHash = res.data.hash
             this.showSuccess = true
-            setTimeout(() => {
-              this.showSuccess = false
-            }, 3000)
           })
           .catch((err) => {
             alert(err)
