@@ -43,6 +43,7 @@ if (process.env.NODE_ENV === 'production') {
   config.rpcHost = `http://${config.delegates[0]}:55000`
 } else {
   config = {
+    rpcProxy: 'https://pla.bs',
     mqttHost: 'ws:18.235.68.120:8883/mqtt',
     requiresAuth: false,
     delegates: {

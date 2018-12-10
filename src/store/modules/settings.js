@@ -2,6 +2,7 @@ import config from '../../../config'
 
 const state = {
   rpcHost: config.rpcHost,
+  delegates: config.delegates,
   proxyURL: config.rpcProxy,
   mqttHost: config.mqttHost
 }
@@ -20,6 +21,9 @@ const mutations = {
   },
   setProxyURL (state, address) {
     state.proxyURL = address
+  },
+  setDelegates (state, delegates) {
+    state.delegates = delegates
   },
   setMqttHost (state, address) {
     state.mqttHost = address

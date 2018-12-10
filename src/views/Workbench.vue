@@ -7,6 +7,9 @@
             <b-tabs pills card vertical>
                 <b-tab title="My Account" active>
                     <p class="card-text text-left">Private Key is required for account actions</p>
+                    <p>
+                      <small class="text-danger">These commands will send your private key to the node to perform actions. You can do all these actions locally elsewhere in the workbench.</small>
+                    </p>
                     <b-input id="pkey" placeholder="Private Key" v-model="key" class="mb-3" />
                     <b-form-select v-model="selectedAccount" :options="labels[0]" class="mb-5" />
                     <div class="text-left" v-for="(param, index) in options[0][selectedAccount].params" :key="index">
@@ -850,88 +853,11 @@ export default {
       {
         action: function (params) {
           let hash = params[0].value
-          $this.editor += `Fetching account who published the transaction with the hash ${hash}....\n`
-          $this.$Logos.transactions.account(hash).then(val => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-          })
-        },
-        params: [
-          {
-            name: 'hash',
-            label: `Hash of the transaction you want to know who published`,
-            required: true
-          }
-        ]
-      },
-      {
-        action: function (params) {
-          let type = params[0].value
-          $this.editor += `Fetching transaction counts....\n`
-          $this.$Logos.transactions.count(type).then(val => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-          })
-        },
-        params: [
-          {
-            name: 'hash',
-            type: `boolean`,
-            label: `Split transaction count by transaction type`,
-            required: true
-          }
-        ]
-      },
-      {
-        action: function (params) {
-          let hash = params[0].value
-          let count = params[1].value
-          $this.editor += `Fetching ${count} predecessors to the transaciton ${hash}....\n`
-          $this.$Logos.transactions.chain(hash, count).then(val => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-          })
-        },
-        params: [
-          {
-            name: 'hash',
-            label: `Hash of the transaction you want to know the predecessors to`,
-            required: true
-          },
-          {
-            name: 'count',
-            label: `Number of predecessors to retrieve`,
-            required: false
-          }
-        ]
-      },
-      {
-        action: function (params) {
-          let hash = params[0].value
-          let count = params[1].value
-          $this.editor += `Fetching ${count} sucessors to the transaciton ${hash}....\n`
-          $this.$Logos.transactions.history(hash, count).then(val => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-          })
-        },
-        params: [
-          {
-            name: 'hash',
-            label: `Hash of the transaction you want to know the successors to`,
-            required: true
-          },
-          {
-            name: 'count',
-            label: `Number of successors to retrieve`,
-            required: false
-          }
-        ]
-      },
-      {
-        action: function (params) {
-          let hash = params[0].value
           if (hash.indexOf(',') !== -1) {
             hash = hash.split(',')
           }
           let details = params[1].value
-          $this.editor += `Fetching transacitons of ${hash}....\n`
+          $this.editor += `Fetching transaciton info of ${hash}....\n`
           $this.$Logos.transactions.info(hash, details).then(val => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
@@ -955,7 +881,7 @@ export default {
         params: [
           {
             name: 'privateKey',
-            label: `Private Key used to sign the message`,
+            label: `Private Key only used locally to sign the message`,
             required: true
           },
           {
@@ -984,12 +910,8 @@ export default {
     ]
 
     const transactionLabels = [
-      { value: 0, text: 'Lookup account by transaction' },
-      { value: 1, text: 'Get number of transactions' },
-      { value: 2, text: 'Retrieve chain up to transaction' },
-      { value: 3, text: 'Retrieve chain after a transaction' },
-      { value: 4, text: 'Transaction Info' },
-      { value: 5, text: 'Publish Send Transaction' }
+      { value: 0, text: 'Transaction Info' },
+      { value: 1, text: 'Publish Send Transaction' }
     ]
 
     const otherOptions = [

@@ -3,8 +3,9 @@
     <b-container class="pt-5">
       <h2 class="text-left d-block" v-t="'blockchains'"></h2>
       <b-tabs v-model="tabIndex">
-        <b-tab :title="$t('batch_blocks')" active>
-          <div :key="batchBlock.hash" v-for="batchBlock in batchBlocks">
+        <b-tab :title="$t('batch_blocks')" v-infinite-scroll="loadMoreBatchBlocks" infinite-scroll-distance="500" active>
+          <b-form-select v-model="selectedDelegate" :options="bsbDelegateLabels" class="mt-3" />
+          <div :key="batchBlock.hash + '_' + batchBlock.delegate" v-for="batchBlock in orderedBatchBlocks">
             <b-link class="cardLink" :to="'/batchBlock/'+batchBlock.hash">
               <b-card class="mt-3 mb-3 text-left">
                 <b-row>
@@ -27,6 +28,11 @@
                     Previous: <b-link :to="'/batchBlock/'+batchBlock.previous">{{batchBlock.previous}}</b-link>
                   </b-col>
                 </b-row>
+                <b-row class="mb-2">
+                  <b-col class="text-truncate">
+                    Proposed by Delegate {{batchBlock.delegate}}
+                  </b-col>
+                </b-row>
                 <b-row>
                   <b-col>
                     Contains {{batchBlock.block_count}} Transactions
@@ -34,7 +40,7 @@
                 </b-row>
               </b-card>
             </b-link>
-            <icon v-if="batchBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" scale="2" name="chevron-down"></icon>
+            <icon v-if="batchBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && selectedDelegate !== -1" scale="2" name="chevron-down"></icon>
           </div>
         </b-tab>
         <b-tab :title="$t('micro_epochs')" v-infinite-scroll="loadMoreMicroEpochs" infinite-scroll-distance="500">
@@ -124,6 +130,7 @@ import { mapActions, mapState } from 'vuex'
 import infiniteScroll from 'vue-infinite-scroll'
 import Vue from 'vue'
 import codepad from '@/components/codepad.vue'
+import orderBy from 'lodash/orderBy'
 Vue.use(infiniteScroll)
 export default {
   name: 'explore',
@@ -132,19 +139,28 @@ export default {
   },
   computed: {
     ...mapState('settings', {
-      mqttHost: state => state.mqttHost
+      mqttHost: state => state.mqttHost,
+      delegates: state => state.delegates
     }),
     ...mapState('chains', {
       batchBlocks: state => state.batchBlocks,
       microEpochs: state => state.microEpochs,
       epochs: state => state.epochs
-    })
+    }),
+    orderedBatchBlocks: function () {
+      return orderBy(this.batchBlocks, 'timestamp', 'desc')
+    }
   },
   data: function () {
     return {
+      batchBlocksBusy: true,
       microEpochsBusy: true,
       epochsBusy: true,
-      tabIndex: 0
+      bsbDelegateLabels: [
+        { value: -1, text: 'All Batch Blocks' }
+      ],
+      tabIndex: 0,
+      selectedDelegate: -1
     }
   },
   created: function () {
@@ -159,6 +175,9 @@ export default {
       this.microEpochsBusy = false
       this.epochsBusy = false
     })
+    for (let i = 0; i < Object.keys(this.delegates).length; i++) {
+      this.bsbDelegateLabels.push({ value: i, text: `Batch Blocks for delegate ${i}: ${this.delegates[i]}` })
+    }
   },
   methods: {
     ...mapActions('mqtt', [
@@ -169,9 +188,26 @@ export default {
     ...mapActions('chains', [
       'getRecentBlocks',
       'loadMicroEpochs',
+      'loadBatchBlocks',
       'loadEpochs',
+      'getRecentBatchBlocks',
       'reset'
     ]),
+    loadMoreBatchBlocks: function () {
+      if (!this.batchBlocksBusy && this.tabIndex === 0) {
+        this.batchBlocksBusy = true
+        this.loadBatchBlocks({
+          index: this.selectedDelegate,
+          cb: (err) => {
+            if (err === 'out of content') {
+              this.batchBlocksBusy = true
+            } else if (err === 'success') {
+              this.batchBlocksBusy = false
+            }
+          }
+        })
+      }
+    },
     loadMoreMicroEpochs: function () {
       if (!this.microEpochsBusy && this.tabIndex === 1) {
         this.microEpochsBusy = true
@@ -195,6 +231,16 @@ export default {
           }
         })
       }
+    }
+  },
+  watch: {
+    selectedDelegate: function (newDelegate, oldDelegate) {
+      this.getRecentBatchBlocks({
+        index: newDelegate,
+        cb: () => {
+          this.batchBlocksBusy = newDelegate === -1
+        }
+      })
     }
   },
   destroyed: function () {
