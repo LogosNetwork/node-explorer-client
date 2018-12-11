@@ -77,7 +77,7 @@ const actions = {
     } else if (blockData.link_as_account === state.account) {
       commit('incrementBlockCount')
       commit('setFrontier', blockData.hash)
-      commit('setRawBalance', bigInt(state.rawBalance).minus(blockData.amount).toString())
+      commit('setRawBalance', bigInt(state.rawBalance).plus(blockData.amount).toString())
       commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5)))
       blockData.type = 'receive'
       blockData.account = blockData.account

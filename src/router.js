@@ -88,7 +88,9 @@ const router = new Router({
     {
       path: '/faucet',
       name: 'faucet',
-      component: Faucet
+      component: Faucet,
+      props: true,
+      meta: { requiresAuth: true }
     },
     {
       path: '*',
