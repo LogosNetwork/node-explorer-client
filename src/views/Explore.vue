@@ -312,25 +312,4 @@ export default {
 .cardLink:hover > .card {
   box-shadow: 0 10px 30px -5px rgba(10, 16, 34, 0.2);
 }
-@keyframes highlight {
-  0% {
-    background-color: #fff;
-  }
-  50% {
-    background-color: #fff3cd;
-  }
-  100% {
-    background-color: #fff;
-  }
-}
-.highlight {
-  animation-name: highlight;
-  animation-duration: 2s;
-}
-.list-enter-active {
-  transition: all 2s;
-}
-.list-enter {
-  background: #fff3cd;
-}
 </style>

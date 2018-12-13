@@ -43,4 +43,24 @@ export default {
 #content {
   flex: 1;
 }
+@keyframes highlight {
+  0% {
+    background-color: #fff;
+  }
+  50% {
+    background-color: #fff3cd;
+  }
+  100% {
+    background-color: #fff;
+  }
+}
+.highlight {
+  animation-name: highlight;
+  animation-duration: 2s;
+}
+.list-enter-active {
+  transition: all 2s;
+  animation-name: highlight;
+  animation-duration: 2s;
+}
 </style>

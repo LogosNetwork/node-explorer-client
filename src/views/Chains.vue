@@ -5,42 +5,44 @@
       <b-tabs v-model="tabIndex">
         <b-tab :title="$t('batch_blocks')" v-infinite-scroll="loadMoreBatchBlocks" infinite-scroll-distance="500" active>
           <b-form-select v-model="selectedDelegate" :options="bsbDelegateLabels" class="mt-3" />
-          <div :key="batchBlock.hash + '_' + batchBlock.delegate" v-for="batchBlock in orderedBatchBlocks">
-            <b-link class="cardLink" :to="'/batchBlock/'+batchBlock.hash">
-              <b-card class="mt-3 mb-3 text-left">
-                <b-row>
-                  <b-col>
-                    <h3>Batch Block</h3>
-                  </b-col>
-                  <b-col class="text-right">
-                    <small>
-                      <span> {{parseInt(batchBlock.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</span>
-                    </small>
-                  </b-col>
-                </b-row>
-                <b-row class="mb-2">
-                  <b-col class="text-truncate">
-                    Hash: <b-link :to="'/batchBlock/'+batchBlock.hash">{{batchBlock.hash}}</b-link>
-                  </b-col>
-                </b-row>
-                <b-row v-if="batchBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-2">
-                  <b-col class="text-truncate">
-                    Previous: <b-link :to="'/batchBlock/'+batchBlock.previous">{{batchBlock.previous}}</b-link>
-                  </b-col>
-                </b-row>
-                <b-row class="mb-2">
-                  <b-col class="text-truncate">
-                    Proposed by Delegate {{batchBlock.delegate}}
-                  </b-col>
-                </b-row>
-                <b-row>
-                  <b-col>
-                    Contains {{batchBlock.block_count}} Transactions
-                  </b-col>
-                </b-row>
-              </b-card>
-            </b-link>
-            <icon v-if="batchBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && selectedDelegate !== -1" scale="2" name="chevron-down"></icon>
+          <div name="list" is="transition-group">
+            <div :key="batchBlock.hash + '_' + batchBlock.delegate" v-for="batchBlock in orderedBatchBlocks">
+              <b-link class="cardLink" :to="'/batchBlock/'+batchBlock.hash">
+                <b-card class="mt-3 mb-3 text-left">
+                  <b-row>
+                    <b-col>
+                      <h3>Batch Block</h3>
+                    </b-col>
+                    <b-col class="text-right">
+                      <small>
+                        <span> {{parseInt(batchBlock.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</span>
+                      </small>
+                    </b-col>
+                  </b-row>
+                  <b-row class="mb-2">
+                    <b-col class="text-truncate">
+                      Hash: <b-link :to="'/batchBlock/'+batchBlock.hash">{{batchBlock.hash}}</b-link>
+                    </b-col>
+                  </b-row>
+                  <b-row v-if="batchBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-2">
+                    <b-col class="text-truncate">
+                      Previous: <b-link :to="'/batchBlock/'+batchBlock.previous">{{batchBlock.previous}}</b-link>
+                    </b-col>
+                  </b-row>
+                  <b-row class="mb-2">
+                    <b-col class="text-truncate">
+                      Proposed by Delegate {{batchBlock.delegate}}
+                    </b-col>
+                  </b-row>
+                  <b-row>
+                    <b-col>
+                      Contains {{batchBlock.block_count}} Transactions
+                    </b-col>
+                  </b-row>
+                </b-card>
+              </b-link>
+              <icon v-if="batchBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && selectedDelegate !== -1" scale="2" name="chevron-down"></icon>
+            </div>
           </div>
         </b-tab>
         <b-tab :title="$t('micro_epochs')" v-infinite-scroll="loadMoreMicroEpochs" infinite-scroll-distance="500">
@@ -265,5 +267,9 @@ export default {
   }
   .cardLink:hover > .card {
     box-shadow: 0 10px 30px -5px rgba(10,16,34,.2);
+  }
+  .list-enter-active > .cardLink > .card {
+    animation-name: highlight;
+    animation-duration: 2s;
   }
 </style>

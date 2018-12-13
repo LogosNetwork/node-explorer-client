@@ -3,7 +3,7 @@
     <b-container class="pt-5">
         <h5 class="text-left" v-t="'build_api_cta'"></h5>
         <b-input :placeholder="config.rpcHost" v-model="nodeURL" class="mb-3" />
-        <b-card no-body>
+        <b-card no-body class="mb-3">
             <b-tabs pills card vertical>
                 <b-tab title="My Account" active>
                     <p class="card-text text-left">Private Key is required for account actions</p>
@@ -110,7 +110,7 @@
                 </b-tab>
             </b-tabs>
         </b-card>
-        <h5 class="text-left mt-3" v-if='editor.length > 0' v-t="'workbench_output'"></h5>
+        <h5 class="text-left" v-if='editor.length > 0' v-t="'workbench_output'"></h5>
         <codepad id='editor' class="text-left mb-3" v-if='editor.length > 0' :code='editor'/>
     </b-container>
   </div>
@@ -949,8 +949,20 @@ export default {
       },
       {
         action: function (params) {
+          // let count = params[0].value
+        },
+        params: [
+          {
+            name: 'number',
+            label: `Number of transactions to send`,
+            required: false
+          }
+        ]
+      },
+      {
+        action: function (params) {
           let epoch = params[0].value
-          $this.editor += `Fetching transaction counts....\n`
+          $this.editor += `Forcing Transition to occur....\n`
           $this.$Logos.generateMicroBlock(epoch).then(val => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
@@ -968,7 +980,8 @@ export default {
     const otherLabels = [
       { value: 0, text: 'Total Available Supply' },
       { value: 1, text: 'Deterministic Key' }
-      // { value: 2, text: 'Force Micro Epoch and Epoch to occur' }
+      // { value: 2, test: 'Fun Stress Test'}
+      // { value: 3, text: 'Force Micro Epoch and Epoch to occur' }
     ]
 
     const options = [
