@@ -14,7 +14,7 @@
         <b-col cols="12" md="4" class="mb-3">
           <h5>Latest Batch Block</h5>
           <b-link v-if="batchBlock" class="cardLink" :to="'/batchBlock/'+batchBlock.hash">
-            <b-card>
+            <b-card v-highlight="batchBlock.hash">
               <b-row>
                 <b-col class="text-truncate">
                   <b-link :to="'/batchBlock/'+batchBlock.hash">{{batchBlock.hash}}</b-link>
@@ -36,7 +36,7 @@
         <b-col cols="12" md="4" class="mb-3">
           <h5>Current Micro Epoch</h5>
            <b-link v-if="microEpoch" class="cardLink" :to="'/microEpoch/'+microEpoch.hash">
-              <b-card>
+              <b-card v-highlight="microEpoch.hash">
                 <b-row>
                   <b-col class="text-truncate">
                     <b-link :to="'/microEpoch/'+microEpoch.hash" v-if="microEpoch.timestamp !== '0'">Micro Epoch #{{microEpoch.sequence}}</b-link>
@@ -59,7 +59,7 @@
         <b-col cols="12" md="4" class="mb-3">
           <h5>Current Epoch</h5>
           <b-link v-if="epoch" class="cardLink" :to="'/epoch/'+epoch.hash">
-              <b-card>
+              <b-card v-highlight="epoch.hash">
                 <b-row>
                   <b-col class="text-truncate">
                     <b-link :to="'/epoch/'+epoch.hash">Epoch #{{epoch.epoch_number}}</b-link>
@@ -83,23 +83,36 @@
       <b-row class="text-left">
         <b-col cols="12" class="mb-5">
           <h5 class="text-left" v-t="'recent_transactions'"></h5>
-          <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="transactions">
-            <template slot="timestamp" slot-scope="data">
-              <div class="text-truncate" v-if="data.item.timestamp">{{ data.item.timestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
-            </template>
-            <template slot="account" slot-scope="data">
-              <div class="text-truncate"><router-link :to="'/'+data.item.account">{{data.item.account}}</router-link></div>
-            </template>
-            <template slot="link_as_account" slot-scope="data">
-              <div class="text-truncate"><router-link :to="'/'+data.item.link_as_account">{{data.item.link_as_account}}</router-link></div>
-            </template>
-            <template slot="amount" slot-scope="data">
-              <div class="text-truncate"><span class="text-success">+{{data.item.amount}}</span></div>
-            </template>
-            <template slot="hash" slot-scope="data">
-              <div class="text-truncate"><router-link :to="'/'+data.item.hash">{{data.item.hash}}</router-link></div>
-            </template>
-          </b-table>
+          <table class="table b-table table-bordered table-sm b-table-fixed" style="background:#FFF">
+            <thead>
+              <tr>
+                <th aria-colindex="1">Time</th>
+                <th aria-colindex="2">From</th>
+                <th aria-colindex="3">To</th>
+                <th aria-colindex="4">Amount</th>
+                <th aria-colindex="5">Hash</th>
+              </tr>
+            </thead>
+            <tbody name="list" is="transition-group">
+              <tr v-for="transaction in transactions" :key="transaction.hash">
+                <td aria-colindex="1">
+                  <div class="text-truncate" v-if="transaction.timestamp">{{ transaction.timestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
+                </td>
+                <td aria-colindex="2">
+                  <div class="text-truncate"><router-link :to="'/'+transaction.account">{{transaction.account}}</router-link></div>
+                </td>
+                <td aria-colindex="3">
+                  <div class="text-truncate"><router-link :to="'/'+transaction.link_as_account">{{transaction.link_as_account}}</router-link></div>
+                </td>
+                <td aria-colindex="4">
+                  <div class="text-truncate"><span class="text-success">+{{transaction.amount}}</span></div>
+                </td>
+                <td aria-colindex="5">
+                  <div class="text-truncate"><router-link :to="'/'+transaction.hash">{{transaction.hash}}</router-link></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </b-col>
         <b-col v-if="false" cols="12" md="6" class="mb-5">
           <h5 class="text-left" v-t="'network_stats.title'"></h5>
@@ -161,6 +174,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import Vue from 'vue'
 let fields = [
   { key: 'timestamp', label: 'Time' },
   { key: 'account', label: 'From' },
@@ -168,6 +182,26 @@ let fields = [
   { key: 'amount', label: 'Amount' },
   { key: 'hash', label: 'Hash' }
 ]
+const hlCache = new Map()
+Vue.directive('highlight', {
+  bind (el, { value }) {
+    hlCache.set(el, value)
+  },
+  componentUpdated (el, { value }) {
+    if (hlCache.get(el) !== value) {
+      hlCache.set(el, value)
+      el.classList.remove('highlight')
+      el.classList.add('highlight')
+
+      setTimeout(() => {
+        el.classList.remove('highlight')
+      }, 2000)
+    }
+  },
+  unbind (el) {
+    hlCache.remove(el)
+  }
+})
 export default {
   name: 'explore',
   components: {},
@@ -176,7 +210,10 @@ export default {
       if (this.address.length === 0) {
         return null
       } else {
-        return this.address.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null || this.address.match(/^[0-9a-fA-F]{64}$/) !== null
+        return (
+          this.address.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !==
+            null || this.address.match(/^[0-9a-fA-F]{64}$/) !== null
+        )
       }
     },
     ...mapState('settings', {
@@ -191,10 +228,12 @@ export default {
     })
   },
   created: function () {
-    this.initalize({ url: this.mqttHost,
+    this.initalize({
+      url: this.mqttHost,
       cb: () => {
         this.subscribe(`#`)
-      } })
+      }
+    })
     this.getRecentTransactions()
   },
   data () {
@@ -207,37 +246,50 @@ export default {
     submitSearch (event) {
       if (event.which === 13) {
         event.preventDefault()
-        if (this.address.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
-          this.$router.push({ name: 'account', params: { account: this.address } })
+        if (
+          this.address.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !==
+          null
+        ) {
+          this.$router.push({
+            name: 'account',
+            params: { account: this.address }
+          })
         } else {
           if (this.address.match(/^[0-9a-fA-F]{64}$/) !== null) {
-            this.getBlockType({ hash: this.address,
-              cb: (blockType) => {
+            this.getBlockType({
+              hash: this.address,
+              cb: blockType => {
                 if (blockType === 'transaction') {
-                  this.$router.push({ name: 'transaction', params: { transaction: this.address } })
+                  this.$router.push({
+                    name: 'transaction',
+                    params: { transaction: this.address }
+                  })
                 } else if (blockType === 'batchBlock') {
-                  this.$router.push({ name: 'batchBlock', params: { hash: this.address } })
+                  this.$router.push({
+                    name: 'batchBlock',
+                    params: { hash: this.address }
+                  })
                 } else if (blockType === 'epoch') {
-                  this.$router.push({ name: 'epoch', params: { hash: this.address } })
+                  this.$router.push({
+                    name: 'epoch',
+                    params: { hash: this.address }
+                  })
                 } else if (blockType === 'microEpoch') {
-                  this.$router.push({ name: 'microEpoch', params: { hash: this.address } })
+                  this.$router.push({
+                    name: 'microEpoch',
+                    params: { hash: this.address }
+                  })
                 } else {
                   alert('Invalid Block 404')
                 }
-              } })
+              }
+            })
           }
         }
       }
     },
-    ...mapActions('mqtt', [
-      'initalize',
-      'unsubscribe',
-      'subscribe'
-    ]),
-    ...mapActions('explorer', [
-      'getRecentTransactions',
-      'getBlockType'
-    ])
+    ...mapActions('mqtt', ['initalize', 'unsubscribe', 'subscribe']),
+    ...mapActions('explorer', ['getRecentTransactions', 'getBlockType'])
   },
   destroyed: function () {
     this.unsubscribe(`#`)
@@ -246,18 +298,39 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .cardLink {
-    color:#525f7f;
+.cardLink {
+  color: #525f7f;
+}
+.cardLink:hover {
+  text-decoration: none;
+}
+.cardLink > .card {
+  -webkit-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  transition: all 0.3s;
+}
+.cardLink:hover > .card {
+  box-shadow: 0 10px 30px -5px rgba(10, 16, 34, 0.2);
+}
+@keyframes highlight {
+  0% {
+    background-color: #fff;
   }
-  .cardLink:hover {
-    text-decoration: none;
+  50% {
+    background-color: #fff3cd;
   }
-  .cardLink > .card {
-    -webkit-transition: all .3s;
-    -o-transition: all .3s;
-    transition: all .3s;
+  100% {
+    background-color: #fff;
   }
-  .cardLink:hover > .card {
-    box-shadow: 0 10px 30px -5px rgba(10,16,34,.2);
-  }
+}
+.highlight {
+  animation-name: highlight;
+  animation-duration: 2s;
+}
+.list-enter-active {
+  transition: all 2s;
+}
+.list-enter {
+  background: #fff3cd;
+}
 </style>
