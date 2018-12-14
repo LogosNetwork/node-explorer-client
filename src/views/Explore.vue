@@ -199,7 +199,7 @@ Vue.directive('highlight', {
     }
   },
   unbind (el) {
-    hlCache.remove(el)
+    hlCache.delete(el)
   }
 })
 export default {
