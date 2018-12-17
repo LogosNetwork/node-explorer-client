@@ -28,7 +28,11 @@ export default {
           .then((res) => {
             localStorage.setItem('authtoken', res.data.token)
             if (this.$route.query.redirect) {
-              this.$router.push({ path: this.$route.query.redirect })
+              if (this.$route.query.redirect === '/manual') {
+                window.location.href = this.$route.query.redirect
+              } else {
+                this.$router.push({ path: this.$route.query.redirect })
+              }
             } else {
               this.$router.push({ path: '/' })
             }
