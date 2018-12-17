@@ -27,7 +27,6 @@ export default {
         })
           .then((res) => {
             localStorage.setItem('authtoken', res.data.token)
-            console.log(this.$route)
             if (this.$route.query.redirect) {
               this.$router.push({ path: this.$route.query.redirect })
             } else {
