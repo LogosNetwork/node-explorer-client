@@ -2,6 +2,7 @@ const CompressionPlugin = require('compression-webpack-plugin')
 
 module.exports = {
   configureWebpack: {
+    devtool: 'source-map',
     plugins: [
       new CompressionPlugin()
     ]
