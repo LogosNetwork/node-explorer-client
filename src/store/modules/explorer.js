@@ -16,31 +16,6 @@ const getters = {
 const actions = {
   getRecentTransactions: ({ commit, rootState }) => {
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
-    rpcClient.batchBlocks.history(1, 0).then(val => {
-      if (val) {
-        if (!val.error) {
-          commit('setBatchBlock', val.batch_blocks[0])
-          // let batchBlock = cloneDeep(val.batch_blocks[0])
-          // let cachedTransactions = []
-          // for (let i = 0; i < batchBlock.length; i++) {
-          //   for (let n = 0; n < batchBlock[i].blocks.length; n++) {
-          //     batchBlock[i].blocks[n].type = 'send'
-          //     batchBlock[i].blocks[n].amount = parseFloat(Number(rpcClient.convert.fromReason(batchBlock[i].blocks[n].amount, 'LOGOS')).toFixed(5))
-          //     batchBlock[i].blocks[n].timestamp = parseInt(batchBlock[i].blocks[n].timestamp)
-          //     cachedTransactions.unshift(batchBlock[i].blocks[n])
-          //     if (i === batchBlock.length - 1 &&
-          //         n === batchBlock[i].blocks.length - 1) {
-          //       commit('setTransactions', cachedTransactions)
-          //     }
-          //   }
-          // }
-        } else {
-          commit('setError', val.error)
-        }
-      } else {
-        commit('setError', 'null')
-      }
-    })
     rpcClient.microEpochs.history(1).then(val => {
       if (val) {
         if (!val.error) {
@@ -72,6 +47,13 @@ const actions = {
             commit('setTransactions', res.data.data.transactions)
           }
         }
+      })
+      .catch((err) => {
+        commit('setError', err)
+      })
+    axios.get('/blocks/lastBatchBlock')
+      .then((res) => {
+        commit('setBatchBlock', res.data.data.batchBlock[0])
       })
       .catch((err) => {
         commit('setError', err)
