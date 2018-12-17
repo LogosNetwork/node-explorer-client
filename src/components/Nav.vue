@@ -16,7 +16,7 @@
       </b-navbar>
     </div>
     <div v-if="showAlert" class="alert alert-warning alert-dismissible fade show" role="alert">
-      This is the permissioned testnet, we will be periodically reseting the network. If your funds are gone please obtain more from the faucet.
+      Please note that this is a test net, which means that we will periodically reset the network. In the case that the reset will cause your funds to disappear, please obtain more from the faucet.
       <button type="button" class="close" v-on:click="showAlert=false" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
