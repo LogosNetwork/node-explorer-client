@@ -95,8 +95,7 @@ const router = new Router({
     {
       path: '*',
       name: '404',
-      component: notFound,
-      meta: { requiresAuth: true }
+      component: notFound
     }
   ],
   scrollBehavior (to, from, savedPosition) {
