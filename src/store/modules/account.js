@@ -50,7 +50,6 @@ const actions = {
           for (let trans of val) {
             trans.amount = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
             trans.timestamp = parseInt(trans.timestamp)
-            trans.account = trans.account
           }
           commit('setTransactions', val)
         } else {
@@ -80,7 +79,6 @@ const actions = {
       commit('setRawBalance', bigInt(state.rawBalance).plus(blockData.amount).toString())
       commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5)))
       blockData.type = 'receive'
-      blockData.account = blockData.account
       blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
       blockData.timestamp = parseInt(blockData.timestamp)
       commit('setLastModified', blockData.timestamp)

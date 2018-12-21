@@ -35,7 +35,9 @@
       </b-row>
       <b-row v-if="error">
         <b-col cols="12" class="text-left">
-          <h4 style="color:red">This transaction does not exist</h4>
+          <h4 style="color:red">This transaction does not exist yet.</h4>
+          <br>
+          <small>If you have just sent this transaction it will appear here when confirmed.</small>
         </b-col>
       </b-row>
     </b-container>
@@ -62,6 +64,11 @@ export default {
     })
   },
   methods: {
+    ...mapActions('mqtt', [
+      'initalize',
+      'unsubscribe',
+      'subscribe'
+    ]),
     ...mapActions('transaction', [
       'getTransactionInfo',
       'reset'
@@ -69,9 +76,23 @@ export default {
   },
   created: function () {
     this.getTransactionInfo(this.$route.params.transaction)
+    this.initalize({ url: this.mqttHost,
+      cb: () => {
+        this.subscribe(`transaction/${this.$route.params.transaction}`)
+      }
+    })
+  },
+  destroyed: function () {
+    this.unsubscribe(`transaction/${this.transaction}`)
   },
   beforeRouteUpdate (to, from, next) {
+    this.unsubscribe(`transaction/${this.transaction}`)
     this.reset()
+    this.initalize({ url: this.mqttHost,
+      cb: () => {
+        this.subscribe(`transaction/${to.params.transaction}`)
+      }
+    })
     this.getTransactionInfo(to.params.transaction)
     next()
   }

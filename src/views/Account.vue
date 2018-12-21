@@ -93,7 +93,8 @@ export default {
     this.initalize({ url: this.mqttHost,
       cb: () => {
         this.subscribe(`account/${this.$route.params.account}`)
-      } })
+      }
+    })
     this.getAccountInfo(this.$route.params.account)
   },
   methods: {

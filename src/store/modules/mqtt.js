@@ -20,6 +20,7 @@ const actions = {
         commit('setConnectionStatus', false)
       })
       const accountMqttRegex = mqttRegex('account/+account').exec
+      const transactionMqttRegex = mqttRegex('transaction/+hash').exec
       client.on('message', (topic, message) => {
         message = JSON.parse(message.toString())
         // TODO Eventually validate the signatures of the blocks to be "trustless"
@@ -33,10 +34,11 @@ const actions = {
           commit('chains/addBatchBlock', message, { root: true })
           commit('explorer/setBatchBlock', message, { root: true })
         } else {
-          let params = accountMqttRegex(topic)
-          if (params) {
+          if (accountMqttRegex(topic)) {
             dispatch('account/addBlock', message, { root: true })
             dispatch('explorer/addBlock', message, { root: true })
+          } else if (transactionMqttRegex(topic)) {
+            dispatch('transction/addBlock', message, { root: true })
           }
         }
       })

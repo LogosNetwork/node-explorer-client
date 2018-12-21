@@ -41,6 +41,25 @@ const actions = {
       }
     })
   },
+  addBlock ({ commit, rootState }, block) {
+    let details = block
+    let prettyDetails = null
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    if (details.type === 'receive') {
+      rpcClient.transactions.info(details.link).then(val => {
+        prettyDetails = JSON.stringify(details, null, ' ')
+        commit('setPrettyDetails', prettyDetails)
+        details.link_as_account = val.account
+        details.amount = parseFloat(Number(rpcClient.convert.fromReason(details.amount, 'LOGOS')).toFixed(5))
+        commit('setDetails', details)
+      })
+    } else {
+      prettyDetails = JSON.stringify(details, null, ' ')
+      commit('setPrettyDetails', prettyDetails)
+      details.amount = parseFloat(Number(rpcClient.convert.fromReason(details.amount, 'LOGOS')).toFixed(5))
+      commit('setDetails', details)
+    }
+  },
   reset: ({ commit }) => {
     commit('reset')
   }
