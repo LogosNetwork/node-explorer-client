@@ -38,7 +38,7 @@ const actions = {
             dispatch('account/addBlock', message, { root: true })
             dispatch('explorer/addBlock', message, { root: true })
           } else if (transactionMqttRegex(topic)) {
-            dispatch('transction/addBlock', message, { root: true })
+            dispatch('transaction/addBlock', message, { root: true })
           }
         }
       })
