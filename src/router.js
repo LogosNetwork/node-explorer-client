@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Explore from './views/Explore.vue'
 import Governance from './views/Governance.vue'
+import Tokens from './views/Tokens.vue'
 import Workbench from './views/Workbench.vue'
 import Transaction from './views/Transaction.vue'
 import microEpoch from './views/MicroEpoch.vue'
@@ -37,6 +38,12 @@ const router = new Router({
       path: '/Governance',
       name: 'governance',
       component: Governance,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/tokens',
+      name: 'tokens',
+      component: Tokens,
       meta: { requiresAuth: true }
     },
     {

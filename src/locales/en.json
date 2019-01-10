@@ -37,6 +37,7 @@
   "searchPlaceholder": "Search for Addresses and Blocks",
   "recent_transactions": "Recent Transactions",
   "workbench_output": "Output from the workbench will be shown below",
+  "tokens": "Tokens",
   "network_stats": {
     "title": "Network Stats",
     "tx-sec-1m": "TX/SEC (1 Min Avg)",
