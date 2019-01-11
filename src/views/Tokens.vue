@@ -15,13 +15,13 @@
             <tbody name="list">
               <tr>
                 <td aria-colindex="1">
-                  <div class="text-truncate">Poop Coin (POOP) <br/>This is a JSON description from the token issuer json data</div>
+                  <div class="text-truncate">My Coin (COIN) <br/>This is a JSON description from the token issuer json data</div>
                 </td>
                 <td aria-colindex="2">
-                  <div class="text-truncate">lgs_123...456</div>
+                  <div class="text-truncate">lgs_13duy35orkazz577x7ucwysu5ujwkr8qgu8beb91r1p14ema7j7n7syadbtx</div>
                 </td>
                 <td aria-colindex="3">
-                  <div class="text-truncate">1,000,000 POOP</div>
+                  <div class="text-truncate">1,000,000 COIN</div>
                 </td>
               </tr>
             </tbody>

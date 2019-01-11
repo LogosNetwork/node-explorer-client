@@ -30,6 +30,9 @@
             <small id="addressHelp" class="form-text text-muted">If you don't have an address you should download our iPhone app or visit the workbench to generate a keypair.</small>
           </div>
           <button type="submit" v-on:click="requestFaucet()" class="btn btn-primary">Send me some Logos</button>
+          <div v-if="startTime !== null && finalTime !== null" class="mt-3">
+            <h4>Transaction Took: {{finalTime - startTime}}ms</h4>
+          </div>
           <div v-if="scanQR" class="mt-3">
             <qrcode-reader @init="onInit" @decode="onDecode" :paused="!scanQR"></qrcode-reader>
             <div class="error">
@@ -46,16 +49,32 @@
 import axios from 'axios'
 import Vue from 'vue'
 import VueQrcodeReader from 'vue-qrcode-reader'
+import { mapActions, mapState } from 'vuex'
 Vue.use(VueQrcodeReader)
 export default {
   name: 'Facuet',
   computed: {
+    ...mapState('settings', {
+      mqttHost: state => state.mqttHost
+    }),
+    ...mapState('transaction', {
+      transaction: state => state.transaction,
+      details: state => state.details,
+      prettyDetails: state => state.prettyDetails,
+      error: state => state.error
+    }),
     searchState () {
       if (this.address.length === 0) {
         return null
       } else {
         return this.address.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null
       }
+    }
+  },
+  watch: {
+    details: function (newDetails, oldDetails) {
+      console.log('new transcation')
+      this.finalTime = Date.now()
     }
   },
   data () {
@@ -65,10 +84,17 @@ export default {
       successMessage: '',
       successHash: null,
       showSuccess: false,
-      errorMessage: null
+      errorMessage: null,
+      startTime: null,
+      finalTime: null
     }
   },
   methods: {
+    ...mapActions('mqtt', [
+      'initalize',
+      'unsubscribe',
+      'subscribe'
+    ]),
     onDecode (content) {
       if (content.match(/^lgs:lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/)) {
         this.address = content.substring(4, 68)
@@ -80,6 +106,9 @@ export default {
     },
     requestFaucet () {
       if (this.address.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
+        if (this.successHash !== null) {
+          this.unsubscribe(`transaction/${this.successHash}`)
+        }
         axios.post('/faucet', {
           address: this.address
         })
@@ -87,6 +116,13 @@ export default {
             this.successMessage = res.data.msg
             this.successHash = res.data.hash
             this.showSuccess = true
+            this.initalize({ url: this.mqttHost,
+              cb: () => {
+                this.subscribe(`transaction/${this.successHash}`)
+              }
+            })
+            this.startTime = Date.now()
+            this.finalTime = null
           })
           .catch((err) => {
             alert(err)
