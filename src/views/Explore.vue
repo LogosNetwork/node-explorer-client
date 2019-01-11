@@ -73,7 +73,7 @@
                 </b-row>
                 <b-row>
                   <b-col>
-                    Fee Reward: {{epoch.transaction_fee_pool}}
+                    Fee Reward: {{epoch.transaction_fee_pool}} Logos
                   </b-col>
                 </b-row>
               </b-card>
