@@ -31,7 +31,7 @@
           </div>
           <button type="submit" v-on:click="requestFaucet()" class="btn btn-primary">Send me some Logos</button>
           <div v-if="startTime !== null && finalTime !== null" class="mt-3">
-            <h4>Transaction Took: {{finalTime - startTime}}ms</h4>
+            <h4>Transaction Confirmed in: {{finalTime - startTime}}ms</h4>
           </div>
           <div v-if="scanQR" class="mt-3">
             <qrcode-reader @init="onInit" @decode="onDecode" :paused="!scanQR"></qrcode-reader>
