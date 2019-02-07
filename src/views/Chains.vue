@@ -3,7 +3,7 @@
     <b-container class="pt-5">
       <h2 class="text-left d-block" v-t="'blockchains'"></h2>
       <b-tabs v-model="tabIndex">
-        <b-tab :title="$t('batch_blocks')" v-infinite-scroll="loadMoreBatchBlocks" infinite-scroll-distance="500" active>
+        <b-tab :title="$t('batch_blocks')" v-infinite-scroll="getBatchBlocks" infinite-scroll-distance="500" active>
           <b-form-select v-model="selectedDelegate" :options="bsbDelegateLabels" class="mt-3" />
           <div name="list" is="transition-group">
             <div :key="batchBlock.hash + '_' + batchBlock.delegate" v-for="batchBlock in orderedBatchBlocks">
@@ -45,7 +45,7 @@
             </div>
           </div>
         </b-tab>
-        <b-tab :title="$t('micro_epochs')" v-infinite-scroll="loadMoreMicroEpochs" infinite-scroll-distance="500">
+        <b-tab :title="$t('micro_epochs')" v-infinite-scroll="getMicroEpochs" infinite-scroll-distance="500">
           <div :key="microEpoch.hash" v-for="microEpoch in microEpochs">
             <b-link class="cardLink" :to="'/microEpoch/'+microEpoch.hash">
               <b-card class="mt-3 mb-3 text-left">
@@ -86,7 +86,7 @@
             <icon v-if="microEpoch.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" scale="2" name="chevron-down"></icon>
           </div>
         </b-tab>
-        <b-tab :title="$t('epochs')" v-infinite-scroll="loadMoreEpochs" infinite-scroll-distance="500">
+        <b-tab :title="$t('epochs')" v-infinite-scroll="getEpochs" infinite-scroll-distance="500">
           <div :key="epoch.hash" v-for="epoch in epochs">
             <b-link class="cardLink" :to="'/epoch/'+epoch.hash">
               <b-card class="mt-3 mb-3 text-left">
@@ -169,14 +169,13 @@ export default {
     this.reset()
     this.initalize({ url: this.mqttHost,
       cb: () => {
-        this.subscribe(`batchBlock`)
+        // this.subscribe(`batchBlock`)
         this.subscribe(`microEpoch`)
         this.subscribe(`epoch`)
       } })
-    this.getRecentBlocks(() => {
-      this.microEpochsBusy = false
-      this.epochsBusy = false
-    })
+    this.getBatchBlocks(true)
+    this.getMicroEpochs(true)
+    this.getEpochs(true)
     for (let i = 0; i < Object.keys(this.delegates).length; i++) {
       this.bsbDelegateLabels.push({ value: i, text: `Batch Blocks for delegate ${i}: ${this.delegates[i]}` })
     }
@@ -188,15 +187,14 @@ export default {
       'subscribe'
     ]),
     ...mapActions('chains', [
-      'getRecentBlocks',
       'loadMicroEpochs',
       'loadBatchBlocks',
       'loadEpochs',
-      'getRecentBatchBlocks',
+      'clearBatchBlocks',
       'reset'
     ]),
-    loadMoreBatchBlocks: function () {
-      if (!this.batchBlocksBusy && this.tabIndex === 0) {
+    getBatchBlocks: function (force = false) {
+      if ((!this.batchBlocksBusy && this.tabIndex === 0) || force) {
         this.batchBlocksBusy = true
         this.loadBatchBlocks({
           index: this.selectedDelegate,
@@ -210,8 +208,8 @@ export default {
         })
       }
     },
-    loadMoreMicroEpochs: function () {
-      if (!this.microEpochsBusy && this.tabIndex === 1) {
+    getMicroEpochs: function (force = false) {
+      if ((!this.microEpochsBusy && this.tabIndex === 1) || force) {
         this.microEpochsBusy = true
         this.loadMicroEpochs((err) => {
           if (err === 'out of content') {
@@ -222,8 +220,8 @@ export default {
         })
       }
     },
-    loadMoreEpochs: function () {
-      if (!this.epochsBusy && this.tabIndex === 2) {
+    getEpochs: function (force = false) {
+      if ((!this.epochsBusy && this.tabIndex === 2) || force) {
         this.epochsBusy = true
         this.loadEpochs((err) => {
           if (err === 'out of content') {
@@ -237,12 +235,8 @@ export default {
   },
   watch: {
     selectedDelegate: function (newDelegate, oldDelegate) {
-      this.getRecentBatchBlocks({
-        index: newDelegate,
-        cb: () => {
-          this.batchBlocksBusy = newDelegate === -1
-        }
-      })
+      this.clearBatchBlocks()
+      this.getBatchBlocks(true)
     }
   },
   destroyed: function () {

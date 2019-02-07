@@ -1,4 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
+import axios from 'axios'
 
 const state = {
   count: 50,
@@ -13,109 +14,8 @@ const getters = {
 }
 
 const actions = {
-  getRecentBatchBlocks: ({ commit, rootState }, data) => {
-    let index = data.index
-    let cb = data.cb
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
-    if (index === -1) {
-      let count = 0
-      let bbs = []
-      for (let i = 0; i < Object.keys(rootState.settings.delegates).length; i++) {
-        rpcClient.batchBlocks.history(50, i).then(val => {
-          count++
-          for (let n of val.batch_blocks) {
-            n.delegate = i
-          }
-          if (val) {
-            if (!val.error) {
-              bbs = bbs.concat(val.batch_blocks)
-              if (count === 32) {
-                commit('setBatchBlocks', bbs)
-                cb()
-              }
-            } else {
-              commit('setError', val.error)
-            }
-          } else {
-            commit('setError', 'null')
-          }
-        })
-      }
-    } else {
-      rpcClient.batchBlocks.history(50, index).then(val => {
-        for (let n of val.batch_blocks) {
-          n.delegate = index
-        }
-        if (val) {
-          if (!val.error) {
-            commit('setBatchBlocks', val.batch_blocks)
-            cb()
-          } else {
-            commit('setError', val.error)
-          }
-        } else {
-          commit('setError', 'null')
-        }
-      })
-    }
-  },
-  getRecentBlocks: ({ commit, rootState }, cb) => {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
-    let count = 0
-    let bbs = []
-    for (let i = 0; i < Object.keys(rootState.settings.delegates).length; i++) {
-      rpcClient.batchBlocks.history(50, i).then(val => {
-        count++
-        for (let n of val.batch_blocks) {
-          n.delegate = i
-        }
-        if (val) {
-          if (!val.error) {
-            bbs = bbs.concat(val.batch_blocks)
-            if (count >= 34) {
-              commit('setBatchBlocks', bbs)
-              cb()
-            }
-          } else {
-            commit('setError', val.error)
-          }
-        } else {
-          commit('setError', 'null')
-        }
-      })
-    }
-    rpcClient.microEpochs.history(50).then(val => {
-      count++
-      if (val) {
-        if (!val.error) {
-          commit('setMicroEpochs', val.micro_blocks)
-          if (count >= 34) {
-            commit('setBatchBlocks', bbs)
-            cb()
-          }
-        } else {
-          commit('setError', val.error)
-        }
-      } else {
-        commit('setError', 'null')
-      }
-    })
-    rpcClient.epochs.history(50).then(val => {
-      count++
-      if (val) {
-        if (!val.error) {
-          commit('setEpochs', val.epochs)
-          if (count >= 34) {
-            commit('setBatchBlocks', bbs)
-            cb()
-          }
-        } else {
-          commit('setError', val.error)
-        }
-      } else {
-        commit('setError', 'null')
-      }
-    })
+  clearBatchBlocks: ({ commit }) => {
+    commit('setBatchBlocks', [])
   },
   loadBatchBlocks: ({ state, commit, rootState }, data) => {
     let index = data.index
@@ -123,14 +23,27 @@ const actions = {
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     let savedBatchBlocks = [...state.batchBlocks]
     let status = 'success'
+    let lastCreatedAt = null
     if (savedBatchBlocks && savedBatchBlocks.length > 0) {
-      let lastHash = savedBatchBlocks[savedBatchBlocks.length - 1].hash
+      lastCreatedAt = savedBatchBlocks[savedBatchBlocks.length - 1].createdAt
+    }
+    let lastHash
+    if (savedBatchBlocks && savedBatchBlocks.length > 0) {
+      lastHash = savedBatchBlocks[savedBatchBlocks.length - 1].hash
+    } else {
+      lastHash = undefined
+    }
+    if (index !== -1) {
       rpcClient.batchBlocks.history(50, index, lastHash).then(val => {
         if (val) {
           if (!val.error) {
             for (let batchBlock of val.batch_blocks) {
               batchBlock.delegate = index
-              if (batchBlock.hash !== lastHash) { commit('pushBatchBlock', batchBlock) }
+              if (lastHash) {
+                if (batchBlock.hash !== lastHash) commit('pushBatchBlock', batchBlock)
+              } else {
+                commit('pushBatchBlock', batchBlock)
+              }
             }
             if (val.batch_blocks.length <= 1) {
               status = 'out of content'
@@ -146,70 +59,95 @@ const actions = {
         }
       })
     } else {
-      status = 'out of content'
-      cb(status)
+      axios.get('/blocks/batchBlocks', {
+        params: {
+          previousDate: lastCreatedAt
+        }
+      })
+        .then((res) => {
+          for (let batchBlock of res.data.data.batchBlock) {
+            commit('pushBatchBlock', batchBlock)
+          }
+          if (res.data.data.batchBlock.length > 0) {
+            cb(status)
+          } else {
+            status = 'out of content'
+            cb(status)
+          }
+        })
+        .catch((err) => {
+          commit('setError', err)
+        })
     }
   },
   loadMicroEpochs: ({ state, commit, rootState }, cb) => {
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     let savedMicroEpochs = [...state.microEpochs]
     let status = 'success'
+    let lastHash = null
     if (savedMicroEpochs && savedMicroEpochs.length > 0) {
-      let lastHash = savedMicroEpochs[savedMicroEpochs.length - 1].hash
-      rpcClient.microEpochs.history(50, lastHash).then(val => {
-        if (val) {
-          if (!val.error) {
-            for (let microEpoch of val.micro_blocks) {
+      lastHash = savedMicroEpochs[savedMicroEpochs.length - 1].hash
+    } else {
+      lastHash = undefined
+    }
+    rpcClient.microEpochs.history(50, lastHash).then(val => {
+      if (val) {
+        if (!val.error) {
+          for (let microEpoch of val.micro_blocks) {
+            if (lastHash) {
               if (microEpoch.hash !== lastHash) { commit('pushMicroEpoch', microEpoch) }
-            }
-            if (val.micro_blocks.length <= 1) {
-              status = 'out of content'
-              cb(status)
             } else {
-              cb(status)
+              commit('pushMicroEpoch', microEpoch)
             }
+          }
+          if (val.micro_blocks.length <= 1) {
+            status = 'out of content'
+            cb(status)
           } else {
-            commit('setError', val.error)
+            cb(status)
           }
         } else {
-          commit('setError', 'null')
+          commit('setError', val.error)
         }
-      })
-    } else {
-      status = 'out of content'
-      cb(status)
-    }
+      } else {
+        commit('setError', 'null')
+      }
+    })
   },
   loadEpochs: ({ state, commit, rootState }, cb) => {
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     let savedEpochs = [...state.epochs]
     let status = 'success'
+    let lastHash = null
     if (savedEpochs && savedEpochs.length > 0) {
-      let lastHash = savedEpochs[savedEpochs.length - 1].hash
-      rpcClient.epochs.history(50, lastHash).then(val => {
-        if (val) {
-          if (!val.error) {
-            for (let epoch of val.epochs) {
-              if (epoch.hash !== lastHash) { commit('pushEpoch', epoch) }
-            }
-            if (val.epochs.length <= 1) {
-              status = 'out of content'
-              cb(status)
-            } else {
-              cb(status)
-            }
-            cb()
-          } else {
-            commit('setError', val.error)
-          }
-        } else {
-          commit('setError', 'null')
-        }
-      })
+      lastHash = savedEpochs[savedEpochs.length - 1].hash
     } else {
-      status = 'out of content'
-      cb(status)
+      lastHash = undefined
     }
+    rpcClient.epochs.history(50, lastHash).then(val => {
+      if (val) {
+        if (!val.error) {
+          for (let epoch of val.epochs) {
+            if (lastHash) {
+              if (epoch.hash !== lastHash) { commit('pushEpoch', epoch) }
+            } else {
+              commit('pushEpoch', epoch)
+            }
+          }
+          if (val.epochs.length <= 1) {
+            status = 'out of content'
+            cb(status)
+          } else {
+            cb(status)
+          }
+          cb()
+        } else {
+          commit('setError', val.error)
+        }
+      } else {
+        commit('setError', 'null')
+      }
+    })
   },
   reset: ({ commit }) => {
     commit('reset')
