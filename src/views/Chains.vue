@@ -169,7 +169,7 @@ export default {
     this.reset()
     this.initalize({ url: this.mqttHost,
       cb: () => {
-        // this.subscribe(`batchBlock`)
+        this.subscribe(`batchBlock/#`)
         this.subscribe(`microEpoch`)
         this.subscribe(`epoch`)
       } })
@@ -235,12 +235,22 @@ export default {
   },
   watch: {
     selectedDelegate: function (newDelegate, oldDelegate) {
+      if (oldDelegate === -1) {
+        this.unsubscribe(`batchBlock/#`)
+      } else {
+        this.unsubscribe(`batchBlock/${oldDelegate}`)
+      }
+      if (newDelegate === -1) {
+        this.subscribe(`batchBlock/#`)
+      } else {
+        this.subscribe(`batchBlock/${newDelegate}`)
+      }
       this.clearBatchBlocks()
       this.getBatchBlocks(true)
     }
   },
   destroyed: function () {
-    this.unsubscribe(`batchBlock`)
+    this.unsubscribe(`batchBlock/#`)
     this.unsubscribe(`microEpoch`)
     this.unsubscribe(`epoch`)
   }
