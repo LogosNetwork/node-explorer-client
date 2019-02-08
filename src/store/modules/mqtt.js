@@ -21,7 +21,7 @@ const actions = {
       })
       const accountMqttRegex = mqttRegex('account/+account').exec
       const transactionMqttRegex = mqttRegex('transaction/+hash').exec
-      const batchblockMqttRegex = mqttRegex('batchblock/+delegateid').exec
+      const batchblockMqttRegex = mqttRegex('batchBlock/+delegateid').exec
       client.on('message', (topic, message) => {
         message = JSON.parse(message.toString())
         // TODO Eventually validate the signatures of the blocks to be "trustless"
