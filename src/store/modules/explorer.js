@@ -30,6 +30,7 @@ const actions = {
     rpcClient.epochs.history(1).then(val => {
       if (val) {
         if (!val.error) {
+          val.epochs[0].feeInLogos = parseFloat(Number(rpcClient.convert.fromReason(val.epochs[0].transaction_fee_pool, 'LOGOS')).toFixed(5))
           commit('setEpoch', val.epochs[0])
         } else {
           commit('setError', val.error)

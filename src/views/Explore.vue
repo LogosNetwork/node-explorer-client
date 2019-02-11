@@ -73,7 +73,7 @@
                 </b-row>
                 <b-row>
                   <b-col>
-                    Fee Reward: {{epoch.transaction_fee_pool}} Logos
+                    Reward: {{epoch.feeInLogos}} Logos
                   </b-col>
                 </b-row>
               </b-card>
@@ -102,10 +102,14 @@
                   <div class="text-truncate"><router-link :to="'/'+transaction.account">{{transaction.account}}</router-link></div>
                 </td>
                 <td aria-colindex="3">
-                  <div class="text-truncate"><router-link :to="'/'+transaction.link_as_account">{{transaction.link_as_account}}</router-link></div>
+                  <div v-for="(transaction, index) in data.item.transactions" :key='index+"address"' class="text-truncate">
+                    <router-link :to="'/'+transaction.target">{{transaction.target}}</router-link>
+                  </div>
                 </td>
                 <td aria-colindex="4">
-                  <div class="text-truncate"><span class="text-success">+{{transaction.amount}}</span></div>
+                  <div v-for="(transaction, index) in data.item.transactions" :key='index+"amount"' class="text-truncate">
+                    <span class="text-success">{{transaction.amount}}</span>
+                  </div>
                 </td>
                 <td aria-colindex="5">
                   <div class="text-truncate"><router-link :to="'/'+transaction.hash">{{transaction.hash}}</router-link></div>
