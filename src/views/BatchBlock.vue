@@ -26,20 +26,18 @@
           </h4>
           <p class="text-left"><span v-t="'batchCreatedOn'"></span> <strong> {{parseInt(batchBlock.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</strong></p>
           <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="batchBlock.blocks">
-            <template slot="type" slot-scope="data">
-              <div class="text-truncate">{{data.item.type}}</div>
-            </template>
-            <template slot="timestamp" slot-scope="data">
-              <div class="text-truncate" v-if="data.item.fakeTimestamp">{{ data.item.fakeTimestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
-            </template>
             <template slot="from" slot-scope="data">
               <div class="text-truncate"><router-link :to="'/'+data.item.account">{{data.item.account}}</router-link></div>
             </template>
             <template slot="to" slot-scope="data">
-              <div class="text-truncate"><router-link :to="'/'+data.item.link_as_account">{{data.item.link_as_account}}</router-link></div>
+              <div v-for="(transaction, index) in data.item.transactions" :key='index+"address"' class="text-truncate">
+                <router-link :to="'/'+transaction.target">{{transaction.target}}</router-link>
+              </div>
             </template>
             <template slot="amount" slot-scope="data">
-              <div class="text-truncate"><span class="text-success">+{{data.item.fakeLogosAmount}}</span></div>
+              <div v-for="(transaction, index) in data.item.transactions" :key='index+"amount"' class="text-truncate">
+                <span>{{transaction.fakeLogosAmount}}</span>
+              </div>
             </template>
             <template slot="hash" slot-scope="data">
               <div class="text-truncate"><router-link :to="'/'+data.item.hash">{{data.item.hash}}</router-link></div>
@@ -51,7 +49,6 @@
         <b-col cols="12" class="text-left">
           <h4 class="text-left" v-t="'batchJSON'"></h4>
           <codepad id='editor' class="text-left" :code="JSON.stringify(batchBlock, null, ' ')"/>
-          <small class="mb-3">* Fields that begin in fake are not present on the actual blockchain</small>
         </b-col>
       </b-row>
     </b-container>
@@ -62,7 +59,6 @@
 import { mapActions, mapState } from 'vuex'
 import codepad from '@/components/codepad.vue'
 let fields = [
-  { key: 'timestamp', label: 'Time' },
   { key: 'from', label: 'From' },
   { key: 'to', label: 'To' },
   { key: 'amount', label: 'Amount' },
