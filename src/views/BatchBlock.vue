@@ -2,19 +2,29 @@
   <div id="primary">
     <b-container v-if="batchBlock">
       <b-row class="text-left pt-5">
-        <b-col cols="12" class="mb-3">
+        <b-col cols="12">
           <h3 class="text-left" v-t="'batch_block'"></h3>
           <code style="background-color:#FFF;color:#ff3860;padding:6px">{{batchBlock.hash}}</code>
           <h4 v-if="error" class="pt-3" style="color:red">This batch block does not exist</h4>
         </b-col>
       </b-row>
-      <b-row v-if="!error" class="mb-3">
-        <b-col v-if="batchBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" cols="12" class="text-left">
+      <b-row v-if="!error && batchBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mt-3">
+        <b-col cols="12" class="text-left">
             <div>
               <h4>
-                Previous
+                Previous Batch Block for Delegate {{batchBlock.delegate}}
               </h4>
               <p class="text-truncate"><router-link :to="'/batchBlock/'+batchBlock.previous">{{batchBlock.previous}}</router-link></p>
+            </div>
+        </b-col>
+      </b-row>
+      <b-row v-if="!error && batchBlock.next !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mt-3">
+        <b-col cols="12" class="text-left">
+            <div>
+              <h4>
+                Next Batch Block for Delegate {{batchBlock.delegate}}
+              </h4>
+              <p class="text-truncate"><router-link :to="'/batchBlock/'+batchBlock.next">{{batchBlock.next}}</router-link></p>
             </div>
         </b-col>
       </b-row>
