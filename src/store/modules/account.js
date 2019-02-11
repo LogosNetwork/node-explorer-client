@@ -47,9 +47,13 @@ const actions = {
     rpcClient.accounts.history(account, state.count).then(val => {
       if (val) {
         if (!val.error) {
-          for (let trans of val) {
-            trans.amount = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
-            trans.timestamp = parseInt(trans.timestamp)
+          for (let transactionRequests of val) {
+            transactionRequests.timestamp = parseInt(transactionRequests.timestamp)
+            if (transactionRequests.transaction_type === 'send') {
+              for (let trans of transactionRequests.transactions) {
+                trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+              }
+            }
           }
           commit('setTransactions', val)
         } else {

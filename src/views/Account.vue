@@ -40,14 +40,19 @@
               <div class="text-truncate"><router-link :to="'/'+data.item.account">{{data.item.account}}</router-link></div>
             </template>
             <template slot="amount" slot-scope="data">
-              <div class="text-truncate" v-if='data.item.type === "receive"'><span class="text-success">+{{data.item.amount}}</span></div>
-              <div class="text-truncate" v-if='data.item.type === "send"'><span class="text-danger">-{{data.item.amount}}</span></div>
+              <div class="text-truncate" v-if='data.item.transaction_type === "receive"'><span class="text-success">+{{data.item.amount}}</span></div>
+              <div v-if='data.item.transaction_type === "send"'>
+                <div v-for="(transaction, index) in data.item.transactions" :key='index' class="text-truncate">
+                  <span class="text-success" v-if='transaction.target === account'>+{{transaction.amountInLogos}}</span>
+                  <span class="text-danger" v-if='transaction.target !== account'>-{{transaction.amountInLogos}}</span>
+                </div>
+              </div>
             </template>
             <template slot="hash" slot-scope="data">
               <div class="text-truncate"><router-link :to="'/'+data.item.hash">{{data.item.hash}}</router-link></div>
             </template>
             <template slot="type" slot-scope="data">
-              <div class="text-truncate">{{data.item.type}}</div>
+              <div class="text-truncate">{{data.item.transaction_type}}</div>
             </template>
           </b-table>
         </b-col>
