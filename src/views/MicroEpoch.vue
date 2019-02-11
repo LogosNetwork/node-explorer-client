@@ -2,13 +2,13 @@
   <div id="primary">
     <b-container v-if="microEpoch">
       <b-row class="text-left pt-5">
-        <b-col cols="12" class="mb-3">
+        <b-col cols="12" class="mt-3">
           <h3 class="text-left">Micro Epoch #{{microEpoch.sequence}}</h3>
           <code style="background-color:#FFF;color:#ff3860;padding:6px">{{microEpoch.hash}}</code>
           <h4 v-if="error" class="pt-3" style="color:red">This micro epoch does not exist</h4>
         </b-col>
       </b-row>
-      <b-row v-if="!error" class="mb-3">
+      <b-row v-if="!error" class="mt-3">
         <b-col cols="12" class="text-left">
             <div>
               <h4>
@@ -18,8 +18,8 @@
             </div>
         </b-col>
       </b-row>
-      <b-row v-if="!error" class="mb-3">
-        <b-col v-if="microEpoch.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" cols="12" class="text-left">
+      <b-row v-if="!error && microEpoch.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mt-3">
+        <b-col cols="12" class="text-left">
             <div>
               <h4>
                 Previous
@@ -28,17 +28,27 @@
             </div>
         </b-col>
       </b-row>
-      <b-row v-if="!error" class="mb-3">
+      <b-row v-if="!error && microEpoch.next !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mt-3">
+        <b-col cols="12" class="text-left">
+            <div>
+              <h4>
+                Next
+              </h4>
+              <p class="text-truncate"><router-link :to="'/microEpoch/'+microEpoch.next">{{microEpoch.next}}</router-link></p>
+            </div>
+        </b-col>
+      </b-row>
+      <b-row v-if="!error && microEpoch.delegate && microEpoch.delegate !== '255'" class="mt-3">
         <b-col cols="12" class="text-left">
             <div>
               <h4>
                 Delegate
               </h4>
-              <p class="text-truncate"><router-link :to="'/delegate/'+microEpoch.account">{{microEpoch.account}}</router-link></p>
+              <p class="text-truncate"><router-link :to="'/delegate/'+microEpoch.delegate">{{microEpoch.delegate}}</router-link></p>
             </div>
         </b-col>
       </b-row>
-      <b-row v-if="!error" class="mb-3">
+      <b-row v-if="!error" class="mt-3">
         <b-col cols="12" class="text-left">
             <div>
               <h4>
@@ -48,12 +58,12 @@
             </div>
         </b-col>
       </b-row>
-      <b-row v-if="microEpoch.tips && microEpoch.tips.length > 0">
-        <b-col cols="12" class="mb-3">
+      <b-row v-if="microEpoch.tips && microEpoch.tips.length > 0" class="mt-3">
+        <b-col cols="12">
           <h4 class="text-left">
             <span v-t="'tips_batchblocks'"></span>
           </h4>
-          <p class="text-left"><span v-t="'microEpochCreatedOn'"></span> <strong> {{parseInt(microEpoch.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</strong></p>
+          <p class="text-left" v-if='microEpoch.timestamp !== "0"'><span v-t="'microEpochCreatedOn'"></span> <strong> {{parseInt(microEpoch.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</strong></p>
           <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="microEpoch.tips">
             <template slot="index" slot-scope="data">
               <div class="text-truncate">{{data.index}}</div>
