@@ -70,7 +70,7 @@
             </template>
             <template slot="hash" slot-scope="data">
               <div class="text-truncate">
-                  <router-link :to="'/batchBlock/'+data.item">{{data.item}}</router-link>
+                <router-link :to="'/batchBlock/'+data.item">{{data.item}}</router-link>
               </div>
             </template>
           </b-table>

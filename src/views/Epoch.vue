@@ -8,34 +8,44 @@
           <h4 v-if="error" class="pt-3" style="color:red">This epoch does not exist</h4>
         </b-col>
       </b-row>
-      <b-row v-if="!error" class="mb-3">
-        <b-col v-if="epoch.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" cols="12" class="text-left">
-            <div>
-              <h4>
-                Previous Epoch
-              </h4>
-              <p class="text-truncate"><router-link :to="'/epoch/'+epoch.previous">{{epoch.previous}}</router-link></p>
-            </div>
+      <b-row v-if="!error && epoch.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-3">
+        <b-col cols="12" class="text-left">
+          <div>
+            <h4>
+              Previous Epoch
+            </h4>
+            <p class="text-truncate"><router-link :to="'/epoch/'+epoch.previous">{{epoch.previous}}</router-link></p>
+          </div>
+        </b-col>
+      </b-row>
+      <b-row v-if="!error && epoch.next !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-3">
+        <b-col cols="12" class="text-left">
+          <div>
+            <h4>
+              Next Epoch
+            </h4>
+            <p class="text-truncate"><router-link :to="'/epoch/'+epoch.next">{{epoch.next}}</router-link></p>
+          </div>
+        </b-col>
+      </b-row>
+      <b-row v-if="!error && epoch.delegate !== '255'" class="mb-3">
+        <b-col cols="12" class="text-left">
+          <div>
+            <h4>
+              Delegate
+            </h4>
+            <p class="text-truncate"><router-link :to="'/delegate/'+epoch.delegate">{{epoch.delegate}}</router-link></p>
+          </div>
         </b-col>
       </b-row>
       <b-row v-if="!error" class="mb-3">
         <b-col cols="12" class="text-left">
-            <div>
-              <h4>
-                Delegate
-              </h4>
-              <p class="text-truncate"><router-link :to="'/delegate/'+epoch.account">{{epoch.account}}</router-link></p>
-            </div>
-        </b-col>
-      </b-row>
-      <b-row v-if="!error" class="mb-3">
-        <b-col cols="12" class="text-left">
-            <div>
-              <h4>
-                Micro Epoch Tip
-              </h4>
-              <p class="text-truncate"><router-link :to="'/microEpoch/'+epoch.micro_block_tip">{{epoch.micro_block_tip}}</router-link></p>
-            </div>
+          <div>
+            <h4>
+              Micro Epoch Tip
+            </h4>
+            <p class="text-truncate"><router-link :to="'/microEpoch/'+epoch.micro_block_tip">{{epoch.micro_block_tip}}</router-link></p>
+          </div>
         </b-col>
       </b-row>
       <b-row v-if="epoch.delegates && epoch.delegates.length > 0">
