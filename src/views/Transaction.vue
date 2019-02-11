@@ -10,20 +10,41 @@
       <b-row v-if="!error && details !== null" class="mb-5">
         <b-col cols="12" class="text-left">
           <h4 class="text-left" v-t="'from'"></h4>
-          <p v-if="details.type === 'send'"><router-link :to="details.account">{{details.account}}</router-link></p>
-          <p v-if="details.type === 'receive'"><router-link :to="details.link_as_account">{{details.link_as_account}}</router-link></p>
-          <h4 class="text-left" v-t="'to'"></h4>
-          <p v-if="details.type === 'send'"><router-link :to="details.link_as_account">{{details.link_as_account}}</router-link></p>
-          <p v-if="details.type === 'receive'"><router-link :to="details.account">{{details.account}}</router-link></p>
+          <p v-if="details.transaction_type === 'send'"><router-link :to="details.account">{{details.account}}</router-link></p>
+          <p v-if="details.transaction_type === 'receive'"><router-link :to="details.link_as_account">{{details.link_as_account}}</router-link></p>
           <h4 class="text-left" v-t="'amount'"></h4>
-          <p>{{details.amount}} Logos</p>
-          <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && details.type === 'send'">
+          <p>{{details.totalAmountInLogos}} Logos</p>
+          <h4 class="text-left" v-t="'to'"></h4>
+          <p v-if="details.transaction_type === 'receive'"><router-link :to="details.account">{{details.account}}</router-link></p>
+          <div v-if="details.transaction_type === 'send'">
+            <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="details.transactions">
+              <template slot="account" slot-scope="data">
+                <div class="text-truncate"><router-link :to="'/'+data.item.target">{{data.item.target}}</router-link></div>
+              </template>
+              <template slot="amount" slot-scope="data">
+                <div class="text-truncate"><span>{{data.item.amountInLogos}}</span></div>
+              </template>
+            </b-table>
+          </div>
+          <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && details.transaction_type === 'send'">
             <h4 class="text-left" v-t="'prevSend'"></h4>
             <p><router-link :to="details.previous">{{details.previous}}</router-link></p>
           </div>
-          <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && details.type === 'receive'">
+          <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && details.transaction_type === 'receive'">
             <h4 class="text-left" v-t="'prevReceive'"></h4>
             <p><router-link :to="details.previous">{{details.previous}}</router-link></p>
+          </div>
+          <div v-if="details.next && details.next !== '0000000000000000000000000000000000000000000000000000000000000000' && details.transaction_type === 'send'">
+            <h4 class="text-left" v-t="'nextSend'"></h4>
+            <p><router-link :to="details.next">{{details.next}}</router-link></p>
+          </div>
+          <div v-if="details.next && details.next !== '0000000000000000000000000000000000000000000000000000000000000000' && details.transaction_type === 'receive'">
+            <h4 class="text-left" v-t="'nextReceive'"></h4>
+            <p><router-link :to="details.next">{{details.next}}</router-link></p>
+          </div>
+          <div v-if="details.batch_hash">
+            <h4 class="text-left">Contained in Batch Block</h4>
+            <p><router-link :to="'/batchBlock/'+details.batch_hash">{{details.batch_hash}}</router-link></p>
           </div>
         </b-col>
       </b-row>
@@ -47,7 +68,10 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import codepad from '@/components/codepad.vue'
-
+let fields = [
+  { key: 'account', label: 'Account' },
+  { key: 'amount', label: 'Amount' }
+]
 export default {
   components: {
     codepad
@@ -95,6 +119,11 @@ export default {
     })
     this.getTransactionInfo(to.params.transaction)
     next()
+  },
+  data () {
+    return {
+      fields: fields
+    }
   }
 }
 </script>

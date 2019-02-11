@@ -18,18 +18,28 @@ const actions = {
       if (val && !val.error) {
         let details = val
         let prettyDetails = null
-        if (details.type === 'receive') {
+        if (details.transaction_type === 'receive') {
           rpcClient.transactions.info(details.link).then(val => {
             prettyDetails = JSON.stringify(details, null, ' ')
             commit('setPrettyDetails', prettyDetails)
             details.link_as_account = val.account
-            details.amount = parseFloat(Number(rpcClient.convert.fromReason(details.amount, 'LOGOS')).toFixed(5))
+            details.totalAmountInLogos = 0
+            for (let trans of details.transactions) {
+              let logosVal = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+              details.totalAmountInLogos += logosVal
+              trans.amountInLogos = logosVal
+            }
             commit('setDetails', details)
           })
-        } else {
+        } else if (details.transaction_type === 'send') {
           prettyDetails = JSON.stringify(details, null, ' ')
           commit('setPrettyDetails', prettyDetails)
-          details.amount = parseFloat(Number(rpcClient.convert.fromReason(details.amount, 'LOGOS')).toFixed(5))
+          details.totalAmountInLogos = 0
+          for (let trans of details.transactions) {
+            let logosVal = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+            details.totalAmountInLogos += logosVal
+            trans.amountInLogos = logosVal
+          }
           commit('setDetails', details)
         }
       } else {
@@ -47,7 +57,12 @@ const actions = {
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     prettyDetails = JSON.stringify(details, null, ' ')
     commit('setPrettyDetails', prettyDetails)
-    details.amount = parseFloat(Number(rpcClient.convert.fromReason(details.amount, 'LOGOS')).toFixed(5))
+    details.totalAmountInLogos = 0
+    for (let trans of details.transactions) {
+      let logosVal = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+      details.totalAmountInLogos += logosVal
+      trans.amountInLogos = logosVal
+    }
     commit('setDetails', details)
     commit('setError', null)
   },
