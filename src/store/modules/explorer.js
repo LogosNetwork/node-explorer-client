@@ -41,13 +41,15 @@ const actions = {
     })
     axios.get('/blocks/transactions')
       .then((res) => {
-        for (var i = 0; i < res.data.data.transactions.length; i++) {
-          res.data.data.transactions[i].timestamp = parseInt(res.data.data.transactions[i].timestamp)
-          res.data.data.transactions[i].amount = parseFloat(Number(rpcClient.convert.fromReason(res.data.data.transactions[i].amount, 'LOGOS')).toFixed(5))
-          if (i === res.data.data.transactions.length - 1) {
-            commit('setTransactions', res.data.data.transactions)
+        for (let transaction of res.data.data.transactions) {
+          transaction.timestamp = parseInt(transaction.timestamp)
+          if (transaction.transactions && transaction.transactions.length > 0) {
+            for (let send of transaction.transactions) {
+              send.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(send.amount, 'LOGOS')).toFixed(5))
+            }
           }
         }
+        commit('setTransactions', res.data.data.transactions)
       })
       .catch((err) => {
         commit('setError', err)
@@ -90,10 +92,11 @@ const actions = {
   },
   addBlock ({ commit, rootState }, block) {
     let blockData = cloneDeep(block)
-    if (blockData.type === 'send') {
+    if (blockData.transaction_type === 'send') {
       let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
-      blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
-      blockData.timestamp = parseInt(blockData.timestamp)
+      for (let trans of blockData.transactions) {
+        trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+      }
       commit('unshiftTransaction', blockData)
     }
   },

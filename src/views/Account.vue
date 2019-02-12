@@ -37,22 +37,25 @@
               <div class="text-truncate" v-if="data.item.timestamp">{{ data.item.timestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
             </template>
             <template slot="account" slot-scope="data">
-              <div class="text-truncate"><router-link :to="'/'+data.item.account">{{data.item.account}}</router-link></div>
+              <div v-if="data.item.account === account">
+                <div v-for="(trans, index) in data.item.transactions" :key='index+"address"' class="text-truncate">
+                  <div class="text-truncate"><router-link :to="'/'+trans.target">{{trans.target}}</router-link></div>
+                </div>
+              </div>
+              <div v-if="data.item.account !== account">
+                <div v-for="(trans, index) in data.item.transactions" :key='index+"address"' class="text-truncate">
+                  <div v-if="trans.target === account" class="text-truncate"><router-link :to="'/'+data.item.account">{{data.item.account}}</router-link></div>
+                </div>
+              </div>
             </template>
             <template slot="amount" slot-scope="data">
-              <div class="text-truncate" v-if='data.item.transaction_type === "receive"'><span class="text-success">+{{data.item.amount}}</span></div>
-              <div v-if='data.item.transaction_type === "send"'>
-                <div v-for="(transaction, index) in data.item.transactions" :key='index' class="text-truncate">
-                  <span class="text-success" v-if='transaction.target === account'>+{{transaction.amountInLogos}}</span>
-                  <span class="text-danger" v-if='transaction.target !== account'>-{{transaction.amountInLogos}}</span>
-                </div>
+              <div v-for="(trans, index) in data.item.transactions" :key='index+"amount"' class="text-truncate">
+                <span class="text-success" v-if='trans.target === account'>+{{trans.amountInLogos}}</span>
+                <span class="text-danger" v-if='data.item.account === account && trans.target !== account'>-{{trans.amountInLogos}}</span>
               </div>
             </template>
             <template slot="hash" slot-scope="data">
               <div class="text-truncate"><router-link :to="'/'+data.item.hash">{{data.item.hash}}</router-link></div>
-            </template>
-            <template slot="type" slot-scope="data">
-              <div class="text-truncate">{{data.item.transaction_type}}</div>
             </template>
           </b-table>
         </b-col>
@@ -70,8 +73,7 @@ let fields = [
   { key: 'timestamp', label: 'Time' },
   { key: 'account', label: 'Account' },
   { key: 'amount', label: 'Amount' },
-  { key: 'hash', label: 'Hash' },
-  { key: 'type', label: 'Type' }
+  { key: 'hash', label: 'Hash' }
 ]
 export default {
   computed: {

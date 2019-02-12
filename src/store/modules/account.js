@@ -68,23 +68,35 @@ const actions = {
     let blockData = cloneDeep(block)
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     if (blockData.account === state.account) {
+      blockData.timestamp = parseInt(blockData.timestamp)
+      let newRawBalance = bigInt(0)
+      if (state.rawBalance) newRawBalance = bigInt(state.rawBalance)
+      for (let trans of blockData.transactions) {
+        newRawBalance = bigInt(newRawBalance).minus(bigInt(trans.amount))
+        trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+      }
+      commit('setError', null)
+      commit('setRawBalance', newRawBalance.toString())
+      commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5)))
       commit('incrementBlockCount')
       commit('setFrontier', blockData.hash)
-      commit('setRawBalance', bigInt(state.rawBalance).minus(blockData.amount).toString())
-      commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5)))
-      blockData.account = blockData.link_as_account
-      blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
-      blockData.timestamp = parseInt(blockData.timestamp)
       commit('setLastModified', blockData.timestamp)
       commit('unshiftTransaction', blockData)
-    } else if (blockData.link_as_account === state.account) {
+    } else if (blockData.account !== state.account) {
+      blockData.timestamp = parseInt(blockData.timestamp)
+      let newRawBalance = bigInt(0)
+      if (state.rawBalance) newRawBalance = bigInt(state.rawBalance)
+      for (let trans of blockData.transactions) {
+        if (trans.target === state.account) {
+          newRawBalance = newRawBalance.add(bigInt(trans.amount))
+        }
+        trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+      }
+      commit('setError', null)
       commit('incrementBlockCount')
       commit('setFrontier', blockData.hash)
-      commit('setRawBalance', bigInt(state.rawBalance).plus(blockData.amount).toString())
+      commit('setRawBalance', newRawBalance.toString())
       commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5)))
-      blockData.type = 'receive'
-      blockData.amount = parseFloat(Number(rpcClient.convert.fromReason(blockData.amount, 'LOGOS')).toFixed(5))
-      blockData.timestamp = parseInt(blockData.timestamp)
       commit('setLastModified', blockData.timestamp)
       commit('unshiftTransaction', blockData)
     }
