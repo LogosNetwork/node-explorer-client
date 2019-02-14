@@ -24,9 +24,14 @@
                       Hash: <b-link :to="'/batchBlock/'+batchBlock.hash">{{batchBlock.hash}}</b-link>
                     </b-col>
                   </b-row>
-                  <b-row v-if="batchBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-2">
+                  <b-row v-if="batchBlock.previous && batchBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-2">
                     <b-col class="text-truncate">
                       Previous: <b-link :to="'/batchBlock/'+batchBlock.previous">{{batchBlock.previous}}</b-link>
+                    </b-col>
+                  </b-row>
+                  <b-row v-if="batchBlock.prevHash && batchBlock.prevHash !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-2">
+                    <b-col class="text-truncate">
+                      Previous: <b-link :to="'/batchBlock/'+batchBlock.prevHash">{{batchBlock.prevHash}}</b-link>
                     </b-col>
                   </b-row>
                   <b-row class="mb-2">
@@ -73,7 +78,7 @@
                 </b-row>
                 <b-row class="mb-2">
                   <b-col class="text-truncate">
-                    Proposed by delegate: <b-link :to="'/delegate/'+microEpoch.delegate">{{microEpoch.account}}</b-link>
+                    Proposed by delegate: <b-link :to="'/delegate/'+microEpoch.delegate">{{microEpoch.delegate}}</b-link>
                   </b-col>
                 </b-row>
                 <b-row>
@@ -114,7 +119,7 @@
                 </b-row>
                 <b-row class="mb-2">
                   <b-col class="text-truncate">
-                    Proposed by delegate: <b-link :to="'/delegate/'+epoch.account">{{epoch.account}}</b-link>
+                    Proposed by delegate: <b-link :to="'/delegate/'+epoch.delegate">{{epoch.delegate}}</b-link>
                   </b-col>
                 </b-row>
               </b-card>
