@@ -98,11 +98,9 @@
 <script>
 import Vue from 'vue'
 import Logos from '../api/rpc'
-import LogosWallet from '../api/wallet'
 import codepad from '@/components/codepad.vue'
 import config from '../../config'
 Vue.use(Logos, { url: config.rpcHost, proxyURL: config.rpcProxy, debug: true })
-Vue.use(LogosWallet)
 export default {
   name: 'workbench',
   components: {
