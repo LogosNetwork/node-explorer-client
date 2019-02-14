@@ -83,7 +83,7 @@
       <b-row class="text-left">
         <b-col cols="12" class="mb-5">
           <h5 class="text-left" v-t="'recent_transactions'"></h5>
-          <table class="table b-table table-bordered table-sm b-table-fixed" style="background:#FFF">
+          <table v-if="transactions && transactions.length > 0" class="table b-table table-bordered table-sm b-table-fixed" style="background:#FFF">
             <thead>
               <tr>
                 <th aria-colindex="1">Time</th>
@@ -96,19 +96,19 @@
             <tbody name="list" is="transition-group">
               <tr v-for="transaction in transactions" :key="transaction.hash">
                 <td aria-colindex="1">
-                  <div class="text-truncate" v-if="transaction.timestamp">{{ transaction.timestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
+                  <div class="text-truncate" v-if="transaction.createdAt">{{ transaction.createdAt | moment("MM/DD/YY h:mm:ssa") }}</div>
                 </td>
                 <td aria-colindex="2">
                   <div class="text-truncate"><router-link :to="'/'+transaction.account">{{transaction.account}}</router-link></div>
                 </td>
                 <td aria-colindex="3">
-                  <div v-for="(transaction, index) in data.item.transactions" :key='index+"address"' class="text-truncate">
-                    <router-link :to="'/'+transaction.target">{{transaction.target}}</router-link>
+                  <div v-for="(trans, index) in transaction.transactions" :key='index+"address"' class="text-truncate">
+                    <router-link :to="'/'+trans.target">{{trans.target}}</router-link>
                   </div>
                 </td>
                 <td aria-colindex="4">
-                  <div v-for="(transaction, index) in data.item.transactions" :key='index+"amount"' class="text-truncate">
-                    <span class="text-success">{{transaction.amount}}</span>
+                  <div v-for="(trans, index) in transaction.transactions" :key='index+"amount"' class="text-truncate">
+                    <span class="text-success">{{trans.amountInLogos}}</span>
                   </div>
                 </td>
                 <td aria-colindex="5">

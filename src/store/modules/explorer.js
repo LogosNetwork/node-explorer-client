@@ -42,7 +42,6 @@ const actions = {
     axios.get('/blocks/transactions')
       .then((res) => {
         for (let transaction of res.data.data.transactions) {
-          transaction.timestamp = parseInt(transaction.timestamp)
           if (transaction.transactions && transaction.transactions.length > 0) {
             for (let send of transaction.transactions) {
               send.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(send.amount, 'LOGOS')).toFixed(5))
