@@ -96,6 +96,7 @@ const actions = {
       for (let trans of blockData.transactions) {
         trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
       }
+      blockData.createdAt = parseInt(blockData.timestamp)
       commit('unshiftTransaction', blockData)
     }
   },
