@@ -14,7 +14,47 @@ const getters = {
 }
 
 const actions = {
-  getRecentTransactions: ({ commit, rootState }) => {
+  getTransactions ({ commit, rootState }, cb) {
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let savedTransactions = [...state.transactions]
+    let lastCreatedAt = null
+    if (savedTransactions && savedTransactions.length > 0) {
+      lastCreatedAt = savedTransactions[savedTransactions.length - 1].createdAt
+    }
+    axios.get('/blocks/transactions', {
+      params: {
+        previousDate: lastCreatedAt
+      }
+    })
+      .then((res) => {
+        for (let transaction of res.data.data.transactions) {
+          for (let trans of transaction.transactions) {
+            trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+          }
+          commit('pushTransaction', transaction)
+        }
+        if (res.data.data.transactions.length > 0) {
+          let status = 'success'
+          cb(status)
+        } else {
+          let status = 'out of content'
+          cb(status)
+        }
+      })
+      .catch((err) => {
+        commit('setError', err)
+      })
+  },
+  getLatestBatchBlock ({ commit }) {
+    axios.get('/blocks/lastBatchBlock')
+      .then((res) => {
+        commit('setBatchBlock', res.data.data.batchBlock[0])
+      })
+      .catch((err) => {
+        commit('setError', err)
+      })
+  },
+  getLatestMicroEpoch: ({ commit, rootState }) => {
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     rpcClient.microEpochs.history(1).then(val => {
       if (val) {
@@ -27,6 +67,9 @@ const actions = {
         commit('setError', 'null')
       }
     })
+  },
+  getLatestEpoch ({ commit, rootState }) {
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     rpcClient.epochs.history(1).then(val => {
       if (val) {
         if (!val.error) {
@@ -39,27 +82,6 @@ const actions = {
         commit('setError', 'null')
       }
     })
-    axios.get('/blocks/transactions')
-      .then((res) => {
-        for (let transaction of res.data.data.transactions) {
-          if (transaction.transactions && transaction.transactions.length > 0) {
-            for (let send of transaction.transactions) {
-              send.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(send.amount, 'LOGOS')).toFixed(5))
-            }
-          }
-        }
-        commit('setTransactions', res.data.data.transactions)
-      })
-      .catch((err) => {
-        commit('setError', err)
-      })
-    axios.get('/blocks/lastBatchBlock')
-      .then((res) => {
-        commit('setBatchBlock', res.data.data.batchBlock[0])
-      })
-      .catch((err) => {
-        commit('setError', err)
-      })
   },
   getBlockType ({ rootState }, data) {
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
@@ -111,6 +133,9 @@ const mutations = {
   },
   setTransactions (state, transactions) {
     state.transactions = transactions
+  },
+  pushTransaction (state, transaction) {
+    state.transactions.push(transaction)
   },
   unshiftTransaction (state, transaction) {
     state.transactions.unshift(transaction)

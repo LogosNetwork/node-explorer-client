@@ -83,40 +83,42 @@
       <b-row class="text-left">
         <b-col cols="12" class="mb-5">
           <h5 class="text-left" v-t="'recent_transactions'"></h5>
-          <table v-if="transactions && transactions.length > 0" class="table b-table table-bordered table-sm b-table-fixed" style="background:#FFF">
-            <thead>
-              <tr>
-                <th aria-colindex="1">Time</th>
-                <th aria-colindex="2">From</th>
-                <th aria-colindex="3">To</th>
-                <th aria-colindex="4">Amount</th>
-                <th aria-colindex="5">Hash</th>
-              </tr>
-            </thead>
-            <tbody name="list" is="transition-group">
-              <tr v-for="transaction in transactions" :key="transaction.hash">
-                <td aria-colindex="1">
-                  <div class="text-truncate" v-if="transaction.createdAt">{{ transaction.createdAt | moment("MM/DD/YY h:mm:ssa") }}</div>
-                </td>
-                <td aria-colindex="2">
-                  <div class="text-truncate"><router-link :to="'/'+transaction.account">{{transaction.account}}</router-link></div>
-                </td>
-                <td aria-colindex="3">
-                  <div v-for="(trans, index) in transaction.transactions" :key='index+"address"' class="text-truncate">
-                    <router-link :to="'/'+trans.target">{{trans.target}}</router-link>
-                  </div>
-                </td>
-                <td aria-colindex="4">
-                  <div v-for="(trans, index) in transaction.transactions" :key='index+"amount"' class="text-truncate">
-                    <span class="text-success">{{trans.amountInLogos}}</span>
-                  </div>
-                </td>
-                <td aria-colindex="5">
-                  <div class="text-truncate"><router-link :to="'/'+transaction.hash">{{transaction.hash}}</router-link></div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div v-infinite-scroll="getMoreTransactions" infinite-scroll-distance="500">
+            <table v-if="transactions && transactions.length > 0" class="table b-table table-bordered table-sm b-table-fixed" style="background:#FFF">
+              <thead>
+                <tr>
+                  <th aria-colindex="1">Time</th>
+                  <th aria-colindex="2">From</th>
+                  <th aria-colindex="3">To</th>
+                  <th aria-colindex="4">Amount</th>
+                  <th aria-colindex="5">Hash</th>
+                </tr>
+              </thead>
+              <tbody name="list" is="transition-group">
+                <tr v-for="transaction in transactions" :key="transaction.hash">
+                  <td aria-colindex="1">
+                    <div class="text-truncate" v-if="transaction.createdAt">{{ transaction.createdAt | moment("MM/DD/YY h:mm:ssa") }}</div>
+                  </td>
+                  <td aria-colindex="2">
+                    <div class="text-truncate"><router-link :to="'/'+transaction.account">{{transaction.account}}</router-link></div>
+                  </td>
+                  <td aria-colindex="3">
+                    <div v-for="(trans, index) in transaction.transactions" :key='index+"address"' class="text-truncate">
+                      <router-link :to="'/'+trans.target">{{trans.target}}</router-link>
+                    </div>
+                  </td>
+                  <td aria-colindex="4">
+                    <div v-for="(trans, index) in transaction.transactions" :key='index+"amount"' class="text-truncate">
+                      <span class="text-success">{{trans.amountInLogos}}</span>
+                    </div>
+                  </td>
+                  <td aria-colindex="5">
+                    <div class="text-truncate"><router-link :to="'/'+transaction.hash">{{transaction.hash}}</router-link></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </b-col>
         <b-col v-if="false" cols="12" md="6" class="mb-5">
           <h5 class="text-left" v-t="'network_stats.title'"></h5>
@@ -179,6 +181,9 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import Vue from 'vue'
+import infiniteScroll from 'vue-infinite-scroll'
+Vue.use(infiniteScroll)
+
 let fields = [
   { key: 'timestamp', label: 'Time' },
   { key: 'account', label: 'From' },
@@ -209,6 +214,13 @@ Vue.directive('highlight', {
 export default {
   name: 'explore',
   components: {},
+  data () {
+    return {
+      address: '',
+      txBusy: false,
+      fields: fields
+    }
+  },
   computed: {
     searchState () {
       if (this.address.length === 0) {
@@ -238,13 +250,10 @@ export default {
         this.subscribe(`#`)
       }
     })
-    this.getRecentTransactions()
-  },
-  data () {
-    return {
-      address: '',
-      fields: fields
-    }
+    this.getLatestBatchBlock()
+    this.getLatestMicroEpoch()
+    this.getLatestEpoch()
+    this.getMoreTransactions(true)
   },
   methods: {
     submitSearch (event) {
@@ -293,7 +302,19 @@ export default {
       }
     },
     ...mapActions('mqtt', ['initalize', 'unsubscribe', 'subscribe']),
-    ...mapActions('explorer', ['getRecentTransactions', 'getBlockType'])
+    ...mapActions('explorer', ['getTransactions', 'getBlockType', 'getLatestBatchBlock', 'getLatestMicroEpoch', 'getLatestEpoch']),
+    getMoreTransactions: function (force = false) {
+      if (!this.txBusy || force) {
+        this.txBusy = true
+        this.getTransactions((response) => {
+          if (response === 'out of content') {
+            this.txBusy = true
+          } else if (response === 'success') {
+            this.txBusy = false
+          }
+        })
+      }
+    }
   },
   destroyed: function () {
     this.unsubscribe(`#`)

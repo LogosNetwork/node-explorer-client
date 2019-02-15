@@ -20,6 +20,47 @@ const getters = {
 }
 
 const actions = {
+  getTransactions ({ commit, rootState }, cb) {
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let savedTransactions = [...state.transactions]
+    if (savedTransactions && savedTransactions.length > 0) {
+      let lastHash = savedTransactions[savedTransactions.length - 1].hash
+      if (lastHash !== null) {
+        rpcClient.accounts.history(state.account, state.count, false, lastHash).then(val => {
+          if (val) {
+            if (!val.error) {
+              if (val.length > 1) {
+                val.splice(0, 1)
+                for (let transactionRequests of val) {
+                  transactionRequests.timestamp = parseInt(transactionRequests.timestamp)
+                  if (transactionRequests.transaction_type === 'send') {
+                    for (let trans of transactionRequests.transactions) {
+                      trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+                    }
+                  }
+                }
+                commit('addTransactions', val)
+                if (val.length !== 49) {
+                  let status = 'out of content'
+                  cb(status)
+                } else {
+                  let status = 'success'
+                  cb(status)
+                }
+              } else {
+                let status = 'out of content'
+                cb(status)
+              }
+            } else {
+              commit('setError', val.error)
+            }
+          } else {
+            commit('setError', 'null')
+          }
+        })
+      }
+    }
+  },
   getAccountInfo: ({ state, commit, rootState }, account) => {
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     commit('setAccount', account)
@@ -142,6 +183,9 @@ const mutations = {
   },
   unshiftTransaction (state, transaction) {
     state.transactions.unshift(transaction)
+  },
+  addTransactions (state, transactions) {
+    state.transactions = state.transactions.concat(transactions)
   },
   setAccount (state, account) {
     state.account = account
