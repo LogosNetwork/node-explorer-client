@@ -12,9 +12,6 @@ import notFound from './views/404.vue'
 import Account from './views/Account.vue'
 import Chains from './views/Chains.vue'
 import Faucet from './views/Faucet.vue'
-import Password from './views/Password.vue'
-import axios from 'axios'
-import config from '../config'
 
 Vue.use(Router)
 
@@ -25,79 +22,63 @@ const router = new Router({
     {
       path: '/',
       name: 'explore',
-      component: Explore,
-      meta: { requiresAuth: true }
+      component: Explore
     },
     {
       path: '/chains',
       name: 'chains',
-      component: Chains,
-      meta: { requiresAuth: true }
+      component: Chains
     },
     {
       path: '/Governance',
       name: 'governance',
-      component: Governance,
-      meta: { requiresAuth: true }
+      component: Governance
     },
     {
       path: '/tokens',
       name: 'tokens',
-      component: Tokens,
-      meta: { requiresAuth: true }
+      component: Tokens
     },
     {
       path: '/workbench',
       name: 'workbench',
-      component: Workbench,
-      meta: { requiresAuth: true }
+      component: Workbench
     },
     {
       path: '/:account(lgs_[13456789abcdefghijkmnopqrstuwxyz]{60})',
       name: 'account',
       component: Account,
-      props: true,
-      meta: { requiresAuth: true }
+      props: true
     },
     {
       path: '/:transaction([0-9a-fA-F]{64})',
       name: 'transaction',
       component: Transaction,
-      props: true,
-      meta: { requiresAuth: true }
+      props: true
     },
     {
       path: '/microEpoch/:hash([0-9a-fA-F]{64})',
       name: 'microEpoch',
       component: microEpoch,
-      props: true,
-      meta: { requiresAuth: true }
+      props: true
     },
     {
       path: '/batchBlock/:hash([0-9a-fA-F]{64})',
       name: 'batchBlock',
       component: batchBlock,
-      props: true,
-      meta: { requiresAuth: true }
+      props: true
     },
     {
       path: '/epoch/:hash([0-9a-fA-F]{64})',
       name: 'epoch',
       component: epoch,
-      props: true,
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/password',
-      name: 'password',
-      component: Password
+      props: true
     },
     {
       path: '/faucet',
       name: 'faucet',
       component: Faucet,
-      props: true,
-      meta: { requiresAuth: true }
+      props: true
     },
     {
       path: '*',
@@ -107,47 +88,6 @@ const router = new Router({
   ],
   scrollBehavior (to, from, savedPosition) {
     return { x: 0, y: 0 }
-  }
-})
-
-router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth) && config.requiresAuth === true) {
-    let token = localStorage.getItem('authtoken')
-    if (token) {
-      axios.post('/verify', {
-        token: token
-      })
-        .then((res) => {
-          if (res.data.authenticated) {
-            next()
-          } else {
-            next({
-              path: '/password',
-              query: {
-                redirect: to.fullPath
-              }
-            })
-          }
-        })
-        .catch((err) => {
-          alert(err)
-          next({
-            path: '/password',
-            query: {
-              redirect: to.fullPath
-            }
-          })
-        })
-    } else {
-      next({
-        path: '/password',
-        query: {
-          redirect: to.fullPath
-        }
-      })
-    }
-  } else {
-    next()
   }
 })
 

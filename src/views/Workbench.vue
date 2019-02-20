@@ -476,10 +476,10 @@ export default {
       {
         action: function (params) {
           let privateKey = params[0].value
-          let transacitons = [{ target: params[1].value, amount: params[2].value }]
+          let transactions = [{ target: params[1].value, amount: params[2].value }]
           let forceDelegate = params[3].value
           $this.editor += `Creating transactions... \n`
-          $this.$Logos.transactions.createSend(privateKey, transacitons).then(val => {
+          $this.$Logos.transactions.createSend(privateKey, transactions).then(val => {
             $this.editor += JSON.stringify(val, null, 2) + '\n\n'
             let delegateId = null
             if (val.previous !== '0000000000000000000000000000000000000000000000000000000000000000') {
