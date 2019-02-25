@@ -4,7 +4,8 @@ const state = {
   rpcHost: config.rpcHost,
   delegates: config.delegates,
   proxyURL: config.rpcProxy,
-  mqttHost: config.mqttHost
+  mqttHost: config.mqttHost,
+  requestURL: config.requestURL
 }
 
 const getters = {
@@ -27,6 +28,9 @@ const mutations = {
   },
   setMqttHost (state, address) {
     state.mqttHost = address
+  },
+  setRequestURL (state, url) {
+    state.requestURL = url
   }
 }
 

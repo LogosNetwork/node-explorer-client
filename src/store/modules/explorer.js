@@ -21,7 +21,7 @@ const actions = {
     if (savedTransactions && savedTransactions.length > 0) {
       lastCreatedAt = savedTransactions[savedTransactions.length - 1].createdAt
     }
-    axios.get('/blocks/transactions', {
+    axios.get(`${rootState.settings.requestURL}/blocks/transactions`, {
       params: {
         previousDate: lastCreatedAt
       }
@@ -45,8 +45,8 @@ const actions = {
         commit('setError', err)
       })
   },
-  getLatestBatchBlock ({ commit }) {
-    axios.get('/blocks/lastBatchBlock')
+  getLatestBatchBlock ({ commit, rootState }) {
+    axios.get(`${rootState.settings.requestURL}/blocks/lastBatchBlock`)
       .then((res) => {
         commit('setBatchBlock', res.data.data.batchBlock[0])
       })

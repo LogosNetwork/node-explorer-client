@@ -59,7 +59,7 @@ const actions = {
         }
       })
     } else {
-      axios.get('/blocks/batchBlocks', {
+      axios.get(`${rootState.settings.requestURL}/blocks/batchBlocks`, {
         params: {
           previousDate: lastCreatedAt
         }
