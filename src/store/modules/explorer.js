@@ -27,13 +27,13 @@ const actions = {
       }
     })
       .then((res) => {
-        for (let request of res.data.data.transactions) {
+        for (let request of res.data.data.requests) {
           for (let trans of request.transactions) {
             trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
           }
           commit('pushRequest', request)
         }
-        if (res.data.data.transactions.length > 0) {
+        if (res.data.data.requests.length > 0) {
           let status = 'success'
           cb(status)
         } else {

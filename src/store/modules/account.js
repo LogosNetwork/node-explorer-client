@@ -138,10 +138,10 @@ const actions = {
         commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5)))
       }
       commit('setError', null)
-      commit('incrementBlockCount')
+      commit('incrementRequestCount')
       commit('setFrontier', requestData.hash)
       commit('setLastModified', requestData.timestamp)
-      commit('unshiftTransaction', requestData)
+      commit('unshiftRequest', requestData)
     }
   },
   reset: ({ commit }) => {
