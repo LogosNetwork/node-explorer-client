@@ -4,9 +4,9 @@ import Explore from './views/Explore.vue'
 import Governance from './views/Governance.vue'
 import Tokens from './views/Tokens.vue'
 import Workbench from './views/Workbench.vue'
-import Transaction from './views/Transaction.vue'
+import Request from './views/Request.vue'
 import microEpoch from './views/MicroEpoch.vue'
-import batchBlock from './views/BatchBlock.vue'
+import requestBlock from './views/RequestBlock.vue'
 import epoch from './views/Epoch.vue'
 import notFound from './views/404.vue'
 import Account from './views/Account.vue'
@@ -51,9 +51,9 @@ const router = new Router({
       props: true
     },
     {
-      path: '/:transaction([0-9a-fA-F]{64})',
-      name: 'transaction',
-      component: Transaction,
+      path: '/:request([0-9a-fA-F]{64})',
+      name: 'request',
+      component: Request,
       props: true
     },
     {
@@ -63,9 +63,9 @@ const router = new Router({
       props: true
     },
     {
-      path: '/batchBlock/:hash([0-9a-fA-F]{64})',
-      name: 'batchBlock',
-      component: batchBlock,
+      path: '/requestBlock/:hash([0-9a-fA-F]{64})',
+      name: 'requestBlock',
+      component: requestBlock,
       props: true
     },
     {

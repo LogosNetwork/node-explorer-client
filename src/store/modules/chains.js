@@ -3,7 +3,7 @@ import axios from 'axios'
 
 const state = {
   count: 50,
-  batchBlocks: [],
+  requestBlocks: [],
   microEpochs: [],
   epochs: [],
   error: null
@@ -14,35 +14,35 @@ const getters = {
 }
 
 const actions = {
-  clearBatchBlocks: ({ commit }) => {
-    commit('setBatchBlocks', [])
+  clearRequestBlocks: ({ commit }) => {
+    commit('setRequestBlocks', [])
   },
-  loadBatchBlocks: ({ state, commit, rootState }, data) => {
+  loadRequestBlocks: ({ state, commit, rootState }, data) => {
     let index = data.index
     let cb = data.cb
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
-    let savedBatchBlocks = [...state.batchBlocks]
+    let savedRequestBlocks = [...state.requestBlocks]
     let status = 'success'
     let lastCreatedAt = null
-    if (savedBatchBlocks && savedBatchBlocks.length > 0) {
-      lastCreatedAt = savedBatchBlocks[savedBatchBlocks.length - 1].createdAt
+    if (savedRequestBlocks && savedRequestBlocks.length > 0) {
+      lastCreatedAt = savedRequestBlocks[savedRequestBlocks.length - 1].createdAt
     }
     let lastHash
-    if (savedBatchBlocks && savedBatchBlocks.length > 0) {
-      lastHash = savedBatchBlocks[savedBatchBlocks.length - 1].hash
+    if (savedRequestBlocks && savedRequestBlocks.length > 0) {
+      lastHash = savedRequestBlocks[savedRequestBlocks.length - 1].hash
     } else {
       lastHash = undefined
     }
     if (index !== -1) {
-      rpcClient.batchBlocks.history(50, index, lastHash).then(val => {
+      rpcClient.requestBlocks.history(50, index, lastHash).then(val => {
         if (val) {
           if (!val.error) {
-            for (let batchBlock of val.batch_blocks) {
-              batchBlock.delegate = index
+            for (let requestBlock of val.batch_blocks) {
+              requestBlock.delegate = index
               if (lastHash) {
-                if (batchBlock.hash !== lastHash) commit('pushBatchBlock', batchBlock)
+                if (requestBlock.hash !== lastHash) commit('pushRequestBlock', requestBlock)
               } else {
-                commit('pushBatchBlock', batchBlock)
+                commit('pushRequestBlock', requestBlock)
               }
             }
             if (val.batch_blocks.length <= 1) {
@@ -59,16 +59,16 @@ const actions = {
         }
       })
     } else {
-      axios.get(`${rootState.settings.requestURL}/blocks/batchBlocks`, {
+      axios.get(`${rootState.settings.requestURL}/blocks/requestBlocks`, {
         params: {
           previousDate: lastCreatedAt
         }
       })
         .then((res) => {
-          for (let batchBlock of res.data.data.batchBlock) {
-            commit('pushBatchBlock', batchBlock)
+          for (let requestBlock of res.data.data.requestBlock) {
+            commit('pushRequestBlock', requestBlock)
           }
-          if (res.data.data.batchBlock.length > 0) {
+          if (res.data.data.requestBlock.length > 0) {
             cb(status)
           } else {
             status = 'out of content'
@@ -155,8 +155,8 @@ const actions = {
 }
 
 const mutations = {
-  setBatchBlocks (state, batchBlocks) {
-    state.batchBlocks = batchBlocks
+  setRequestBlocks (state, requestBlocks) {
+    state.requestBlocks = requestBlocks
   },
   setMicroEpochs (state, microEpochs) {
     state.microEpochs = microEpochs
@@ -166,15 +166,15 @@ const mutations = {
   },
   reset (state) {
     state.count = 50
-    state.batchBlocks = []
+    state.requestBlocks = []
     state.microEpochs = []
     state.epochs = []
   },
-  addBatchBlock (state, data) {
-    state.batchBlocks.unshift(data)
+  addRequestBlock (state, data) {
+    state.requestBlocks.unshift(data)
   },
-  pushBatchBlock (state, data) {
-    state.batchBlocks.push(data)
+  pushRequestBlock (state, data) {
+    state.requestBlocks.push(data)
   },
   addMicroEpoch (state, data) {
     state.microEpochs.unshift(data)

@@ -1,6 +1,6 @@
 import Logos from '@logosnetwork/logos-rpc-client'
 const state = {
-  transaction: null,
+  request: null,
   details: null,
   prettyDetails: null,
   error: null
@@ -11,27 +11,14 @@ const getters = {
 }
 
 const actions = {
-  getTransactionInfo: ({ commit, rootState }, transaction) => {
-    commit('setTransaction', transaction)
+  getRequestInfo: ({ commit, rootState }, request) => {
+    commit('setRequest', request)
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
-    rpcClient.transactions.info(transaction).then(val => {
+    rpcClient.requests.info(request).then(val => {
       if (val && !val.error) {
         let details = val
         let prettyDetails = null
-        if (details.transaction_type === 'receive') {
-          rpcClient.transactions.info(details.link).then(val => {
-            prettyDetails = JSON.stringify(details, null, ' ')
-            commit('setPrettyDetails', prettyDetails)
-            details.link_as_account = val.account
-            details.totalAmountInLogos = 0
-            for (let trans of details.transactions) {
-              let logosVal = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
-              details.totalAmountInLogos += logosVal
-              trans.amountInLogos = logosVal
-            }
-            commit('setDetails', details)
-          })
-        } else if (details.transaction_type === 'send') {
+        if (details.type === 'send') {
           prettyDetails = JSON.stringify(details, null, ' ')
           commit('setPrettyDetails', prettyDetails)
           details.totalAmountInLogos = 0
@@ -51,8 +38,8 @@ const actions = {
       }
     })
   },
-  addBlock ({ commit, rootState }, block) {
-    let details = block
+  addRequest ({ commit, rootState }, request) {
+    let details = request
     let prettyDetails = null
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     prettyDetails = JSON.stringify(details, null, ' ')
@@ -72,8 +59,8 @@ const actions = {
 }
 
 const mutations = {
-  setTransaction (state, transaction) {
-    state.transaction = transaction
+  setRequest (state, request) {
+    state.request = request
   },
   setDetails (state, details) {
     state.details = details
@@ -87,7 +74,7 @@ const mutations = {
   reset (state) {
     state.details = null
     state.prettyDetails = null
-    state.transaction = null
+    state.request = null
     state.error = null
   }
 }

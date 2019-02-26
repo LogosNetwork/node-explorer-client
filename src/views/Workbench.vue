@@ -39,9 +39,9 @@
                     </div>
                     <b-button class="float-right mb-3" variant="primary" v-on:click="options[2][selectedWork].action(options[2][selectedWork].params)">Execute</b-button>
                 </b-tab>
-                <b-tab title="Transactions">
-                    <b-form-select v-model="selectedTransactions" :options="labels[3]" class="mb-5" />
-                    <div class="text-left" v-for="(param, index) in options[3][selectedTransactions].params" :key="index">
+                <b-tab title="Requests">
+                    <b-form-select v-model="selectedRequests" :options="labels[3]" class="mb-5" />
+                    <div class="text-left" v-for="(param, index) in options[3][selectedRequests].params" :key="index">
                       <p v-if="!param.type || param.type === 'text'" class="card-text text-left">{{param.label}}
                           {{param.type}}
                           <b-input :placeholder="param.name" v-model="param.value" class="mb-3" />
@@ -53,7 +53,7 @@
                           {{param.label}}
                       </b-form-checkbox>
                     </div>
-                    <b-button class="float-right mb-3" variant="primary" v-on:click="options[3][selectedTransactions].action(options[3][selectedTransactions].params)">Execute</b-button>
+                    <b-button class="float-right mb-3" variant="primary" v-on:click="options[3][selectedRequests].action(options[3][selectedRequests].params)">Execute</b-button>
                 </b-tab>
                 <b-tab title="Blocks">
                     <b-form-select v-model="selectedBlocks" :options="labels[5]" class="mb-5" />
@@ -178,7 +178,7 @@ export default {
         action: function (params) {
           let accountId = params[0].value
           let count = params[1].value
-          $this.editor += `Checking last ${count} transactions for account ${accountId}....\n`
+          $this.editor += `Checking last ${count} requests for account ${accountId}....\n`
           $this.$Logos.accounts.history(accountId, count).then(val => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
@@ -191,7 +191,7 @@ export default {
           },
           {
             name: 'count',
-            label: `Number of transactions you wish to see`,
+            label: `Number of requests you wish to see`,
             required: true
           }
         ]
@@ -284,7 +284,7 @@ export default {
         params: [
           {
             name: 'hash',
-            label: `Hash of the transaction you are requesting work for`,
+            label: `Hash of the request you are requesting work for`,
             required: true
           }
         ]
@@ -306,7 +306,7 @@ export default {
           },
           {
             name: 'hash',
-            label: `Hash of the transaction you are checking the work for`,
+            label: `Hash of the request you are checking the work for`,
             required: true
           }
         ]
@@ -326,15 +326,15 @@ export default {
           } else {
             hash = [hash]
           }
-          $this.editor += `Fetching batch block of ${hash}....\n`
-          $this.$Logos.batchBlocks.get(hash).then(val => {
+          $this.editor += `Fetching request block of ${hash}....\n`
+          $this.$Logos.requestBlocks.get(hash).then(val => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         params: [
           {
             name: 'hash',
-            label: `Comma seperated Hashes of the batch blocks you want to know about`,
+            label: `Comma seperated Hashes of the request blocks you want to know about`,
             required: true
           }
         ]
@@ -343,20 +343,20 @@ export default {
         action: function (params) {
           let count = params[0].value
           let delegateIndex = params[1].value
-          $this.editor += `Fetching ${count} of the most recent batch state blocks from delegate ${delegateIndex}....\n`
-          $this.$Logos.batchBlocks.history(count, delegateIndex).then(val => {
+          $this.editor += `Fetching ${count} of the most recent request state blocks from delegate ${delegateIndex}....\n`
+          $this.$Logos.requestBlocks.history(count, delegateIndex).then(val => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
         },
         params: [
           {
             name: 'count',
-            label: `Number of most recent batch state blocks you wish to retreive`,
+            label: `Number of most recent request blocks you wish to retreive`,
             required: false
           },
           {
             name: 'delegateIndex',
-            label: `Index of the delegate you wish to lookup their batch state block chain`,
+            label: `Index of the delegate you wish to lookup their request blockchain`,
             required: false
           }
         ]
@@ -438,48 +438,22 @@ export default {
     ]
 
     const blockLabels = [
-      { value: 0, text: 'Lookup Batch Blocks by hash' },
-      { value: 1, text: 'Recent Batch Blocks' },
+      { value: 0, text: 'Lookup Request Blocks by hash' },
+      { value: 1, text: 'Recent Request Blocks' },
       { value: 2, text: 'Lookup Micro Epochs by hash' },
       { value: 3, text: 'Recent Micro Epochs' },
       { value: 4, text: 'Lookup Epochs by hash' },
       { value: 5, text: 'Recent Epochs' }
     ]
 
-    const transactionOptions = [
-      {
-        action: function (params) {
-          let hash = params[0].value
-          if (hash.indexOf(',') !== -1) {
-            hash = hash.split(',')
-          }
-          let details = params[1].value
-          $this.editor += `Fetching transaciton info of ${hash}....\n`
-          $this.$Logos.transactions.info(hash, details).then(val => {
-            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
-          })
-        },
-        params: [
-          {
-            name: 'hash',
-            label: `Comma seperated Hashes of the transactions you want to know about`,
-            required: true
-          },
-          {
-            name: 'details',
-            type: 'boolean',
-            label: `Show full transaction details`,
-            required: false
-          }
-        ]
-      },
+    const requestOptions = [
       {
         action: function (params) {
           let privateKey = params[0].value
-          let transactions = [{ target: params[1].value, amount: params[2].value }]
+          let requests = [{ destination: params[1].value, amount: params[2].value }]
           let forceDelegate = params[3].value
-          $this.editor += `Creating transactions... \n`
-          $this.$Logos.transactions.createSend(privateKey, transactions).then(val => {
+          $this.editor += `Creating request... \n`
+          $this.$Logos.requests.createSend(privateKey, requests).then(val => {
             $this.editor += JSON.stringify(val, null, 2) + '\n\n'
             let delegateId = null
             if (val.previous !== '0000000000000000000000000000000000000000000000000000000000000000') {
@@ -500,11 +474,11 @@ export default {
                   `http://${$this.delegateNodeUrl}:55000`
                 )
               }
-              $this.editor += `Publishing transaction to delegate ${delegateId}... \n`
+              $this.editor += `Publishing request to delegate ${delegateId}... \n`
             } else {
-              $this.editor += `Publishing transaction... \n`
+              $this.editor += `Publishing request... \n`
             }
-            $this.$Logos.transactions.publish(JSON.stringify(val)).then((response) => {
+            $this.$Logos.requests.publish(JSON.stringify(val)).then((response) => {
               $this.editor += JSON.stringify(response, null, ' ') + '\n\n'
               if (!forceDelegate) {
                 if (config.rpcProxy) {
@@ -526,7 +500,7 @@ export default {
         params: [
           {
             name: 'privateKey',
-            label: `The private key of your account only used to locally sign the transaction`,
+            label: `The private key of your account only used to locally sign the request`,
             required: true
           },
           {
@@ -542,16 +516,42 @@ export default {
           {
             name: 'force',
             type: 'boolean',
-            label: `Force transaction to be processed by your selected node this will incur a 5 second delay on your transaction`,
+            label: `Force request to be processed by your selected node this will incur a 5 second delay on your request`,
             required: true
+          }
+        ]
+      },
+      {
+        action: function (params) {
+          let hash = params[0].value
+          if (hash.indexOf(',') !== -1) {
+            hash = hash.split(',')
+          }
+          let details = params[1].value
+          $this.editor += `Fetching request info of ${hash}....\n`
+          $this.$Logos.requests.info(hash, details).then(val => {
+            $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
+          })
+        },
+        params: [
+          {
+            name: 'hash',
+            label: `Hash of the request you want to know about`,
+            required: true
+          },
+          {
+            name: 'details',
+            type: 'boolean',
+            label: `Show full request details`,
+            required: false
           }
         ]
       }
     ]
 
-    const transactionLabels = [
-      { value: 0, text: 'Transaction Info' },
-      { value: 1, text: 'Publish Send Transaction' }
+    const requestLabels = [
+      { value: 0, text: 'Publish Send Request' },
+      { value: 1, text: 'Request Info' }
     ]
 
     const otherOptions = [
@@ -594,7 +594,7 @@ export default {
         params: [
           {
             name: 'number',
-            label: `Number of transactions to send`,
+            label: `Number of requests to send`,
             required: false
           }
         ]
@@ -602,7 +602,7 @@ export default {
       {
         action: function (params) {
           let epoch = params[0].value
-          $this.editor += `Forcing Transition to occur....\n`
+          $this.editor += `Forcing Request to occur....\n`
           $this.$Logos.generateMicroBlock(epoch).then(val => {
             $this.editor += JSON.stringify(val, null, ' ') + '\n\n'
           })
@@ -628,7 +628,7 @@ export default {
       accountsOptions,
       keyOptions,
       workOptions,
-      transactionOptions,
+      requestOptions,
       otherOptions,
       blockOptions
     ]
@@ -637,7 +637,7 @@ export default {
       accountsLabels,
       keyLabels,
       workLabels,
-      transactionLabels,
+      requestLabels,
       otherLabels,
       blockLabels
     ]
@@ -653,7 +653,7 @@ export default {
       selectedAccounts: 0,
       selectedKeys: 0,
       selectedWork: 0,
-      selectedTransactions: 0,
+      selectedRequests: 0,
       selectedOther: 0,
       selectedBlocks: 0
     }

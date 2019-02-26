@@ -22,37 +22,37 @@
             </div>
         </b-col>
       </b-row>
-      <div v-infinite-scroll="getMoreTransactions" infinite-scroll-distance="500">
-        <b-row v-if="transactions && transactions.length > 0">
+      <div v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
+        <b-row v-if="requests && requests.length > 0">
           <b-col cols="12" class="mb-3">
             <h4 class="text-left">
-              <span>{{blockCount}} </span>
-              <span v-t="'transactions'"></span>
-              <small v-if='transactions.length === count'> (showing last {{count}})</small>
-              <small v-if='transactions.length > count'> (showing last {{transactions.length}})</small>
-              <small v-if='transactions.length < count'> (showing all {{transactions.length}})</small>
+              <span>{{requestCount}} </span>
+              <span v-t="'requests'"></span>
+              <small v-if='requests.length === count'> (showing last {{count}})</small>
+              <small v-if='requests.length > count'> (showing last {{requests.length}})</small>
+              <small v-if='requests.length < count'> (showing all {{requests.length}})</small>
             </h4>
             <p class="text-left" v-if="lastModified"><span v-t="'lastUpdated'"></span> <strong> {{ lastModified | moment("MMMM DD, YYYY h:mm:ss A") }}</strong></p>
-            <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="transactions">
+            <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="requests">
               <template slot="timestamp" slot-scope="data">
                 <div class="text-truncate" v-if="data.item.timestamp">{{ data.item.timestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
               </template>
               <template slot="account" slot-scope="data">
-                <div v-if="data.item.account === account">
+                <div v-if="data.item.origin === account">
                   <div v-for="(trans, index) in data.item.transactions" :key='index+"address"' class="text-truncate">
-                    <div class="text-truncate"><router-link :to="'/'+trans.target">{{trans.target}}</router-link></div>
+                    <div class="text-truncate"><router-link :to="'/'+trans.destination">{{trans.destination}}</router-link></div>
                   </div>
                 </div>
-                <div v-if="data.item.account !== account">
+                <div v-if="data.item.origin !== account">
                   <div v-for="(trans, index) in data.item.transactions" :key='index+"address"' class="text-truncate">
-                    <div v-if="trans.target === account" class="text-truncate"><router-link :to="'/'+data.item.account">{{data.item.account}}</router-link></div>
+                    <div v-if="trans.destination === account" class="text-truncate"><router-link :to="'/'+data.item.origin">{{data.item.origin}}</router-link></div>
                   </div>
                 </div>
               </template>
               <template slot="amount" slot-scope="data">
                 <div v-for="(trans, index) in data.item.transactions" :key='index+"amount"' class="text-truncate">
-                  <span class="text-success" v-if='trans.target === account'>+{{trans.amountInLogos}}</span>
-                  <span class="text-danger" v-if='data.item.account === account && trans.target !== account'>-{{trans.amountInLogos}}</span>
+                  <span class="text-success" v-if='trans.destination === account'>+{{trans.amountInLogos}}</span>
+                  <span class="text-danger" v-if='data.item.origin === account && trans.destination !== account'>-{{trans.amountInLogos}}</span>
                 </div>
               </template>
               <template slot="hash" slot-scope="data">
@@ -87,13 +87,12 @@ export default {
     ...mapState('account', {
       account: state => state.account,
       frontier: state => state.frontier,
-      openBlock: state => state.openBlock,
       representaive: state => state.representaive,
       error: state => state.error,
       balance: state => state.balance,
       rawBalance: state => state.rawBalance,
-      transactions: state => state.transactions,
-      blockCount: state => state.blockCount,
+      requests: state => state.requests,
+      requestCount: state => state.requestCount,
       count: state => state.count,
       lastModified: state => state.lastModified
     })
@@ -116,17 +115,17 @@ export default {
     ]),
     ...mapActions('account', [
       'getAccountInfo',
-      'getTransactions',
+      'getRequests',
       'reset'
     ]),
-    getMoreTransactions: function () {
-      if (!this.txBusy && this.transactions && this.transactions.length > 0) {
-        this.txBusy = true
-        this.getTransactions((response) => {
+    getMoreRequests: function () {
+      if (!this.requestsBusy && this.requests && this.requests.length > 0) {
+        this.requestsBusy = true
+        this.getRequests((response) => {
           if (response === 'out of content') {
-            this.txBusy = true
+            this.requestsBusy = true
           } else if (response === 'success') {
-            this.txBusy = false
+            this.requestsBusy = false
           }
         })
       }
@@ -138,7 +137,7 @@ export default {
   data () {
     return {
       fields: fields,
-      txBusy: false
+      requestsBusy: false
     }
   },
   beforeRouteUpdate (to, from, next) {

@@ -2,11 +2,11 @@ import Logos from '@logosnetwork/logos-rpc-client'
 import axios from 'axios'
 import cloneDeep from 'lodash/cloneDeep'
 const state = {
-  transactions: [],
+  requests: [],
   error: null,
   epoch: null,
   microEpoch: null,
-  batchBlock: null
+  requestBlock: null
 }
 
 const getters = {
@@ -14,24 +14,24 @@ const getters = {
 }
 
 const actions = {
-  getTransactions ({ commit, rootState }, cb) {
+  getRequests ({ commit, rootState }, cb) {
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
-    let savedTransactions = [...state.transactions]
+    let savedRequests = [...state.requests]
     let lastCreatedAt = null
-    if (savedTransactions && savedTransactions.length > 0) {
-      lastCreatedAt = savedTransactions[savedTransactions.length - 1].createdAt
+    if (savedRequests && savedRequests.length > 0) {
+      lastCreatedAt = savedRequests[savedRequests.length - 1].createdAt
     }
-    axios.get(`${rootState.settings.requestURL}/blocks/transactions`, {
+    axios.get(`${rootState.settings.requestURL}/blocks/requests`, {
       params: {
         previousDate: lastCreatedAt
       }
     })
       .then((res) => {
-        for (let transaction of res.data.data.transactions) {
-          for (let trans of transaction.transactions) {
+        for (let request of res.data.data.transactions) {
+          for (let trans of request.transactions) {
             trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
           }
-          commit('pushTransaction', transaction)
+          commit('pushRequest', request)
         }
         if (res.data.data.transactions.length > 0) {
           let status = 'success'
@@ -45,10 +45,10 @@ const actions = {
         commit('setError', err)
       })
   },
-  getLatestBatchBlock ({ commit, rootState }) {
-    axios.get(`${rootState.settings.requestURL}/blocks/lastBatchBlock`)
+  getLatestRequestBlock ({ commit, rootState }) {
+    axios.get(`${rootState.settings.requestURL}/blocks/lastRequestBlock`)
       .then((res) => {
-        commit('setBatchBlock', res.data.data.batchBlock[0])
+        commit('setRequestBlock', res.data.data.requestBlock[0])
       })
       .catch((err) => {
         commit('setError', err)
@@ -83,15 +83,15 @@ const actions = {
       }
     })
   },
-  getBlockType ({ rootState }, data) {
+  getRequestType ({ rootState }, data) {
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
-    rpcClient.transactions.info(data.hash, false).then((val) => {
+    rpcClient.requests.info(data.hash, false).then((val) => {
       if (!val.error) {
-        data.cb('transaction')
+        data.cb('request')
       } else {
-        rpcClient.batchBlocks.get([data.hash]).then((val) => {
+        rpcClient.requestBlocks.get([data.hash]).then((val) => {
           if (!val.error) {
-            data.cb('batchBlock')
+            data.cb('requestBlock')
           } else {
             rpcClient.epochs.get([data.hash]).then((val) => {
               if (!val.error) {
@@ -111,15 +111,15 @@ const actions = {
       }
     })
   },
-  addBlock ({ commit, rootState }, block) {
-    let blockData = cloneDeep(block)
-    if (blockData.transaction_type === 'send') {
+  addRequest ({ commit, rootState }, request) {
+    let requestData = cloneDeep(request)
+    if (requestData.type === 'send') {
       let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
-      for (let trans of blockData.transactions) {
+      for (let trans of requestData.transactions) {
         trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
       }
-      blockData.createdAt = parseInt(blockData.timestamp)
-      commit('unshiftTransaction', blockData)
+      requestData.createdAt = parseInt(requestData.timestamp)
+      commit('unshiftRequest', requestData)
     }
   },
   reset: ({ commit }) => {
@@ -131,17 +131,17 @@ const mutations = {
   setError (state, error) {
     state.error = error
   },
-  setTransactions (state, transactions) {
-    state.transactions = transactions
+  setRequests (state, requests) {
+    state.requests = requests
   },
-  pushTransaction (state, transaction) {
-    state.transactions.push(transaction)
+  pushRequest (state, request) {
+    state.requests.push(request)
   },
-  unshiftTransaction (state, transaction) {
-    state.transactions.unshift(transaction)
+  unshiftRequest (state, request) {
+    state.requests.unshift(request)
   },
-  setBatchBlock (state, batchBlock) {
-    state.batchBlock = batchBlock
+  setRequestBlock (state, requestBlock) {
+    state.requestBlock = requestBlock
   },
   setMicroEpoch (state, microEpoch) {
     state.microEpoch = microEpoch

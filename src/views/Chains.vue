@@ -3,50 +3,50 @@
     <b-container class="pt-5">
       <h2 class="text-left d-block" v-t="'blockchains'"></h2>
       <b-tabs v-model="tabIndex">
-        <b-tab :title="$t('batch_blocks')" v-infinite-scroll="getBatchBlocks" infinite-scroll-distance="500" active>
-          <b-form-select v-model="selectedDelegate" :options="bsbDelegateLabels" class="mt-3" />
+        <b-tab :title="$t('request_blocks')" v-infinite-scroll="getRequestBlocks" infinite-scroll-distance="500" active>
+          <b-form-select v-model="selectedDelegate" :options="rbDelegateLabels" class="mt-3" />
           <div name="list" is="transition-group">
-            <div :key="batchBlock.hash + '_' + batchBlock.delegate" v-for="batchBlock in orderedBatchBlocks">
-              <b-link class="cardLink" :to="'/batchBlock/'+batchBlock.hash">
+            <div :key="requestBlock.hash + '_' + requestBlock.delegate" v-for="requestBlock in orderedRequestBlocks">
+              <b-link class="cardLink" :to="'/requestBlock/'+requestBlock.hash">
                 <b-card class="mt-3 mb-3 text-left">
                   <b-row>
                     <b-col>
-                      <h3>Batch Block</h3>
+                      <h3>Request Block</h3>
                     </b-col>
                     <b-col class="text-right">
                       <small>
-                        <span> {{parseInt(batchBlock.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</span>
+                        <span> {{parseInt(requestBlock.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</span>
                       </small>
                     </b-col>
                   </b-row>
                   <b-row class="mb-2">
                     <b-col class="text-truncate">
-                      Hash: <b-link :to="'/batchBlock/'+batchBlock.hash">{{batchBlock.hash}}</b-link>
+                      Hash: <b-link :to="'/requestBlock/'+requestBlock.hash">{{requestBlock.hash}}</b-link>
                     </b-col>
                   </b-row>
-                  <b-row v-if="batchBlock.previous && batchBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-2">
+                  <b-row v-if="requestBlock.previous && requestBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-2">
                     <b-col class="text-truncate">
-                      Previous: <b-link :to="'/batchBlock/'+batchBlock.previous">{{batchBlock.previous}}</b-link>
+                      Previous: <b-link :to="'/requestBlock/'+requestBlock.previous">{{requestBlock.previous}}</b-link>
                     </b-col>
                   </b-row>
-                  <b-row v-if="batchBlock.prevHash && batchBlock.prevHash !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-2">
+                  <b-row v-if="requestBlock.prevHash && requestBlock.prevHash !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-2">
                     <b-col class="text-truncate">
-                      Previous: <b-link :to="'/batchBlock/'+batchBlock.prevHash">{{batchBlock.prevHash}}</b-link>
+                      Previous: <b-link :to="'/requestBlock/'+requestBlock.prevHash">{{requestBlock.prevHash}}</b-link>
                     </b-col>
                   </b-row>
                   <b-row class="mb-2">
                     <b-col class="text-truncate">
-                      Proposed by Delegate {{batchBlock.delegate}}
+                      Proposed by Delegate {{requestBlock.delegate}}
                     </b-col>
                   </b-row>
                   <b-row>
                     <b-col>
-                      Contains {{batchBlock.block_count}} Transactions
+                      Contains {{requestBlock.request_count}} Requests
                     </b-col>
                   </b-row>
                 </b-card>
               </b-link>
-              <icon v-if="batchBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && selectedDelegate !== -1" scale="2" name="chevron-down"></icon>
+              <icon v-if="requestBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && selectedDelegate !== -1" scale="2" name="chevron-down"></icon>
             </div>
           </div>
         </b-tab>
@@ -83,7 +83,7 @@
                 </b-row>
                 <b-row>
                   <b-col>
-                    Contains {{microEpoch.number_batch_blocks}} Batch Blocks
+                    Contains {{microEpoch.number_batch_blocks}} Request Blocks
                   </b-col>
                 </b-row>
               </b-card>
@@ -150,21 +150,21 @@ export default {
       delegates: state => state.delegates
     }),
     ...mapState('chains', {
-      batchBlocks: state => state.batchBlocks,
+      requestBlocks: state => state.requestBlocks,
       microEpochs: state => state.microEpochs,
       epochs: state => state.epochs
     }),
-    orderedBatchBlocks: function () {
-      return orderBy(this.batchBlocks, 'timestamp', 'desc')
+    orderedRequestBlocks: function () {
+      return orderBy(this.requestBlocks, 'timestamp', 'desc')
     }
   },
   data: function () {
     return {
-      batchBlocksBusy: true,
+      requestBlocksBusy: true,
       microEpochsBusy: true,
       epochsBusy: true,
-      bsbDelegateLabels: [
-        { value: -1, text: 'All Batch Blocks' }
+      rbDelegateLabels: [
+        { value: -1, text: 'All Request Blocks' }
       ],
       tabIndex: 0,
       selectedDelegate: -1
@@ -174,15 +174,15 @@ export default {
     this.reset()
     this.initalize({ url: this.mqttHost,
       cb: () => {
-        this.subscribe(`batchBlock/#`)
+        this.subscribe(`requestBlock/#`)
         this.subscribe(`microEpoch`)
         this.subscribe(`epoch`)
       } })
-    this.getBatchBlocks(true)
+    this.getRequestBlocks(true)
     this.getMicroEpochs(true)
     this.getEpochs(true)
     for (let i = 0; i < Object.keys(this.delegates).length; i++) {
-      this.bsbDelegateLabels.push({ value: i, text: `Batch Blocks for delegate ${i}: ${this.delegates[i]}` })
+      this.rbDelegateLabels.push({ value: i, text: `Request Blocks for delegate ${i}: ${this.delegates[i]}` })
     }
   },
   methods: {
@@ -193,21 +193,21 @@ export default {
     ]),
     ...mapActions('chains', [
       'loadMicroEpochs',
-      'loadBatchBlocks',
+      'loadRequestBlocks',
       'loadEpochs',
-      'clearBatchBlocks',
+      'clearRequestBlocks',
       'reset'
     ]),
-    getBatchBlocks: function (force = false) {
-      if ((!this.batchBlocksBusy && this.tabIndex === 0) || force) {
-        this.batchBlocksBusy = true
-        this.loadBatchBlocks({
+    getRequestBlocks: function (force = false) {
+      if ((!this.requestBlocksBusy && this.tabIndex === 0) || force) {
+        this.requestBlocksBusy = true
+        this.loadRequestBlocks({
           index: this.selectedDelegate,
           cb: (err) => {
             if (err === 'out of content') {
-              this.batchBlocksBusy = true
+              this.requestBlocksBusy = true
             } else if (err === 'success') {
-              this.batchBlocksBusy = false
+              this.requestBlocksBusy = false
             }
           }
         })
@@ -241,21 +241,21 @@ export default {
   watch: {
     selectedDelegate: function (newDelegate, oldDelegate) {
       if (oldDelegate === -1) {
-        this.unsubscribe(`batchBlock/#`)
+        this.unsubscribe(`requestBlock/#`)
       } else {
-        this.unsubscribe(`batchBlock/${oldDelegate}`)
+        this.unsubscribe(`requestBlock/${oldDelegate}`)
       }
       if (newDelegate === -1) {
-        this.subscribe(`batchBlock/#`)
+        this.subscribe(`requestBlock/#`)
       } else {
-        this.subscribe(`batchBlock/${newDelegate}`)
+        this.subscribe(`requestBlock/${newDelegate}`)
       }
-      this.clearBatchBlocks()
-      this.getBatchBlocks(true)
+      this.clearRequestBlocks()
+      this.getRequestBlocks(true)
     }
   },
   destroyed: function () {
-    this.unsubscribe(`batchBlock/#`)
+    this.unsubscribe(`requestBlock/#`)
     this.unsubscribe(`microEpoch`)
     this.unsubscribe(`epoch`)
   }

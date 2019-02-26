@@ -31,7 +31,7 @@
           </div>
           <button type="submit" v-on:click="requestFaucet()" class="btn btn-primary">Send me some Logos</button>
           <div v-if="startTime !== null && finalTime !== null" class="mt-3">
-            <h4>Transaction Confirmed in: {{finalTime - startTime}}ms</h4>
+            <h4>Request Confirmed in: {{finalTime - startTime}}ms</h4>
           </div>
           <div v-if="scanQR" class="mt-3">
             <qrcode-reader @init="onInit" @decode="onDecode" :paused="!scanQR"></qrcode-reader>
@@ -55,10 +55,11 @@ export default {
   name: 'Facuet',
   computed: {
     ...mapState('settings', {
-      mqttHost: state => state.mqttHost
+      mqttHost: state => state.mqttHost,
+      requestURL: state => state.requestURL
     }),
-    ...mapState('transaction', {
-      transaction: state => state.transaction,
+    ...mapState('request', {
+      request: state => state.request,
       details: state => state.details,
       prettyDetails: state => state.prettyDetails,
       error: state => state.error
@@ -73,7 +74,6 @@ export default {
   },
   watch: {
     details: function (newDetails, oldDetails) {
-      console.log('new transcation')
       this.finalTime = Date.now()
     }
   },
@@ -107,9 +107,9 @@ export default {
     requestFaucet () {
       if (this.address.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
         if (this.successHash !== null) {
-          this.unsubscribe(`transaction/${this.successHash}`)
+          this.unsubscribe(`request/${this.successHash}`)
         }
-        axios.post('/faucet', {
+        axios.post(`${this.requestURL}/faucet`, {
           address: this.address
         })
           .then((res) => {
@@ -118,7 +118,7 @@ export default {
             this.showSuccess = true
             this.initalize({ url: this.mqttHost,
               cb: () => {
-                this.subscribe(`transaction/${this.successHash}`)
+                this.subscribe(`request/${this.successHash}`)
               }
             })
             this.startTime = Date.now()

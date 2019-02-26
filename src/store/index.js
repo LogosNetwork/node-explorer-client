@@ -4,11 +4,11 @@ import mqtt from './modules/mqtt'
 import account from './modules/account'
 import explorer from './modules/explorer'
 import chains from './modules/chains'
-import batchBlock from './modules/batchBlock'
+import requestBlock from './modules/requestBlock'
 import microEpoch from './modules/microEpoch'
 import epoch from './modules/epoch'
 import settings from './modules/settings'
-import transaction from './modules/transaction'
+import request from './modules/request'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -17,11 +17,11 @@ export default new Vuex.Store({
     explorer,
     account,
     chains,
-    batchBlock,
+    requestBlock,
     microEpoch,
     epoch,
     settings,
-    transaction
+    request
   },
   strict: process.env.NODE_ENV !== 'production'
 })

@@ -4,14 +4,13 @@ import cloneDeep from 'lodash/cloneDeep'
 const state = {
   account: null,
   frontier: null,
-  openBlock: null,
   representaive: null,
   error: null,
   balance: null,
   rawBalance: null,
   count: 50,
-  transactions: [],
-  blockCount: 0,
+  requests: [],
+  requestCount: 0,
   lastModified: 0
 }
 
@@ -20,27 +19,27 @@ const getters = {
 }
 
 const actions = {
-  getTransactions ({ commit, rootState }, cb) {
+  getRequests ({ commit, rootState }, cb) {
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
-    let savedTransactions = [...state.transactions]
-    if (savedTransactions && savedTransactions.length > 0) {
-      let lastHash = savedTransactions[savedTransactions.length - 1].hash
+    let savedRequests = [...state.requests]
+    if (savedRequests && savedRequests.length > 0) {
+      let lastHash = savedRequests[savedRequests.length - 1].hash
       if (lastHash !== null) {
-        rpcClient.accounts.history(state.account, state.count, false, lastHash).then(val => {
-          if (val) {
-            if (!val.error) {
-              if (val.length > 1) {
-                val.splice(0, 1)
-                for (let transactionRequests of val) {
-                  transactionRequests.timestamp = parseInt(transactionRequests.timestamp)
-                  if (transactionRequests.transaction_type === 'send') {
-                    for (let trans of transactionRequests.transactions) {
+        rpcClient.accounts.history(state.account, state.count, false, lastHash).then(requests => {
+          if (requests) {
+            if (!requests.error) {
+              if (requests.length > 1) {
+                requests.splice(0, 1)
+                for (let request of requests) {
+                  request.timestamp = parseInt(request.timestamp)
+                  if (request.type === 'send') {
+                    for (let trans of request.transactions) {
                       trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
                     }
                   }
                 }
-                commit('addTransactions', val)
-                if (val.length !== 49) {
+                commit('addRequests', requests)
+                if (requests.length !== 49) {
                   let status = 'out of content'
                   cb(status)
                 } else {
@@ -52,7 +51,7 @@ const actions = {
                 cb(status)
               }
             } else {
-              commit('setError', val.error)
+              commit('setError', requests.error)
             }
           } else {
             commit('setError', 'null')
@@ -68,10 +67,9 @@ const actions = {
       if (val) {
         if (!val.error) {
           commit('setFrontier', val.frontier)
-          commit('setOpenBlock', val.open_block)
           commit('setRawBalance', val.balance)
           commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(val.balance, 'LOGOS')).toFixed(5)))
-          commit('setBlockCount', val.block_count)
+          commit('setRequestCount', val.block_count)
           commit('setLastModified', parseInt(val.modified_timestamp))
           rpcClient.accounts.toAddress(val.representative_block).then(val => {
             if (val.account) {
@@ -85,61 +83,65 @@ const actions = {
         commit('setError', 'null')
       }
     })
-    rpcClient.accounts.history(account, state.count).then(val => {
-      if (val) {
-        if (!val.error) {
-          for (let transactionRequests of val) {
-            transactionRequests.timestamp = parseInt(transactionRequests.timestamp)
-            if (transactionRequests.transaction_type === 'send') {
-              for (let trans of transactionRequests.transactions) {
+    rpcClient.accounts.history(account, state.count).then(requests => {
+      if (requests) {
+        if (!requests.error) {
+          for (let request of requests) {
+            request.timestamp = parseInt(request.timestamp)
+            if (request.type === 'send') {
+              for (let trans of request.transactions) {
                 trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
               }
             }
           }
-          commit('setTransactions', val)
+          commit('setRequests', requests)
         } else {
-          commit('setError', val.error)
+          commit('setError', requests.error)
         }
       } else {
         commit('setError', 'null')
       }
     })
   },
-  addBlock ({ state, commit, rootState }, block) {
-    let blockData = cloneDeep(block)
+  addRequest ({ state, commit, rootState }, request) {
+    let requestData = cloneDeep(request)
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
-    if (blockData.account === state.account) {
-      blockData.timestamp = parseInt(blockData.timestamp)
-      let newRawBalance = bigInt(0)
-      if (state.rawBalance) newRawBalance = bigInt(state.rawBalance)
-      for (let trans of blockData.transactions) {
-        newRawBalance = bigInt(newRawBalance).minus(bigInt(trans.amount))
-        trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
-      }
-      commit('setError', null)
-      commit('setRawBalance', newRawBalance.toString())
-      commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5)))
-      commit('incrementBlockCount')
-      commit('setFrontier', blockData.hash)
-      commit('setLastModified', blockData.timestamp)
-      commit('unshiftTransaction', blockData)
-    } else if (blockData.account !== state.account) {
-      blockData.timestamp = parseInt(blockData.timestamp)
-      let newRawBalance = bigInt(0)
-      if (state.rawBalance) newRawBalance = bigInt(state.rawBalance)
-      for (let trans of blockData.transactions) {
-        if (trans.target === state.account) {
-          newRawBalance = newRawBalance.add(bigInt(trans.amount))
+    if (requestData.origin === state.account) {
+      requestData.timestamp = parseInt(requestData.timestamp)
+      if (requestData.type === 'send') {
+        let newRawBalance = bigInt(0)
+        if (state.rawBalance) newRawBalance = bigInt(state.rawBalance)
+        for (let trans of requestData.transactions) {
+          newRawBalance = bigInt(newRawBalance).minus(bigInt(trans.amount))
+          trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
         }
-        trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+        commit('setRawBalance', newRawBalance.toString())
+        commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5)))
+      }
+      commit('setError', null)
+      commit('incrementRequestCount')
+      commit('setFrontier', requestData.hash)
+      commit('setLastModified', requestData.timestamp)
+      commit('unshiftRequest', requestData)
+    } else if (requestData.account !== state.account) {
+      requestData.timestamp = parseInt(requestData.timestamp)
+      if (requestData.type === 'send') {
+        let newRawBalance = bigInt(0)
+        if (state.rawBalance) newRawBalance = bigInt(state.rawBalance)
+        for (let trans of requestData.transactions) {
+          if (trans.target === state.account) {
+            newRawBalance = newRawBalance.add(bigInt(trans.amount))
+          }
+          trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+        }
+        commit('setRawBalance', newRawBalance.toString())
+        commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5)))
       }
       commit('setError', null)
       commit('incrementBlockCount')
-      commit('setFrontier', blockData.hash)
-      commit('setRawBalance', newRawBalance.toString())
-      commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5)))
-      commit('setLastModified', blockData.timestamp)
-      commit('unshiftTransaction', blockData)
+      commit('setFrontier', requestData.hash)
+      commit('setLastModified', requestData.timestamp)
+      commit('unshiftTransaction', requestData)
     }
   },
   reset: ({ commit }) => {
@@ -151,9 +153,6 @@ const mutations = {
   setFrontier (state, frontier) {
     state.frontier = frontier
   },
-  setOpenBlock (state, openBlock) {
-    state.openBlock = openBlock
-  },
   setRepresentative (state, rep) {
     state.rep = rep
   },
@@ -163,11 +162,11 @@ const mutations = {
   setRawBalance (state, balance) {
     state.rawBalance = balance
   },
-  setBlockCount (state, blockCount) {
-    state.blockCount = blockCount
+  setRequestCount (state, requestCount) {
+    state.requestCount = requestCount
   },
-  incrementBlockCount (state) {
-    state.blockCount++
+  incrementRequestCount (state) {
+    state.requestCount++
   },
   setCount (state, count) {
     state.count = count
@@ -178,14 +177,14 @@ const mutations = {
   setError (state, error) {
     state.error = error
   },
-  setTransactions (state, transactions) {
-    state.transactions = transactions
+  setRequests (state, requests) {
+    state.requests = requests
   },
-  unshiftTransaction (state, transaction) {
-    state.transactions.unshift(transaction)
+  unshiftRequest (state, request) {
+    state.requests.unshift(request)
   },
-  addTransactions (state, transactions) {
-    state.transactions = state.transactions.concat(transactions)
+  addRequests (state, requests) {
+    state.requests = state.requests.concat(requests)
   },
   setAccount (state, account) {
     state.account = account
@@ -193,13 +192,12 @@ const mutations = {
   reset (state) {
     state.account = null
     state.frontier = null
-    state.openBlock = null
     state.representaive = null
     state.error = null
     state.balance = null
     state.count = 50
-    state.transactions = []
-    state.blockCount = 0
+    state.requests = []
+    state.requestCount = 0
     state.lastModified = 0
   }
 }

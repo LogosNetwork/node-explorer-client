@@ -2,7 +2,7 @@ import Logos from '@logosnetwork/logos-rpc-client'
 
 const state = {
   hash: null,
-  batchBlock: null,
+  requestBlock: null,
   prettyDetails: null,
   error: null
 }
@@ -12,7 +12,7 @@ const getters = {
 }
 
 const actions = {
-  getBatchBlock: ({ commit, rootState }, hash) => {
+  getRequestBlock: ({ commit, rootState }, hash) => {
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     commit('setHash', hash)
     let searchHashes = null
@@ -21,24 +21,24 @@ const actions = {
     } else {
       searchHashes = [hash]
     }
-    rpcClient.batchBlocks.get(searchHashes).then(val => {
-      if (val) {
-        if (!val.error) {
-          if (val.blocks.length > 0) {
+    rpcClient.requestBlocks.get(searchHashes).then(requestBlock => {
+      if (requestBlock) {
+        if (!requestBlock.error) {
+          if (requestBlock.blocks.length > 0) {
             let prettyDetails = null
-            prettyDetails = JSON.stringify(val.blocks[0], null, ' ')
+            prettyDetails = JSON.stringify(requestBlock.blocks[0], null, ' ')
             commit('setPrettyDetails', prettyDetails)
-            for (let transactionRequest of val.blocks[0].blocks) {
-              if (transactionRequest.transactions && transactionRequest.transactions.length > 0) {
-                for (let trans of transactionRequest.transactions) {
+            for (let request of requestBlock.blocks[0].requests) {
+              if (request.type === 'send' && request.transactions && request.transactions.length > 0) {
+                for (let trans of request.transactions) {
                   trans.fakeLogosAmount = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
                 }
               }
             }
-            commit('setBatchBlock', val.blocks[0])
+            commit('setRequestBlock', requestBlock.blocks[0])
           }
         } else {
-          commit('setError', val.error)
+          commit('setError', requestBlock.error)
         }
       } else {
         commit('setError', 'null')
@@ -51,14 +51,14 @@ const actions = {
 }
 
 const mutations = {
-  setBatchBlock (state, batchBlock) {
-    state.batchBlock = batchBlock
+  setRequestBlock (state, requestBlock) {
+    state.requestBlock = requestBlock
   },
   setHash (state, hash) {
     state.hash = hash
   },
   reset (state) {
-    state.batchBlock = null
+    state.requestBlock = null
   },
   setPrettyDetails (state, prettyDetails) {
     state.prettyDetails = prettyDetails

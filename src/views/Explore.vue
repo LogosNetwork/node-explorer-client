@@ -7,27 +7,27 @@
         <label class="sr-only" for="address" v-t="'searchPlaceholder'"></label>
         <b-input @keydown.native="submitSearch" id="address" type="text" :state="searchState" aria-describedby="inputLiveFeedback" :placeholder="$t('searchPlaceholder')" v-model="address" />
         <b-form-invalid-feedback id="inputLiveFeedback">
-          Enter a Logos address or a transactions hash.
+          Enter a Logos address or a request hash
         </b-form-invalid-feedback>
       </b-form>
       <b-row class="text-left">
         <b-col cols="12" md="4" class="mb-3">
-          <h5>Latest Batch Block</h5>
-          <b-link v-if="batchBlock" class="cardLink" :to="'/batchBlock/'+batchBlock.hash">
-            <b-card v-highlight="batchBlock.hash">
+          <h5>Latest Request Block</h5>
+          <b-link v-if="requestBlock" class="cardLink" :to="'/requestBlock/'+requestBlock.hash">
+            <b-card v-highlight="requestBlock.hash">
               <b-row>
                 <b-col class="text-truncate">
-                  <b-link :to="'/batchBlock/'+batchBlock.hash">{{batchBlock.hash}}</b-link>
+                  <b-link :to="'/requestBlock/'+requestBlock.hash">{{requestBlock.hash}}</b-link>
                 </b-col>
               </b-row>
               <b-row>
                 <b-col>
-                  <span> {{parseInt(batchBlock.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</span>
+                  <span> {{parseInt(requestBlock.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</span>
                 </b-col>
               </b-row>
               <b-row>
                 <b-col>
-                  Contains {{batchBlock.block_count}} Transactions
+                  Contains {{requestBlock.request_count}} Requests
                 </b-col>
               </b-row>
             </b-card>
@@ -50,7 +50,7 @@
                 </b-row>
                 <b-row>
                   <b-col>
-                    Contains {{microEpoch.number_batch_blocks}} Batch Blocks
+                    Contains {{microEpoch.number_batch_blocks}} Request Blocks
                   </b-col>
                 </b-row>
               </b-card>
@@ -82,9 +82,9 @@
       </b-row>
       <b-row class="text-left">
         <b-col cols="12" class="mb-5">
-          <h5 class="text-left" v-t="'recent_transactions'"></h5>
-          <div v-infinite-scroll="getMoreTransactions" infinite-scroll-distance="500">
-            <table v-if="transactions && transactions.length > 0" class="table b-table table-bordered table-sm b-table-fixed" style="background:#FFF">
+          <h5 class="text-left" v-t="'recent_requests'"></h5>
+          <div v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
+            <table v-if="requests && requests.length > 0" class="table b-table table-bordered table-sm b-table-fixed" style="background:#FFF">
               <thead>
                 <tr>
                   <th aria-colindex="1">Time</th>
@@ -95,83 +95,30 @@
                 </tr>
               </thead>
               <tbody name="list" is="transition-group">
-                <tr v-for="transaction in transactions" :key="transaction.hash">
+                <tr v-for="request in requests" :key="request.hash">
                   <td aria-colindex="1">
-                    <div class="text-truncate" v-if="transaction.createdAt">{{ transaction.createdAt | moment("MM/DD/YY h:mm:ssa") }}</div>
+                    <div class="text-truncate" v-if="request.createdAt">{{ request.createdAt | moment("MM/DD/YY h:mm:ssa") }}</div>
                   </td>
                   <td aria-colindex="2">
-                    <div class="text-truncate"><router-link :to="'/'+transaction.account">{{transaction.account}}</router-link></div>
+                    <div class="text-truncate"><router-link :to="'/'+request.origin">{{request.origin}}</router-link></div>
                   </td>
                   <td aria-colindex="3">
-                    <div v-for="(trans, index) in transaction.transactions" :key='index+"address"' class="text-truncate">
-                      <router-link :to="'/'+trans.target">{{trans.target}}</router-link>
+                    <div v-for="(trans, index) in request.transactions" :key='index+"address"' class="text-truncate">
+                      <router-link :to="'/'+trans.destination">{{trans.destination}}</router-link>
                     </div>
                   </td>
                   <td aria-colindex="4">
-                    <div v-for="(trans, index) in transaction.transactions" :key='index+"amount"' class="text-truncate">
+                    <div v-for="(trans, index) in request.transactions" :key='index+"amount"' class="text-truncate">
                       <span class="text-success">{{trans.amountInLogos}}</span>
                     </div>
                   </td>
                   <td aria-colindex="5">
-                    <div class="text-truncate"><router-link :to="'/'+transaction.hash">{{transaction.hash}}</router-link></div>
+                    <div class="text-truncate"><router-link :to="'/'+request.hash">{{request.hash}}</router-link></div>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </b-col>
-        <b-col v-if="false" cols="12" md="6" class="mb-5">
-          <h5 class="text-left" v-t="'network_stats.title'"></h5>
-          <b-row>
-            <b-col cols="6">
-              <div class="text-center">
-                <small class="heading text-uppercase" v-t="'network_stats.tx-sec-1m'"></small>
-                <p class="title text-dark font-weight-bold">4.33</p>
-              </div>
-            </b-col>
-            <b-col cols="6">
-              <div class="text-center">
-                <small class="heading text-uppercase" v-t="'network_stats.tx-sec-30m'"></small>
-                <p class="title text-dark font-weight-bold">2.34</p>
-              </div>
-            </b-col>
-            <b-col cols="6">
-              <div class="text-center">
-                <small class="heading text-uppercase" v-t="'network_stats.market-cap'"></small>
-                <p class="title text-dark font-weight-bold">$640M</p>
-              </div>
-            </b-col>
-            <b-col cols="6">
-              <div class="text-center">
-                <small class="heading text-uppercase" v-t="'network_stats.change24hr'"></small>
-                <p class="title font-weight-bold text-success">4.33%</p>
-              </div>
-            </b-col>
-            <b-col cols="6">
-              <div class="text-center">
-                <small class="heading text-uppercase" v-t="'network_stats.change7d'"></small>
-                <p class="title font-weight-bold text-success">1.16%</p>
-              </div>
-            </b-col>
-            <b-col cols="6">
-              <div class="text-center">
-                <small class="heading text-uppercase" v-t="'network_stats.price-local'"></small>
-                <p class="title text-dark font-weight-bold">$3.22</p>
-              </div>
-            </b-col>
-            <b-col cols="6">
-              <div class="text-center">
-                <small class="heading text-uppercase" v-t="'network_stats.price-satoshi'"></small>
-                <p class="title text-dark font-weight-bold">50.19K</p>
-              </div>
-            </b-col>
-            <b-col cols="6">
-              <div class="text-center">
-                <small class="heading text-uppercase" v-t="'network_stats.volume24h'"></small>
-                <p class="title text-dark font-weight-bold">$20.34M</p>
-              </div>
-            </b-col>
-          </b-row>
         </b-col>
       </b-row>
     </b-container>
@@ -237,9 +184,9 @@ export default {
     }),
     ...mapState('explorer', {
       error: state => state.error,
-      transactions: state => state.transactions,
+      requests: state => state.requests,
       microEpoch: state => state.microEpoch,
-      batchBlock: state => state.batchBlock,
+      requestBlock: state => state.requestBlock,
       epoch: state => state.epoch
     })
   },
@@ -250,10 +197,10 @@ export default {
         this.subscribe(`#`)
       }
     })
-    this.getLatestBatchBlock()
+    this.getLatestRequestBlock()
     this.getLatestMicroEpoch()
     this.getLatestEpoch()
-    this.getMoreTransactions(true)
+    this.getMoreRequests(true)
   },
   methods: {
     submitSearch (event) {
@@ -272,14 +219,14 @@ export default {
             this.getBlockType({
               hash: this.address,
               cb: blockType => {
-                if (blockType === 'transaction') {
+                if (blockType === 'request') {
                   this.$router.push({
-                    name: 'transaction',
-                    params: { transaction: this.address }
+                    name: 'request',
+                    params: { request: this.address }
                   })
-                } else if (blockType === 'batchBlock') {
+                } else if (blockType === 'requestBlock') {
                   this.$router.push({
-                    name: 'batchBlock',
+                    name: 'requestBlock',
                     params: { hash: this.address }
                   })
                 } else if (blockType === 'epoch') {
@@ -302,11 +249,11 @@ export default {
       }
     },
     ...mapActions('mqtt', ['initalize', 'unsubscribe', 'subscribe']),
-    ...mapActions('explorer', ['getTransactions', 'getBlockType', 'getLatestBatchBlock', 'getLatestMicroEpoch', 'getLatestEpoch']),
-    getMoreTransactions: function (force = false) {
+    ...mapActions('explorer', ['getRequests', 'getBlockType', 'getLatestRequestBlock', 'getLatestMicroEpoch', 'getLatestEpoch']),
+    getMoreRequests: function (force = false) {
       if (!this.txBusy || force) {
         this.txBusy = true
-        this.getTransactions((response) => {
+        this.getRequests((response) => {
           if (response === 'out of content') {
             this.txBusy = true
           } else if (response === 'success') {
