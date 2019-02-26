@@ -2,7 +2,7 @@
   <div id="primary">
     <b-container>
       <b-row class="text-left pt-5">
-        <b-col cols="12" md="8" class="mb-5">
+        <b-col cols="12" md="8" class="mb-3">
           <h3 class="text-left" v-t="'request'"></h3>
           <code style="background-color:#FFF;color:#ff3860;padding:6px">{{request}}</code>
         </b-col>
@@ -10,7 +10,9 @@
       <b-row v-if="!error && details !== null" class="mb-5">
         <b-col cols="12" class="text-left">
           <h4 class="text-left" v-t="'from'"></h4>
-          <p v-if="details.type === 'send'"><router-link :to="details.origin">{{details.origin}}</router-link></p>
+          <p><router-link :to="details.origin">{{details.origin}}</router-link></p>
+          <h4 class="text-left" v-t="'type'"></h4>
+          <p>{{details.type}}</p>
           <h4 class="text-left" v-t="'amount'"></h4>
           <p>{{details.totalAmountInLogos}} Logos</p>
           <h4 class="text-left" v-t="'to'"></h4>
@@ -25,11 +27,11 @@
             </b-table>
           </div>
           <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && details.type === 'send'">
-            <h4 class="text-left" v-t="'prevSend'"></h4>
+            <h4 class="text-left" v-t="'prevRequest'"></h4>
             <p><router-link :to="details.previous">{{details.previous}}</router-link></p>
           </div>
           <div v-if="details.next && details.next !== '0000000000000000000000000000000000000000000000000000000000000000' && details.type === 'send'">
-            <h4 class="text-left" v-t="'nextSend'"></h4>
+            <h4 class="text-left" v-t="'nextRequest'"></h4>
             <p><router-link :to="details.next">{{details.next}}</router-link></p>
           </div>
           <div v-if="details.batch_hash">
