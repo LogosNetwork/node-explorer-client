@@ -28,6 +28,10 @@ const actions = {
             trans.amountInLogos = logosVal
           }
           commit('setDetails', details)
+        } else if (details.type === 'issue') {
+          prettyDetails = JSON.stringify(details, null, ' ')
+          commit('setPrettyDetails', prettyDetails)
+          commit('setDetails', details)
         }
       } else {
         if (val && val.error) {

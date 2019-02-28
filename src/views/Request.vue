@@ -9,14 +9,14 @@
       </b-row>
       <b-row v-if="!error && details !== null" class="mb-5">
         <b-col cols="12" class="text-left">
-          <h4 class="text-left" v-t="'from'"></h4>
+          <h4 class="text-left">Account Origin</h4>
           <p><router-link :to="details.origin">{{details.origin}}</router-link></p>
           <h4 class="text-left" v-t="'type'"></h4>
           <p>{{details.type}}</p>
-          <h4 class="text-left" v-t="'amount'"></h4>
-          <p>{{details.totalAmountInLogos}} Logos</p>
-          <h4 class="text-left" v-t="'to'"></h4>
           <div v-if="details.type === 'send'">
+            <h4 class="text-left" v-t="'amount'"></h4>
+            <p>{{details.totalAmountInLogos}} Logos</p>
+            <h4 class="text-left" v-t="'to'"></h4>
             <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="details.transactions">
               <template slot="origin" slot-scope="data">
                 <div class="text-truncate"><router-link :to="'/'+data.item.destination">{{data.item.destination}}</router-link></div>
@@ -25,6 +25,18 @@
                 <div class="text-truncate"><span>{{data.item.amountInLogos}}</span></div>
               </template>
             </b-table>
+          </div>
+          <div v-if="details.type === 'issue'">
+            <h4 class="text-left">Token</h4>
+            <p>{{details.name}} - {{details.symbol}}</p>
+            <h4 class="text-left">Token ID</h4>
+            <p><router-link :to="'/token/'+details.token_id">{{details.token_id}}</router-link></p>
+            <h4 class="text-left">Total Supply</h4>
+            <p>{{details.total_supply}}</p>
+            <h4 class="text-left">Fee Type</h4>
+            <p>{{details.fee_type}}</p>
+            <h4 class="text-left">Fee Rate</h4>
+            <p>{{details.fee_rate}}</p>
           </div>
           <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && details.type === 'send'">
             <h4 class="text-left" v-t="'prevRequest'"></h4>
