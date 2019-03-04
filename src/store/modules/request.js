@@ -28,10 +28,13 @@ const actions = {
             trans.amountInLogos = logosVal
           }
           commit('setDetails', details)
-        } else if (details.type === 'issue') {
-          prettyDetails = JSON.stringify(details, null, ' ')
-          commit('setPrettyDetails', prettyDetails)
-          commit('setDetails', details)
+        } else if (details.type === 'issuance') {
+          rpcClient.accounts.toAddress(details.token_id).then(val => {
+            details.token_account = val.account
+            prettyDetails = JSON.stringify(details, null, ' ')
+            commit('setPrettyDetails', prettyDetails)
+            commit('setDetails', details)
+          })
         }
       } else {
         if (val && val.error) {

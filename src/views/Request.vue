@@ -26,11 +26,11 @@
               </template>
             </b-table>
           </div>
-          <div v-if="details.type === 'issue'">
+          <div v-if="details.type === 'issuance'">
             <h4 class="text-left">Token</h4>
             <p>{{details.name}} - {{details.symbol}}</p>
-            <h4 class="text-left">Token ID</h4>
-            <p><router-link :to="'/token/'+details.token_id">{{details.token_id}}</router-link></p>
+            <h4 class="text-left">Token Account</h4>
+            <p><router-link :to="details.token_account">{{details.token_account}}</router-link></p>
             <h4 class="text-left">Total Supply</h4>
             <p>{{details.total_supply}}</p>
             <h4 class="text-left">Fee Type</h4>
