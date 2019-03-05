@@ -26,23 +26,79 @@
               </template>
             </b-table>
           </div>
+          <div v-if="details.token_account">
+            <h4 class="text-left">Token Account</h4>
+            <p><router-link :to="details.token_account">{{details.token_account}}</router-link></p>
+          </div>
           <div v-if="details.type === 'issuance'">
             <h4 class="text-left">Token</h4>
             <p>{{details.name}} - {{details.symbol}}</p>
-            <h4 class="text-left">Token Account</h4>
-            <p><router-link :to="details.token_account">{{details.token_account}}</router-link></p>
             <h4 class="text-left">Total Supply</h4>
             <p>{{details.total_supply}}</p>
+          </div>
+          <div v-if="details.fee_type">
             <h4 class="text-left">Fee Type</h4>
             <p>{{details.fee_type}}</p>
+          </div>
+          <div v-if="details.fee_rate">
             <h4 class="text-left">Fee Rate</h4>
             <p>{{details.fee_rate}}</p>
           </div>
-          <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && details.type === 'send'">
+          <div v-if="details.type === 'update_controller'">
+            <h4 class="text-left">Action</h4>
+            <p>{{details.action}}</p>
+            <h4 class="text-left">Controller Account</h4>
+            <p><router-link :to="details.controller.account">{{details.controller.account}}</router-link></p>
+            <h4 v-if="details.action === 'remove' && details.controller.privileges.length > 0" class="text-left">Permissions Removed</h4>
+            <h4 v-if="details.action === 'add' && details.controller.privileges.length > 0" class="text-left">Permissions Added</h4>
+            <ul v-if="details.controller.privileges.length > 0"><li v-for="privilege in details.controller.privileges" :key="privilege">{{privilege}}</li></ul>
+          </div>
+          <div v-if="details.type === 'issue_additional' || details.type === 'burn'">
+            <h4 class="text-left">Amount</h4>
+            <p>{{details.amount}}</p>
+          </div>
+          <div v-if="details.new_info">
+            <h4 class="text-left">New Token Info</h4>
+            <p>{{details.new_info}}</p>
+          </div>
+          <div v-if="details.type === 'change_setting'">
+            <h4 class="text-left">Setting</h4>
+            <p>{{details.setting}}</p>
+            <h4 class="text-left">Value</h4>
+            <p>{{details.value}}</p>
+          </div>
+          <div v-if="details.type === 'distribute'">
+            <h4 class="text-left">Distributed To:</h4>
+            <table class="table b-table table-bordered table-sm b-table-fixed" style="background:#FFF">
+              <thead>
+                <tr>
+                  <th aria-colindex="1">Account</th>
+                  <th aria-colindex="2">Amount</th>
+                </tr>
+              </thead>
+              <tbody name="list">
+                <tr>
+                  <td aria-colindex="1">
+                    <div class="text-truncate"><router-link :to="'/'+details.transaction.destination">{{details.transaction.destination}}</router-link></div>
+                  </td>
+                  <td aria-colindex="2">
+                    <div class="text-truncate">{{details.transaction.amount}}</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div v-if="details.type === 'adjust_user_status'">
+            <h4 class="text-left">Account</h4>
+            <p><router-link :to="details.account">{{details.account}}</router-link></p>
+            <h4 class="text-left">Status</h4>
+            <p>{{details.status}}</p>
+          </div>
+          <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000'">
             <h4 class="text-left" v-t="'prevRequest'"></h4>
             <p><router-link :to="details.previous">{{details.previous}}</router-link></p>
           </div>
-          <div v-if="details.next && details.next !== '0000000000000000000000000000000000000000000000000000000000000000' && details.type === 'send'">
+          <div v-if="details.next && details.next !== '0000000000000000000000000000000000000000000000000000000000000000'">
             <h4 class="text-left" v-t="'nextRequest'"></h4>
             <p><router-link :to="details.next">{{details.next}}</router-link></p>
           </div>
