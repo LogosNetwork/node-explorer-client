@@ -1,5 +1,5 @@
 <template>
-  <div class="codemirror">
+  <div v-bind:class="{ border: !thin }" class="codemirror">
     <codemirror v-model="code" :options="cmOption"></codemirror>
   </div>
 </template>
@@ -53,7 +53,8 @@ import 'codemirror/addon/fold/xml-fold.js'
 export default {
   name: 'codepad',
   props: {
-    code: String
+    code: String,
+    thin: Boolean
   },
   components: {
     codemirror
@@ -82,16 +83,20 @@ export default {
     }
   },
   mounted () {
-    setTimeout(() => {
-      this.styleSelectedText = true
-      this.cmOption.styleActiveLine = true
-    }, 1800)
+    this.styleSelectedText = true
+    if (this.thin) {
+      this.cmOption.gutters = []
+      this.cmOption.lineNumbers = false
+      this.cmOption.foldGutter = false
+    }
   }
 }
 </script>
 <style lang="scss">
   .CodeMirror {
-    border: 1px solid rgba(0, 0, 0, 0.125);
     height: auto !important;
+  }
+  .CodeMirror.border {
+    border: 1px solid rgba(0, 0, 0, 0.125);
   }
 </style>

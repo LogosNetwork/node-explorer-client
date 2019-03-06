@@ -1,5 +1,8 @@
 <template>
-  <b-link :title="address" :href="'/'+address">{{abrvAddress}}</b-link>
+  <span v-on:click.stop>
+    <b-link class="d-lg-none" :title="address" :to="'/'+address">{{abrvAddress}}</b-link>
+    <b-link class="d-none d-lg-inline-block" :title="address" :to="'/'+address">{{address}}</b-link>
+  </span>
 </template>
 
 <script>

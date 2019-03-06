@@ -38,6 +38,8 @@
           <div v-for="(request, index) in requestBlock.requests" :key='index'>
             <send v-if="request.type === 'send'" :requestInfo="request"/>
             <burn v-if="request.type === 'burn'" :requestInfo="request"/>
+            <issuerInfo v-if="request.type === 'update_issuer_info'" :requestInfo="request"/>
+            <tokenSend v-if="request.type === 'token_send'" :requestInfo="request"/>
           </div>
         </b-col>
       </b-row>
@@ -56,12 +58,16 @@ import { mapActions, mapState } from 'vuex'
 import codepad from '@/components/codepad.vue'
 import send from '@/components/requests/send.vue'
 import burn from '@/components/requests/burn.vue'
+import issuerInfo from '@/components/requests/issuerInfo.vue'
+import tokenSend from '@/components/requests/tokenSend.vue'
 
 export default {
   components: {
     codepad,
     send,
-    burn
+    burn,
+    issuerInfo,
+    tokenSend
   },
   computed: {
     ...mapState('requestBlock', {
