@@ -1,6 +1,7 @@
 import Logos from '@logosnetwork/logos-rpc-client'
 import axios from 'axios'
 import cloneDeep from 'lodash/cloneDeep'
+import bigInt from 'big-integer'
 const state = {
   requests: [],
   error: null,
@@ -28,8 +29,13 @@ const actions = {
     })
       .then((res) => {
         for (let request of res.data.data.requests) {
-          for (let trans of request.transactions) {
-            trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+          if (request.type === 'send') {
+            let total = bigInt(0)
+            for (let trans of request.transactions) {
+              total = total.plus(bigInt(trans.amount))
+              trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+            }
+            request.totalAmountLogos = parseFloat(Number(rpcClient.convert.fromReason(total.toString(), 'LOGOS')).toFixed(5))
           }
           commit('pushRequest', request)
         }

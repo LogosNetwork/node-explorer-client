@@ -84,40 +84,9 @@
         <b-col cols="12" class="mb-5">
           <h5 class="text-left" v-t="'recent_requests'"></h5>
           <div v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
-            <table v-if="requests && requests.length > 0" class="table b-table table-bordered table-sm b-table-fixed" style="background:#FFF">
-              <thead>
-                <tr>
-                  <th aria-colindex="1">Time</th>
-                  <th aria-colindex="2">From</th>
-                  <th aria-colindex="3">To</th>
-                  <th aria-colindex="4">Amount</th>
-                  <th aria-colindex="5">Hash</th>
-                </tr>
-              </thead>
-              <tbody name="list" is="transition-group">
-                <tr v-for="request in requests" :key="request.hash">
-                  <td aria-colindex="1">
-                    <div class="text-truncate" v-if="request.createdAt">{{ request.createdAt | moment("MM/DD/YY h:mm:ssa") }}</div>
-                  </td>
-                  <td aria-colindex="2">
-                    <div class="text-truncate"><router-link :to="'/'+request.origin">{{request.origin}}</router-link></div>
-                  </td>
-                  <td aria-colindex="3">
-                    <div v-for="(trans, index) in request.transactions" :key='index+"address"' class="text-truncate">
-                      <router-link :to="'/'+trans.destination">{{trans.destination}}</router-link>
-                    </div>
-                  </td>
-                  <td aria-colindex="4">
-                    <div v-for="(trans, index) in request.transactions" :key='index+"amount"' class="text-truncate">
-                      <span class="text-success">{{trans.amountInLogos}}</span>
-                    </div>
-                  </td>
-                  <td aria-colindex="5">
-                    <div class="text-truncate"><router-link :to="'/'+request.hash">{{request.hash}}</router-link></div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div v-for="(request, index) in requests" :key='index'>
+              <send v-if="request.type === 'send'" :requestInfo="request"/>
+            </div>
           </div>
         </b-col>
       </b-row>
@@ -129,15 +98,9 @@
 import { mapActions, mapState } from 'vuex'
 import Vue from 'vue'
 import infiniteScroll from 'vue-infinite-scroll'
+import send from '@/components/requests/send.vue'
 Vue.use(infiniteScroll)
 
-let fields = [
-  { key: 'timestamp', label: 'Time' },
-  { key: 'account', label: 'From' },
-  { key: 'link_as_account', label: 'To' },
-  { key: 'amount', label: 'Amount' },
-  { key: 'hash', label: 'Hash' }
-]
 const hlCache = new Map()
 Vue.directive('highlight', {
   bind (el, { value }) {
@@ -160,12 +123,13 @@ Vue.directive('highlight', {
 })
 export default {
   name: 'explore',
-  components: {},
+  components: {
+    send
+  },
   data () {
     return {
       address: '',
-      txBusy: false,
-      fields: fields
+      txBusy: false
     }
   },
   computed: {

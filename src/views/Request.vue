@@ -94,6 +94,19 @@
             <h4 class="text-left">Status</h4>
             <p>{{details.status}}</p>
           </div>
+          <div v-if="details.type === 'token_send'">
+            <h4 class="text-left" v-t="'amount'"></h4>
+            <p>{{details.totalAmount}}</p>
+            <h4 class="text-left" v-t="'to'"></h4>
+            <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="details.transactions">
+              <template slot="origin" slot-scope="data">
+                <div class="text-truncate"><router-link :to="'/'+data.item.destination">{{data.item.destination}}</router-link></div>
+              </template>
+              <template slot="amount" slot-scope="data">
+                <div class="text-truncate"><span>{{data.item.amount}}</span></div>
+              </template>
+            </b-table>
+          </div>
           <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000'">
             <h4 class="text-left" v-t="'prevRequest'"></h4>
             <p><router-link :to="details.previous">{{details.previous}}</router-link></p>

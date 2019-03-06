@@ -35,30 +35,15 @@
             <span v-t="'requests'"></span>
           </h4>
           <p class="text-left"><span v-t="'requestBlockCreatedOn'"></span> <strong> {{parseInt(requestBlock.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</strong></p>
-          <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="requestBlock.requests">
-            <template slot="from" slot-scope="data">
-              <div class="text-truncate"><router-link :to="'/'+data.item.origin">{{data.item.origin}}</router-link></div>
-            </template>
-            <template slot="to" slot-scope="data">
-              <div v-for="(transaction, index) in data.item.transactions" :key='index+"address"' class="text-truncate">
-                <router-link :to="'/'+transaction.destination">{{transaction.destination}}</router-link>
-              </div>
-            </template>
-            <template slot="amount" slot-scope="data">
-              <div v-for="(transaction, index) in data.item.transactions" :key='index+"amount"' class="text-truncate">
-                <span>{{transaction.fakeLogosAmount}}</span>
-              </div>
-            </template>
-            <template slot="hash" slot-scope="data">
-              <div class="text-truncate"><router-link :to="'/'+data.item.hash">{{data.item.hash}}</router-link></div>
-            </template>
-          </b-table>
+          <div v-for="(request, index) in requestBlock.requests" :key='index'>
+            <send v-if="request.type === 'send'" :requestInfo="request"/>
+          </div>
         </b-col>
       </b-row>
     <b-row v-if="!error">
         <b-col cols="12" class="text-left">
           <h4 class="text-left" v-t="'requestBlockJSON'"></h4>
-          <codepad id='editor' class="text-left" :code="JSON.stringify(requestBlock, null, ' ')"/>
+          <codepad id='editor' class="text-left" :code="prettyDetails"/>
         </b-col>
       </b-row>
     </b-container>
@@ -68,20 +53,18 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import codepad from '@/components/codepad.vue'
-let fields = [
-  { key: 'from', label: 'From' },
-  { key: 'to', label: 'To' },
-  { key: 'amount', label: 'Amount' },
-  { key: 'hash', label: 'Hash' }
-]
+import send from '@/components/requests/send.vue'
+
 export default {
   components: {
-    codepad
+    codepad,
+    send
   },
   computed: {
     ...mapState('requestBlock', {
       hash: state => state.hash,
       requestBlock: state => state.requestBlock,
+      prettyDetails: state => state.prettyDetails,
       error: state => state.error
     })
   },
@@ -94,11 +77,6 @@ export default {
       'getRequestBlock',
       'reset'
     ])
-  },
-  data () {
-    return {
-      fields: fields
-    }
   },
   beforeRouteUpdate (to, from, next) {
     this.reset()

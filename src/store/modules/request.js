@@ -1,4 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
+import bigInt from 'big-integer'
 const state = {
   request: null,
   details: null,
@@ -32,11 +33,17 @@ const actions = {
           details.type === 'issue_additional' || details.type === 'burn' ||
           details.type === 'update_issuer_info' || details.type === 'adjust_fee' ||
           details.type === 'change_setting' || details.type === 'distribute' ||
-          details.type === 'adjust_user_status') {
+          details.type === 'adjust_user_status' || details.type === 'token_send') {
           rpcClient.accounts.toAddress(details.token_id).then(val => {
             prettyDetails = JSON.stringify(details, null, ' ')
             details.token_account = val.account
             commit('setPrettyDetails', prettyDetails)
+            if (details.type === 'token_send') {
+              details.totalAmount = 0
+              for (let trans of details.transactions) {
+                details.totalAmount = bigInt(details.totalAmount).plus(trans.amount)
+              }
+            }
             commit('setDetails', details)
           })
         }

@@ -1,4 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
+import bigInt from 'big-integer'
 
 const state = {
   hash: null,
@@ -29,10 +30,14 @@ const actions = {
             prettyDetails = JSON.stringify(requestBlock.blocks[0], null, ' ')
             commit('setPrettyDetails', prettyDetails)
             for (let request of requestBlock.blocks[0].requests) {
+              request.timestamp = requestBlock.blocks[0].timestamp
               if (request.type === 'send' && request.transactions && request.transactions.length > 0) {
+                let total = bigInt(0)
                 for (let trans of request.transactions) {
-                  trans.fakeLogosAmount = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+                  total = total.plus(trans.amount)
+                  trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
                 }
+                request.totalAmountLogos = parseFloat(Number(rpcClient.convert.fromReason(total.toString(), 'LOGOS')).toFixed(5))
               }
             }
             commit('setRequestBlock', requestBlock.blocks[0])
