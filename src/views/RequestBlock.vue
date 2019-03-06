@@ -37,6 +37,7 @@
           <p class="text-left"><span v-t="'requestBlockCreatedOn'"></span> <strong> {{parseInt(requestBlock.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</strong></p>
           <div v-for="(request, index) in requestBlock.requests" :key='index'>
             <send v-if="request.type === 'send'" :requestInfo="request"/>
+            <burn v-if="request.type === 'burn'" :requestInfo="request"/>
           </div>
         </b-col>
       </b-row>
@@ -54,11 +55,13 @@
 import { mapActions, mapState } from 'vuex'
 import codepad from '@/components/codepad.vue'
 import send from '@/components/requests/send.vue'
+import burn from '@/components/requests/burn.vue'
 
 export default {
   components: {
     codepad,
-    send
+    send,
+    burn
   },
   computed: {
     ...mapState('requestBlock', {

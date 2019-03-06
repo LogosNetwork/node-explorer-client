@@ -2,6 +2,7 @@ import Logos from '@logosnetwork/logos-rpc-client'
 import axios from 'axios'
 import cloneDeep from 'lodash/cloneDeep'
 import bigInt from 'big-integer'
+import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
 const state = {
   requests: [],
   error: null,
@@ -36,8 +37,27 @@ const actions = {
               trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
             }
             request.totalAmountLogos = parseFloat(Number(rpcClient.convert.fromReason(total.toString(), 'LOGOS')).toFixed(5))
+            commit('pushRequest', request)
+          } else if (request.type === 'burn') {
+            let tokenAddress = LogosWallet.LogosUtils.accountFromHexKey(request.token_id)
+            rpcClient.accounts.info(tokenAddress).then(data => {
+              data.tokenAccount = tokenAddress
+              try {
+                data.issuerInfo = JSON.parse(data.issuer_info)
+              } catch (e) {
+                data.issuerInfo = {}
+              }
+              request.tokenInfo = data
+              if (request.type === 'burn') {
+                if (data.issuerInfo.decimals) {
+                  request.amountInToken = parseFloat(Number(rpcClient.convert.fromTo(request.amount, 0, data.issuerInfo.decimals)).toFixed(5))
+                }
+              }
+              commit('pushRequest', request)
+            })
+          } else {
+            commit('pushRequest', request)
           }
-          commit('pushRequest', request)
         }
         if (res.data.data.requests.length > 0) {
           let status = 'success'

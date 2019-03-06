@@ -6,7 +6,7 @@
           <b-card-title>
             <div class="d-flex justify-content-between">
               <div>
-                Send Request
+                Token Burn Request
               </div>
               <div v-if="requestInfo.createdAt" class="timestamp text-right">
                 <small>
@@ -20,15 +20,16 @@
               </div>
             </div>
           </b-card-title>
-          <b-card-subtitle sub-title-text-variant="success">{{requestInfo.totalAmountLogos + ' Logos'}}</b-card-subtitle>
-          <b-card-text class="text-truncate">
-              Sent By: <LogosAddress :address="requestInfo.origin" />
-          </b-card-text>
+          <token :tokenInfo="requestInfo.tokenInfo" />
         </b-card-body>
         <b-list-group flush>
-          <b-list-group-item v-for="transaction in requestInfo.transactions" :key="transaction.hash">
-            <icon name="arrow-down" class="text-success"></icon>&nbsp;
-            <LogosAddress :address="transaction.destination" /> received <span class="text-success">{{transaction.amountInLogos}} Logos</span>
+          <b-list-group-item>
+            <icon name="burn" class="text-danger mr-2"></icon>
+            <LogosAddress class="mr-2" :address="requestInfo.origin" />
+            <span class="mr-2">burned</span>
+            <span v-if="requestInfo.amountInToken" class="text-danger mr-2">{{requestInfo.amountInToken}}</span>
+            <span v-if="!requestInfo.amountInToken" class="text-danger mr-2">{{requestInfo.amount}}</span>
+            <span>{{requestInfo.tokenInfo.symbol}}</span>
           </b-list-group-item>
         </b-list-group>
       </b-card>
@@ -44,10 +45,11 @@ import bCardText from 'bootstrap-vue/es/components/card/card-text'
 import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import LogosAddress from '@/components/LogosAddress.vue'
-import 'vue-awesome/icons/arrow-down'
+import token from '@/components/requests/token.vue'
+import 'vue-awesome/icons/burn'
 
 export default {
-  name: 'Send',
+  name: 'burn',
   props: {
     requestInfo: Object
   },
@@ -58,7 +60,8 @@ export default {
     'b-card-text': bCardText,
     'b-list-group': bListGroup,
     'b-list-group-item': bListGroupItem,
-    LogosAddress
+    LogosAddress,
+    token
   }
 }
 </script>

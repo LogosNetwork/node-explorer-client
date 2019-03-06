@@ -1,4 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
+import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
 import bigInt from 'big-integer'
 
 const state = {
@@ -38,9 +39,26 @@ const actions = {
                   trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
                 }
                 request.totalAmountLogos = parseFloat(Number(rpcClient.convert.fromReason(total.toString(), 'LOGOS')).toFixed(5))
+                commit('setRequestBlock', requestBlock.blocks[0])
+              } else if (request.type === 'burn') {
+                let tokenAddress = LogosWallet.LogosUtils.accountFromHexKey(request.token_id)
+                rpcClient.accounts.info(tokenAddress).then(data => {
+                  data.tokenAccount = tokenAddress
+                  try {
+                    data.issuerInfo = JSON.parse(data.issuer_info)
+                  } catch (e) {
+                    data.issuerInfo = {}
+                  }
+                  request.tokenInfo = data
+                  if (request.type === 'burn') {
+                    if (data.issuerInfo.decimals) {
+                      request.amountInToken = parseFloat(Number(rpcClient.convert.fromTo(request.amount, 0, data.issuerInfo.decimals)).toFixed(5))
+                    }
+                  }
+                  commit('setRequestBlock', requestBlock.blocks[0])
+                })
               }
             }
-            commit('setRequestBlock', requestBlock.blocks[0])
           }
         } else {
           commit('setError', requestBlock.error)
