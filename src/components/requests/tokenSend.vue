@@ -20,9 +20,7 @@
               </div>
             </div>
           </b-card-title>
-          <b-card-subtitle v-if="requestInfo.totalAmountInToken" sub-title-text-variant="danger">{{requestInfo.totalAmountInToken + ' ' + requestInfo.tokenInfo.symbol}}</b-card-subtitle>
-          <b-card-subtitle v-if="requestInfo.totalAmountInToken === null" sub-title-text-variant="danger">{{requestInfo.total + ' ' + requestInfo.tokenInfo.symbol}}</b-card-subtitle>
-          <token class="mt-3" :tokenInfo="requestInfo.tokenInfo" />
+          <token :tokenInfo="requestInfo.tokenInfo" />
           <b-card-text>
             <icon name="paper-plane" class="text-danger mr-2"></icon>
             <LogosAddress class="mr-2" :address="requestInfo.origin" />
