@@ -20,15 +20,19 @@
               </div>
             </div>
           </b-card-title>
-          <b-card-subtitle sub-title-text-variant="success">{{requestInfo.totalAmountLogos + ' Logos'}}</b-card-subtitle>
-          <b-card-text class="text-truncate">
-              Sent By: <LogosAddress :address="requestInfo.origin" />
+          <b-card-text>
+            <icon name="paper-plane" class="text-danger mr-2"></icon>
+            <LogosAddress class="mr-2" :address="requestInfo.origin" />
+            <span class="mr-2">sent</span>
+            <span class="text-danger">{{requestInfo.totalAmountLogos}} Logos</span>
           </b-card-text>
         </b-card-body>
         <b-list-group flush>
           <b-list-group-item v-for="transaction in requestInfo.transactions" :key="transaction.hash">
-            <icon name="arrow-down" class="text-success"></icon>&nbsp;
-            <LogosAddress :address="transaction.destination" /> received <span class="text-success">{{transaction.amountInLogos}} Logos</span>
+            <icon name="arrow-down" class="text-success mr-2"></icon>
+            <LogosAddress class="mr-2" :address="transaction.destination" />
+            <span class="mr-2">received</span>
+            <span class="text-success">{{transaction.amountInLogos}} Logos</span>
           </b-list-group-item>
         </b-list-group>
       </b-card>
