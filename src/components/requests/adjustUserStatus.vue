@@ -6,7 +6,7 @@
           <b-card-title>
             <div class="d-flex justify-content-between">
               <div>
-                Token Burn Request
+                Token Adjust User Status Request
               </div>
               <div v-if="requestInfo.createdAt" class="timestamp text-right">
                 <small>
@@ -24,11 +24,8 @@
         </b-card-body>
         <b-list-group flush>
           <b-list-group-item>
-            <icon name="burn" class="text-danger mr-2"></icon>
-            <strong class="mr-2">Burned</strong>
-            <span v-if="requestInfo.amountInToken" class="text-danger mr-2">{{requestInfo.amountInToken}}</span>
-            <span v-if="!requestInfo.amountInToken" class="text-danger mr-2">{{requestInfo.amount}}</span>
-            <span>{{requestInfo.tokenInfo.symbol}}</span>
+            <strong class="mr-2">{{requestInfo.status}}</strong>
+            <LogosAddress class="mr-2" :address="requestInfo.account" />
           </b-list-group-item>
         </b-list-group>
       </b-card>
@@ -43,11 +40,12 @@ import bCardSubtitle from 'bootstrap-vue/es/components/card/card-sub-title'
 import bCardText from 'bootstrap-vue/es/components/card/card-text'
 import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
+import LogosAddress from '@/components/LogosAddress.vue'
 import token from '@/components/requests/token.vue'
-import 'vue-awesome/icons/burn'
+import 'vue-awesome/icons/user-circle'
 
 export default {
-  name: 'burn',
+  name: 'adjustUserStatus',
   props: {
     requestInfo: Object
   },
@@ -58,6 +56,7 @@ export default {
     'b-card-text': bCardText,
     'b-list-group': bListGroup,
     'b-list-group-item': bListGroupItem,
+    LogosAddress,
     token
   }
 }

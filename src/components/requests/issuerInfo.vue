@@ -20,21 +20,11 @@
               </div>
             </div>
           </b-card-title>
-          <token :tokenInfo="requestInfo.tokenInfo" />
+          <token :tokenInfo="requestInfo.tokenInfo" :origin="requestInfo.origin" />
         </b-card-body>
         <b-list-group flush>
-          <b-list-group-item>
-            <b-row>
-              <b-col>
-                <LogosAddress class="mr-2" :address="requestInfo.origin" />
-                <span class="mr-2">edited the token info</span>
-              </b-col>
-            </b-row>
-            <b-row v-on:click.prevent>
-              <b-col>
-                <codepad id='editor' class="text-left" :code="requestInfo.prettyInfo" :thin="true"/>
-              </b-col>
-            </b-row>
+          <b-list-group-item v-on:click.prevent>
+            <codepad id='editor' class="text-left" :code="requestInfo.prettyInfo" :thin="true"/>
           </b-list-group-item>
         </b-list-group>
       </b-card>
@@ -49,7 +39,6 @@ import bCardSubtitle from 'bootstrap-vue/es/components/card/card-sub-title'
 import bCardText from 'bootstrap-vue/es/components/card/card-text'
 import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
-import LogosAddress from '@/components/LogosAddress.vue'
 import token from '@/components/requests/token.vue'
 import codepad from '@/components/codepad.vue'
 import 'vue-awesome/icons/edit'
@@ -66,7 +55,6 @@ export default {
     'b-card-text': bCardText,
     'b-list-group': bListGroup,
     'b-list-group-item': bListGroupItem,
-    LogosAddress,
     codepad,
     token
   }

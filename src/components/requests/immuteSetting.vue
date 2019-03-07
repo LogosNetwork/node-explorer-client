@@ -6,7 +6,7 @@
           <b-card-title>
             <div class="d-flex justify-content-between">
               <div>
-                Token Burn Request
+                Token Immute Setting Request
               </div>
               <div v-if="requestInfo.createdAt" class="timestamp text-right">
                 <small>
@@ -24,11 +24,7 @@
         </b-card-body>
         <b-list-group flush>
           <b-list-group-item>
-            <icon name="burn" class="text-danger mr-2"></icon>
-            <strong class="mr-2">Burned</strong>
-            <span v-if="requestInfo.amountInToken" class="text-danger mr-2">{{requestInfo.amountInToken}}</span>
-            <span v-if="!requestInfo.amountInToken" class="text-danger mr-2">{{requestInfo.amount}}</span>
-            <span>{{requestInfo.tokenInfo.symbol}}</span>
+            <strong>Immute: </strong>{{requestInfo.setting}}
           </b-list-group-item>
         </b-list-group>
       </b-card>
@@ -44,10 +40,9 @@ import bCardText from 'bootstrap-vue/es/components/card/card-text'
 import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import token from '@/components/requests/token.vue'
-import 'vue-awesome/icons/burn'
 
 export default {
-  name: 'burn',
+  name: 'immuteSetting',
   props: {
     requestInfo: Object
   },

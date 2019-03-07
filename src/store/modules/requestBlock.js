@@ -41,7 +41,12 @@ const actions = {
                 request.totalAmountLogos = rpcClient.convert.fromReason(total.toString(), 'LOGOS').replace(/\.0+$/, '')
                 commit('setRequestBlock', requestBlock.blocks[0])
               } else if (request.type === 'burn' || request.type === 'update_issuer_info' ||
-                request.type === 'token_send') {
+                request.type === 'token_send' || request.type === 'distribute' ||
+                request.type === 'adjust_fee' || request.type === 'change_setting' ||
+                request.type === 'adjust_user_status' || request.type === 'issuance' ||
+                request.type === 'issue_additional' || request.type === 'withdraw_fee' ||
+                request.type === 'update_controller' || request.type === 'revoke' ||
+                request.type === 'immute_setting') {
                 let tokenAddress = LogosWallet.LogosUtils.accountFromHexKey(request.token_id)
                 rpcClient.accounts.info(tokenAddress).then(data => {
                   data.tokenAccount = tokenAddress
@@ -51,9 +56,16 @@ const actions = {
                     data.issuerInfo = {}
                   }
                   request.tokenInfo = data
-                  if (request.type === 'burn') {
+
+                  // Individual Token Request Handling
+                  if (request.type === 'burn' || request.type === 'issue_additional') {
                     if (data.issuerInfo.decimals !== null) {
                       request.amountInToken = rpcClient.convert.fromTo(request.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
+                    }
+                  }
+                  if (request.type === 'distribute' || request.type === 'withdraw_fee' || request.type === 'revoke') {
+                    if (data.issuerInfo.decimals !== null) {
+                      request.transaction.amountInToken = rpcClient.convert.fromTo(request.transaction.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
                     }
                   }
                   if (request.type === 'update_issuer_info') {
@@ -69,12 +81,21 @@ const actions = {
                       total = total.plus(trans.amount)
                       if (data.issuerInfo.decimals !== null) {
                         trans.amountInToken = rpcClient.convert.fromTo(trans.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
-                        console.log(trans.amountInToken)
                       }
                     }
                     request.totalAmount = total
                     if (data.issuerInfo.decimals !== null) {
                       request.totalAmountInToken = rpcClient.convert.fromTo(total, 0, data.issuerInfo.decimals)
+                    }
+                  }
+                  if (request.type === 'issuance') {
+                    if (data.issuerInfo.decimals !== null) {
+                      request.totalSupplyInToken = rpcClient.convert.fromTo(request.total_supply, 0, data.issuerInfo.decimals)
+                    }
+                    try {
+                      request.prettyInfo = JSON.stringify(JSON.parse(request.issuer_info), null, ' ')
+                    } catch (e) {
+                      request.prettyInfo = request.issuer_info
                     }
                   }
                   commit('setRequestBlock', requestBlock.blocks[0])

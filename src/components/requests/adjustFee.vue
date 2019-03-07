@@ -6,7 +6,7 @@
           <b-card-title>
             <div class="d-flex justify-content-between">
               <div>
-                Token Burn Request
+                Token Fee Adjustment Request
               </div>
               <div v-if="requestInfo.createdAt" class="timestamp text-right">
                 <small>
@@ -24,11 +24,15 @@
         </b-card-body>
         <b-list-group flush>
           <b-list-group-item>
-            <icon name="burn" class="text-danger mr-2"></icon>
-            <strong class="mr-2">Burned</strong>
-            <span v-if="requestInfo.amountInToken" class="text-danger mr-2">{{requestInfo.amountInToken}}</span>
-            <span v-if="!requestInfo.amountInToken" class="text-danger mr-2">{{requestInfo.amount}}</span>
-            <span>{{requestInfo.tokenInfo.symbol}}</span>
+            <strong>Fee Type: </strong>{{requestInfo.fee_type}}
+          </b-list-group-item>
+          <b-list-group-item>
+            <span v-if="requestInfo.fee_type.toLowerCase() === 'flat'">
+              <strong>Fee Rate: </strong>{{requestInfo.fee_rate}} base units of {{requestInfo.tokenInfo.symbol}}
+            </span>
+            <span v-if="requestInfo.fee_type.toLowerCase() === 'percentage'">
+              <strong>Fee Rate: </strong>{{requestInfo.fee_rate}}%
+            </span>
           </b-list-group-item>
         </b-list-group>
       </b-card>
@@ -44,10 +48,10 @@ import bCardText from 'bootstrap-vue/es/components/card/card-text'
 import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import token from '@/components/requests/token.vue'
-import 'vue-awesome/icons/burn'
+import 'vue-awesome/icons/exchange-alt'
 
 export default {
-  name: 'burn',
+  name: 'adjustFee',
   props: {
     requestInfo: Object
   },
