@@ -37,10 +37,10 @@
             <strong>Symbol: </strong>{{requestInfo.symbol}}
           </b-list-group-item>
           <b-list-group-item>
-            <span v-if="requestInfo.totalSupplyInToken !== null">
+            <span v-if="typeof requestInfo.totalSupplyInToken !== 'undefined'">
               <strong>Total Supply: </strong>{{requestInfo.totalSupplyInToken}} {{requestInfo.symbol}}
             </span>
-            <span v-if="requestInfo.totalSupplyInToken === null">
+            <span v-if="typeof requestInfo.totalSupplyInToken === 'undefined'">
               <strong>Total Supply: </strong>{{requestInfo.total_supply}} {{requestInfo.symbol}}
             </span>
           </b-list-group-item>

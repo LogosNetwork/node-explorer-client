@@ -59,12 +59,12 @@ const actions = {
 
                   // Individual Token Request Handling
                   if (request.type === 'burn' || request.type === 'issue_additional') {
-                    if (data.issuerInfo.decimals !== null) {
+                    if (typeof data.issuerInfo.decimals !== 'undefined') {
                       request.amountInToken = rpcClient.convert.fromTo(request.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
                     }
                   }
                   if (request.type === 'distribute' || request.type === 'withdraw_fee' || request.type === 'revoke') {
-                    if (data.issuerInfo.decimals !== null) {
+                    if (typeof data.issuerInfo.decimals !== 'undefined') {
                       request.transaction.amountInToken = rpcClient.convert.fromTo(request.transaction.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
                     }
                   }
@@ -79,17 +79,17 @@ const actions = {
                     let total = bigInt(0)
                     for (let trans of request.transactions) {
                       total = total.plus(trans.amount)
-                      if (data.issuerInfo.decimals !== null) {
+                      if (typeof data.issuerInfo.decimals !== 'undefined') {
                         trans.amountInToken = rpcClient.convert.fromTo(trans.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
                       }
                     }
                     request.totalAmount = total
-                    if (data.issuerInfo.decimals !== null) {
+                    if (typeof data.issuerInfo.decimals !== 'undefined') {
                       request.totalAmountInToken = rpcClient.convert.fromTo(total, 0, data.issuerInfo.decimals)
                     }
                   }
                   if (request.type === 'issuance') {
-                    if (data.issuerInfo.decimals !== null) {
+                    if (typeof data.issuerInfo.decimals !== 'undefined') {
                       request.totalSupplyInToken = rpcClient.convert.fromTo(request.total_supply, 0, data.issuerInfo.decimals)
                     }
                     try {
