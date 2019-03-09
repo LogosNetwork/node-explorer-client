@@ -33,8 +33,8 @@
               <small v-if='requests.length < count'> (showing all {{requests.length}})</small>
             </h4>
             <p class="text-left" v-if="lastModified"><span v-t="'lastUpdated'"></span> <strong> {{ lastModified | moment("MMMM DD, YYYY h:mm:ss A") }}</strong></p>
-            <div v-for="(request, index) in requests" :key='index'>
-              <send v-if="request.type === 'send'" :requestInfo="request"/>
+            <div v-for="request in orderedRequests" :key='request.hash'>
+              <send v-if="request.type === 'send'" :requestInfo="request" :account="account"/>
               <burn v-if="request.type === 'burn'" :requestInfo="request"/>
               <issuerInfo v-if="request.type === 'update_issuer_info'" :requestInfo="request"/>
               <tokenSend v-if="request.type === 'token_send'" :requestInfo="request"/>
@@ -75,6 +75,7 @@ import updateController from '@/components/requests/updateController.vue'
 import revoke from '@/components/requests/revoke.vue'
 import immuteSetting from '@/components/requests/immuteSetting.vue'
 import tokenSend from '@/components/requests/tokenSend.vue'
+
 Vue.use(infiniteScroll)
 Vue.component(VueQrcode.name, VueQrcode)
 
@@ -93,9 +94,9 @@ export default {
       requests: state => state.requests,
       requestCount: state => state.requestCount,
       count: state => state.count,
-      lastModified: state => state.lastModified
+      lastModified: state => state.lastModified,
+      orderedRequests: state => state.orderedRequests
     })
-
   },
   components: {
     send,

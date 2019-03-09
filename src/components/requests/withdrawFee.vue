@@ -28,7 +28,7 @@
             <LogosAddress class="mr-2" :address="requestInfo.transaction.destination" />
             <span class="mr-2">received</span>
             <span v-if="requestInfo.transaction.amountInToken" class="text-success mr-2">{{requestInfo.transaction.amountInToken}}</span>
-            <span v-if="requestInfo.transaction.amountInToken === null" class="text-success mr-2">{{requestInfo.transaction.amount}}</span>
+            <span v-if="typeof requestInfo.transaction.amountInToken === 'undefined'" class="text-success mr-2">{{requestInfo.transaction.amount}}</span>
             <span>{{requestInfo.tokenInfo.symbol}}</span>
           </b-list-group-item>
         </b-list-group>

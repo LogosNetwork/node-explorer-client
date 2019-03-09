@@ -26,7 +26,7 @@
             <LogosAddress class="mr-2" :address="requestInfo.origin" />
             <span class="mr-2">sent</span>
             <span v-if="requestInfo.totalAmountInToken" class="text-danger mr-2">{{requestInfo.totalAmountInToken}}</span>
-            <span v-if="requestInfo.totalAmountInToken === null" class="text-danger mr-2">{{requestInfo.total}}</span>
+            <span v-if="typeof requestInfo.totalAmountInToken === 'undefined'" class="text-danger mr-2">{{requestInfo.totalAmount}}</span>
             <span>{{requestInfo.tokenInfo.symbol}}</span>
           </b-card-text>
         </b-card-body>
@@ -36,7 +36,7 @@
             <LogosAddress class="mr-2" :address="transaction.destination" />
             <span class="mr-2">received</span>
             <span v-if="transaction.amountInToken" class="text-success mr-2">{{transaction.amountInToken}}</span>
-            <span v-if="transaction.amountInToken === null" class="text-success mr-2">{{transaction.amount}}</span>
+            <span v-if="typeof transaction.amountInToken === 'undefined'" class="text-success mr-2">{{transaction.amount}}</span>
             <span>{{requestInfo.tokenInfo.symbol}}</span>
           </b-list-group-item>
         </b-list-group>

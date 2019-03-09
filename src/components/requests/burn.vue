@@ -27,7 +27,7 @@
             <icon name="burn" class="text-danger mr-2"></icon>
             <strong class="mr-2">Burned</strong>
             <span v-if="requestInfo.amountInToken" class="text-danger mr-2">{{requestInfo.amountInToken}}</span>
-            <span v-if="!requestInfo.amountInToken" class="text-danger mr-2">{{requestInfo.amount}}</span>
+            <span v-if="typeof requestInfo.amountInToken === 'undefined'" class="text-danger mr-2">{{requestInfo.amount}}</span>
             <span>{{requestInfo.tokenInfo.symbol}}</span>
           </b-list-group-item>
         </b-list-group>
