@@ -33,32 +33,22 @@
               <small v-if='requests.length < count'> (showing all {{requests.length}})</small>
             </h4>
             <p class="text-left" v-if="lastModified"><span v-t="'lastUpdated'"></span> <strong> {{ lastModified | moment("MMMM DD, YYYY h:mm:ss A") }}</strong></p>
-            <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="requests">
-              <template slot="timestamp" slot-scope="data">
-                <div class="text-truncate" v-if="data.item.timestamp">{{ data.item.timestamp | moment("MM/DD/YY h:mm:ssa") }}</div>
-              </template>
-              <template slot="account" slot-scope="data">
-                <div v-if="data.item.origin === account">
-                  <div v-for="(trans, index) in data.item.transactions" :key='index+"address"' class="text-truncate">
-                    <div class="text-truncate"><router-link :to="'/'+trans.destination">{{trans.destination}}</router-link></div>
-                  </div>
-                </div>
-                <div v-if="data.item.origin !== account">
-                  <div v-for="(trans, index) in data.item.transactions" :key='index+"address"' class="text-truncate">
-                    <div v-if="trans.destination === account" class="text-truncate"><router-link :to="'/'+data.item.origin">{{data.item.origin}}</router-link></div>
-                  </div>
-                </div>
-              </template>
-              <template slot="amount" slot-scope="data">
-                <div v-for="(trans, index) in data.item.transactions" :key='index+"amount"' class="text-truncate">
-                  <span class="text-success" v-if='trans.destination === account'>+{{trans.amountInLogos}}</span>
-                  <span class="text-danger" v-if='data.item.origin === account && trans.destination !== account'>-{{trans.amountInLogos}}</span>
-                </div>
-              </template>
-              <template slot="hash" slot-scope="data">
-                <div class="text-truncate"><router-link :to="'/'+data.item.hash">{{data.item.hash}}</router-link></div>
-              </template>
-            </b-table>
+            <div v-for="(request, index) in requests" :key='index'>
+              <send v-if="request.type === 'send'" :requestInfo="request"/>
+              <burn v-if="request.type === 'burn'" :requestInfo="request"/>
+              <issuerInfo v-if="request.type === 'update_issuer_info'" :requestInfo="request"/>
+              <tokenSend v-if="request.type === 'token_send'" :requestInfo="request"/>
+              <distribute v-if="request.type === 'distribute'" :requestInfo="request"/>
+              <adjustFee v-if="request.type === 'adjust_fee'" :requestInfo="request"/>
+              <changeSetting v-if="request.type === 'change_setting'" :requestInfo="request"/>
+              <adjustUserStatus v-if="request.type === 'adjust_user_status'" :requestInfo="request"/>
+              <issuance v-if="request.type === 'issuance'" :requestInfo="request"/>
+              <issueAdditional v-if="request.type === 'issue_additional'" :requestInfo="request"/>
+              <withdrawFee v-if="request.type === 'withdraw_fee'" :requestInfo="request"/>
+              <updateController v-if="request.type === 'update_controller'" :requestInfo="request"/>
+              <revoke v-if="request.type === 'revoke'" :requestInfo="request"/>
+              <immuteSetting v-if="request.type === 'immute_setting'" :requestInfo="request"/>
+            </div>
           </b-col>
         </b-row>
       </div>
@@ -71,14 +61,23 @@ import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
 import VueQrcode from '@xkeshi/vue-qrcode'
 import infiniteScroll from 'vue-infinite-scroll'
+import send from '@/components/requests/send.vue'
+import burn from '@/components/requests/burn.vue'
+import issuerInfo from '@/components/requests/issuerInfo.vue'
+import distribute from '@/components/requests/distribute.vue'
+import adjustFee from '@/components/requests/adjustFee.vue'
+import changeSetting from '@/components/requests/changeSetting.vue'
+import adjustUserStatus from '@/components/requests/adjustUserStatus.vue'
+import issuance from '@/components/requests/issuance.vue'
+import issueAdditional from '@/components/requests/issueAdditional.vue'
+import withdrawFee from '@/components/requests/withdrawFee.vue'
+import updateController from '@/components/requests/updateController.vue'
+import revoke from '@/components/requests/revoke.vue'
+import immuteSetting from '@/components/requests/immuteSetting.vue'
+import tokenSend from '@/components/requests/tokenSend.vue'
 Vue.use(infiniteScroll)
 Vue.component(VueQrcode.name, VueQrcode)
-let fields = [
-  { key: 'timestamp', label: 'Time' },
-  { key: 'account', label: 'Account' },
-  { key: 'amount', label: 'Amount' },
-  { key: 'hash', label: 'Hash' }
-]
+
 export default {
   computed: {
     ...mapState('settings', {
@@ -97,6 +96,22 @@ export default {
       lastModified: state => state.lastModified
     })
 
+  },
+  components: {
+    send,
+    burn,
+    issuerInfo,
+    distribute,
+    adjustFee,
+    changeSetting,
+    adjustUserStatus,
+    issuance,
+    issueAdditional,
+    withdrawFee,
+    updateController,
+    revoke,
+    immuteSetting,
+    tokenSend
   },
   created: function () {
     this.reset()
@@ -136,7 +151,6 @@ export default {
   },
   data () {
     return {
-      fields: fields,
       requestsBusy: false
     }
   },
