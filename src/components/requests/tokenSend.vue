@@ -21,7 +21,7 @@
             </div>
           </b-card-title>
           <token :tokenInfo="requestInfo.tokenInfo" />
-          <b-card-text>
+          <b-card-text class="mt-3">
             <icon name="paper-plane" class="text-danger mr-2"></icon>
             <LogosAddress class="mr-2" :address="requestInfo.origin" />
             <span class="mr-2">sent</span>

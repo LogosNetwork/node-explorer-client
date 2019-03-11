@@ -5,7 +5,16 @@
         <b-col cols="12" md="8" class="mb-3">
           <h3 class="text-left" v-t="'account'"></h3>
           <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
-          <h3 v-if="!error && balance !== null" class="pt-3" style="color:green">{{balance}} LOGOS</h3>
+          <h3 v-if="!error && balance !== null && selected === 'all' || selected === 'lgs'" class="pt-3" style="color:green">{{balance}} LOGOS</h3>
+          <h3 v-if="!error && tokenBalances !== null && selected !== 'all' && selected !== 'lgs'" class="pt-3" style="color:green">
+            <span v-if="tokenBalances[selected].tokenInfo.pending !== true">
+              <span v-if="tokenBalances[selected].balanceInTokens">{{tokenBalances[selected].balanceInTokens}} {{tokenBalances[selected].tokenInfo.symbol}}</span>
+              <span v-if="!tokenBalances[selected].balanceInTokens">{{tokenBalances[selected].balance}} {{tokenBalances[selected].tokenInfo.symbol}}</span>
+            </span>
+            <span v-if="tokenBalances[selected].tokenInfo.pending === true">
+              <icon name="spinner" :spin="true" /> Loading Token Info
+            </span>
+          </h3>
           <h4 v-if="error" class="pt-3" style="color:red">This account has not been opened yet</h4>
         </b-col>
         <b-col cols="12" md="4" class="mb-3" id="qrHolder">
@@ -33,21 +42,46 @@
               <small v-if='requests.length < count'> (showing all {{requests.length}})</small>
             </h4>
             <p class="text-left" v-if="lastModified"><span v-t="'lastUpdated'"></span> <strong> {{ lastModified | moment("MMMM DD, YYYY h:mm:ss A") }}</strong></p>
+            <b-row class="mb-3 text-left">
+              <b-col>
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                  <label class="btn btn-outline-secondary" v-bind:class="{ active: selected === 'all' }">
+                    <input type="radio" name="tokenFilter" id="all" autocomplete="off" :checked="selected === 'all'" v-on:click="changeSelected('all')"> All
+                  </label>
+                  <label class="btn btn-outline-secondary" v-bind:class="{ active: selected === 'lgs' }">
+                    <input type="radio" name="tokenFilter" id="lgs" autocomplete="off" :checked="selected === 'lgs'" v-on:click="changeSelected('lgs')">
+                    <img class="avatar mr-1" src="/favicon-32x32.png">
+                    <span>Logos</span>
+                  </label>
+                  <label v-for="tokenBalance in Object.entries(tokenBalances)" :key="tokenBalance[0]" class="btn btn-outline-secondary" v-bind:class="{ active: selected === tokenBalance[0] }">
+                    <input type="radio" name="tokenFilter" :id="tokenBalance[0]" autocomplete="off" :checked="selected === tokenBalance[0]" v-on:click="changeSelected(tokenBalance[0])">
+                    <span v-if="tokenBalance[1].tokenInfo.pending !== true">
+                      <img v-if="tokenBalance[1].tokenInfo.issuerInfo.image" class="avatar mr-1" :src="tokenBalance[1].tokenInfo.issuerInfo.image">
+                      <icon v-if="!tokenBalance[1].tokenInfo.issuerInfo.image" class="mr-1" label="Token Image" name="coins"/>
+                      <span>{{tokenBalance[1].tokenInfo.symbol}}</span>
+                    </span>
+                    <span v-if="tokenBalance[1].tokenInfo.pending === true">
+                      <icon name="spinner" :spin="true" />
+                    </span>
+                  </label>
+                </div>
+              </b-col>
+            </b-row>
             <div v-for="request in orderedRequests" :key='request.hash'>
-              <send v-if="request.type === 'send'" :requestInfo="request" :account="account"/>
-              <burn v-if="request.type === 'burn'" :requestInfo="request"/>
-              <issuerInfo v-if="request.type === 'update_issuer_info'" :requestInfo="request"/>
-              <tokenSend v-if="request.type === 'token_send'" :requestInfo="request"/>
-              <distribute v-if="request.type === 'distribute'" :requestInfo="request"/>
-              <adjustFee v-if="request.type === 'adjust_fee'" :requestInfo="request"/>
-              <changeSetting v-if="request.type === 'change_setting'" :requestInfo="request"/>
-              <adjustUserStatus v-if="request.type === 'adjust_user_status'" :requestInfo="request"/>
-              <issuance v-if="request.type === 'issuance'" :requestInfo="request"/>
-              <issueAdditional v-if="request.type === 'issue_additional'" :requestInfo="request"/>
-              <withdrawFee v-if="request.type === 'withdraw_fee'" :requestInfo="request"/>
-              <updateController v-if="request.type === 'update_controller'" :requestInfo="request"/>
-              <revoke v-if="request.type === 'revoke'" :requestInfo="request"/>
-              <immuteSetting v-if="request.type === 'immute_setting'" :requestInfo="request"/>
+              <send v-if="request.type === 'send' && (selected === 'all' || selected ==='lgs')" :requestInfo="request" :account="account"/>
+              <burn v-if="request.type === 'burn' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
+              <issuerInfo v-if="request.type === 'update_issuer_info' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
+              <tokenSend v-if="request.type === 'token_send' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
+              <distribute v-if="request.type === 'distribute' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
+              <adjustFee v-if="request.type === 'adjust_fee' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
+              <changeSetting v-if="request.type === 'change_setting' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
+              <adjustUserStatus v-if="request.type === 'adjust_user_status' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
+              <issuance v-if="request.type === 'issuance' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
+              <issueAdditional v-if="request.type === 'issue_additional' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
+              <withdrawFee v-if="request.type === 'withdraw_fee' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
+              <updateController v-if="request.type === 'update_controller' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
+              <revoke v-if="request.type === 'revoke' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
+              <immuteSetting v-if="request.type === 'immute_setting' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
             </div>
           </b-col>
         </b-row>
@@ -75,6 +109,8 @@ import updateController from '@/components/requests/updateController.vue'
 import revoke from '@/components/requests/revoke.vue'
 import immuteSetting from '@/components/requests/immuteSetting.vue'
 import tokenSend from '@/components/requests/tokenSend.vue'
+import 'vue-awesome/icons/coins'
+import 'vue-awesome/icons/spinner'
 
 Vue.use(infiniteScroll)
 Vue.component(VueQrcode.name, VueQrcode)
@@ -95,6 +131,7 @@ export default {
       requestCount: state => state.requestCount,
       count: state => state.count,
       lastModified: state => state.lastModified,
+      tokenBalances: state => state.tokenBalances,
       orderedRequests: state => state.orderedRequests
     })
   },
@@ -145,6 +182,9 @@ export default {
           }
         })
       }
+    },
+    changeSelected: function (newSelected) {
+      this.selected = newSelected
     }
   },
   destroyed: function () {
@@ -152,7 +192,8 @@ export default {
   },
   data () {
     return {
-      requestsBusy: false
+      requestsBusy: false,
+      selected: 'all'
     }
   },
   beforeRouteUpdate (to, from, next) {
@@ -171,6 +212,13 @@ export default {
 <style scoped lang="scss">
   #qrHolder {
     text-align: center;
+  }
+  .btn:not(:disabled) {
+    cursor: pointer;
+  }
+  .avatar {
+    width: 20px;
+    height: 20px;
   }
   @media (min-width: 768px) {
     #qrHolder {

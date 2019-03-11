@@ -21,9 +21,11 @@ const state = {
   requestCount: 0,
   lastModified: 0
 }
+// Should token information be globally stored in its own vuex?
+// Pros: Less API requests
+// Cons: Data might be outdated or I have to write a lot of code for MQTT handling for token accounts
 
 const handleTokenRequests = (request, rpcClient) => {
-  // Individual Token Request Handling
   if (request.type === 'burn' || request.type === 'issue_additional') {
     if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
       request.amountInToken = rpcClient.convert.fromTo(request.amount, 0, request.tokenInfo.issuerInfo.decimals).replace(/\.0+$/, '')
@@ -153,9 +155,11 @@ const actions = {
           commit('setFrontier', val.frontier)
           commit('setRawBalance', val.balance)
           commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(val.balance, 'LOGOS')).toFixed(5)))
-          commit('setRequestCount', val.block_count)
+          commit('setRequestCount', val.request_count)
           commit('setLastModified', parseInt(val.modified_timestamp))
-          commit('setRepresentative', LogosWallet.LogosUtils.accountFromHexKey(val.representative_block))
+          if (val.representative_block !== '0000000000000000000000000000000000000000000000000000000000000000') {
+            commit('setRepresentative', LogosWallet.LogosUtils.accountFromHexKey(val.representative_block))
+          }
         } else {
           commit('setError', val.error)
         }
@@ -228,7 +232,7 @@ const mutations = {
     state.frontier = frontier
   },
   setRepresentative (state, rep) {
-    state.rep = rep
+    state.representaive = rep
   },
   setBalance (state, balance) {
     state.balance = balance
@@ -278,9 +282,13 @@ const mutations = {
       if (tokenBalance.tokenInfo && tokenBalance.tokenInfo.pending &&
         tokenBalance.tokenInfo.tokenAccount === data.tokenInfo.tokenAccount) {
         tokenBalance.tokenInfo = state.tokens[data.tokenInfo.tokenAccount]
+        if (tokenBalance.tokenInfo.issuerInfo && typeof tokenBalance.tokenInfo.issuerInfo.decimals !== 'undefined') {
+          tokenBalance.balanceInTokens = data.rpcClient.convert.fromTo(tokenBalance.balance, 0, tokenBalance.tokenInfo.issuerInfo.decimals)
+        }
         state.tokenBalances[data.tokenInfo.tokenAccount] = tokenBalance
       }
     }
+    // TODO UPDATE TOKENS THAT ARE NOT IN THE RECENT REQUESTS
   },
   setTokenBalances (state, data) {
     let balances = {}
