@@ -122,7 +122,6 @@ export default {
     }),
     ...mapState('account', {
       account: state => state.account,
-      frontier: state => state.frontier,
       representaive: state => state.representaive,
       error: state => state.error,
       balance: state => state.balance,

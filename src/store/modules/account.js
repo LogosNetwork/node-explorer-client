@@ -6,7 +6,6 @@ import orderBy from 'lodash/orderBy'
 
 const state = {
   account: null,
-  frontier: null,
   representaive: null,
   error: null,
   balance: null,
@@ -22,18 +21,31 @@ const state = {
   lastModified: 0
 }
 // Should token information be globally stored in its own vuex?
-// Pros: Less API requests
+// Pros: Less API requests | Caching which means faster page switching on slower internet connectiosn
 // Cons: Data might be outdated or I have to write a lot of code for MQTT handling for token accounts
+// Conclustion: Yes but thats a lot of work and code
+
+const updateTokenBalance = (raw, tokenAccount, rpcClient, commit, state) => {
+  commit('setRawTokenBalance', { tokenAccount: tokenAccount, rawTokenBalance: raw.toString() })
+  if (state.tokenBalances[tokenAccount].tokenInfo.issuerInfo &&
+    typeof state.tokenBalances[tokenAccount].tokenInfo.issuerInfo.decimals !== 'undefined') {
+    let tokenBalance = rpcClient.convert.fromTo(raw.toString(), 0, state.tokenBalances[tokenAccount].tokenInfo.issuerInfo.decimals)
+    commit('setTokenBalance', {
+      tokenAccount: tokenAccount,
+      tokenBalance: tokenBalance
+    })
+  }
+}
 
 const handleTokenRequests = (request, rpcClient) => {
   if (request.type === 'burn' || request.type === 'issue_additional') {
     if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
-      request.amountInToken = rpcClient.convert.fromTo(request.amount, 0, request.tokenInfo.issuerInfo.decimals).replace(/\.0+$/, '')
+      request.amountInToken = rpcClient.convert.fromTo(request.amount, 0, request.tokenInfo.issuerInfo.decimals)
     }
   }
   if (request.type === 'distribute' || request.type === 'withdraw_fee' || request.type === 'revoke') {
     if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
-      request.transaction.amountInToken = rpcClient.convert.fromTo(request.transaction.amount, 0, request.tokenInfo.issuerInfo.decimals).replace(/\.0+$/, '')
+      request.transaction.amountInToken = rpcClient.convert.fromTo(request.transaction.amount, 0, request.tokenInfo.issuerInfo.decimals)
     }
   }
   if (request.type === 'update_issuer_info') {
@@ -48,7 +60,7 @@ const handleTokenRequests = (request, rpcClient) => {
     for (let trans of request.transactions) {
       total = total.plus(trans.amount)
       if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
-        trans.amountInToken = rpcClient.convert.fromTo(trans.amount, 0, request.tokenInfo.issuerInfo.decimals).replace(/\.0+$/, '')
+        trans.amountInToken = rpcClient.convert.fromTo(trans.amount, 0, request.tokenInfo.issuerInfo.decimals)
       }
     }
     request.totalAmount = total
@@ -69,14 +81,29 @@ const handleTokenRequests = (request, rpcClient) => {
   return request
 }
 
+const pullTokenInfo = (tokenAccount, rpcClient, commit) => {
+  rpcClient.accounts.info(tokenAccount).then(tokenInfo => {
+    tokenInfo.tokenAccount = tokenAccount
+    try {
+      tokenInfo.issuerInfo = JSON.parse(tokenInfo.issuer_info)
+    } catch (e) {
+      tokenInfo.issuerInfo = {}
+    }
+    commit('updateToken', {
+      rpcClient: rpcClient,
+      tokenInfo: tokenInfo
+    })
+  })
+}
+
 const parseRequests = (request, rpcClient, commit, state) => {
   if (request.type === 'send' && request.transactions && request.transactions.length > 0) {
     let total = bigInt(0)
     for (let trans of request.transactions) {
       total = total.plus(trans.amount)
-      trans.amountInLogos = rpcClient.convert.fromReason(trans.amount, 'LOGOS').replace(/\.0+$/, '')
+      trans.amountInLogos = rpcClient.convert.fromReason(trans.amount, 'LOGOS')
     }
-    request.totalAmountLogos = rpcClient.convert.fromReason(total.toString(), 'LOGOS').replace(/\.0+$/, '')
+    request.totalAmountLogos = rpcClient.convert.fromReason(total.toString(), 'LOGOS')
     commit('addRequest', request)
   } else if (request.type === 'burn' || request.type === 'update_issuer_info' ||
     request.type === 'token_send' || request.type === 'distribute' ||
@@ -85,29 +112,18 @@ const parseRequests = (request, rpcClient, commit, state) => {
     request.type === 'issue_additional' || request.type === 'withdraw_fee' ||
     request.type === 'update_controller' || request.type === 'revoke' ||
     request.type === 'immute_setting') {
-    let tokenAddress = LogosWallet.LogosUtils.accountFromHexKey(request.token_id)
-    if (state.tokens[tokenAddress]) {
-      request.tokenInfo = state.tokens[tokenAddress]
+    let tokenAccount = LogosWallet.LogosUtils.accountFromHexKey(request.token_id)
+    if (state.tokens[tokenAccount]) {
+      request.tokenInfo = state.tokens[tokenAccount]
       commit('addRequest', handleTokenRequests(request, rpcClient))
     } else {
-      commit('addToken', tokenAddress)
+      commit('addToken', tokenAccount)
       request.tokenInfo = {
         pending: true,
-        tokenAccount: tokenAddress
+        tokenAccount: tokenAccount
       }
+      pullTokenInfo(tokenAccount, rpcClient, commit)
       commit('addRequest', handleTokenRequests(request, rpcClient))
-      rpcClient.accounts.info(tokenAddress).then(tokenInfo => {
-        tokenInfo.tokenAccount = tokenAddress
-        try {
-          tokenInfo.issuerInfo = JSON.parse(tokenInfo.issuer_info)
-        } catch (e) {
-          tokenInfo.issuerInfo = {}
-        }
-        commit('updateToken', {
-          rpcClient: rpcClient,
-          tokenInfo: tokenInfo
-        })
-      })
     }
   } else {
     commit('addRequest', request)
@@ -150,11 +166,30 @@ const actions = {
     rpcClient.accounts.info(account).then(val => {
       if (val) {
         if (!val.error) {
-          if (val.tokens) commit('setTokenBalances', { rpcClient: rpcClient, tokens: val.tokens })
-          // TODO Dispatch action to request token infos
-          commit('setFrontier', val.frontier)
+          if (val.tokens) {
+            let balances = {}
+            Object.entries(val.tokens).forEach(entry => {
+              let tokenID = entry[0]
+              let tokenAccountInfo = entry[1]
+              let tokenAccount = LogosWallet.LogosUtils.accountFromHexKey(tokenID)
+              if (state.tokens[tokenAccount]) {
+                tokenAccountInfo.tokenInfo = state.tokens[tokenAccount]
+                balances[tokenAccount] = tokenAccountInfo
+              } else {
+                tokenAccountInfo.tokenInfo = {
+                  pending: true,
+                  tokenAccount: tokenAccount
+                }
+                balances[tokenAccount] = tokenAccountInfo
+                commit('addToken', tokenAccount)
+                pullTokenInfo(tokenAccount, rpcClient, commit)
+              }
+            })
+            commit('setTokenBalances', balances)
+          }
+
           commit('setRawBalance', val.balance)
-          commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(val.balance, 'LOGOS')).toFixed(5)))
+          commit('setBalance', rpcClient.convert.fromReason(val.balance, 'LOGOS'))
           commit('setRequestCount', val.request_count)
           commit('setLastModified', parseInt(val.modified_timestamp))
           if (val.representative_block !== '0000000000000000000000000000000000000000000000000000000000000000') {
@@ -182,45 +217,112 @@ const actions = {
     })
   },
   addRequest ({ state, commit, rootState }, request) {
-    // TODO update handling of MQTT messages
     let requestData = cloneDeep(request)
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
-    if (requestData.origin === state.account) {
+
+    // Add token data
+    let tokenAccount = null
+    if (requestData.token_id) {
+      tokenAccount = LogosWallet.LogosUtils.accountFromHexKey(requestData.token_id)
+      if (state.tokens[tokenAccount]) {
+        requestData.tokenInfo = state.tokens[tokenAccount]
+      } else {
+        commit('addToken', tokenAccount)
+        requestData.tokenInfo = {
+          pending: true,
+          tokenAccount: tokenAccount
+        }
+        pullTokenInfo(tokenAccount, rpcClient, commit)
+      }
+      requestData = handleTokenRequests(requestData, rpcClient)
+    }
+
+    // Handle Sends and Recieves
+    if (requestData.origin === state.account &&
+        (requestData.type === 'send' || requestData.type === 'token_send' || requestData.type === 'issuance')) {
       requestData.timestamp = parseInt(requestData.timestamp)
       if (requestData.type === 'send') {
         let newRawBalance = bigInt(0)
-        if (state.rawBalance) newRawBalance = bigInt(state.rawBalance)
+        if (state.rawBalance) newRawBalance = bigInt(state.rawBalance).minus(bigInt(requestData.fee))
         for (let trans of requestData.transactions) {
-          newRawBalance = bigInt(newRawBalance).minus(bigInt(trans.amount))
+          if (trans.destination !== state.account) newRawBalance = bigInt(newRawBalance).minus(bigInt(trans.amount))
         }
         commit('setRawBalance', newRawBalance.toString())
-        commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5)))
+        commit('setBalance', rpcClient.convert.fromReason(state.rawBalance, 'LOGOS'))
+      } else if (requestData.type === 'token_send' || requestData.type === 'issuance') {
+        let newRawBalance = bigInt(0)
+        if (state.rawBalance) newRawBalance = bigInt(state.rawBalance).minus(bigInt(requestData.fee))
+        commit('setRawBalance', newRawBalance.toString())
+        commit('setBalance', rpcClient.convert.fromReason(state.rawBalance, 'LOGOS'))
+        if (requestData.type === 'token_send') {
+          let newRawTokenBalance = bigInt(0)
+          if (state.tokenBalances[tokenAccount]) newRawTokenBalance = bigInt(state.tokenBalances[tokenAccount].balance).minus(bigInt(requestData.token_fee))
+          for (let trans of requestData.transactions) {
+            if (trans.destination !== state.account) newRawTokenBalance = bigInt(newRawTokenBalance).minus(bigInt(trans.amount))
+          }
+          updateTokenBalance(newRawTokenBalance, tokenAccount, rpcClient, commit, state)
+        }
       }
       commit('setError', null)
       commit('incrementRequestCount')
-      commit('setFrontier', requestData.hash)
       commit('setLastModified', requestData.timestamp)
       commit('addRequest', requestData)
-    } else if (requestData.account !== state.account) {
+    } else if (requestData.account !== state.account && (requestData.type === 'send' || requestData.type === 'token_send')) {
       requestData.timestamp = parseInt(requestData.timestamp)
       if (requestData.type === 'send') {
         let newRawBalance = bigInt(0)
         if (state.rawBalance) newRawBalance = bigInt(state.rawBalance)
         for (let trans of requestData.transactions) {
-          if (trans.target === state.account) {
+          if (trans.destination === state.account) {
             newRawBalance = newRawBalance.add(bigInt(trans.amount))
           }
-          trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+          trans.amountInLogos = rpcClient.convert.fromReason(trans.amount, 'LOGOS')
         }
         commit('setRawBalance', newRawBalance.toString())
-        commit('setBalance', parseFloat(Number(rpcClient.convert.fromReason(state.rawBalance, 'LOGOS')).toFixed(5)))
+        commit('setBalance', rpcClient.convert.fromReason(state.rawBalance, 'LOGOS'))
+      } else if (requestData.type === 'token_send') {
+        let newRawTokenBalance = bigInt(0)
+        if (state.tokenBalances[tokenAccount]) newRawTokenBalance = bigInt(state.tokenBalances[tokenAccount].balance)
+        for (let trans of requestData.transactions) {
+          if (trans.destination === state.account) newRawTokenBalance = bigInt(newRawTokenBalance).plus(bigInt(trans.amount))
+        }
+        updateTokenBalance(newRawTokenBalance, tokenAccount, rpcClient, commit, state)
       }
       commit('setError', null)
       commit('incrementRequestCount')
-      commit('setFrontier', requestData.hash)
       commit('setLastModified', requestData.timestamp)
       commit('addRequest', requestData)
     }
+
+    // Handle other block types that may affect token balance
+    if (requestData.type === 'withdraw_fee' || requestData.type === 'distribute') {
+      if (state.account === requestData.transaction.destination) {
+        let newRawTokenBalance = bigInt(0)
+        if (state.tokenBalances[tokenAccount]) newRawTokenBalance = bigInt(state.tokenBalances[tokenAccount].balance).plus(bigInt(requestData.transaction.amount))
+        updateTokenBalance(newRawTokenBalance, tokenAccount, rpcClient, commit, state)
+        commit('setError', null)
+        commit('incrementRequestCount')
+        commit('setLastModified', requestData.timestamp)
+        commit('addRequest', requestData)
+      }
+    } else if (requestData.type === 'revoke') {
+      let newRawTokenBalance = bigInt(0)
+      let tokenAccount = LogosWallet.LogosUtils.accountFromHexKey(requestData.token_id)
+      if (state.tokenBalances[tokenAccount]) newRawTokenBalance = bigInt(state.tokenBalances[tokenAccount].balance)
+      if (state.account === requestData.transaction.destination) {
+        newRawTokenBalance.plus(bigInt(requestData.transaction.amount))
+      }
+      if (state.account === requestData.source) {
+        newRawTokenBalance.minus(bigInt(requestData.transaction.amount))
+      }
+      updateTokenBalance(newRawTokenBalance, tokenAccount, rpcClient, commit, state)
+      commit('setError', null)
+      commit('incrementRequestCount')
+      commit('setLastModified', requestData.timestamp)
+      commit('addRequest', requestData)
+    }
+
+    // TODO Token Account MQTT handling?
   },
   reset: ({ commit }) => {
     commit('reset')
@@ -228,9 +330,6 @@ const actions = {
 }
 
 const mutations = {
-  setFrontier (state, frontier) {
-    state.frontier = frontier
-  },
   setRepresentative (state, rep) {
     state.representaive = rep
   },
@@ -239,6 +338,12 @@ const mutations = {
   },
   setRawBalance (state, balance) {
     state.rawBalance = balance
+  },
+  setTokenBalance (state, data) {
+    state.tokenBalances[data.tokenAccount].balanceInTokens = data.tokenBalance
+  },
+  setRawTokenBalance (state, data) {
+    state.tokenBalances[data.tokenAccount].balance = data.rawTokenBalance
   },
   setRequestCount (state, requestCount) {
     state.requestCount = requestCount
@@ -288,25 +393,8 @@ const mutations = {
         state.tokenBalances[data.tokenInfo.tokenAccount] = tokenBalance
       }
     }
-    // TODO UPDATE TOKENS THAT ARE NOT IN THE RECENT REQUESTS
   },
-  setTokenBalances (state, data) {
-    let balances = {}
-    Object.entries(data.tokens).forEach(entry => {
-      let tokenID = entry[0]
-      let tokenAccountInfo = entry[1]
-      let tokenAccount = LogosWallet.LogosUtils.accountFromHexKey(tokenID)
-      if (state.tokens[tokenAccount]) {
-        tokenAccountInfo.tokenInfo = state.tokens[tokenAccount]
-        balances[tokenAccount] = tokenAccountInfo
-      } else {
-        tokenAccountInfo.tokenInfo = {
-          pending: true,
-          tokenAccount: tokenAccount
-        }
-        balances[tokenAccount] = tokenAccountInfo
-      }
-    })
+  setTokenBalances (state, balances) {
     state.tokenBalances = balances
   },
   setAccount (state, account) {
@@ -314,7 +402,6 @@ const mutations = {
   },
   reset (state) {
     state.account = null
-    state.frontier = null
     state.representaive = null
     state.error = null
     state.balance = null
