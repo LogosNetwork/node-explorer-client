@@ -52,7 +52,7 @@
               <strong>Fee Rate: </strong>{{requestInfo.fee_rate}}%
             </span>
           </b-list-group-item>
-          <b-list-group-item>
+          <b-list-group-item v-if="requestInfo.settings.length > 0">
             <strong>Settings: </strong>
             <ul>
               <li v-for="setting in requestInfo.settings" :key="'set'+setting">

@@ -7,11 +7,11 @@
           <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
           <h3 v-if="!error && balance !== null && selected === 'all' || selected === 'lgs'" class="pt-3" style="color:green">{{balance}} LOGOS</h3>
           <h3 v-if="!error && tokenBalances !== null && selected !== 'all' && selected !== 'lgs'" class="pt-3" style="color:green">
-            <span v-if="tokenBalances[selected].tokenInfo.pending !== true">
+            <span v-if="tokenBalances[selected] && tokenBalances[selected].tokenInfo.pending !== true">
               <span v-if="tokenBalances[selected].balanceInTokens">{{tokenBalances[selected].balanceInTokens}} {{tokenBalances[selected].tokenInfo.symbol}}</span>
               <span v-if="!tokenBalances[selected].balanceInTokens">{{tokenBalances[selected].balance}} {{tokenBalances[selected].tokenInfo.symbol}}</span>
             </span>
-            <span v-if="tokenBalances[selected].tokenInfo.pending === true">
+            <span v-if="!tokenBalances[selected] || tokenBalances[selected].tokenInfo.pending === true">
               <icon name="spinner" :spin="true" /> Loading Token Info
             </span>
           </h3>

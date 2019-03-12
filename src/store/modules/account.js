@@ -194,7 +194,7 @@ const actions = {
           commit('setBalance', rpcClient.convert.fromReason(val.balance, 'LOGOS'))
           commit('setRequestCount', val.request_count)
           commit('setLastModified', parseInt(val.modified_timestamp))
-          if (val.representative_block !== '0000000000000000000000000000000000000000000000000000000000000000') {
+          if (val.representative_block && val.representative_block !== '0000000000000000000000000000000000000000000000000000000000000000') {
             commit('setRepresentative', LogosWallet.LogosUtils.accountFromHexKey(val.representative_block))
           }
         } else {
@@ -404,10 +404,13 @@ const mutations = {
     state.representaive = null
     state.error = null
     state.balance = null
+    state.rawBalance = null
     state.count = 50
     state.requests = []
     state.hashes = {}
     state.orderedRequests = []
+    state.lastHash = null
+    state.tokens = {}
     state.tokenBalances = {}
     state.requestCount = 0
     state.lastModified = 0
