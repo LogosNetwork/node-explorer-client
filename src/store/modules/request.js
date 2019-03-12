@@ -33,7 +33,8 @@ const actions = {
           details.type === 'issue_additional' || details.type === 'burn' ||
           details.type === 'update_issuer_info' || details.type === 'adjust_fee' ||
           details.type === 'change_setting' || details.type === 'distribute' ||
-          details.type === 'adjust_user_status' || details.type === 'token_send') {
+          details.type === 'adjust_user_status' || details.type === 'token_send' ||
+          details.type === 'withdraw_fee') {
           rpcClient.accounts.toAddress(details.token_id).then(val => {
             prettyDetails = JSON.stringify(details, null, ' ')
             details.token_account = val.account
