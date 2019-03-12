@@ -38,6 +38,14 @@ const updateTokenBalance = (raw, tokenAccount, rpcClient, commit, state) => {
 }
 
 const handleTokenRequests = (request, rpcClient) => {
+  if (request.type === 'send') {
+    let total = bigInt(0)
+    for (let trans of request.transactions) {
+      total = total.plus(trans.amount)
+      trans.amountInLogos = rpcClient.convert.fromReason(trans.amount, 'LOGOS')
+    }
+    request.totalAmountLogos = rpcClient.convert.fromReason(total.toString(), 'LOGOS')
+  }
   if (request.type === 'burn' || request.type === 'issue_additional') {
     if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
       request.amountInToken = rpcClient.convert.fromTo(request.amount, 0, request.tokenInfo.issuerInfo.decimals)
@@ -98,13 +106,7 @@ const pullTokenInfo = (tokenAccount, rpcClient, commit) => {
 
 const parseRequests = (request, rpcClient, commit, state) => {
   if (request.type === 'send' && request.transactions && request.transactions.length > 0) {
-    let total = bigInt(0)
-    for (let trans of request.transactions) {
-      total = total.plus(trans.amount)
-      trans.amountInLogos = rpcClient.convert.fromReason(trans.amount, 'LOGOS')
-    }
-    request.totalAmountLogos = rpcClient.convert.fromReason(total.toString(), 'LOGOS')
-    commit('addRequest', request)
+    commit('addRequest', handleTokenRequests(request, rpcClient))
   } else if (request.type === 'burn' || request.type === 'update_issuer_info' ||
     request.type === 'token_send' || request.type === 'distribute' ||
     request.type === 'adjust_fee' || request.type === 'change_setting' ||
@@ -234,10 +236,11 @@ const actions = {
         }
         pullTokenInfo(tokenAccount, rpcClient, commit)
       }
-      requestData = handleTokenRequests(requestData, rpcClient)
     }
 
     // Handle Sends and Recieves
+    requestData = handleTokenRequests(requestData, rpcClient)
+    requestData.timestamp = Date.now()
     if (requestData.origin === state.account &&
         (requestData.type === 'send' || requestData.type === 'token_send' || requestData.type === 'issuance')) {
       requestData.timestamp = parseInt(requestData.timestamp)
@@ -273,10 +276,7 @@ const actions = {
         let newRawBalance = bigInt(0)
         if (state.rawBalance) newRawBalance = bigInt(state.rawBalance)
         for (let trans of requestData.transactions) {
-          if (trans.destination === state.account) {
-            newRawBalance = newRawBalance.add(bigInt(trans.amount))
-          }
-          trans.amountInLogos = rpcClient.convert.fromReason(trans.amount, 'LOGOS')
+          if (trans.destination === state.account) newRawBalance = newRawBalance.add(bigInt(trans.amount))
         }
         commit('setRawBalance', newRawBalance.toString())
         commit('setBalance', rpcClient.convert.fromReason(state.rawBalance, 'LOGOS'))
