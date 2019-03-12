@@ -237,9 +237,9 @@ const actions = {
         pullTokenInfo(tokenAccount, rpcClient, commit)
       }
     }
+    requestData = handleTokenRequests(requestData, rpcClient)
 
     // Handle Balance Changes
-    requestData = handleTokenRequests(requestData, rpcClient)
     if (requestData.origin === state.account &&
         (requestData.type === 'send' || requestData.type === 'token_send' || requestData.type === 'issuance')) {
       requestData.timestamp = parseInt(requestData.timestamp)
