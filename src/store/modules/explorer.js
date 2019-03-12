@@ -8,15 +8,97 @@ const state = {
   error: null,
   epoch: null,
   microEpoch: null,
-  requestBlock: null
+  requestBlock: null,
+  tokens: {}
 }
 
 const getters = {
 
 }
 
+const pullTokenInfo = (tokenAccount, rpcClient, commit) => {
+  rpcClient.accounts.info(tokenAccount).then(tokenInfo => {
+    tokenInfo.tokenAccount = tokenAccount
+    try {
+      tokenInfo.issuerInfo = JSON.parse(tokenInfo.issuer_info)
+    } catch (e) {
+      tokenInfo.issuerInfo = {}
+    }
+    commit('updateToken', {
+      rpcClient: rpcClient,
+      tokenInfo: tokenInfo,
+      commit: commit
+    })
+  })
+}
+
+const handleRequests = (request, rpcClient, commit, state) => {
+  if (request.token_id) {
+    let tokenAccount = LogosWallet.LogosUtils.accountFromHexKey(request.token_id)
+    if (state.tokens[tokenAccount]) {
+      request.tokenInfo = state.tokens[tokenAccount]
+    } else {
+      commit('addToken', tokenAccount)
+      request.tokenInfo = {
+        pending: true,
+        tokenAccount: tokenAccount
+      }
+      pullTokenInfo(tokenAccount, rpcClient, commit)
+    }
+  }
+  if (request.type === 'send') {
+    let total = bigInt(0)
+    for (let trans of request.transactions) {
+      total = total.plus(trans.amount)
+      trans.amountInLogos = rpcClient.convert.fromReason(trans.amount, 'LOGOS')
+    }
+    request.totalAmountLogos = rpcClient.convert.fromReason(total.toString(), 'LOGOS')
+  }
+  if (request.type === 'burn' || request.type === 'issue_additional') {
+    if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
+      request.amountInToken = rpcClient.convert.fromTo(request.amount, 0, request.tokenInfo.issuerInfo.decimals)
+    }
+  }
+  if (request.type === 'distribute' || request.type === 'withdraw_fee' || request.type === 'revoke') {
+    if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
+      request.transaction.amountInToken = rpcClient.convert.fromTo(request.transaction.amount, 0, request.tokenInfo.issuerInfo.decimals)
+    }
+  }
+  if (request.type === 'update_issuer_info') {
+    try {
+      request.prettyInfo = JSON.stringify(JSON.parse(request.new_info), null, ' ')
+    } catch (e) {
+      request.prettyInfo = request.new_info
+    }
+  }
+  if (request.type === 'token_send') {
+    let total = bigInt(0)
+    for (let trans of request.transactions) {
+      total = total.plus(trans.amount)
+      if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
+        trans.amountInToken = rpcClient.convert.fromTo(trans.amount, 0, request.tokenInfo.issuerInfo.decimals)
+      }
+    }
+    request.totalAmount = total
+    if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
+      request.totalAmountInToken = rpcClient.convert.fromTo(total, 0, request.tokenInfo.issuerInfo.decimals)
+    }
+  }
+  if (request.type === 'issuance') {
+    if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
+      request.totalSupplyInToken = rpcClient.convert.fromTo(request.total_supply, 0, request.tokenInfo.issuerInfo.decimals)
+    }
+    try {
+      request.prettyInfo = JSON.stringify(JSON.parse(request.issuer_info), null, ' ')
+    } catch (e) {
+      request.prettyInfo = request.issuer_info
+    }
+  }
+  return request
+}
+
 const actions = {
-  getRequests ({ commit, rootState }, cb) {
+  getRequests ({ commit, rootState, state }, cb) {
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     let savedRequests = [...state.requests]
     let lastCreatedAt = null
@@ -30,77 +112,7 @@ const actions = {
     })
       .then((res) => {
         for (let request of res.data.data.requests) {
-          if (request.type === 'send' && request.transactions && request.transactions.length > 0) {
-            let total = bigInt(0)
-            for (let trans of request.transactions) {
-              total = total.plus(trans.amount)
-              trans.amountInLogos = rpcClient.convert.fromReason(trans.amount, 'LOGOS').replace(/\.0+$/, '')
-            }
-            request.totalAmountLogos = rpcClient.convert.fromReason(total.toString(), 'LOGOS').replace(/\.0+$/, '')
-            commit('pushRequest', request)
-          } else if (request.type === 'burn' || request.type === 'update_issuer_info' ||
-            request.type === 'token_send' || request.type === 'distribute' ||
-            request.type === 'adjust_fee' || request.type === 'change_setting' ||
-            request.type === 'adjust_user_status' || request.type === 'issuance' ||
-            request.type === 'issue_additional' || request.type === 'withdraw_fee' ||
-            request.type === 'update_controller' || request.type === 'revoke' ||
-            request.type === 'immute_setting') {
-            let tokenAddress = LogosWallet.LogosUtils.accountFromHexKey(request.token_id)
-            rpcClient.accounts.info(tokenAddress).then(data => {
-              data.tokenAccount = tokenAddress
-              try {
-                data.issuerInfo = JSON.parse(data.issuer_info)
-              } catch (e) {
-                data.issuerInfo = {}
-              }
-              request.tokenInfo = data
-
-              // Individual Token Request Handling
-              if (request.type === 'burn' || request.type === 'issue_additional') {
-                if (typeof data.issuerInfo.decimals !== 'undefined') {
-                  request.amountInToken = rpcClient.convert.fromTo(request.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
-                }
-              }
-              if (request.type === 'distribute' || request.type === 'withdraw_fee' || request.type === 'revoke') {
-                if (typeof data.issuerInfo.decimals !== 'undefined') {
-                  request.transaction.amountInToken = rpcClient.convert.fromTo(request.transaction.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
-                }
-              }
-              if (request.type === 'update_issuer_info') {
-                try {
-                  request.prettyInfo = JSON.stringify(JSON.parse(request.new_info), null, ' ')
-                } catch (e) {
-                  request.prettyInfo = request.new_info
-                }
-              }
-              if (request.type === 'token_send') {
-                let total = bigInt(0)
-                for (let trans of request.transactions) {
-                  total = total.plus(trans.amount)
-                  if (typeof data.issuerInfo.decimals !== 'undefined') {
-                    trans.amountInToken = rpcClient.convert.fromTo(trans.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
-                  }
-                }
-                request.totalAmount = total
-                if (typeof data.issuerInfo.decimals !== 'undefined') {
-                  request.totalAmountInToken = rpcClient.convert.fromTo(total, 0, data.issuerInfo.decimals)
-                }
-              }
-              if (request.type === 'issuance') {
-                if (typeof data.issuerInfo.decimals !== 'undefined') {
-                  request.totalSupplyInToken = rpcClient.convert.fromTo(request.total_supply, 0, data.issuerInfo.decimals)
-                }
-                try {
-                  request.prettyInfo = JSON.stringify(JSON.parse(request.issuer_info), null, ' ')
-                } catch (e) {
-                  request.prettyInfo = request.issuer_info
-                }
-              }
-              commit('pushRequest', request)
-            })
-          } else {
-            commit('pushRequest', request)
-          }
+          commit('pushRequest', handleRequests(request, rpcClient, commit, state))
         }
         if (res.data.data.requests.length > 0) {
           let status = 'success'
@@ -180,16 +192,27 @@ const actions = {
       }
     })
   },
-  addRequest ({ commit, rootState }, request) {
+  addRequest ({ commit, rootState, state }, request) {
     let requestData = cloneDeep(request)
-    if (requestData.type === 'send') {
-      let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
-      for (let trans of requestData.transactions) {
-        trans.amountInLogos = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+
+    // Add token data
+    let tokenAccount = null
+    if (requestData.token_id) {
+      tokenAccount = LogosWallet.LogosUtils.accountFromHexKey(requestData.token_id)
+      if (state.tokens[tokenAccount]) {
+        requestData.tokenInfo = state.tokens[tokenAccount]
+      } else {
+        commit('addToken', tokenAccount)
+        requestData.tokenInfo = {
+          pending: true,
+          tokenAccount: tokenAccount
+        }
+        pullTokenInfo(tokenAccount, rpcClient, commit)
       }
-      requestData.createdAt = parseInt(requestData.timestamp)
-      commit('unshiftRequest', requestData)
     }
+    requestData = handleRequests(requestData, rpcClient, commit, state)
+    commit('unshiftRequest', requestData)
   },
   reset: ({ commit }) => {
     commit('reset')
@@ -217,6 +240,22 @@ const mutations = {
   },
   setEpoch (state, epoch) {
     state.epoch = epoch
+  },
+  addToken (state, tokenAccount) {
+    state.tokens[tokenAccount] = {
+      pending: true,
+      tokenAccount: tokenAccount
+    }
+  },
+  updateToken (state, data) {
+    state.tokens[data.tokenInfo.tokenAccount] = data.tokenInfo
+    for (let request of state.requests) {
+      if (request.tokenInfo && request.tokenInfo.pending &&
+        request.tokenInfo.tokenAccount === data.tokenInfo.tokenAccount) {
+        request.tokenInfo = state.tokens[data.tokenInfo.tokenAccount]
+        request = handleRequests(request, data.rpcClient, data.commit, state)
+      }
+    }
   }
 }
 

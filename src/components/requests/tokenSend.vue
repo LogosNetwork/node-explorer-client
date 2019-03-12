@@ -5,7 +5,10 @@
         <b-card-body>
           <b-card-title>
             <div class="d-flex justify-content-between">
-              <div>
+              <div v-if="account && requestInfo.origin !== account">
+                Token Recieve Request
+              </div>
+              <div v-if="!account || (account && requestInfo.origin === account)">
                 Token Send Request
               </div>
               <div v-if="requestInfo.createdAt" class="timestamp text-right">
@@ -60,7 +63,8 @@ import 'vue-awesome/icons/arrow-down'
 export default {
   name: 'tokenSend',
   props: {
-    requestInfo: Object
+    requestInfo: Object,
+    account: String
   },
   components: {
     'b-card-body': bCardBody,

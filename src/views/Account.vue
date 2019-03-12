@@ -71,7 +71,7 @@
               <send v-if="request.type === 'send' && (selected === 'all' || selected ==='lgs')" :requestInfo="request" :account="account"/>
               <burn v-if="request.type === 'burn' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
               <issuerInfo v-if="request.type === 'update_issuer_info' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
-              <tokenSend v-if="request.type === 'token_send' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
+              <tokenSend v-if="request.type === 'token_send' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request" :account="account"/>
               <distribute v-if="request.type === 'distribute' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
               <adjustFee v-if="request.type === 'adjust_fee' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
               <changeSetting v-if="request.type === 'change_setting' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>

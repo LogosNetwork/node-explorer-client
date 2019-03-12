@@ -238,9 +238,8 @@ const actions = {
       }
     }
 
-    // Handle Sends and Recieves
+    // Handle Balance Changes
     requestData = handleTokenRequests(requestData, rpcClient)
-    requestData.timestamp = Date.now()
     if (requestData.origin === state.account &&
         (requestData.type === 'send' || requestData.type === 'token_send' || requestData.type === 'issuance')) {
       requestData.timestamp = parseInt(requestData.timestamp)
@@ -407,7 +406,7 @@ const mutations = {
     state.balance = null
     state.count = 50
     state.requests = []
-    state.hash = {}
+    state.hashes = {}
     state.orderedRequests = []
     state.tokenBalances = {}
     state.requestCount = 0
