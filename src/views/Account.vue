@@ -198,6 +198,7 @@ export default {
   beforeRouteUpdate (to, from, next) {
     this.unsubscribe(`account/${this.account}`)
     this.reset()
+    this.selected = 'all'
     this.initalize({ url: this.mqttHost,
       cb: () => {
         this.subscribe(`account/${to.params.account}`)
