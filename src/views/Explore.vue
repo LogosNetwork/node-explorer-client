@@ -85,20 +85,7 @@
           <h5 class="text-left" v-t="'recent_requests'"></h5>
           <div v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
             <div v-for="(request, index) in requests" :key='index'>
-              <send v-if="request.type === 'send'" :requestInfo="request"/>
-              <burn v-if="request.type === 'burn'" :requestInfo="request"/>
-              <issuerInfo v-if="request.type === 'update_issuer_info'" :requestInfo="request"/>
-              <tokenSend v-if="request.type === 'token_send'" :requestInfo="request"/>
-              <distribute v-if="request.type === 'distribute'" :requestInfo="request"/>
-              <adjustFee v-if="request.type === 'adjust_fee'" :requestInfo="request"/>
-              <changeSetting v-if="request.type === 'change_setting'" :requestInfo="request"/>
-              <adjustUserStatus v-if="request.type === 'adjust_user_status'" :requestInfo="request"/>
-              <issuance v-if="request.type === 'issuance'" :requestInfo="request"/>
-              <issueAdditional v-if="request.type === 'issue_additional'" :requestInfo="request"/>
-              <withdrawFee v-if="request.type === 'withdraw_fee'" :requestInfo="request"/>
-              <updateController v-if="request.type === 'update_controller'" :requestInfo="request"/>
-              <revoke v-if="request.type === 'revoke'" :requestInfo="request"/>
-              <immuteSetting v-if="request.type === 'immute_setting'" :requestInfo="request"/>
+              <request :requestInfo="request"/>
             </div>
           </div>
         </b-col>
@@ -111,20 +98,7 @@
 import { mapActions, mapState } from 'vuex'
 import Vue from 'vue'
 import infiniteScroll from 'vue-infinite-scroll'
-import send from '@/components/requests/send.vue'
-import burn from '@/components/requests/burn.vue'
-import issuerInfo from '@/components/requests/issuerInfo.vue'
-import distribute from '@/components/requests/distribute.vue'
-import adjustFee from '@/components/requests/adjustFee.vue'
-import changeSetting from '@/components/requests/changeSetting.vue'
-import adjustUserStatus from '@/components/requests/adjustUserStatus.vue'
-import issuance from '@/components/requests/issuance.vue'
-import issueAdditional from '@/components/requests/issueAdditional.vue'
-import withdrawFee from '@/components/requests/withdrawFee.vue'
-import updateController from '@/components/requests/updateController.vue'
-import revoke from '@/components/requests/revoke.vue'
-import immuteSetting from '@/components/requests/immuteSetting.vue'
-import tokenSend from '@/components/requests/tokenSend.vue'
+import request from '@/components/requests/request.vue'
 Vue.use(infiniteScroll)
 
 const hlCache = new Map()
@@ -150,20 +124,7 @@ Vue.directive('highlight', {
 export default {
   name: 'explore',
   components: {
-    send,
-    burn,
-    issuerInfo,
-    distribute,
-    adjustFee,
-    changeSetting,
-    adjustUserStatus,
-    issuance,
-    issueAdditional,
-    withdrawFee,
-    updateController,
-    revoke,
-    immuteSetting,
-    tokenSend
+    request
   },
   data () {
     return {

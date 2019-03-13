@@ -7,118 +7,51 @@
           <code style="background-color:#FFF;color:#ff3860;padding:6px">{{request}}</code>
         </b-col>
       </b-row>
-      <b-row v-if="!error && details !== null" class="mb-5">
+      <b-row v-if="!error && details && details.origin" class="mt-3">
         <b-col cols="12" class="text-left">
-          <h4 class="text-left">Account Origin</h4>
-          <p><router-link :to="details.origin">{{details.origin}}</router-link></p>
-          <h4 class="text-left" v-t="'type'"></h4>
-          <p>{{details.type}}</p>
-          <div v-if="details.type === 'send'">
-            <h4 class="text-left" v-t="'amount'"></h4>
-            <p>{{details.totalAmountInLogos}} Logos</p>
-            <h4 class="text-left" v-t="'to'"></h4>
-            <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="details.transactions">
-              <template slot="origin" slot-scope="data">
-                <div class="text-truncate"><router-link :to="'/'+data.item.destination">{{data.item.destination}}</router-link></div>
-              </template>
-              <template slot="amount" slot-scope="data">
-                <div class="text-truncate"><span>{{data.item.amountInLogos}}</span></div>
-              </template>
-            </b-table>
-          </div>
-          <div v-if="details.token_account">
-            <h4 class="text-left">Token Account</h4>
-            <p><router-link :to="details.token_account">{{details.token_account}}</router-link></p>
-          </div>
-          <div v-if="details.type === 'issuance'">
-            <h4 class="text-left">Token</h4>
-            <p>{{details.name}} - {{details.symbol}}</p>
-            <h4 class="text-left">Total Supply</h4>
-            <p>{{details.total_supply}}</p>
-          </div>
-          <div v-if="details.fee_type">
-            <h4 class="text-left">Fee Type</h4>
-            <p>{{details.fee_type}}</p>
-          </div>
-          <div v-if="details.fee_rate">
-            <h4 class="text-left">Fee Rate</h4>
-            <p>{{details.fee_rate}}</p>
-          </div>
-          <div v-if="details.type === 'update_controller'">
-            <h4 class="text-left">Action</h4>
-            <p>{{details.action}}</p>
-            <h4 class="text-left">Controller Account</h4>
-            <p><router-link :to="details.controller.account">{{details.controller.account}}</router-link></p>
-            <h4 v-if="details.action === 'remove' && details.controller.privileges.length > 0" class="text-left">Permissions Removed</h4>
-            <h4 v-if="details.action === 'add' && details.controller.privileges.length > 0" class="text-left">Permissions Added</h4>
-            <ul v-if="details.controller.privileges.length > 0"><li v-for="privilege in details.controller.privileges" :key="privilege">{{privilege}}</li></ul>
-          </div>
-          <div v-if="details.type === 'issue_additional' || details.type === 'burn'">
-            <h4 class="text-left">Amount</h4>
-            <p>{{details.amount}}</p>
-          </div>
-          <div v-if="details.new_info">
-            <h4 class="text-left">New Token Info</h4>
-            <p>{{details.new_info}}</p>
-          </div>
-          <div v-if="details.type === 'change_setting'">
-            <h4 class="text-left">Setting</h4>
-            <p>{{details.setting}}</p>
-            <h4 class="text-left">Value</h4>
-            <p>{{details.value}}</p>
-          </div>
-          <div v-if="details.type === 'distribute'">
-            <h4 class="text-left">Distributed To:</h4>
-            <table class="table b-table table-bordered table-sm b-table-fixed" style="background:#FFF">
-              <thead>
-                <tr>
-                  <th aria-colindex="1">Account</th>
-                  <th aria-colindex="2">Amount</th>
-                </tr>
-              </thead>
-              <tbody name="list">
-                <tr>
-                  <td aria-colindex="1">
-                    <div class="text-truncate"><router-link :to="'/'+details.transaction.destination">{{details.transaction.destination}}</router-link></div>
-                  </td>
-                  <td aria-colindex="2">
-                    <div class="text-truncate">{{details.transaction.amount}}</div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div v-if="details.type === 'adjust_user_status'">
-            <h4 class="text-left">Account</h4>
-            <p><router-link :to="details.account">{{details.account}}</router-link></p>
-            <h4 class="text-left">Status</h4>
-            <p>{{details.status}}</p>
-          </div>
-          <div v-if="details.type === 'token_send'">
-            <h4 class="text-left" v-t="'amount'"></h4>
-            <p>{{details.totalAmount}}</p>
-            <h4 class="text-left" v-t="'to'"></h4>
-            <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="details.transactions">
-              <template slot="origin" slot-scope="data">
-                <div class="text-truncate"><router-link :to="'/'+data.item.destination">{{data.item.destination}}</router-link></div>
-              </template>
-              <template slot="amount" slot-scope="data">
-                <div class="text-truncate"><span>{{data.item.amount}}</span></div>
-              </template>
-            </b-table>
-          </div>
-          <div v-if="details.previous !== '0000000000000000000000000000000000000000000000000000000000000000'">
-            <h4 class="text-left" v-t="'prevRequest'"></h4>
-            <p><router-link :to="details.previous">{{details.previous}}</router-link></p>
-          </div>
-          <div v-if="details.next && details.next !== '0000000000000000000000000000000000000000000000000000000000000000'">
-            <h4 class="text-left" v-t="'nextRequest'"></h4>
-            <p><router-link :to="details.next">{{details.next}}</router-link></p>
-          </div>
-          <div v-if="details.batch_hash">
-            <h4 class="text-left">Contained in Request Block</h4>
-            <p><router-link :to="'/requestBlock/'+details.batch_hash">{{details.batch_hash}}</router-link></p>
-          </div>
+            <div>
+              <h4>
+                Created By
+              </h4>
+              <p class="text-truncate">
+                <router-link :to="'/'+details.origin">{{details.origin}}</router-link>
+              </p>
+            </div>
+        </b-col>
+      </b-row>
+      <b-row v-if="!error && details && details.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mt-3">
+        <b-col cols="12" class="text-left">
+            <div>
+              <h4>
+                Previous Request
+              </h4>
+              <p class="text-truncate"><router-link :to="'/'+details.previous">{{details.previous}}</router-link></p>
+            </div>
+        </b-col>
+      </b-row>
+      <b-row v-if="!error && details && details.next !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mt-3">
+        <b-col cols="12" class="text-left">
+            <div>
+              <h4>
+                Next Request
+              </h4>
+              <p class="text-truncate"><router-link :to="'/'+details.next">{{details.next}}</router-link></p>
+            </div>
+        </b-col>
+      </b-row>
+      <b-row v-if="!error && details" class="mt-3">
+        <b-col cols="12" class="text-left">
+            <div>
+              <h4>
+                Confirmed in Request Block
+              </h4>
+              <p class="text-truncate"><router-link :to="'/requestBlock/'+details.request_block_hash">{{details.request_block_hash}}</router-link></p>
+            </div>
+        </b-col>
+      </b-row>
+      <b-row v-if="!error && details" class="mb-5">
+        <b-col cols="12">
+          <request :requestInfo="details"/>
         </b-col>
       </b-row>
       <b-row v-if="!error && details !== null">
@@ -141,13 +74,12 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import codepad from '@/components/codepad.vue'
-let fields = [
-  { key: 'origin', label: 'Account' },
-  { key: 'amount', label: 'Amount' }
-]
+import request from '@/components/requests/request.vue'
+
 export default {
   components: {
-    codepad
+    codepad,
+    request
   },
   computed: {
     ...mapState('settings', {
@@ -192,11 +124,6 @@ export default {
     })
     this.getRequestInfo(to.params.request)
     next()
-  },
-  data () {
-    return {
-      fields: fields
-    }
   }
 }
 </script>

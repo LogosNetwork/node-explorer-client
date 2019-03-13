@@ -1,4 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
+import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
 import bigInt from 'big-integer'
 const state = {
   request: null,
@@ -12,45 +13,87 @@ const getters = {
 }
 
 const actions = {
-  getRequestInfo: ({ commit, rootState }, request) => {
-    commit('setRequest', request)
+  getRequestInfo: ({ commit, rootState }, hash) => {
+    commit('setRequest', hash)
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
-    rpcClient.requests.info(request).then(val => {
-      if (val && !val.error) {
-        let details = val
-        let prettyDetails = null
-        if (details.type === 'send') {
-          prettyDetails = JSON.stringify(details, null, ' ')
-          commit('setPrettyDetails', prettyDetails)
-          details.totalAmountInLogos = 0
-          for (let trans of details.transactions) {
-            let logosVal = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
-            details.totalAmountInLogos += logosVal
-            trans.amountInLogos = logosVal
+    rpcClient.requests.info(hash).then(request => {
+      if (request && !request.error) {
+        commit('setPrettyDetails', JSON.stringify(request, null, ' '))
+        request.inactive = true
+        if (request.type === 'send' && request.transactions && request.transactions.length > 0) {
+          let total = bigInt(0)
+          for (let trans of request.transactions) {
+            total = total.plus(trans.amount)
+            trans.amountInLogos = rpcClient.convert.fromReason(trans.amount, 'LOGOS').replace(/\.0+$/, '')
           }
-          commit('setDetails', details)
-        } else if (details.type === 'issuance' || details.type === 'update_controller' ||
-          details.type === 'issue_additional' || details.type === 'burn' ||
-          details.type === 'update_issuer_info' || details.type === 'adjust_fee' ||
-          details.type === 'change_setting' || details.type === 'distribute' ||
-          details.type === 'adjust_user_status' || details.type === 'token_send' ||
-          details.type === 'withdraw_fee') {
-          rpcClient.accounts.toAddress(details.token_id).then(val => {
-            prettyDetails = JSON.stringify(details, null, ' ')
-            details.token_account = val.account
-            commit('setPrettyDetails', prettyDetails)
-            if (details.type === 'token_send') {
-              details.totalAmount = 0
-              for (let trans of details.transactions) {
-                details.totalAmount = bigInt(details.totalAmount).plus(trans.amount)
+          request.totalAmountLogos = rpcClient.convert.fromReason(total.toString(), 'LOGOS').replace(/\.0+$/, '')
+          commit('setDetails', request)
+        } else if (request.type === 'burn' || request.type === 'update_issuer_info' ||
+          request.type === 'token_send' || request.type === 'distribute' ||
+          request.type === 'adjust_fee' || request.type === 'change_setting' ||
+          request.type === 'adjust_user_status' || request.type === 'issuance' ||
+          request.type === 'issue_additional' || request.type === 'withdraw_fee' ||
+          request.type === 'update_controller' || request.type === 'revoke' ||
+          request.type === 'immute_setting') {
+          let tokenAddress = LogosWallet.LogosUtils.accountFromHexKey(request.token_id)
+          rpcClient.accounts.info(tokenAddress).then(data => {
+            data.tokenAccount = tokenAddress
+            try {
+              data.issuerInfo = JSON.parse(data.issuer_info)
+            } catch (e) {
+              data.issuerInfo = {}
+            }
+            request.tokenInfo = data
+
+            // Individual Token Request Handling
+            if (request.type === 'burn' || request.type === 'issue_additional') {
+              if (typeof data.issuerInfo.decimals !== 'undefined') {
+                request.amountInToken = rpcClient.convert.fromTo(request.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
               }
             }
-            commit('setDetails', details)
+            if (request.type === 'distribute' || request.type === 'withdraw_fee' || request.type === 'revoke') {
+              if (typeof data.issuerInfo.decimals !== 'undefined') {
+                request.transaction.amountInToken = rpcClient.convert.fromTo(request.transaction.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
+              }
+            }
+            if (request.type === 'update_issuer_info') {
+              try {
+                request.prettyInfo = JSON.stringify(JSON.parse(request.new_info), null, ' ')
+              } catch (e) {
+                request.prettyInfo = request.new_info
+              }
+            }
+            if (request.type === 'token_send') {
+              let total = bigInt(0)
+              for (let trans of request.transactions) {
+                total = total.plus(trans.amount)
+                if (typeof data.issuerInfo.decimals !== 'undefined') {
+                  trans.amountInToken = rpcClient.convert.fromTo(trans.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
+                }
+              }
+              request.totalAmount = total
+              if (typeof data.issuerInfo.decimals !== 'undefined') {
+                request.totalAmountInToken = rpcClient.convert.fromTo(total, 0, data.issuerInfo.decimals)
+              }
+            }
+            if (request.type === 'issuance') {
+              if (typeof data.issuerInfo.decimals !== 'undefined') {
+                request.totalSupplyInToken = rpcClient.convert.fromTo(request.total_supply, 0, data.issuerInfo.decimals)
+              }
+              try {
+                request.prettyInfo = JSON.stringify(JSON.parse(request.issuer_info), null, ' ')
+              } catch (e) {
+                request.prettyInfo = request.issuer_info
+              }
+            }
+            commit('setDetails', request)
           })
+        } else {
+          commit('setDetails', request)
         }
       } else {
-        if (val && val.error) {
-          commit('setError', val.error)
+        if (request && request.error) {
+          commit('setError', request.error)
         } else {
           commit('setError', '404')
         }
@@ -64,10 +107,12 @@ const actions = {
     prettyDetails = JSON.stringify(details, null, ' ')
     commit('setPrettyDetails', prettyDetails)
     details.totalAmountInLogos = 0
-    for (let trans of details.transactions) {
-      let logosVal = parseFloat(Number(rpcClient.convert.fromReason(trans.amount, 'LOGOS')).toFixed(5))
-      details.totalAmountInLogos += logosVal
-      trans.amountInLogos = logosVal
+    if (details.transactions) {
+      for (let trans of details.transactions) {
+        let logosVal = rpcClient.convert.fromReason(trans.amount, 'LOGOS')
+        details.totalAmountInLogos += logosVal
+        trans.amountInLogos = logosVal
+      }
     }
     commit('setDetails', details)
     commit('setError', null)

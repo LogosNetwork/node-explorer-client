@@ -68,20 +68,14 @@
               </b-col>
             </b-row>
             <div v-for="request in orderedRequests" :key='request.hash'>
-              <send v-if="request.type === 'send' && (selected === 'all' || selected ==='lgs')" :requestInfo="request" :account="account"/>
-              <burn v-if="request.type === 'burn' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
-              <issuerInfo v-if="request.type === 'update_issuer_info' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
-              <tokenSend v-if="request.type === 'token_send' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request" :account="account"/>
-              <distribute v-if="request.type === 'distribute' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
-              <adjustFee v-if="request.type === 'adjust_fee' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
-              <changeSetting v-if="request.type === 'change_setting' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
-              <adjustUserStatus v-if="request.type === 'adjust_user_status' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
-              <issuance v-if="request.type === 'issuance' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
-              <issueAdditional v-if="request.type === 'issue_additional' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
-              <withdrawFee v-if="request.type === 'withdraw_fee' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
-              <updateController v-if="request.type === 'update_controller' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
-              <revoke v-if="request.type === 'revoke' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
-              <immuteSetting v-if="request.type === 'immute_setting' && (selected === 'all' || selected === request.tokenInfo.tokenAccount)" :requestInfo="request"/>
+              <div v-if="(request.type === 'send' || request.type === 'issuance') && (selected === 'all' || selected ==='lgs')">
+                <request :requestInfo="request" :account="account"/>
+              </div>
+              <div v-if="request.type !== 'send' &&
+                (selected === 'all' || selected === request.tokenInfo.tokenAccount) &&
+                (request.type !== 'issuance' || (request.type === 'issuance' && selected === request.tokenInfo.tokenAccount))">
+                <request :requestInfo="request" :account="account"/>
+              </div>
             </div>
           </b-col>
         </b-row>
@@ -95,20 +89,7 @@ import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
 import VueQrcode from '@xkeshi/vue-qrcode'
 import infiniteScroll from 'vue-infinite-scroll'
-import send from '@/components/requests/send.vue'
-import burn from '@/components/requests/burn.vue'
-import issuerInfo from '@/components/requests/issuerInfo.vue'
-import distribute from '@/components/requests/distribute.vue'
-import adjustFee from '@/components/requests/adjustFee.vue'
-import changeSetting from '@/components/requests/changeSetting.vue'
-import adjustUserStatus from '@/components/requests/adjustUserStatus.vue'
-import issuance from '@/components/requests/issuance.vue'
-import issueAdditional from '@/components/requests/issueAdditional.vue'
-import withdrawFee from '@/components/requests/withdrawFee.vue'
-import updateController from '@/components/requests/updateController.vue'
-import revoke from '@/components/requests/revoke.vue'
-import immuteSetting from '@/components/requests/immuteSetting.vue'
-import tokenSend from '@/components/requests/tokenSend.vue'
+import request from '@/components/requests/request.vue'
 import 'vue-awesome/icons/coins'
 import 'vue-awesome/icons/spinner'
 
@@ -135,20 +116,7 @@ export default {
     })
   },
   components: {
-    send,
-    burn,
-    issuerInfo,
-    distribute,
-    adjustFee,
-    changeSetting,
-    adjustUserStatus,
-    issuance,
-    issueAdditional,
-    withdrawFee,
-    updateController,
-    revoke,
-    immuteSetting,
-    tokenSend
+    request
   },
   created: function () {
     this.reset()
