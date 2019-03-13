@@ -3,6 +3,7 @@ import bigInt from 'big-integer'
 import cloneDeep from 'lodash/cloneDeep'
 import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
 import orderBy from 'lodash/orderBy'
+import Vue from 'vue'
 
 const state = {
   account: null,
@@ -26,14 +27,35 @@ const state = {
 // Conclustion: Yes but thats a lot of work and code
 
 const updateTokenBalance = (raw, tokenAccount, rpcClient, commit, state) => {
-  commit('setRawTokenBalance', { tokenAccount: tokenAccount, rawTokenBalance: raw.toString() })
-  if (state.tokenBalances[tokenAccount].tokenInfo.issuerInfo &&
-    typeof state.tokenBalances[tokenAccount].tokenInfo.issuerInfo.decimals !== 'undefined') {
-    let tokenBalance = rpcClient.convert.fromTo(raw.toString(), 0, state.tokenBalances[tokenAccount].tokenInfo.issuerInfo.decimals)
-    commit('setTokenBalance', {
-      tokenAccount: tokenAccount,
-      tokenBalance: tokenBalance
-    })
+  if (state.tokenBalances[tokenAccount]) {
+    commit('setRawTokenBalance', { tokenAccount: tokenAccount, rawTokenBalance: raw.toString() })
+    if (state.tokenBalances[tokenAccount].tokenInfo.pending !== true &&
+      typeof state.tokenBalances[tokenAccount].tokenInfo.issuerInfo.decimals !== 'undefined') {
+      let tokenBalance = rpcClient.convert.fromTo(raw.toString(), 0, state.tokenBalances[tokenAccount].tokenInfo.issuerInfo.decimals)
+      commit('setTokenBalance', {
+        tokenAccount: tokenAccount,
+        tokenBalance: tokenBalance
+      })
+    }
+  } else {
+    if (state.tokens[tokenAccount]) {
+      let info = {
+        balance: raw.toString(),
+        tokenInfo: state.tokens[tokenAccount]
+      }
+      commit('addTokenBalance', { tokenAccount: tokenAccount, info: info })
+    } else {
+      let info = {
+        balance: raw.toString(),
+        tokenInfo: {
+          pending: true,
+          tokenAccount: tokenAccount
+        }
+      }
+      commit('addTokenBalance', { tokenAccount: tokenAccount, info: info })
+      commit('addToken', tokenAccount)
+      pullTokenInfo(tokenAccount, rpcClient, commit)
+    }
   }
 }
 
@@ -368,13 +390,13 @@ const mutations = {
     }
   },
   addToken (state, tokenAccount) {
-    state.tokens[tokenAccount] = {
+    Vue.set(state.tokens, tokenAccount, {
       pending: true,
       tokenAccount: tokenAccount
-    }
+    })
   },
   updateToken (state, data) {
-    state.tokens[data.tokenInfo.tokenAccount] = data.tokenInfo
+    Vue.set(state.tokens, data.tokenInfo.tokenAccount, data.tokenInfo)
     for (let request of state.requests) {
       if (request.tokenInfo && request.tokenInfo.pending &&
         request.tokenInfo.tokenAccount === data.tokenInfo.tokenAccount) {
@@ -383,18 +405,21 @@ const mutations = {
       }
     }
     for (let tokenBalance of Object.values(state.tokenBalances)) {
-      if (tokenBalance.tokenInfo && tokenBalance.tokenInfo.pending &&
+      if (tokenBalance && tokenBalance.tokenInfo && tokenBalance.tokenInfo.pending &&
         tokenBalance.tokenInfo.tokenAccount === data.tokenInfo.tokenAccount) {
         tokenBalance.tokenInfo = state.tokens[data.tokenInfo.tokenAccount]
         if (tokenBalance.tokenInfo.issuerInfo && typeof tokenBalance.tokenInfo.issuerInfo.decimals !== 'undefined') {
           tokenBalance.balanceInTokens = data.rpcClient.convert.fromTo(tokenBalance.balance, 0, tokenBalance.tokenInfo.issuerInfo.decimals)
         }
-        state.tokenBalances[data.tokenInfo.tokenAccount] = tokenBalance
+        Vue.set(state.tokenBalances, data.tokenInfo.tokenAccount, tokenBalance)
       }
     }
   },
   setTokenBalances (state, balances) {
     state.tokenBalances = balances
+  },
+  addTokenBalance (state, data) {
+    Vue.set(state.tokenBalances, data.tokenAccount, data.info)
   },
   setAccount (state, account) {
     state.account = account
