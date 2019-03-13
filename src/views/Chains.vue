@@ -5,49 +5,47 @@
       <b-tabs v-model="tabIndex">
         <b-tab :title="$t('request_blocks')" v-infinite-scroll="getRequestBlocks" infinite-scroll-distance="500" active>
           <b-form-select v-model="selectedDelegate" :options="rbDelegateLabels" class="mt-3" />
-          <div name="list" is="transition-group">
-            <div :key="requestBlock.hash + '_' + requestBlock.delegate" v-for="requestBlock in orderedRequestBlocks">
-              <b-link class="cardLink" :to="'/requestBlock/'+requestBlock.hash">
-                <b-card class="mt-3 mb-3 text-left">
-                  <b-row>
-                    <b-col>
-                      <h3>Request Block</h3>
-                    </b-col>
-                    <b-col class="text-right">
-                      <small>
-                        <span> {{parseInt(requestBlock.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</span>
-                      </small>
-                    </b-col>
-                  </b-row>
-                  <b-row class="mb-2">
-                    <b-col class="text-truncate">
-                      Hash: <b-link :to="'/requestBlock/'+requestBlock.hash">{{requestBlock.hash}}</b-link>
-                    </b-col>
-                  </b-row>
-                  <b-row v-if="requestBlock.previous && requestBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-2">
-                    <b-col class="text-truncate">
-                      Previous: <b-link :to="'/requestBlock/'+requestBlock.previous">{{requestBlock.previous}}</b-link>
-                    </b-col>
-                  </b-row>
-                  <b-row v-if="requestBlock.prevHash && requestBlock.prevHash !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-2">
-                    <b-col class="text-truncate">
-                      Previous: <b-link :to="'/requestBlock/'+requestBlock.prevHash">{{requestBlock.prevHash}}</b-link>
-                    </b-col>
-                  </b-row>
-                  <b-row class="mb-2">
-                    <b-col class="text-truncate">
-                      Proposed by Delegate {{requestBlock.delegate}}
-                    </b-col>
-                  </b-row>
-                  <b-row>
-                    <b-col>
-                      Contains {{requestBlock.request_count}} Requests
-                    </b-col>
-                  </b-row>
-                </b-card>
-              </b-link>
-              <icon v-if="requestBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && selectedDelegate !== -1" scale="2" name="chevron-down"></icon>
-            </div>
+          <div :key="requestBlock.hash + '_' + requestBlock.delegate" v-for="requestBlock in orderedRequestBlocks">
+            <b-link class="cardLink" :to="'/requestBlock/'+requestBlock.hash">
+              <b-card class="mt-3 mb-3 text-left">
+                <b-row>
+                  <b-col>
+                    <h3>Request Block</h3>
+                  </b-col>
+                  <b-col class="text-right">
+                    <small>
+                      <span> {{parseInt(requestBlock.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</span>
+                    </small>
+                  </b-col>
+                </b-row>
+                <b-row class="mb-2">
+                  <b-col class="text-truncate">
+                    Hash: <b-link :to="'/requestBlock/'+requestBlock.hash">{{requestBlock.hash}}</b-link>
+                  </b-col>
+                </b-row>
+                <b-row v-if="requestBlock.previous && requestBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-2">
+                  <b-col class="text-truncate">
+                    Previous: <b-link :to="'/requestBlock/'+requestBlock.previous">{{requestBlock.previous}}</b-link>
+                  </b-col>
+                </b-row>
+                <b-row v-if="requestBlock.prevHash && requestBlock.prevHash !== '0000000000000000000000000000000000000000000000000000000000000000'" class="mb-2">
+                  <b-col class="text-truncate">
+                    Previous: <b-link :to="'/requestBlock/'+requestBlock.prevHash">{{requestBlock.prevHash}}</b-link>
+                  </b-col>
+                </b-row>
+                <b-row class="mb-2">
+                  <b-col class="text-truncate">
+                    Proposed by Delegate {{requestBlock.delegate}}
+                  </b-col>
+                </b-row>
+                <b-row>
+                  <b-col>
+                    Contains {{requestBlock.request_count}} Requests
+                  </b-col>
+                </b-row>
+              </b-card>
+            </b-link>
+            <icon v-if="requestBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && selectedDelegate !== -1" scale="2" name="chevron-down"></icon>
           </div>
         </b-tab>
         <b-tab :title="$t('micro_epochs')" v-infinite-scroll="getMicroEpochs" infinite-scroll-distance="500">
@@ -276,9 +274,5 @@ export default {
   }
   .cardLink:hover > .card {
     box-shadow: 0 10px 30px -5px rgba(10,16,34,.2);
-  }
-  .list-enter-active > .cardLink > .card {
-    animation-name: highlight;
-    animation-duration: 2s;
   }
 </style>

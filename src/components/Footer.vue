@@ -13,9 +13,9 @@
             <b-col>
               <b-link to="/chains" exact-active-class="is-active" v-t="'chains'"></b-link>
             </b-col>
-            <!-- <b-col>
+            <b-col>
               <b-link to="/tokens" exact-active-class="is-active" v-t="'tokens'"></b-link>
-            </b-col> -->
+            </b-col>
             <b-col>
               <b-link to="/faucet" exact-active-class="is-active" v-t="'faucet'"></b-link>
             </b-col>

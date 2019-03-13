@@ -83,8 +83,8 @@
       <b-row class="text-left">
         <b-col cols="12" class="mb-5">
           <h5 class="text-left" v-t="'recent_requests'"></h5>
-          <div v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
-            <div v-for="(request, index) in requests" :key='index'>
+          <div v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500" name="list" is="transition-group">
+            <div v-for="request in requests" :key='request.hash'>
               <request :requestInfo="request"/>
             </div>
           </div>
@@ -240,12 +240,14 @@ export default {
 .cardLink:hover {
   text-decoration: none;
 }
-.cardLink > .card {
-  -webkit-transition: all 0.3s;
-  -o-transition: all 0.3s;
-  transition: all 0.3s;
-}
 .cardLink:hover > .card {
   box-shadow: 0 10px 30px -5px rgba(10, 16, 34, 0.2);
+}
+.list-enter-active, .list-leave-active {
+  transition: transform 1s ease-out, opacity 1s ease-out;
+}
+.list-enter, .list-leave-to {
+  transform: scale(0);
+  opacity: 0;
 }
 </style>

@@ -58,9 +58,4 @@ export default {
   animation-name: highlight;
   animation-duration: 2s;
 }
-.list-enter-active {
-  transition: all 2s;
-  animation-name: highlight;
-  animation-duration: 2s;
-}
 </style>

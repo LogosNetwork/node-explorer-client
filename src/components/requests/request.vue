@@ -83,6 +83,9 @@ export default {
   .cardLink:hover {
     text-decoration: none;
   }
+  .list-group-item {
+    background-color: inherit;
+  }
   .cardLink > .card {
     -webkit-transition: all .3s;
     -o-transition: all .3s;
