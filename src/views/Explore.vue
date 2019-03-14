@@ -244,10 +244,9 @@ export default {
   box-shadow: 0 10px 30px -5px rgba(10, 16, 34, 0.2);
 }
 .list-enter-active, .list-leave-active {
-  transition: transform 1s ease-out, opacity 1s ease-out;
+  transition: opacity .5s;
 }
-.list-enter, .list-leave-to {
-  transform: scale(0);
+.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
   opacity: 0;
 }
 </style>
