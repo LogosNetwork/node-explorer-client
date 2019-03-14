@@ -9,6 +9,7 @@ import microEpoch from './modules/microEpoch'
 import epoch from './modules/epoch'
 import settings from './modules/settings'
 import request from './modules/request'
+import tokens from './modules/tokens'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -21,7 +22,8 @@ export default new Vuex.Store({
     microEpoch,
     epoch,
     settings,
-    request
+    request,
+    tokens
   },
   strict: process.env.NODE_ENV !== 'production'
 })

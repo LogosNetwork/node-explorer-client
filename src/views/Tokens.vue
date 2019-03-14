@@ -3,29 +3,12 @@
     <b-container class="pt-5">
       <b-row class="text-left">
         <b-col cols="12" class="mb-5">
-          <h5 class="text-left" v-t="'tokens'"></h5>
-          <table class="table b-table table-bordered table-sm b-table-fixed" style="background:#FFF">
-            <thead>
-              <tr>
-                <th aria-colindex="1">Token</th>
-                <th aria-colindex="2">Issuer</th>
-                <th aria-colindex="3">Total Supply</th>
-              </tr>
-            </thead>
-            <tbody name="list">
-              <tr>
-                <td aria-colindex="1">
-                  <div class="text-truncate">My Coin (COIN) <br/>This is a JSON description from the token issuer json data</div>
-                </td>
-                <td aria-colindex="2">
-                  <div class="text-truncate">lgs_13duy35orkazz577x7ucwysu5ujwkr8qgu8beb91r1p14ema7j7n7syadbtx</div>
-                </td>
-                <td aria-colindex="3">
-                  <div class="text-truncate">1,000,000 COIN</div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <h3 class="text-left" v-t="'tokens'"></h3>
+          <div v-infinite-scroll="getMoreTokens" infinite-scroll-distance="500" name="list" is="transition-group">
+            <div v-for="token in tokens" :key='token.token_id'>
+              <tokenCard :tokenInfo="token" class="mb-3"/>
+            </div>
+          </div>
         </b-col>
       </b-row>
     </b-container>
@@ -33,9 +16,56 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
+import Vue from 'vue'
+import infiniteScroll from 'vue-infinite-scroll'
+import codepad from '@/components/codepad.vue'
+import tokenCard from '@/components/requests/tokenCard.vue'
+Vue.use(infiniteScroll)
+
 export default {
   name: 'tokens',
-  components: {}
+  components: {
+    codepad,
+    tokenCard
+  },
+  computed: {
+    ...mapState('tokens', {
+      tokens: state => state.tokens,
+      error: state => state.error
+    })
+  },
+  methods: {
+    ...mapActions('tokens', [
+      'getTokens',
+      'reset'
+    ]),
+    getMoreTokens: function (force = false) {
+      if (!this.txBusy || force) {
+        this.txBusy = true
+        this.getTokens((response) => {
+          if (response === 'out of content') {
+            this.txBusy = true
+          } else if (response === 'success') {
+            this.txBusy = false
+          }
+        })
+      }
+    }
+  },
+  data () {
+    return {
+      txBusy: false
+    }
+  },
+  created: function () {
+    this.getMoreTokens(true)
+  },
+  beforeRouteUpdate (to, from, next) {
+    this.reset()
+    this.getMoreTokens(true)
+    next()
+  }
 }
 </script>
 
