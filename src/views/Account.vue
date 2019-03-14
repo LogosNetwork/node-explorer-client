@@ -37,8 +37,7 @@
             <h4 class="text-left">
               <span>{{requestCount}} </span>
               <span v-t="'requests'"></span>
-              <small v-if='requests.length === count'> (showing last {{count}})</small>
-              <small v-if='requests.length > count'> (showing last {{requests.length}})</small>
+              <small v-if='requests.length >= count'> (showing last {{requests.length}})</small>
               <small v-if='requests.length < count'> (showing all {{requests.length}})</small>
             </h4>
             <p class="text-left" v-if="lastModified"><span v-t="'lastUpdated'"></span> <strong> {{ lastModified | moment("MMMM DD, YYYY h:mm:ss A") }}</strong></p>
@@ -67,14 +66,16 @@
                 </div>
               </b-col>
             </b-row>
-            <div v-for="request in orderedRequests" :key='request.hash'>
-              <div v-if="(request.type === 'send' || request.type === 'issuance') && (selected === 'all' || selected ==='lgs')">
-                <request :requestInfo="request" :account="account"/>
-              </div>
-              <div v-if="request.type !== 'send' &&
-                (selected === 'all' || selected === request.tokenInfo.tokenAccount) &&
-                (request.type !== 'issuance' || (request.type === 'issuance' && selected === request.tokenInfo.tokenAccount))">
-                <request :requestInfo="request" :account="account"/>
+            <div name="list" is="transition-group">
+              <div v-for="request in requests" :key="request.hash">
+                <div v-if="(request.type === 'send' || request.type === 'issuance') && (selected === 'all' || selected ==='lgs')">
+                  <request :requestInfo="request" :account="account"/>
+                </div>
+                <div v-if="request.type !== 'send' &&
+                  (selected === 'all' || selected === request.tokenInfo.tokenAccount) &&
+                  (request.type !== 'issuance' || (request.type === 'issuance' && selected === request.tokenInfo.tokenAccount))">
+                  <request :requestInfo="request" :account="account"/>
+                </div>
               </div>
             </div>
           </b-col>
@@ -192,5 +193,11 @@ export default {
     #qrHolder {
       text-align: right;
     }
+  }
+  .list-enter-active, .list-leave-active {
+    transition: opacity .5s;
+  }
+  .list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+    opacity: 0;
   }
 </style>

@@ -2,7 +2,6 @@ import Logos from '@logosnetwork/logos-rpc-client'
 import bigInt from 'big-integer'
 import cloneDeep from 'lodash/cloneDeep'
 import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
-import orderBy from 'lodash/orderBy'
 import Vue from 'vue'
 
 const state = {
@@ -14,7 +13,6 @@ const state = {
   count: 50,
   requests: [],
   hashes: {},
-  orderedRequests: [],
   lastHash: null,
   tokens: {},
   tokenBalances: {},
@@ -385,8 +383,7 @@ const mutations = {
     if (!state.hashes[request.hash]) {
       state.hashes[request.hash] = request
       state.requests.push(request)
-      state.orderedRequests = orderBy(state.requests, 'timestamp', 'desc')
-      if (request.origin === state.account) state.lastHash = state.orderedRequests[state.orderedRequests.length - 1].hash
+      if (request.origin === state.account) state.lastHash = state.requests[state.requests.length - 1].hash
     }
   },
   addToken (state, tokenAccount) {
@@ -433,7 +430,6 @@ const mutations = {
     state.count = 50
     state.requests = []
     state.hashes = {}
-    state.orderedRequests = []
     state.lastHash = null
     state.tokens = {}
     state.tokenBalances = {}
