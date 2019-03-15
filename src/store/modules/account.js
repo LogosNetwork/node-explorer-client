@@ -12,6 +12,7 @@ const state = {
   rawBalance: null,
   count: 50,
   requests: [],
+  type: null,
   hashes: {},
   lastHash: null,
   tokens: {},
@@ -214,6 +215,28 @@ const actions = {
           commit('setBalance', rpcClient.convert.fromReason(val.balance, 'LOGOS'))
           commit('setRequestCount', val.request_count)
           commit('setLastModified', parseInt(val.modified_timestamp))
+          if (val.type === 'TokenAccount') {
+            val.tokenAccount = account
+            try {
+              val.issuerInfo = JSON.parse(val.issuer_info)
+            } catch (e) {
+              val.issuerInfo = {}
+            }
+            val.inactive = true
+            val.circulating_supply = bigInt(val.total_supply).minus(bigInt(val.token_balance))
+            if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
+              val.balanceInTokens = rpcClient.convert.fromTo(val.token_balance, 0, val.issuerInfo.decimals)
+              val.feeBalanceInTokens = rpcClient.convert.fromTo(val.token_fee_balance, 0, val.issuerInfo.decimals)
+              val.totalSupplyInTokens = rpcClient.convert.fromTo(val.total_supply, 0, val.issuerInfo.decimals)
+              val.circulatingSupplyInTokens = rpcClient.convert.fromTo(val.circulating_supply, 0, val.issuerInfo.decimals)
+            }
+            commit('updateToken', {
+              rpcClient: rpcClient,
+              tokenInfo: val
+            })
+            console.log(val)
+          }
+          commit('setAccountType', val.type)
           if (val.representative_block && val.representative_block !== '0000000000000000000000000000000000000000000000000000000000000000') {
             commit('setRepresentative', LogosWallet.LogosUtils.accountFromHexKey(val.representative_block))
           }
@@ -373,6 +396,9 @@ const mutations = {
   setCount (state, count) {
     state.count = count
   },
+  setAccountType (state, type) {
+    state.type = type
+  },
   setLastModified (state, lastModified) {
     state.lastModified = lastModified
   },
@@ -431,6 +457,7 @@ const mutations = {
     state.requests = []
     state.hashes = {}
     state.lastHash = null
+    state.type = null
     state.tokens = {}
     state.tokenBalances = {}
     state.requestCount = 0

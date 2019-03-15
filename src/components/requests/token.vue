@@ -7,7 +7,8 @@
           <icon name="circle" scale="2" class="alert"/>
           <icon name="coins" style="color:#FFF"/>
         </icon>
-        <b-link :title="tokenInfo.name" :to="'/'+tokenInfo.tokenAccount">{{tokenInfo.name}} - {{tokenInfo.symbol}}</b-link>
+        <b-link v-if="!tokenInfo.inactive" :title="tokenInfo.name" :to="'/'+tokenInfo.tokenAccount">{{tokenInfo.name}} - {{tokenInfo.symbol}}</b-link>
+        <span v-if="tokenInfo.inactive">{{tokenInfo.name}} - {{tokenInfo.symbol}}</span>
       </b-card-text>
       <b-card-text v-if="origin">
         <icon style="vertical-align:middle;" scale="2" name="user-circle" class="text-info mr-2"></icon>

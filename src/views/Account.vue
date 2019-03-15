@@ -1,41 +1,106 @@
 <template>
   <div id="primary">
     <b-container>
-      <b-row class="text-left pt-5">
-        <b-col cols="12" md="8" class="mb-3">
-          <h3 class="text-left" v-t="'account'"></h3>
-          <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
-          <h3 v-if="!error && balance !== null && selected === 'all' || selected === 'lgs'" class="pt-3" style="color:green">{{balance}} LOGOS</h3>
-          <h3 v-if="!error && tokenBalances !== null && selected !== 'all' && selected !== 'lgs'" class="pt-3" style="color:green">
-            <span v-if="tokenBalances[selected] && tokenBalances[selected].tokenInfo.pending !== true">
-              <span v-if="tokenBalances[selected].balanceInTokens">{{tokenBalances[selected].balanceInTokens}} {{tokenBalances[selected].tokenInfo.symbol}}</span>
-              <span v-if="!tokenBalances[selected].balanceInTokens">{{tokenBalances[selected].balance}} {{tokenBalances[selected].tokenInfo.symbol}}</span>
-            </span>
-            <span v-if="!tokenBalances[selected] || tokenBalances[selected].tokenInfo.pending === true">
-              <icon name="spinner" :spin="true" /> Loading Token Info
-            </span>
-          </h3>
-          <h4 v-if="error" class="pt-3" style="color:red">This account has not been opened yet</h4>
-        </b-col>
-        <b-col cols="12" md="4" class="mb-3" id="qrHolder">
-            <qrcode :value="'lgs:'+account" :options="{ size: 110 }"></qrcode>
-        </b-col>
-      </b-row>
-      <b-row v-if="!error" class="mb-3">
-        <b-col v-if="representaive" cols="12" class="text-left">
-            <div>
-              <h4>
-                Representaive
-              </h4>
-              <p class="text-truncate"><router-link :to="'/'+representaive">{{representaive}}</router-link></p>
-            </div>
-        </b-col>
-      </b-row>
+      <div v-if="type === 'LogosAccount'">
+        <b-row class="text-left pt-5">
+          <b-col cols="12" md="8" class="mb-3">
+            <h3 class="text-left" v-t="'account'"></h3>
+            <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
+            <h3 v-if="!error && balance !== null && selected === 'all' || selected === 'lgs'" class="pt-3" style="color:green">{{balance}} LOGOS</h3>
+            <h3 v-if="!error && tokenBalances !== null && selected !== 'all' && selected !== 'lgs'" class="pt-3" style="color:green">
+              <span v-if="tokenBalances[selected] && tokenBalances[selected].tokenInfo.pending !== true">
+                <span v-if="tokenBalances[selected].balanceInTokens">{{tokenBalances[selected].balanceInTokens}} {{tokenBalances[selected].tokenInfo.symbol}}</span>
+                <span v-if="!tokenBalances[selected].balanceInTokens">{{tokenBalances[selected].balance}} {{tokenBalances[selected].tokenInfo.symbol}}</span>
+              </span>
+              <span v-if="!tokenBalances[selected] || tokenBalances[selected].tokenInfo.pending === true">
+                <icon name="spinner" :spin="true" /> Loading Token Info
+              </span>
+            </h3>
+            <h4 v-if="error" class="pt-3" style="color:red">This account has not been opened yet</h4>
+          </b-col>
+          <b-col cols="12" md="4" class="mb-3" id="qrHolder">
+              <qrcode :value="'lgs:'+account" :options="{ size: 110 }"></qrcode>
+          </b-col>
+        </b-row>
+        <b-row v-if="!error" class="mb-3">
+          <b-col v-if="representaive" cols="12" class="text-left">
+              <div>
+                <h4>
+                  Representaive
+                </h4>
+                <p class="text-truncate"><router-link :to="'/'+representaive">{{representaive}}</router-link></p>
+              </div>
+          </b-col>
+        </b-row>
+      </div>
+      <div v-else-if="type === 'TokenAccount'" class="mb-5 pt-5">
+        <h3 class="text-left">Token Account</h3>
+        <b-card no-body class="text-left">
+          <b-card-body>
+            <b-card-title>
+              <div class="d-flex justify-content-between">
+                <token :tokenInfo="token" />
+                <div v-if="token.createdAt" class="timestamp text-right">
+                  <small>
+                    <span>Created on {{ token.createdAt | moment('ddd, D MMM YYYY') }}</span>
+                  </small>
+                </div>
+              </div>
+            </b-card-title>
+            <b-card-text v-if="typeof token.totalSupplyInTokens !== 'undefined'">
+              <strong>Total Supply: </strong>{{token.totalSupplyInTokens}} {{token.symbol}}
+            </b-card-text>
+            <b-card-text v-if="typeof token.totalSupplyInTokens === 'undefined'">
+              <strong>Total Supply: </strong>{{token.total_supply}} {{token.symbol}}
+            </b-card-text>
+            <b-card-text v-if="typeof token.circulatingSupplyInTokens !== 'undefined'">
+              <strong>Circulating Supply: </strong>{{token.circulatingSupplyInTokens}} {{token.symbol}}
+            </b-card-text>
+            <b-card-text v-if="typeof token.circulatingSupplyInTokens === 'undefined'">
+              <strong>Circulating Supply: </strong>{{token.circulating_supply}} {{token.symbol}}
+            </b-card-text>
+            <b-card-text v-if="token.fee_type.toLowerCase() === 'flat'">
+              <strong>Fee Rate: </strong>{{token.fee_rate}} base units of {{token.symbol}}
+            </b-card-text>
+            <b-card-text v-if="token.fee_type.toLowerCase() === 'percentage'">
+              <strong>Fee Rate: </strong>{{token.fee_rate}}% of each token_send
+            </b-card-text>
+            <b-card-text v-if="typeof token.feeBalanceInTokens !== 'undefined'">
+              <strong>Available Fees: </strong>{{token.feeBalanceInTokens}} {{token.symbol}}
+            </b-card-text>
+            <b-card-text v-if="typeof token.feeBalanceInTokens === 'undefined'">
+              <strong>Available Fees: </strong>{{token.token_fee_balance}} {{token.symbol}}
+            </b-card-text>
+            <b-card-text>
+              <strong>Logos Balance: </strong>{{balance}} Logos
+            </b-card-text>
+          </b-card-body>
+          <b-list-group flush>
+            <b-list-group-item v-if="Object.keys(token.settings).length > 0">
+              <strong>Settings: </strong>
+              <ul>
+                <li v-for="setting in Object.keys(token.settings)" :key="'set'+setting">
+                  <span v-if="token.settings[setting]">{{setting}}</span>
+                </li>
+              </ul>
+            </b-list-group-item>
+            <b-list-group-item v-for="controller in token.controllers" :key="'controller'+controller.account">
+              <strong>Controller: </strong><LogosAddress :address="controller.account" /><br/>
+              <ul>
+                <li v-for="privilege in controller.privileges" :key="controller.account+privilege">
+                  {{privilege}}
+                </li>
+              </ul>
+            </b-list-group-item>
+          </b-list-group>
+        </b-card>
+      </div>
       <div v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
         <b-row v-if="requests && requests.length > 0">
           <b-col cols="12" class="mb-3">
             <h4 class="text-left">
-              <span>{{requestCount}} </span>
+              <span v-if="type === 'LogosAccount'">{{requestCount}} </span>
+              <span v-if="type === 'TokenAccount'">{{requests.length}} </span>
               <span v-t="'requests'"></span>
               <small v-if='requests.length >= count'> (showing last {{requests.length}})</small>
               <small v-if='requests.length < count'> (showing all {{requests.length}})</small>
@@ -91,6 +156,13 @@ import { mapActions, mapState } from 'vuex'
 import VueQrcode from '@xkeshi/vue-qrcode'
 import infiniteScroll from 'vue-infinite-scroll'
 import request from '@/components/requests/request.vue'
+import bCardBody from 'bootstrap-vue/es/components/card/card-body'
+import bCardTitle from 'bootstrap-vue/es/components/card/card-title'
+import bCardText from 'bootstrap-vue/es/components/card/card-text'
+import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
+import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
+import LogosAddress from '@/components/LogosAddress.vue'
+import token from '@/components/requests/token.vue'
 import 'vue-awesome/icons/coins'
 import 'vue-awesome/icons/spinner'
 
@@ -107,6 +179,8 @@ export default {
       representaive: state => state.representaive,
       error: state => state.error,
       balance: state => state.balance,
+      type: state => state.type,
+      tokens: state => state.tokens,
       rawBalance: state => state.rawBalance,
       requests: state => state.requests,
       requestCount: state => state.requestCount,
@@ -114,10 +188,24 @@ export default {
       lastModified: state => state.lastModified,
       tokenBalances: state => state.tokenBalances,
       orderedRequests: state => state.orderedRequests
-    })
+    }),
+    token: function () {
+      if (this.type === 'TokenAccount') {
+        return this.tokens[this.account]
+      } else {
+        return null
+      }
+    }
   },
   components: {
-    request
+    request,
+    bCardBody,
+    bCardTitle,
+    bCardText,
+    bListGroup,
+    LogosAddress,
+    bListGroupItem,
+    token
   },
   created: function () {
     this.reset()
