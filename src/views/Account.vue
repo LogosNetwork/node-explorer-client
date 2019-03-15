@@ -33,67 +33,132 @@
           </b-col>
         </b-row>
       </div>
-      <div v-else-if="type === 'TokenAccount'" class="mb-5 pt-5">
-        <h3 class="text-left">Token Account</h3>
-        <b-card no-body class="text-left">
-          <b-card-body>
-            <b-card-title>
-              <div class="d-flex justify-content-between">
-                <token :tokenInfo="token" />
-                <div v-if="token.createdAt" class="timestamp text-right">
-                  <small>
-                    <span>Created on {{ token.createdAt | moment('ddd, D MMM YYYY') }}</span>
-                  </small>
-                </div>
-              </div>
-            </b-card-title>
-            <b-card-text v-if="typeof token.totalSupplyInTokens !== 'undefined'">
-              <strong>Total Supply: </strong>{{token.totalSupplyInTokens}} {{token.symbol}}
-            </b-card-text>
-            <b-card-text v-if="typeof token.totalSupplyInTokens === 'undefined'">
-              <strong>Total Supply: </strong>{{token.total_supply}} {{token.symbol}}
-            </b-card-text>
-            <b-card-text v-if="typeof token.circulatingSupplyInTokens !== 'undefined'">
-              <strong>Circulating Supply: </strong>{{token.circulatingSupplyInTokens}} {{token.symbol}}
-            </b-card-text>
-            <b-card-text v-if="typeof token.circulatingSupplyInTokens === 'undefined'">
-              <strong>Circulating Supply: </strong>{{token.circulating_supply}} {{token.symbol}}
-            </b-card-text>
-            <b-card-text v-if="token.fee_type.toLowerCase() === 'flat'">
-              <strong>Fee Rate: </strong>{{token.fee_rate}} base units of {{token.symbol}}
-            </b-card-text>
-            <b-card-text v-if="token.fee_type.toLowerCase() === 'percentage'">
-              <strong>Fee Rate: </strong>{{token.fee_rate}}% of each token_send
-            </b-card-text>
-            <b-card-text v-if="typeof token.feeBalanceInTokens !== 'undefined'">
-              <strong>Available Fees: </strong>{{token.feeBalanceInTokens}} {{token.symbol}}
-            </b-card-text>
-            <b-card-text v-if="typeof token.feeBalanceInTokens === 'undefined'">
-              <strong>Available Fees: </strong>{{token.token_fee_balance}} {{token.symbol}}
-            </b-card-text>
-            <b-card-text>
-              <strong>Logos Balance: </strong>{{balance}} Logos
-            </b-card-text>
-          </b-card-body>
-          <b-list-group flush>
-            <b-list-group-item v-if="Object.keys(token.settings).length > 0">
-              <strong>Settings: </strong>
-              <ul>
-                <li v-for="setting in Object.keys(token.settings)" :key="'set'+setting">
-                  <span v-if="token.settings[setting]">{{setting}}</span>
-                </li>
-              </ul>
-            </b-list-group-item>
-            <b-list-group-item v-for="controller in token.controllers" :key="'controller'+controller.account">
-              <strong>Controller: </strong><LogosAddress :address="controller.account" /><br/>
-              <ul>
-                <li v-for="privilege in controller.privileges" :key="controller.account+privilege">
-                  {{privilege}}
-                </li>
-              </ul>
-            </b-list-group-item>
-          </b-list-group>
-        </b-card>
+      <div v-else-if="type === 'TokenAccount'" class="mb-5 pt-5 text-left">
+        <div class="mb-3">
+          <h3 class="mb-3">
+            <token :tokenInfo="token" :inactive="true" size="33" />
+          </h3>
+          <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
+        </div>
+        <b-row>
+          <b-col lg="6" md="12" class="mb-3">
+            <b-card no-body>
+              <b-list-group flush>
+                <b-list-group-item>
+                  <b-row class="justify-content-md-center">
+                    <div class="col-md-4 mb-1 mb-md-0">
+                      <span class="text-nowrap">
+                        Total Supply:
+                      </span>
+                    </div>
+                    <div class="col-md-8 font-weight-bold text-left">
+                      <span v-if="typeof token.totalSupplyInTokens !== 'undefined'">{{token.totalSupplyInTokens}} {{token.symbol}}</span>
+                      <span v-else>{{token.total_supply}} base units of {{token.symbol}}</span>
+                    </div>
+                  </b-row>
+                </b-list-group-item>
+                <b-list-group-item>
+                  <b-row class="justify-content-md-center">
+                    <div class="col-md-4 mb-1 mb-md-0">
+                      <span class="text-nowrap">
+                        Circulating Supply:
+                      </span>
+                    </div>
+                    <div class="col-md-8 font-weight-bold text-left">
+                      <span v-if="typeof token.circulatingSupplyInTokens !== 'undefined'">{{token.circulatingSupplyInTokens}} {{token.symbol}}</span>
+                      <span v-else>{{token.circulating_supply}} base units of {{token.symbol}}</span>
+                    </div>
+                  </b-row>
+                </b-list-group-item>
+                <b-list-group-item>
+                  <b-row class="justify-content-md-center">
+                    <div class="col-md-4 mb-1 mb-md-0">
+                      <span class="text-nowrap">
+                        Logos Balance:
+                      </span>
+                    </div>
+                    <div class="col-md-8 font-weight-bold text-left">
+                      <span>{{balance}} Logos</span>
+                    </div>
+                  </b-row>
+                </b-list-group-item>
+              </b-list-group>
+            </b-card>
+          </b-col>
+          <b-col lg="6" md="12" class="mb-3">
+            <b-card no-body>
+              <b-list-group flush>
+                <b-list-group-item>
+                  <b-row class="justify-content-md-center">
+                    <div class="col-md-4 mb-1 mb-md-0">
+                      <span class="text-nowrap">
+                        Fee Rate:
+                      </span>
+                    </div>
+                    <div class="col-md-8 font-weight-bold text-left">
+                      <span v-if="token.fee_type.toLowerCase() === 'flat' && typeof token.feeInTokens !== 'undefined' && parseInt(token.feeInTokens) > 0">
+                        {{token.feeInTokens}} {{token.symbol}}
+                      </span>
+                      <span v-else-if="token.fee_type.toLowerCase() === 'flat'">
+                        {{token.fee_rate}} base units of {{token.symbol}}
+                      </span>
+                      <span v-else-if="token.fee_type.toLowerCase() === 'percentage'">
+                        {{token.fee_rate}}% of each token_send
+                      </span>
+                    </div>
+                  </b-row>
+                </b-list-group-item>
+                <b-list-group-item>
+                  <b-row class="justify-content-md-center">
+                    <div class="col-md-4 mb-1 mb-md-0">
+                      <span class="text-nowrap">
+                        Available Fees:
+                      </span>
+                    </div>
+                    <div class="col-md-8 font-weight-bold text-left">
+                      <span v-if="typeof token.feeBalanceInTokens !== 'undefined'">{{token.feeBalanceInTokens}} {{token.symbol}}</span>
+                      <span v-else>{{token.token_fee_balance}} {{token.symbol}}</span>
+                    </div>
+                  </b-row>
+                </b-list-group-item>
+                <b-list-group-item>
+                  <b-row class="justify-content-md-center">
+                    <div class="col-md-4 mb-1 mb-md-0">
+                      <span class="text-nowrap">
+                        Settings:
+                      </span>
+                    </div>
+                    <div class="col-md-8 text-left">
+                      <span v-for="setting in Object.keys(token.settings)" :key="'set'+setting">
+                        <!-- Stack the Icon lock with the setting icon inside the lock body -->
+                        <icon v-if="token.settings[setting] && setting === 'issuance'" name="magic" class="mr-2" v-b-tooltip.hover :title="token.name + ' allows controllers to issue more ' + token.symbol"></icon>
+                        <icon v-if="token.settings[setting] && setting === 'revoke'" name="mask" class="mr-2" v-b-tooltip.hover :title="token.name + ' allows controllers to revoke '+ token.symbol +' from token holder\'s accounts'"></icon>
+                        <icon v-if="token.settings[setting] && setting === 'freeze'" name="snowflake" class="mr-2" v-b-tooltip.hover :title="`${token.name} allows controllers to freeze accounts`"></icon>
+                        <icon v-if="token.settings[setting] && setting === 'adjust_fee'" name="coins" class="mr-2" v-b-tooltip.hover :title="`${token.name} allows controllers to adjust the fee of any token holders`"></icon>
+                        <icon v-if="token.settings[setting] && setting === 'whitelist'" name="list-alt" class="mr-2" v-b-tooltip.hover :title="`${token.name} requires accounts to be whitelisted prior to using the ${token.symbol} token`"></icon>
+                      </span>
+                    </div>
+                  </b-row>
+                </b-list-group-item>
+              </b-list-group>
+            </b-card>
+          </b-col>
+        </b-row>
+        <div class="mb-3">
+          <h4>Token Controllers</h4>
+          <b-card no-body>
+            <b-card-body>
+              <b-card-text v-for="controller in token.controllers" :key="'controller'+controller.account">
+                <LogosAddress :address="controller.account" /><br/>
+                <ul>
+                  <li v-for="privilege in controller.privileges" :key="controller.account+privilege">
+                    {{privilege}}
+                  </li>
+                </ul>
+              </b-card-text>
+            </b-card-body>
+          </b-card>
+        </div>
       </div>
       <div v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
         <b-row v-if="requests && requests.length > 0">
@@ -165,6 +230,12 @@ import LogosAddress from '@/components/LogosAddress.vue'
 import token from '@/components/requests/token.vue'
 import 'vue-awesome/icons/coins'
 import 'vue-awesome/icons/spinner'
+import 'vue-awesome/icons/magic'
+import 'vue-awesome/icons/snowflake'
+import 'vue-awesome/icons/mask'
+import 'vue-awesome/icons/list-alt'
+import 'vue-awesome/icons/lock-open'
+import 'vue-awesome/icons/lock'
 
 Vue.use(infiniteScroll)
 Vue.component(VueQrcode.name, VueQrcode)
@@ -281,6 +352,10 @@ export default {
     #qrHolder {
       text-align: right;
     }
+  }
+  .card-body > .card-text > ul,
+  .card-body > ul {
+    margin-bottom: 0px;
   }
   .list-enter-active, .list-leave-active {
     transition: opacity .5s;

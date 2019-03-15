@@ -118,6 +118,7 @@ const pullTokenInfo = (tokenAccount, rpcClient, commit) => {
     } catch (e) {
       tokenInfo.issuerInfo = {}
     }
+    console.log('pullTokenInfo update token')
     commit('updateToken', {
       rpcClient: rpcClient,
       tokenInfo: tokenInfo
@@ -140,12 +141,14 @@ const parseRequests = (request, rpcClient, commit, state) => {
       request.tokenInfo = state.tokens[tokenAccount]
       commit('addRequest', handleTokenRequests(request, rpcClient))
     } else {
-      commit('addToken', tokenAccount)
       request.tokenInfo = {
         pending: true,
         tokenAccount: tokenAccount
       }
-      pullTokenInfo(tokenAccount, rpcClient, commit)
+      if (tokenAccount !== state.account) {
+        commit('addToken', tokenAccount)
+        pullTokenInfo(tokenAccount, rpcClient, commit)
+      }
       commit('addRequest', handleTokenRequests(request, rpcClient))
     }
   } else {
@@ -222,13 +225,13 @@ const actions = {
             } catch (e) {
               val.issuerInfo = {}
             }
-            val.inactive = true
             val.circulating_supply = bigInt(val.total_supply).minus(bigInt(val.token_balance))
             if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
               val.balanceInTokens = rpcClient.convert.fromTo(val.token_balance, 0, val.issuerInfo.decimals)
               val.feeBalanceInTokens = rpcClient.convert.fromTo(val.token_fee_balance, 0, val.issuerInfo.decimals)
               val.totalSupplyInTokens = rpcClient.convert.fromTo(val.total_supply, 0, val.issuerInfo.decimals)
               val.circulatingSupplyInTokens = rpcClient.convert.fromTo(val.circulating_supply, 0, val.issuerInfo.decimals)
+              if (val.fee_type.toLowerCase() === 'flat') val.feeInTokens = rpcClient.convert.fromTo(val.fee_rate, 0, val.issuerInfo.decimals)
             }
             commit('updateToken', {
               rpcClient: rpcClient,
@@ -371,7 +374,8 @@ const actions = {
     // Handle MQTT for Token Accounts
     if (state.account === tokenAccount) {
       let val = cloneDeep(state.tokens[tokenAccount])
-      if (requestData.type === 'issue_additional') {
+      if (requestData.type === 'issuance') {
+      } else if (requestData.type === 'issue_additional') {
         let totalSupply = bigInt(val.total_supply).plus(bigInt(requestData.amount)).toString()
         val.total_supply = totalSupply
         if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
@@ -401,6 +405,10 @@ const actions = {
       } else if (requestData.type === 'adjust_fee') {
         val.fee_rate = requestData.fee_rate
         val.fee_type = requestData.fee_type
+        if (val.fee_type.toLowerCase() === 'flat' &&
+          val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
+          val.feeInTokens = rpcClient.convert.fromTo(val.fee_rate, 0, val.issuerInfo.decimals)
+        }
       } else if (requestData.type === 'update_issuer_info') {
         try {
           val.issuerInfo = JSON.parse(requestData.new_info)
@@ -449,7 +457,7 @@ const actions = {
         rpcClient: rpcClient,
         tokenInfo: val
       })
-      if (requestData.type !== 'token_send') {
+      if (requestData.type !== 'token_send' && requestData.type !== 'issuance') {
         commit('setError', null)
         commit('incrementRequestCount')
         commit('setLastModified', requestData.timestamp)
