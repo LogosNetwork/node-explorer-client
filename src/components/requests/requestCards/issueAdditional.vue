@@ -22,7 +22,7 @@
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item>
-        <icon name="magic" class="text-success mr-2"></icon>
+        <font-awesome-icon :icon="faMagic" class="text-success mr-2"/>
         <strong class="mr-2">Added</strong>
         <span v-if="requestInfo.amountInToken" class="text-success mr-2">{{requestInfo.amountInToken}}</span>
         <span v-if="typeof requestInfo.amountInToken === 'undefined'" class="text-success mr-2">{{requestInfo.amount}}</span>
@@ -40,10 +40,15 @@ import bCardText from 'bootstrap-vue/es/components/card/card-text'
 import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import token from '@/components/requests/token.vue'
-import 'vue-awesome/icons/magic'
+import { faMagic } from '@fortawesome/pro-light-svg-icons'
 
 export default {
   name: 'issueAdditional',
+  data () {
+    return {
+      faMagic
+    }
+  },
   props: {
     requestInfo: Object
   },

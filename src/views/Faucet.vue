@@ -22,7 +22,7 @@
               <b-input id="address" type="text" :state="searchState" aria-describedby="addressHelp" placeholder="lgs_address" v-model="address" />
               <div class="input-group-append">
                 <b-button v-b-tooltip.hover title="Scan a QR Code Address" :pressed="scanQR" variant="primary" v-on:click="toggleQRCode()" class="btn btn-default btn-sm">
-                  <icon name="qrcode"></icon>
+                  <font-awesome-icon :icon="faQrcode"/>
                   <span class="sr-only">Scan QR Code</span>
                 </b-button>
               </div>
@@ -50,6 +50,7 @@ import axios from 'axios'
 import Vue from 'vue'
 import VueQrcodeReader from 'vue-qrcode-reader'
 import { mapActions, mapState } from 'vuex'
+import { faQrcode } from '@fortawesome/pro-light-svg-icons'
 Vue.use(VueQrcodeReader)
 export default {
   name: 'Facuet',
@@ -79,6 +80,7 @@ export default {
   },
   data () {
     return {
+      faQrcode,
       address: '',
       scanQR: false,
       successMessage: '',

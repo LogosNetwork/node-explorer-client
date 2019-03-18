@@ -45,7 +45,7 @@
                 </b-row>
               </b-card>
             </b-link>
-            <icon v-if="requestBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && selectedDelegate !== -1" scale="2" name="chevron-down"></icon>
+            <font-awesome-icon size="lg" :icon="faChevronDown" v-if="requestBlock.previous !== '0000000000000000000000000000000000000000000000000000000000000000' && selectedDelegate !== -1"/>
           </div>
         </b-tab>
         <b-tab :title="$t('micro_epochs')" v-infinite-scroll="getMicroEpochs" infinite-scroll-distance="500">
@@ -86,7 +86,7 @@
                 </b-row>
               </b-card>
             </b-link>
-            <icon v-if="microEpoch.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" scale="2" name="chevron-down"></icon>
+            <font-awesome-icon size="lg" :icon="faChevronDown" v-if="microEpoch.previous !== '0000000000000000000000000000000000000000000000000000000000000000'"/>
           </div>
         </b-tab>
         <b-tab :title="$t('epochs')" v-infinite-scroll="getEpochs" infinite-scroll-distance="500">
@@ -122,7 +122,7 @@
                 </b-row>
               </b-card>
             </b-link>
-            <icon v-if="epoch.previous !== '0000000000000000000000000000000000000000000000000000000000000000'" scale="2" name="chevron-down"></icon>
+            <font-awesome-icon size="lg" :icon="faChevronDown" v-if="epoch.previous !== '0000000000000000000000000000000000000000000000000000000000000000'"/>
           </div>
         </b-tab>
       </b-tabs>
@@ -136,6 +136,7 @@ import infiniteScroll from 'vue-infinite-scroll'
 import Vue from 'vue'
 import codepad from '@/components/codepad.vue'
 import orderBy from 'lodash/orderBy'
+import { faChevronDown } from '@fortawesome/pro-light-svg-icons'
 Vue.use(infiniteScroll)
 export default {
   name: 'explore',
@@ -156,8 +157,9 @@ export default {
       return orderBy(this.requestBlocks, 'timestamp', 'desc')
     }
   },
-  data: function () {
+  data () {
     return {
+      faChevronDown,
       requestBlocksBusy: true,
       microEpochsBusy: true,
       epochsBusy: true,

@@ -8,6 +8,9 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.15",
+    "@fortawesome/pro-light-svg-icons": "^5.7.2",
+    "@fortawesome/vue-fontawesome": "^0.1.6",
     "@logosnetwork/logos-rpc-client": "^1.1.25",
     "@logosnetwork/logos-webwallet-sdk": "^0.1.13",
     "@xkeshi/vue-qrcode": "^1.0.0",
@@ -19,7 +22,6 @@
     "mqtt": "^2.18.8",
     "mqtt-regex": "^1.0.5",
     "vue": "^2.6.6",
-    "vue-awesome": "^3.4.0",
     "vue-codemirror": "^4.0.6",
     "vue-headful": "^2.0.1",
     "vue-i18n": "^8.8.1",

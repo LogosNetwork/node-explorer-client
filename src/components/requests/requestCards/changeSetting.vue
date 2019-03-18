@@ -36,7 +36,6 @@ import bCardText from 'bootstrap-vue/es/components/card/card-text'
 import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import token from '@/components/requests/token.vue'
-import 'vue-awesome/icons/exchange-alt'
 
 export default {
   name: 'changeSetting',

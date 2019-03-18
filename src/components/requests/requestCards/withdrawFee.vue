@@ -22,7 +22,7 @@
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item>
-        <icon name="arrow-down" class="text-success mr-2"></icon>
+        <font-awesome-icon :icon="faArrowDown" class="text-success mr-2"/>
         <LogosAddress class="mr-2" :address="requestInfo.transaction.destination" />
         <span class="mr-2">received</span>
         <span v-if="requestInfo.transaction.amountInToken" class="text-success mr-2">{{requestInfo.transaction.amountInToken}}</span>
@@ -42,10 +42,15 @@ import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import LogosAddress from '@/components/LogosAddress.vue'
 import token from '@/components/requests/token.vue'
-import 'vue-awesome/icons/arrow-down'
+import { faArrowDown } from '@fortawesome/pro-light-svg-icons'
 
 export default {
   name: 'withdrawFee',
+  data () {
+    return {
+      faArrowDown
+    }
+  },
   props: {
     requestInfo: Object
   },

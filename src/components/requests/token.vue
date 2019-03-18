@@ -4,15 +4,15 @@
       <b-card-text v-on:click.stop>
         <span v-if="size"><img v-bind:style="{ width: size + 'px', height: size + 'px' }" v-if="tokenInfo.issuerInfo.image" class="avatar mr-2" :src="tokenInfo.issuerInfo.image"></span>
         <span v-else><img v-if="tokenInfo.issuerInfo.image" class="avatar mr-2" :src="tokenInfo.issuerInfo.image"></span>
-        <icon v-if="!tokenInfo.issuerInfo.image" class="mr-2" label="Token Image">
-          <icon name="circle" scale="2" class="alert"/>
-          <icon name="coins" style="color:#FFF"/>
-        </icon>
+        <font-awesome-layers class="fa-lg mr-2" v-if="!tokenInfo.issuerInfo.image">
+          <font-awesome-icon :icon="faCircle" />
+          <font-awesome-icon :icon="faCoins" transform="shrink-6" :style="{ color: 'white' }" />
+        </font-awesome-layers>
         <b-link v-if="!inactive" :title="tokenInfo.name" :to="'/'+tokenInfo.tokenAccount">{{tokenInfo.name}} - {{tokenInfo.symbol}}</b-link>
         <span v-if="inactive">{{tokenInfo.name}} - {{tokenInfo.symbol}}</span>
       </b-card-text>
       <b-card-text v-if="origin">
-        <icon style="vertical-align:middle;" scale="1.35" name="user-circle" class="text-info mr-2"></icon>
+        <font-awesome-icon size="lg" class="text-info mr-2" style="vertical-align:middle;" :icon="faUserCircle" />
         <strong class="mr-2">Token Controller:</strong>
         <LogosAddress class="mr-2" :address="origin" />
       </b-card-text>
@@ -28,11 +28,16 @@
 <script>
 import bCardText from 'bootstrap-vue/es/components/card/card-text'
 import LogosAddress from '@/components/LogosAddress.vue'
-import 'vue-awesome/icons/coins'
-import 'vue-awesome/icons/circle'
-import 'vue-awesome/icons/user-circle'
+import { faCoins, faCircle, faUserCircle } from '@fortawesome/pro-light-svg-icons'
 export default {
   name: 'token',
+  data () {
+    return {
+      faCoins,
+      faCircle,
+      faUserCircle
+    }
+  },
   props: {
     tokenInfo: Object,
     origin: String,

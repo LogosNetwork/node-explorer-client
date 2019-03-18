@@ -23,7 +23,7 @@
       </b-card-title>
       <token :tokenInfo="requestInfo.tokenInfo" />
       <b-card-text class="mt-3">
-        <icon name="paper-plane" class="text-danger mr-2"></icon>
+        <font-awesome-icon :icon="faPaperPlane" class="text-danger mr-2"/>
         <LogosAddress class="mr-2" :address="requestInfo.origin" />
         <span class="mr-2">sent</span>
         <span v-if="requestInfo.totalAmountInToken" class="text-danger mr-2">{{requestInfo.totalAmountInToken}}</span>
@@ -33,7 +33,7 @@
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item v-for="transaction in requestInfo.transactions" :key="transaction.hash">
-        <icon name="arrow-down" class="text-success mr-2"></icon>
+        <font-awesome-icon :icon="faArrowDown" class="text-success mr-2"/>
         <LogosAddress class="mr-2" :address="transaction.destination" />
         <span class="mr-2">received</span>
         <span v-if="transaction.amountInToken" class="text-success mr-2">{{transaction.amountInToken}}</span>
@@ -53,11 +53,16 @@ import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import LogosAddress from '@/components/LogosAddress.vue'
 import token from '@/components/requests/token.vue'
-import 'vue-awesome/icons/paper-plane'
-import 'vue-awesome/icons/arrow-down'
+import { faPaperPlane, faArrowDown } from '@fortawesome/pro-light-svg-icons'
 
 export default {
   name: 'tokenSend',
+  data () {
+    return {
+      faPaperPlane,
+      faArrowDown
+    }
+  },
   props: {
     requestInfo: Object,
     account: String

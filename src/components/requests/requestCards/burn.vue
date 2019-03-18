@@ -22,7 +22,7 @@
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item>
-        <icon name="burn" class="text-danger mr-2"></icon>
+        <font-awesome-icon :icon="faFire" class="text-danger mr-2"/>
         <strong class="mr-2">Burned</strong>
         <span v-if="requestInfo.amountInToken" class="text-danger mr-2">{{requestInfo.amountInToken}}</span>
         <span v-if="typeof requestInfo.amountInToken === 'undefined'" class="text-danger mr-2">{{requestInfo.amount}}</span>
@@ -40,10 +40,15 @@ import bCardText from 'bootstrap-vue/es/components/card/card-text'
 import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import token from '@/components/requests/token.vue'
-import 'vue-awesome/icons/burn'
+import { faFire } from '@fortawesome/pro-light-svg-icons'
 
 export default {
   name: 'burn',
+  data () {
+    return {
+      faFire
+    }
+  },
   props: {
     requestInfo: Object
   },

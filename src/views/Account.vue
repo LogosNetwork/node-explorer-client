@@ -13,7 +13,7 @@
                 <span v-if="!tokenBalances[selected].balanceInTokens">{{tokenBalances[selected].balance}} {{tokenBalances[selected].tokenInfo.symbol}}</span>
               </span>
               <span v-if="!tokenBalances[selected] || tokenBalances[selected].tokenInfo.pending === true">
-                <icon name="spinner" :spin="true" /> Loading Token Info
+                <font-awesome-icon :icon="faSpinner" spin /> Loading Token Info
               </span>
             </h3>
             <h4 v-if="error" class="pt-3" style="color:red">This account has not been opened yet</h4>
@@ -122,21 +122,15 @@
                   </b-row>
                 </b-list-group-item>
                 <b-list-group-item>
-                  <b-row class="justify-content-md-center">
+                  <b-row class="justify-content-md-center iconSettings">
                     <div class="col-md-4 mb-1 mb-md-0">
                       <span class="text-nowrap">
                         Settings:
                       </span>
                     </div>
-                    <div class="col-md-8 text-left">
-                      <span v-for="setting in Object.keys(token.settings)" :key="'set'+setting">
-                        <!-- Stack the Icon lock with the setting icon inside the lock body -->
-                        <icon v-if="token.settings[setting] && setting === 'issuance'" name="magic" class="mr-2" v-b-tooltip.hover :title="token.name + ' allows controllers to issue more ' + token.symbol"></icon>
-                        <icon v-if="token.settings[setting] && setting === 'revoke'" name="mask" class="mr-2" v-b-tooltip.hover :title="token.name + ' allows controllers to revoke '+ token.symbol +' from token holder\'s accounts'"></icon>
-                        <icon v-if="token.settings[setting] && setting === 'freeze'" name="snowflake" class="mr-2" v-b-tooltip.hover :title="`${token.name} allows controllers to freeze accounts`"></icon>
-                        <icon v-if="token.settings[setting] && setting === 'adjust_fee'" name="coins" class="mr-2" v-b-tooltip.hover :title="`${token.name} allows controllers to adjust the fee of any token holders`"></icon>
-                        <icon v-if="token.settings[setting] && setting === 'whitelist'" name="list-alt" class="mr-2" v-b-tooltip.hover :title="`${token.name} requires accounts to be whitelisted prior to using the ${token.symbol} token`"></icon>
-                      </span>
+                    <div class="col-md-8 font-weight-bold text-left" style="padding-right:0px">
+                      <TokenSettings v-if="Object.keys(token.settings).length > 0" :token="token"/>
+                      <span v-else>No Permissions</span>
                     </div>
                   </b-row>
                 </b-list-group-item>
@@ -186,11 +180,11 @@
                     <input type="radio" name="tokenFilter" :id="tokenBalance[0]" autocomplete="off" :checked="selected === tokenBalance[0]" v-on:click="changeSelected(tokenBalance[0])">
                     <span v-if="tokenBalance[1].tokenInfo.pending !== true">
                       <img v-if="tokenBalance[1].tokenInfo.issuerInfo.image" class="avatar mr-1" :src="tokenBalance[1].tokenInfo.issuerInfo.image">
-                      <icon v-if="!tokenBalance[1].tokenInfo.issuerInfo.image" class="mr-1" label="Token Image" name="coins"/>
+                      <font-awesome-icon :icon="faCoins" v-if="!tokenBalance[1].tokenInfo.issuerInfo.image" class="mr-1" />
                       <span>{{tokenBalance[1].tokenInfo.symbol}}</span>
                     </span>
                     <span v-if="tokenBalance[1].tokenInfo.pending === true">
-                      <icon name="spinner" :spin="true" />
+                      <font-awesome-icon :icon="faSpinner" spin />
                     </span>
                   </label>
                 </div>
@@ -228,15 +222,8 @@ import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import LogosAddress from '@/components/LogosAddress.vue'
 import token from '@/components/requests/token.vue'
-import 'vue-awesome/icons/coins'
-import 'vue-awesome/icons/spinner'
-import 'vue-awesome/icons/magic'
-import 'vue-awesome/icons/snowflake'
-import 'vue-awesome/icons/mask'
-import 'vue-awesome/icons/list-alt'
-import 'vue-awesome/icons/lock-open'
-import 'vue-awesome/icons/lock'
-
+import TokenSettings from '@/components/requests/tokenSettings.vue'
+import { faSpinner, faCoins } from '@fortawesome/pro-light-svg-icons'
 Vue.use(infiniteScroll)
 Vue.component(VueQrcode.name, VueQrcode)
 
@@ -276,6 +263,7 @@ export default {
     bListGroup,
     LogosAddress,
     bListGroupItem,
+    TokenSettings,
     token
   },
   created: function () {
@@ -320,7 +308,9 @@ export default {
   data () {
     return {
       requestsBusy: false,
-      selected: 'all'
+      selected: 'all',
+      faSpinner,
+      faCoins
     }
   },
   beforeRouteUpdate (to, from, next) {
@@ -362,5 +352,11 @@ export default {
   }
   .list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
     opacity: 0;
+  }
+  @media (min-width: 768px) {
+    .iconSettings {
+      height: 23.326px;
+      overflow: hidden;
+    }
   }
 </style>

@@ -84,7 +84,6 @@ import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-it
 import LogosAddress from '@/components/LogosAddress.vue'
 import token from '@/components/requests/token.vue'
 import codepad from '@/components/codepad.vue'
-import 'vue-awesome/icons/exchange-alt'
 
 export default {
   name: 'issuance',

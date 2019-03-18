@@ -38,7 +38,6 @@ import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import LogosAddress from '@/components/LogosAddress.vue'
 import token from '@/components/requests/token.vue'
-import 'vue-awesome/icons/user-circle'
 
 export default {
   name: 'adjustUserStatus',

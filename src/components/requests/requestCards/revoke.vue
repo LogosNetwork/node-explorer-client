@@ -22,7 +22,7 @@
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item>
-        <icon name="paper-plane" class="text-danger mr-2"></icon>
+        <font-awesome-icon :icon="mafaMasksk" class="text-danger mr-2"/>
         <LogosAddress class="mr-2" :address="requestInfo.source" />
         <span class="mr-2">was revoked</span>
         <span v-if="requestInfo.transaction.amountInToken" class="text-danger mr-2">{{requestInfo.transaction.amountInToken}}</span>
@@ -30,7 +30,7 @@
         <span>{{requestInfo.tokenInfo.symbol}}</span>
       </b-list-group-item>
       <b-list-group-item>
-        <icon name="arrow-down" class="text-success mr-2"></icon>
+        <font-awesome-icon :icon="faArrowDown" class="text-success mr-2"/>
         <LogosAddress class="mr-2" :address="requestInfo.transaction.destination" />
         <span class="mr-2">received</span>
         <span v-if="requestInfo.transaction.amountInToken" class="text-success mr-2">{{requestInfo.transaction.amountInToken}}</span>
@@ -50,11 +50,16 @@ import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import LogosAddress from '@/components/LogosAddress.vue'
 import token from '@/components/requests/token.vue'
-import 'vue-awesome/icons/paper-plane'
-import 'vue-awesome/icons/arrow-down'
+import { faMask, faArrowDown } from '@fortawesome/pro-light-svg-icons'
 
 export default {
   name: 'revoke',
+  data () {
+    return {
+      faMask,
+      faArrowDown
+    }
+  },
   props: {
     requestInfo: Object
   },

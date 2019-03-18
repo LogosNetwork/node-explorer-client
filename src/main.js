@@ -31,12 +31,13 @@ import bTable from 'bootstrap-vue/es/components/table/table'
 import bFormCheckbox from 'bootstrap-vue/es/components/form-checkbox/form-checkbox'
 
 // Icons
-import Icon from 'vue-awesome/components/Icon'
-import 'vue-awesome/icons/chevron-down'
-import 'vue-awesome/icons/qrcode'
+import { FontAwesomeIcon, FontAwesomeLayers, FontAwesomeLayersText } from '@fortawesome/vue-fontawesome'
 
 Vue.config.productionTip = false
 Vue.directive('b-tooltip', vBTooltip)
+Vue.component('font-awesome-icon', FontAwesomeIcon)
+Vue.component('font-awesome-layers', FontAwesomeLayers)
+Vue.component('font-awesome-layers-text', FontAwesomeLayersText)
 Vue.component('b-form', bForm)
 Vue.component('b-input', bFormInput)
 Vue.component('b-container', bContainer)
@@ -59,7 +60,6 @@ Vue.component('b-collapse', bCollapse)
 Vue.component('b-table', bTable)
 Vue.component('b-form-checkbox', bFormCheckbox)
 Vue.component('vue-headful', vueHeadful)
-Vue.component('icon', Icon)
 Vue.use(VueMoment)
 
 new Vue({

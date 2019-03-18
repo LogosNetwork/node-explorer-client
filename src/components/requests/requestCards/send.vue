@@ -22,7 +22,7 @@
         </div>
       </b-card-title>
       <b-card-text>
-        <icon name="paper-plane" class="text-danger mr-2"></icon>
+        <font-awesome-icon :icon="faPaperPlane" class="text-danger mr-2"/>
         <LogosAddress class="mr-2" :address="requestInfo.origin" />
         <span class="mr-2">sent</span>
         <span class="text-danger">{{requestInfo.totalAmountLogos}} Logos</span>
@@ -30,7 +30,7 @@
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item v-for="transaction in requestInfo.transactions" :key="transaction.hash">
-        <icon name="arrow-down" class="text-success mr-2"></icon>
+        <font-awesome-icon :icon="faArrowDown" class="text-success mr-2"/>
         <LogosAddress class="mr-2" :address="transaction.destination" />
         <span class="mr-2">received</span>
         <span class="text-success">{{transaction.amountInLogos}} Logos</span>
@@ -47,10 +47,16 @@ import bCardText from 'bootstrap-vue/es/components/card/card-text'
 import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import LogosAddress from '@/components/LogosAddress.vue'
-import 'vue-awesome/icons/arrow-down'
+import { faPaperPlane, faArrowDown } from '@fortawesome/pro-light-svg-icons'
 
 export default {
   name: 'Send',
+  data () {
+    return {
+      faPaperPlane,
+      faArrowDown
+    }
+  },
   props: {
     requestInfo: Object,
     account: String

@@ -37,7 +37,6 @@ import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import token from '@/components/requests/token.vue'
 import codepad from '@/components/codepad.vue'
-import 'vue-awesome/icons/edit'
 
 export default {
   name: 'issuerInfo',
