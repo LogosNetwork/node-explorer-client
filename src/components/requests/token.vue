@@ -12,7 +12,7 @@
         <span v-if="inactive">{{tokenInfo.name}} - {{tokenInfo.symbol}}</span>
       </b-card-text>
       <b-card-text v-if="origin">
-        <font-awesome-icon size="lg" class="text-info mr-2" style="vertical-align:middle;" :icon="faUserCircle" />
+        <font-awesome-icon size="lg" class="text-info mr-2 align-middle" :icon="faUserCircle" />
         <strong class="mr-2">Token Controller:</strong>
         <LogosAddress class="mr-2" :address="origin" />
       </b-card-text>

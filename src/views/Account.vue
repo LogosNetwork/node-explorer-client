@@ -33,7 +33,7 @@
           </b-col>
         </b-row>
       </div>
-      <div v-else-if="type === 'TokenAccount'" class="mb-5 pt-5 text-left">
+      <div v-else-if="type === 'TokenAccount'" class="mb-3 pt-5 text-left">
         <div class="mb-3">
           <h3 class="mb-3">
             <token :tokenInfo="token" :inactive="true" size="33" />
@@ -138,20 +138,176 @@
             </b-card>
           </b-col>
         </b-row>
-        <div class="mb-3">
-          <h4>Token Controllers</h4>
-          <b-card no-body>
-            <b-card-body>
-              <b-card-text v-for="controller in token.controllers" :key="'controller'+controller.account">
-                <LogosAddress :address="controller.account" /><br/>
-                <ul>
-                  <li v-for="privilege in controller.privileges" :key="controller.account+privilege">
-                    {{privilege}}
-                  </li>
-                </ul>
-              </b-card-text>
-            </b-card-body>
-          </b-card>
+        <div>
+          <div v-for="controller in token.controllers" :key="'controller'+controller.account" class="mb-3 mr-2 tkCtrlContainer">
+            <b-button v-b-modal="'controllerModal'" variant="outline-primary" @click="selectedController = controller">
+              <b-row class="justify-content-md-center">
+                <b-col class="font-weight-bold text-left">
+                  <span v-if="controller.privileges.includes('update_controller')" v-b-tooltip.hover :title="`This controller has admin rights of ${token.name}. They can add or remove other controllers and set any privileges.`">
+                    <font-awesome-icon :icon="faCrown" class="mr-2"/>
+                  </span>
+                  <LogosAddress :address="controller.account" :inactive="true" :force="true" /><br/>
+                </b-col>
+              </b-row>
+            </b-button>
+          </div>
+          <b-modal
+            size="lg"
+            id="controllerModal"
+            scrollable
+            title="Token Controller Privileges"
+            title-tag="h3">
+            <span v-if="selectedController">
+              <div class="text-break mb-4">
+                <h4>Controller Address:</h4>
+                <LogosAddress class="font-weight-bold" :address="selectedController.account" :forceExpand="true" />
+              </div>
+              <div class="content">
+                <div v-for="privilege in selectedController.privileges" :key="selectedController.account+privilege">
+                  <span v-if="privilege === 'change_issuance' && token.settings['modify_issuance']">
+                    <h5>
+                      <font-awesome-icon :icon="faMagic" class="mr-2"/>
+                      Change Issuance
+                    </h5>
+                    <p>The controller can change the issuance setting of {{token.name}}. This allows controllers to issue additional {{token.symbol}}.</p>
+                  </span>
+                  <span v-else-if="privilege === 'change_modify_issuance' && token.settings['modify_issuance']">
+                    <h5>
+                      <font-awesome-icon :icon="faLockAlt" class="mr-2"/>
+                      Immute Issuance
+                    </h5>
+                    <p>The controller is allowed to make the current issuance setting permanent.</p>
+                  </span>
+                  <span v-else-if="privilege === 'issuance' && token.settings['issuance']">
+                    <h5>
+                      <font-awesome-icon :icon="faMagic" class="mr-2"/>
+                      Issuance
+                    </h5>
+                    <p>The controller is allowed to issue additional {{token.symbol}}.</p>
+                  </span>
+                  <span v-else-if="privilege === 'change_revoke' && token.settings['modify_revoke']">
+                    <h5>
+                      <font-awesome-icon :icon="faMask" class="mr-2"/>
+                      Change Revoke
+                    </h5>
+                    <p>The controller can change the revoke setting of {{token.name}}. This allows controllers to revoke {{token.symbol}} from user accounts.</p>
+                  </span>
+                  <span v-else-if="privilege === 'change_modify_revoke' && token.settings['modify_revoke']">
+                    <h5>
+                      <font-awesome-icon :icon="faLockAlt" class="mr-2"/>
+                      Immute Revoke
+                    </h5>
+                    <p>The controller is allowed to make the current revoke setting permanent.</p>
+                  </span>
+                  <span v-else-if="privilege === 'revoke' && token.settings['revoke']">
+                    <h5>
+                      <font-awesome-icon :icon="faMask" class="mr-2"/>
+                      Revoke
+                    </h5>
+                    <p>The controller is allowed to revoke {{token.symbol}} from user accounts.</p>
+                  </span>
+                  <span v-else-if="privilege === 'change_freeze' && token.settings['modify_freeze']">
+                    <h5>
+                      <font-awesome-icon :icon="faSnowflake" class="mr-2"/>
+                      Change Freeze
+                    </h5>
+                    <p>The controller can change the freeze setting of {{token.name}}. This allows controllers to freeze {{token.symbol}} in user accounts.</p>
+                  </span>
+                  <span v-else-if="privilege === 'change_modify_freeze' && token.settings['modify_freeze']">
+                    <h5>
+                      <font-awesome-icon :icon="faLockAlt" class="mr-2"/>
+                      Immute Freeze
+                    </h5>
+                    <p>The controller is allowed to make the current freeze setting permanent.</p>
+                  </span>
+                  <span v-else-if="privilege === 'freeze' && token.settings['freeze']">
+                    <h5>
+                      <font-awesome-icon :icon="faSnowflake" class="mr-2"/>
+                      Freeze
+                    </h5>
+                    <p>The controller is allowed to freeze {{token.symbol}} in user accounts.</p>
+                  </span>
+                  <span v-else-if="privilege === 'change_adjust_fee' && token.settings['modify_adjust_fee']">
+                    <h5>
+                      <font-awesome-icon :icon="faCoins" class="mr-2"/>
+                      Change Adjust Fee
+                    </h5>
+                    <p>The controller can change the adjust fee setting of {{token.name}}. This allows controllers to change the {{token.symbol}} token fee.</p>
+                  </span>
+                  <span v-else-if="privilege === 'change_modify_adjust_fee' && token.settings['modify_adjust_fee']">
+                    <h5>
+                      <font-awesome-icon :icon="faLockAlt" class="mr-2"/>
+                      Immute Adjust Fee
+                    </h5>
+                    <p>The controller is allowed to make the current adjust fee setting permanent.</p>
+                  </span>
+                  <span v-else-if="privilege === 'adjust_fee' && token.settings['adjust_fee']">
+                    <h5>
+                      <font-awesome-icon :icon="faCoins" class="mr-2"/>
+                      Adjust Fee
+                    </h5>
+                    <p>The controller is allowed to to change the {{token.symbol}} token fee.</p>
+                  </span>
+                  <span v-else-if="privilege === 'change_whitelist' && token.settings['modify_whitelist']">
+                    <h5>
+                      <font-awesome-icon :icon="faListAlt" class="mr-2"/>
+                      Change Whitelist
+                    </h5>
+                    <p>The controller can change the whitelist setting of {{token.name}}. This allows controllers to only allow approved accounts to use the {{token.symbol}} token.</p>
+                  </span>
+                  <span v-else-if="privilege === 'change_modify_whitelist' && token.settings['modify_whitelist']">
+                    <h5>
+                      <font-awesome-icon :icon="faLockAlt" class="mr-2"/>
+                      Immute Whitelist
+                    </h5>
+                    <p>The controller is allowed to make the current whitelist setting permanent.</p>
+                  </span>
+                  <span v-else-if="privilege === 'whitelist' && token.settings['whitelist']">
+                    <h5>
+                      <font-awesome-icon :icon="faListAlt" class="mr-2"/>
+                      Whitelist
+                    </h5>
+                    <p>The controller is allowed to approved accounts to use the {{token.symbol}} token.</p>
+                  </span>
+                  <span v-else-if="privilege === 'update_issuer_info'">
+                    <h5>
+                      <font-awesome-icon :icon="faEdit" class="mr-2"/>
+                      Update Token Info
+                    </h5>
+                    <p>The controller is allowed to change the token info of {{token.name}}.</p>
+                  </span>
+                  <span v-else-if="privilege === 'update_controller'">
+                    <h5>
+                      <font-awesome-icon :icon="faCrown" class="mr-2"/>
+                      Token Admin
+                    </h5>
+                    <p>This controller has admin rights and can add controllers, remove controllers, or change controllers privileges.</p>
+                  </span>
+                  <span v-else-if="privilege === 'burn'">
+                    <h5>
+                      <font-awesome-icon :icon="faFire" class="mr-2"/>
+                      Burn
+                    </h5>
+                    <p>The controller is allowed to burn tokens that are inside the official {{token.name}} token account.</p>
+                  </span>
+                  <span v-else-if="privilege === 'distribute'">
+                    <h5>
+                      <font-awesome-icon :icon="faArrowDown" class="mr-2"/>
+                      Distribute
+                    </h5>
+                    <p>The controller is allowed to distribute tokens that are inside the offical {{token.name}} token account.</p>
+                  </span>
+                  <span v-else-if="privilege === 'withdraw_fee'">
+                    <h5>
+                      <font-awesome-icon :icon="faHandReceiving" class="mr-2"/>
+                      Withdraw Fee
+                    </h5>
+                    <p>The controller is allowed to withdraw the collected token fees from the {{token.symbol}} token fee pool.</p>
+                  </span>
+                </div>
+              </div>
+            </span>
+          </b-modal>
         </div>
       </div>
       <div v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
@@ -223,7 +379,8 @@ import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-it
 import LogosAddress from '@/components/LogosAddress.vue'
 import token from '@/components/requests/token.vue'
 import TokenSettings from '@/components/requests/tokenSettings.vue'
-import { faSpinner, faCoins } from '@fortawesome/pro-light-svg-icons'
+import bModal from 'bootstrap-vue/es/components/modal/modal'
+import { faSpinner, faCoins, faCrown, faUserCircle, faMagic, faLockAlt, faMask, faSnowflake, faListAlt, faArrowDown, faFire, faEdit, faHandReceiving } from '@fortawesome/pro-light-svg-icons'
 Vue.use(infiniteScroll)
 Vue.component(VueQrcode.name, VueQrcode)
 
@@ -263,6 +420,7 @@ export default {
     bListGroup,
     LogosAddress,
     bListGroupItem,
+    bModal,
     TokenSettings,
     token
   },
@@ -310,7 +468,19 @@ export default {
       requestsBusy: false,
       selected: 'all',
       faSpinner,
-      faCoins
+      faCoins,
+      faCrown,
+      faUserCircle,
+      faMagic,
+      faListAlt,
+      faMask,
+      faSnowflake,
+      faLockAlt,
+      faFire,
+      faArrowDown,
+      faEdit,
+      faHandReceiving,
+      selectedController: null
     }
   },
   beforeRouteUpdate (to, from, next) {
@@ -358,5 +528,11 @@ export default {
       height: 23.326px;
       overflow: hidden;
     }
+  }
+  .tkCtrlContainer {
+    display: inline-block;
+  }
+  .content > div:not(:first-child) {
+    margin-top: 2rem;
   }
 </style>

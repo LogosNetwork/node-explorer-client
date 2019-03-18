@@ -24,6 +24,7 @@ import bCard from 'bootstrap-vue/es/components/card/card'
 import bFormSelect from 'bootstrap-vue/es/components/form-select/form-select'
 import bLink from 'bootstrap-vue/es/components/link/link'
 import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
+import vBModal from 'bootstrap-vue/es/directives/modal/modal'
 import bContainer from 'bootstrap-vue/es/components/layout/container'
 import bRow from 'bootstrap-vue/es/components/layout/row'
 import bCol from 'bootstrap-vue/es/components/layout/col'
@@ -35,6 +36,7 @@ import { FontAwesomeIcon, FontAwesomeLayers, FontAwesomeLayersText } from '@fort
 
 Vue.config.productionTip = false
 Vue.directive('b-tooltip', vBTooltip)
+Vue.directive('b-modal', vBModal)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('font-awesome-layers', FontAwesomeLayers)
 Vue.component('font-awesome-layers-text', FontAwesomeLayersText)
