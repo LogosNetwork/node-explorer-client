@@ -310,7 +310,7 @@
         </div>
       </div>
       <div v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
-        <b-row v-if="requests && requests.length > 0">
+        <b-row>
           <b-col cols="12" class="mb-3">
             <h4 class="text-left">
               <span v-if="type === 'LogosAccount'">{{requestCount}} </span>
@@ -345,7 +345,7 @@
                 </div>
               </b-col>
             </b-row>
-            <div name="list" is="transition-group">
+            <div name="list" is="transition-group" v-if="requests && requests.length > 0">
               <div v-for="request in requests" :key="request.hash">
                 <div v-if="(request.type === 'send' || request.type === 'issuance') && (selected === 'all' || selected ==='lgs')">
                   <request :requestInfo="request" :account="account"/>
@@ -356,6 +356,9 @@
                   <request :requestInfo="request" :account="account"/>
                 </div>
               </div>
+            </div>
+            <div v-else>
+              This account has no requests
             </div>
           </b-col>
         </b-row>
