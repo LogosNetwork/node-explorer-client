@@ -1,22 +1,41 @@
 <template>
   <div id="primary">
     <b-container>
+      <div v-if="showSuccess" id="success">
+        <div class="alert alert-success text-left alert-dismissible fade show" role="alert">
+          <h4 class="alert-heading">Logos was sent!</h4>
+          <p>
+            {{successMessage}} <br>
+            <a v-if="successHash" :href="'/'+successHash">{{successHash}}</a>
+          </p>
+          <button type="button" class="close" v-on:click="showSuccess=false" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
       <div v-if="error">
         <b-row class="text-left pt-5">
           <b-col cols="12" md="8" class="mb-3">
-            <h3 class="text-left">Unopened Account</h3>
+            <div class="d-flex justify-content-between mb-3">
+              <h3 class="text-left">Unopened Account</h3>
+              <b-button v-on:click="requestFaucet()" class="fundBtn d-md-none" size="sm" variant="outline-primary">Fund Account</b-button>
+            </div>
             <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
             <h4 v-if="error" class="pt-3" style="color:red">This account has not been opened yet</h4>
           </b-col>
           <b-col cols="12" md="4" class="mb-3" id="qrHolder">
-              <qrcode :value="'lgs:'+account" :options="{ size: 110 }"></qrcode>
+            <b-button v-on:click="requestFaucet()" class="fundBtn mb-3 d-none d-md-block" size="sm" variant="outline-primary">Fund Account</b-button>
+            <qrcode :value="'lgs:'+account" :options="{ size: 110 }"></qrcode>
           </b-col>
         </b-row>
       </div>
       <div v-else-if="type === 'LogosAccount'">
         <b-row class="text-left pt-5">
           <b-col cols="12" md="8" class="mb-3">
-            <h3 class="text-left" v-t="'account'"></h3>
+            <div class="d-flex justify-content-between mb-3">
+              <h3 class="text-left" v-t="'account'"></h3>
+              <b-button v-on:click="requestFaucet()" class="fundBtn d-md-none" size="sm" variant="outline-primary">Fund Account</b-button>
+            </div>
             <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
             <h3 v-if="balance !== null && selected === 'all' || selected === 'lgs'" class="pt-3" style="color:green">{{balance}} LOGOS</h3>
             <h3 v-if="tokenBalances !== null && selected !== 'all' && selected !== 'lgs'" class="pt-3" style="color:green">
@@ -30,7 +49,8 @@
             </h3>
           </b-col>
           <b-col cols="12" md="4" class="mb-3" id="qrHolder">
-              <qrcode :value="'lgs:'+account" :options="{ size: 110 }"></qrcode>
+            <b-button v-on:click="requestFaucet()" class="fundBtn mb-3 d-none d-md-block" size="sm" variant="outline-primary">Fund Account</b-button>
+            <qrcode :value="'lgs:'+account" :options="{ size: 110 }"></qrcode>
           </b-col>
         </b-row>
         <b-row class="mb-3">
@@ -46,9 +66,12 @@
       </div>
       <div v-else-if="type === 'TokenAccount'" class="mb-3 pt-5 text-left">
         <div class="mb-3">
-          <h3 class="mb-3">
-            <token :tokenInfo="token" :inactive="true" size="33" />
-          </h3>
+          <div class="d-flex justify-content-between mb-3">
+            <h3>
+              <token :tokenInfo="token" :inactive="true" size="33" />
+            </h3>
+            <b-button v-on:click="requestFaucet()" class="fundBtn" size="sm" variant="outline-primary">Fund Account</b-button>
+          </div>
           <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
         </div>
         <b-row>
@@ -394,6 +417,7 @@ import LogosAddress from '@/components/LogosAddress.vue'
 import token from '@/components/requests/token.vue'
 import TokenSettings from '@/components/requests/tokenSettings.vue'
 import bModal from 'bootstrap-vue/es/components/modal/modal'
+import axios from 'axios'
 import { faSpinner, faCoins, faCrown, faUserCircle, faMagic, faLockAlt, faMask, faSnowflake, faListAlt, faArrowDown, faFire, faEdit, faHandReceiving } from '@fortawesome/pro-light-svg-icons'
 Vue.use(infiniteScroll)
 Vue.component(VueQrcode.name, VueQrcode)
@@ -401,7 +425,8 @@ Vue.component(VueQrcode.name, VueQrcode)
 export default {
   computed: {
     ...mapState('settings', {
-      mqttHost: state => state.mqttHost
+      mqttHost: state => state.mqttHost,
+      requestURL: state => state.requestURL
     }),
     ...mapState('account', {
       account: state => state.account,
@@ -472,6 +497,22 @@ export default {
     },
     changeSelected: function (newSelected) {
       this.selected = newSelected
+    },
+    hideSuccess () {
+      this.showSuccess = false
+    },
+    requestFaucet () {
+      if (this.account.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
+        axios.post(`${this.requestURL}/faucet`, {
+          address: this.account
+        }).then((res) => {
+          this.successMessage = res.data.msg
+          this.successHash = res.data.hash
+          this.showSuccess = true
+        }).catch((err) => {
+          alert(err)
+        })
+      }
     }
   },
   destroyed: function () {
@@ -494,7 +535,10 @@ export default {
       faArrowDown,
       faEdit,
       faHandReceiving,
-      selectedController: null
+      selectedController: null,
+      successMessage: '',
+      successHash: null,
+      showSuccess: false
     }
   },
   beforeRouteUpdate (to, from, next) {
@@ -546,7 +590,20 @@ export default {
   .tkCtrlContainer {
     display: inline-block;
   }
+  .fundBtn {
+    max-height: 33px;
+    margin-left: auto;
+  }
   .content > div:not(:first-child) {
     margin-top: 2rem;
+  }
+  #success {
+    position: fixed;
+    z-index: 99;
+    margin-top:15px;
+    padding:15px;
+    top: 0;
+    left: 0;
+    width: 100%;
   }
 </style>
