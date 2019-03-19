@@ -4,7 +4,6 @@ if (process.env.NODE_ENV === 'production') {
   config = {
     rpcProxy: 'https://pla.bs',
     mqttHost: 'wss:pla.bs:8443',
-    requiresAuth: true,
     requestURL: '',
     delegates: {
       0: '100.25.175.142',
@@ -47,7 +46,6 @@ if (process.env.NODE_ENV === 'production') {
     requestURL: 'http://localhost:3000',
     rpcProxy: 'https://pla.bs',
     mqttHost: 'ws:localhost:8883',
-    requiresAuth: false,
     delegates: {
       0: '172.1.1.100',
       1: '172.1.1.101',

@@ -154,6 +154,7 @@
             size="lg"
             id="controllerModal"
             scrollable
+            :hide-footer="true"
             title="Token Controller Privileges"
             title-tag="h3">
             <span v-if="selectedController">
