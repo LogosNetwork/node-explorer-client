@@ -1,13 +1,25 @@
 <template>
   <div id="primary">
     <b-container>
-      <div v-if="type === 'LogosAccount'">
+      <div v-if="error">
+        <b-row class="text-left pt-5">
+          <b-col cols="12" md="8" class="mb-3">
+            <h3 class="text-left">Unopened Account</h3>
+            <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
+            <h4 v-if="error" class="pt-3" style="color:red">This account has not been opened yet</h4>
+          </b-col>
+          <b-col cols="12" md="4" class="mb-3" id="qrHolder">
+              <qrcode :value="'lgs:'+account" :options="{ size: 110 }"></qrcode>
+          </b-col>
+        </b-row>
+      </div>
+      <div v-else-if="type === 'LogosAccount'">
         <b-row class="text-left pt-5">
           <b-col cols="12" md="8" class="mb-3">
             <h3 class="text-left" v-t="'account'"></h3>
             <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
-            <h3 v-if="!error && balance !== null && selected === 'all' || selected === 'lgs'" class="pt-3" style="color:green">{{balance}} LOGOS</h3>
-            <h3 v-if="!error && tokenBalances !== null && selected !== 'all' && selected !== 'lgs'" class="pt-3" style="color:green">
+            <h3 v-if="balance !== null && selected === 'all' || selected === 'lgs'" class="pt-3" style="color:green">{{balance}} LOGOS</h3>
+            <h3 v-if="tokenBalances !== null && selected !== 'all' && selected !== 'lgs'" class="pt-3" style="color:green">
               <span v-if="tokenBalances[selected] && tokenBalances[selected].tokenInfo.pending !== true">
                 <span v-if="tokenBalances[selected].balanceInTokens">{{tokenBalances[selected].balanceInTokens}} {{tokenBalances[selected].tokenInfo.symbol}}</span>
                 <span v-if="!tokenBalances[selected].balanceInTokens">{{tokenBalances[selected].balance}} {{tokenBalances[selected].tokenInfo.symbol}}</span>
@@ -16,13 +28,12 @@
                 <font-awesome-icon :icon="faSpinner" spin /> Loading Token Info
               </span>
             </h3>
-            <h4 v-if="error" class="pt-3" style="color:red">This account has not been opened yet</h4>
           </b-col>
           <b-col cols="12" md="4" class="mb-3" id="qrHolder">
               <qrcode :value="'lgs:'+account" :options="{ size: 110 }"></qrcode>
           </b-col>
         </b-row>
-        <b-row v-if="!error" class="mb-3">
+        <b-row class="mb-3">
           <b-col v-if="representaive" cols="12" class="text-left">
               <div>
                 <h4>
@@ -310,7 +321,7 @@
           </b-modal>
         </div>
       </div>
-      <div v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
+      <div v-if="type" v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
         <b-row>
           <b-col cols="12" class="mb-3">
             <h4 class="text-left">
