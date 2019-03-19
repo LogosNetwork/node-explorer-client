@@ -180,8 +180,6 @@ const actions = {
         } else {
           commit('setError', requests.error)
         }
-      } else {
-        commit('setError', null)
       }
     })
   },
@@ -245,7 +243,7 @@ const actions = {
           commit('setError', val.error)
         }
       } else {
-        commit('setError', null)
+        commit('setError', 'Account Info Not Found')
       }
     })
     rpcClient.accounts.history(account, state.count).then(requests => {
@@ -257,8 +255,6 @@ const actions = {
         } else {
           commit('setError', requests.error)
         }
-      } else {
-        commit('setError', null)
       }
     })
   },
