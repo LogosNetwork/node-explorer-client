@@ -1,18 +1,6 @@
 <template>
   <div id="primary">
     <b-container>
-      <div v-if="showSuccess" id="success">
-        <div class="alert alert-success text-left alert-dismissible fade show" role="alert">
-          <h4 class="alert-heading">Logos was sent!</h4>
-          <p>
-            {{successMessage}} <br>
-            <a v-if="successHash" :href="'/'+successHash">{{successHash}}</a>
-          </p>
-          <button type="button" class="close" v-on:click="showSuccess=false" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-      </div>
       <div v-if="error">
         <b-row class="text-left pt-5">
           <b-col cols="12" md="8" class="mb-3">
@@ -498,17 +486,11 @@ export default {
     changeSelected: function (newSelected) {
       this.selected = newSelected
     },
-    hideSuccess () {
-      this.showSuccess = false
-    },
     requestFaucet () {
       if (this.account.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
         axios.post(`${this.requestURL}/faucet`, {
           address: this.account
         }).then((res) => {
-          this.successMessage = res.data.msg
-          this.successHash = res.data.hash
-          this.showSuccess = true
         }).catch((err) => {
           alert(err)
         })
@@ -535,10 +517,7 @@ export default {
       faArrowDown,
       faEdit,
       faHandReceiving,
-      selectedController: null,
-      successMessage: '',
-      successHash: null,
-      showSuccess: false
+      selectedController: null
     }
   },
   beforeRouteUpdate (to, from, next) {
@@ -596,14 +575,5 @@ export default {
   }
   .content > div:not(:first-child) {
     margin-top: 2rem;
-  }
-  #success {
-    position: fixed;
-    z-index: 99;
-    margin-top:15px;
-    padding:15px;
-    top: 0;
-    left: 0;
-    width: 100%;
   }
 </style>

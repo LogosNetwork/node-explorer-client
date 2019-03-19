@@ -27,7 +27,7 @@
               </b-row>
               <b-row>
                 <b-col>
-                  Contains {{requestBlock.request_count}} Requests
+                  {{requestBlock.request_count}} Requests
                 </b-col>
               </b-row>
             </b-card>
@@ -50,7 +50,7 @@
                 </b-row>
                 <b-row>
                   <b-col>
-                    Contains {{microEpoch.number_batch_blocks}} Request Blocks
+                    {{microEpoch.number_batch_blocks}} Request Blocks
                   </b-col>
                 </b-row>
               </b-card>
