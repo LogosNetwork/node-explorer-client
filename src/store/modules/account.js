@@ -181,7 +181,7 @@ const actions = {
           commit('setError', requests.error)
         }
       } else {
-        commit('setError', 'null')
+        commit('setError', null)
       }
     })
   },
@@ -245,7 +245,7 @@ const actions = {
           commit('setError', val.error)
         }
       } else {
-        commit('setError', 'null')
+        commit('setError', null)
       }
     })
     rpcClient.accounts.history(account, state.count).then(requests => {
@@ -258,7 +258,7 @@ const actions = {
           commit('setError', requests.error)
         }
       } else {
-        commit('setError', 'null')
+        commit('setError', null)
       }
     })
   },
