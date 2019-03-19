@@ -129,8 +129,7 @@
                       </span>
                     </div>
                     <div class="col-md-8 font-weight-bold text-left" style="padding-right:0px">
-                      <TokenSettings v-if="Object.keys(token.settings).length > 0" :token="token"/>
-                      <span v-else>No Permissions</span>
+                      <TokenSettings :token="token"/>
                     </div>
                   </b-row>
                 </b-list-group-item>

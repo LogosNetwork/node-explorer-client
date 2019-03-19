@@ -224,9 +224,6 @@ const actions = {
             } catch (e) {
               val.issuerInfo = {}
             }
-            console.log(val.settings)
-            // delete val.settings.issuance
-            // delete val.settings.modify_issuance
             val.circulating_supply = bigInt(val.total_supply).minus(bigInt(val.token_balance))
             if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
               val.balanceInTokens = rpcClient.convert.fromTo(val.token_balance, 0, val.issuerInfo.decimals)
