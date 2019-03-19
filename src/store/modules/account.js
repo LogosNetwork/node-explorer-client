@@ -262,7 +262,7 @@ const actions = {
       }
     })
   },
-  addRequest ({ state, commit, rootState }, request) {
+  addRequest ({ state, commit, rootState, dispatch }, request) {
     let requestData = cloneDeep(request)
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
 
@@ -333,6 +333,9 @@ const actions = {
         updateTokenBalance(newRawTokenBalance, tokenAccount, rpcClient, commit, state)
       }
       if (state.type === 'LogosAccount' || requestData.type === 'send') {
+        if (state.requests.length === 0) {
+          dispatch('getAccountInfo', state.account)
+        }
         commit('setError', null)
         commit('incrementRequestCount')
         commit('setLastModified', requestData.timestamp)
