@@ -386,9 +386,7 @@ const actions = {
           val.settings[requestData.setting] = requestData.value
         }
       } else if (requestData.type === 'immute_setting') {
-        if (val.settings.hasOwnProperty('modify_' + requestData.setting)) {
-          delete val.settings[requestData.setting]
-        }
+        delete val.settings['modify_' + requestData.setting]
       } else if (requestData.type === 'revoke') {
         if (requestData.transaction.destination === tokenAccount) {
           let circulatingSupply = bigInt(val.circulating_supply).plus(bigInt(requestData.transaction.amount)).toString()
