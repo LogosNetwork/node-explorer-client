@@ -416,6 +416,7 @@ const actions = {
           val.feeBalanceInTokens = rpcClient.convert.fromTo(val.token_fee_balance, 0, val.issuerInfo.decimals)
           val.totalSupplyInTokens = rpcClient.convert.fromTo(val.total_supply, 0, val.issuerInfo.decimals)
           val.circulatingSupplyInTokens = rpcClient.convert.fromTo(val.circulating_supply, 0, val.issuerInfo.decimals)
+          if (val.fee_type.toLowerCase() === 'flat') val.feeInTokens = rpcClient.convert.fromTo(val.fee_rate, 0, val.issuerInfo.decimals)
         }
       } else if (requestData.type === 'update_controller') {
         val.controllers = val.controllers.filter(controller => controller.account !== requestData.controller.account)
