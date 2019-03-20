@@ -450,10 +450,12 @@ const actions = {
           val.feeBalanceInTokens = rpcClient.convert.fromTo(feeBalance, 0, val.issuerInfo.decimals)
         }
       }
-      commit('updateToken', {
-        rpcClient: rpcClient,
-        tokenInfo: val
-      })
+      if (val) {
+        commit('updateToken', {
+          rpcClient: rpcClient,
+          tokenInfo: val
+        })
+      }
       if (requestData.type !== 'token_send' && requestData.type !== 'issuance') {
         commit('setError', null)
         commit('incrementRequestCount')

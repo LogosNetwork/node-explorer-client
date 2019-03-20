@@ -158,7 +158,9 @@ export default {
     this.initalize({
       url: this.mqttHost,
       cb: () => {
-        this.subscribe(`#`)
+        this.subscribe(`microEpoch`)
+        this.subscribe(`epoch`)
+        this.subscribe(`requestBlock/#`)
       }
     })
     this.getLatestRequestBlock()
@@ -228,7 +230,9 @@ export default {
     }
   },
   destroyed: function () {
-    this.unsubscribe(`#`)
+    this.unsubscribe(`microEpoch`)
+    this.unsubscribe(`epoch`)
+    this.unsubscribe(`requestBlock/#`)
   }
 }
 </script>

@@ -34,12 +34,16 @@ const actions = {
         } else if (requestBlockMqttRegex(topic)) {
           commit('chains/addRequestBlock', message, { root: true })
           commit('explorer/setRequestBlock', message, { root: true })
+          if (message.requests && message.requests.length > 0) {
+            for (let request of message.requests) {
+              dispatch('explorer/addRequest', request, { root: true })
+            }
+          }
         } else {
           if (accountMqttRegex(topic)) {
             dispatch('account/addRequest', message, { root: true })
           } else if (requestMqttRegex(topic)) {
             dispatch('request/addRequest', message, { root: true })
-            dispatch('explorer/addRequest', message, { root: true })
           }
         }
       })
