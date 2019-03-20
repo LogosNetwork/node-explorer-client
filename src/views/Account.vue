@@ -118,7 +118,7 @@
                       </span>
                     </div>
                     <div class="col-md-8 font-weight-bold text-left">
-                      <span v-if="token.fee_type.toLowerCase() === 'flat' && typeof token.feeInTokens !== 'undefined' && parseInt(token.feeInTokens) > 0">
+                      <span v-if="token.fee_type.toLowerCase() === 'flat' && typeof token.feeInTokens !== 'undefined' && token.feeInTokens !== '0'">
                         {{token.feeInTokens}} {{token.symbol}}
                       </span>
                       <span v-else-if="token.fee_type.toLowerCase() === 'flat'">
