@@ -389,9 +389,9 @@ const actions = {
         delete val.settings['modify_' + requestData.setting]
       } else if (requestData.type === 'revoke') {
         if (requestData.transaction.destination === tokenAccount) {
-          let circulatingSupply = bigInt(val.circulating_supply).plus(bigInt(requestData.transaction.amount)).toString()
+          let circulatingSupply = bigInt(val.circulating_supply).minus(bigInt(requestData.transaction.amount)).toString()
           val.circulating_supply = circulatingSupply
-          val.token_balance = bigInt(val.token_balance).minus(bigInt(requestData.transaction.amount)).toString()
+          val.token_balance = bigInt(val.token_balance).plus(bigInt(requestData.transaction.amount)).toString()
           if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
             let circulatingSupplyInTokens = rpcClient.convert.fromTo(circulatingSupply, 0, val.issuerInfo.decimals)
             val.circulatingSupplyInTokens = circulatingSupplyInTokens
