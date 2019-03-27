@@ -345,16 +345,16 @@
             <p class="text-left" v-if="lastModified"><span v-t="'lastUpdated'"></span> <strong> {{ lastModified | moment("MMMM DD, YYYY h:mm:ss A") }}</strong></p>
             <b-row class="mb-3 text-left">
               <b-col>
-                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                  <label class="btn btn-outline-secondary" v-bind:class="{ active: selected === 'all' }">
+                <div class="btn-group btn-group-toggle flex-wrap" data-toggle="buttons">
+                  <label class="btn btn-outline-secondary btnWrap" v-bind:class="{ active: selected === 'all' }">
                     <input type="radio" name="tokenFilter" id="all" autocomplete="off" :checked="selected === 'all'" v-on:click="changeSelected('all')"> All
                   </label>
-                  <label class="btn btn-outline-secondary" v-bind:class="{ active: selected === 'lgs' }">
+                  <label class="btn btn-outline-secondary btnWrap" v-bind:class="{ active: selected === 'lgs' }">
                     <input type="radio" name="tokenFilter" id="lgs" autocomplete="off" :checked="selected === 'lgs'" v-on:click="changeSelected('lgs')">
                     <img class="avatar mr-1" src="/favicon-32x32.png">
                     <span>Logos</span>
                   </label>
-                  <label v-for="tokenBalance in Object.entries(tokenBalances)" :key="tokenBalance[0]" class="btn btn-outline-secondary" v-bind:class="{ active: selected === tokenBalance[0] }">
+                  <label v-for="tokenBalance in Object.entries(tokenBalances)" :key="tokenBalance[0]" class="btn btn-outline-secondary btnWrap" v-bind:class="{ active: selected === tokenBalance[0] }">
                     <input type="radio" name="tokenFilter" :id="tokenBalance[0]" autocomplete="off" :checked="selected === tokenBalance[0]" v-on:click="changeSelected(tokenBalance[0])">
                     <span v-if="tokenBalance[1].tokenInfo.pending !== true">
                       <img v-if="tokenBalance[1].tokenInfo.issuerInfo.image" class="avatar mr-1" :src="tokenBalance[1].tokenInfo.issuerInfo.image">
@@ -575,5 +575,9 @@ export default {
   }
   .content > div:not(:first-child) {
     margin-top: 2rem;
+  }
+  .btnWrap {
+    max-width: 119px;
+    width: 119px;
   }
 </style>
