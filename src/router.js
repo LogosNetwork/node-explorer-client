@@ -4,6 +4,7 @@ import Explore from './views/Explore.vue'
 import Governance from './views/Governance.vue'
 import Tokens from './views/Tokens.vue'
 import Workbench from './views/Workbench.vue'
+import Forge from './views/Forge.vue'
 import Request from './views/Request.vue'
 import microEpoch from './views/MicroEpoch.vue'
 import requestBlock from './views/RequestBlock.vue'
@@ -43,6 +44,11 @@ const router = new Router({
       path: '/workbench',
       name: 'workbench',
       component: Workbench
+    },
+    {
+      path: '/forge',
+      name: 'forge',
+      component: Forge
     },
     {
       path: '/:account(lgs_[13456789abcdefghijkmnopqrstuwxyz]{60})',
