@@ -299,8 +299,8 @@ const actions = {
         val.tokenAccount = tokenAccount
         val.balance = '0'
         val.controllers = requestData.controllers
-        val.fee_rate = requestData.feeRate
-        val.fee_type = requestData.feeType
+        val.fee_rate = requestData.fee_rate
+        val.fee_type = requestData.fee_type
         val.frontier = null
         val.issuance_request = requestData.hash
         try {
