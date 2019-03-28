@@ -344,16 +344,7 @@ const actions = {
       } else if (requestData.type === 'immute_setting') {
         delete val.settings['modify_' + requestData.setting]
       } else if (requestData.type === 'revoke') {
-        if (requestData.transaction.destination === tokenAccount) {
-          let circulatingSupply = bigInt(val.circulating_supply).minus(bigInt(requestData.transaction.amount)).toString()
-          val.circulating_supply = circulatingSupply
-          val.token_balance = bigInt(val.token_balance).plus(bigInt(requestData.transaction.amount)).toString()
-          if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
-            let circulatingSupplyInTokens = rpcClient.convert.fromTo(circulatingSupply, 0, val.issuerInfo.decimals)
-            val.circulatingSupplyInTokens = circulatingSupplyInTokens
-          }
-        }
-      } else if (requestData.type === 'revoke') {
+        // Does not handle foreign tokens
         if (state.account === requestData.transaction.destination) {
           val.token_balance = bigInt(val.token_balance).plus(bigInt(requestData.transaction.amount)).toString()
         }
@@ -361,6 +352,10 @@ const actions = {
           val.token_balance = bigInt(val.token_balance).minus(bigInt(requestData.transaction.amount)).toString()
         }
         val.circulating_supply = bigInt(val.total_supply).minus(bigInt(val.token_balance)).toString()
+        if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
+          let circulatingSupplyInTokens = rpcClient.convert.fromTo(val.circulating_supply, 0, val.issuerInfo.decimals)
+          val.circulatingSupplyInTokens = circulatingSupplyInTokens
+        }
       } else if (requestData.type === 'adjust_user_status') {
         // No reason to handle anything but in future maybe
       } else if (requestData.type === 'adjust_fee') {
@@ -395,23 +390,45 @@ const actions = {
           val.totalSupplyInTokens = totalSupplyInTokens
         }
       } else if (requestData.type === 'distribute') {
-        let circulatingSupply = bigInt(val.circulating_supply).plus(bigInt(requestData.transaction.amount)).toString()
-        val.circulating_supply = circulatingSupply
-        val.token_balance = bigInt(val.token_balance).minus(bigInt(requestData.transaction.amount)).toString()
-        if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
-          let circulatingSupplyInTokens = rpcClient.convert.fromTo(circulatingSupply, 0, val.issuerInfo.decimals)
-          val.circulatingSupplyInTokens = circulatingSupplyInTokens
+        // Does not handle foreign tokens
+        if (requestData.transaction.destination !== state.account) {
+          let circulatingSupply = bigInt(val.circulating_supply).plus(bigInt(requestData.transaction.amount)).toString()
+          val.circulating_supply = circulatingSupply
+          val.token_balance = bigInt(val.token_balance).minus(bigInt(requestData.transaction.amount)).toString()
+          if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
+            let circulatingSupplyInTokens = rpcClient.convert.fromTo(circulatingSupply, 0, val.issuerInfo.decimals)
+            val.circulatingSupplyInTokens = circulatingSupplyInTokens
+          }
         }
       } else if (requestData.type === 'withdraw_fee') {
-        let feeBalance = bigInt(val.token_fee_balance).minus(bigInt(requestData.transaction.amount)).toString()
-        val.token_fee_balance = feeBalance
-        if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
-          val.feeBalanceInTokens = rpcClient.convert.fromTo(feeBalance, 0, val.issuerInfo.decimals)
+        // Receive
+        if (requestData.transaction.destination === state.account) {
+          val.token_balance = bigInt(val.token_balance).plus(bigInt(requestData.transaction.amount)).toString()
+          val.circulating_supply = bigInt(val.circulating_supply).plus(bigInt(requestData.transaction.amount)).toString()
+          if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
+            val.circulatingSupplyInTokens = rpcClient.convert.fromTo(val.circulating_supply, 0, val.issuerInfo.decimals)
+          }
+        }
+
+        // Send
+        if (tokenAccount === state.account) {
+          let feeBalance = bigInt(val.token_fee_balance).minus(bigInt(requestData.transaction.amount)).toString()
+          val.token_fee_balance = feeBalance
+          if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
+            val.feeBalanceInTokens = rpcClient.convert.fromTo(feeBalance, 0, val.issuerInfo.decimals)
+          }
         }
       } else if (requestData.type === 'withdraw_logos') {
-        let newRawBalance = bigInt(val.balance).minus(bigInt(requestData.transaction.amount)).toString()
-        val.balance = newRawBalance
+        // Receive
+        if (requestData.transaction.destination === state.account) {
+          val.balance = bigInt(val.balance).plus(bigInt(requestData.transaction.amount)).toString()
+        }
+        // Send
+        if (tokenAccount === state.account) {
+          val.balance = bigInt(val.balance).minus(bigInt(requestData.transaction.amount)).toString()
+        }
       } else if (requestData.type === 'token_send') {
+        // Does not handle foreign token sends to this account
         let feeBalance = bigInt(val.token_fee_balance).plus(bigInt(requestData.token_fee)).toString()
         val.token_fee_balance = feeBalance
         if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
