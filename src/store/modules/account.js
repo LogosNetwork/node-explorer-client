@@ -260,8 +260,12 @@ const actions = {
 
     // Add token data
     let tokenAccount = null
-    if (requestData.token_id) {
-      tokenAccount = LogosWallet.LogosUtils.accountFromHexKey(requestData.token_id)
+    if (state.type === 'TokenAccount' || requestData.token_id) {
+      if (requestData.token_id) {
+        tokenAccount = LogosWallet.LogosUtils.accountFromHexKey(requestData.token_id)
+      } else {
+        tokenAccount = state.account
+      }
       if (state.tokens[tokenAccount]) {
         requestData.tokenInfo = state.tokens[tokenAccount]
       } else {
@@ -276,13 +280,14 @@ const actions = {
     requestData = handleRequest(requestData, rpcClient)
     requestData.timestamp = parseInt(requestData.timestamp)
 
-    if (tokenAccount !== null && state.account === tokenAccount) {
+    if (state.type === 'TokenAccount') {
       // Add requests from the MQTT for token accounts
       let val = cloneDeep(state.tokens[tokenAccount])
 
       // Handle Logos Fees
       if (requestData.type !== 'issuance' &&
         requestData.type !== 'token_send' &&
+        requestData.type !== 'send' &&
         tokenAccount === state.account) {
         let newRawBalance = bigInt(val.balance).minus(bigInt(requestData.fee)).toString()
         val.balance = newRawBalance
