@@ -12,6 +12,7 @@
       <issuance v-if="requestInfo.type === 'issuance'" :requestInfo="requestInfo"/>
       <issueAdditional v-if="requestInfo.type === 'issue_additional'" :requestInfo="requestInfo"/>
       <withdrawFee v-if="requestInfo.type === 'withdraw_fee'" :requestInfo="requestInfo"/>
+      <withdrawLogos v-if="requestInfo.type === 'withdraw_logos'" :requestInfo="requestInfo"/>
       <updateController v-if="requestInfo.type === 'update_controller'" :requestInfo="requestInfo"/>
       <revoke v-if="requestInfo.type === 'revoke'" :requestInfo="requestInfo"/>
       <immuteSetting v-if="requestInfo.type === 'immute_setting'" :requestInfo="requestInfo"/>
@@ -28,6 +29,7 @@
       <issuance v-if="requestInfo.type === 'issuance'" :requestInfo="requestInfo"/>
       <issueAdditional v-if="requestInfo.type === 'issue_additional'" :requestInfo="requestInfo"/>
       <withdrawFee v-if="requestInfo.type === 'withdraw_fee'" :requestInfo="requestInfo"/>
+      <withdrawLogos v-if="requestInfo.type === 'withdraw_logos'" :requestInfo="requestInfo"/>
       <updateController v-if="requestInfo.type === 'update_controller'" :requestInfo="requestInfo"/>
       <revoke v-if="requestInfo.type === 'revoke'" :requestInfo="requestInfo"/>
       <immuteSetting v-if="requestInfo.type === 'immute_setting'" :requestInfo="requestInfo"/>
@@ -46,6 +48,7 @@ import adjustUserStatus from '@/components/requests/requestCards/adjustUserStatu
 import issuance from '@/components/requests/requestCards/issuance.vue'
 import issueAdditional from '@/components/requests/requestCards/issueAdditional.vue'
 import withdrawFee from '@/components/requests/requestCards/withdrawFee.vue'
+import withdrawLogos from '@/components/requests/requestCards/withdrawLogos.vue'
 import updateController from '@/components/requests/requestCards/updateController.vue'
 import revoke from '@/components/requests/requestCards/revoke.vue'
 import immuteSetting from '@/components/requests/requestCards/immuteSetting.vue'
@@ -68,6 +71,7 @@ export default {
     issuance,
     issueAdditional,
     withdrawFee,
+    withdrawLogos,
     updateController,
     revoke,
     immuteSetting,

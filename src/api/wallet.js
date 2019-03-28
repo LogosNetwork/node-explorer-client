@@ -1,14 +1,14 @@
-import LogosWallet from '@logosnetwork/logos-rpc-client'
+import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
 
 export { LogosWallet }
 
 export default {
-  install (Vue, options) {
+  install (Vue) {
     if (this.installed) {
       return
     }
     this.installed = true
     Vue.prototype.$Wallet = LogosWallet.Wallet
-    Vue.prototype.$Utils = LogosWallet.LogosUtils
+    Vue.prototype.$Utils = LogosWallet.Utils
   }
 }
