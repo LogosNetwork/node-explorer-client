@@ -547,6 +547,8 @@ const actions = {
           commit('incrementRequestCount')
           commit('setRawBalance', newRawBalance.toString())
           commit('setBalance', rpcClient.convert.fromReason(state.rawBalance, 'LOGOS'))
+          commit('setLastModified', requestData.timestamp)
+          commit('unshiftRequest', requestData)
         }
       }
     }
@@ -611,7 +613,6 @@ const mutations = {
     })
   },
   updateToken (state, data) {
-    console.log(data.tokenInfo)
     Vue.set(state.tokens, data.tokenInfo.tokenAccount, data.tokenInfo)
     for (let request of state.requests) {
       if (request.tokenInfo && request.tokenInfo.pending &&
