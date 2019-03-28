@@ -186,105 +186,105 @@
               </div>
               <div class="content">
                 <div v-for="privilege in selectedController.privileges" :key="selectedController.account+privilege">
-                  <span v-if="privilege === 'change_issuance' && token.settings['modify_issuance']">
+                  <span v-if="privilege === 'change_issuance' && token.settings.includes('modify_issuance')">
                     <h5>
                       <font-awesome-icon :icon="faMagic" class="mr-2"/>
                       Change Issuance
                     </h5>
                     <p>The controller can change the issuance setting of {{token.name}}. This allows controllers to issue additional {{token.symbol}}.</p>
                   </span>
-                  <span v-else-if="privilege === 'change_modify_issuance' && token.settings['modify_issuance']">
+                  <span v-else-if="privilege === 'change_modify_issuance' && token.settings.includes('modify_issuance')">
                     <h5>
                       <font-awesome-icon :icon="faLockAlt" class="mr-2"/>
                       Immute Issuance
                     </h5>
                     <p>The controller is allowed to make the current issuance setting permanent.</p>
                   </span>
-                  <span v-else-if="privilege === 'issuance' && token.settings['issuance']">
+                  <span v-else-if="privilege === 'issuance' && token.settings.includes('issuance')">
                     <h5>
                       <font-awesome-icon :icon="faMagic" class="mr-2"/>
                       Issuance
                     </h5>
                     <p>The controller is allowed to issue additional {{token.symbol}}.</p>
                   </span>
-                  <span v-else-if="privilege === 'change_revoke' && token.settings['modify_revoke']">
+                  <span v-else-if="privilege === 'change_revoke' && token.settings.includes('modify_revoke')">
                     <h5>
                       <font-awesome-icon :icon="faMask" class="mr-2"/>
                       Change Revoke
                     </h5>
                     <p>The controller can change the revoke setting of {{token.name}}. This allows controllers to revoke {{token.symbol}} from user accounts.</p>
                   </span>
-                  <span v-else-if="privilege === 'change_modify_revoke' && token.settings['modify_revoke']">
+                  <span v-else-if="privilege === 'change_modify_revoke' && token.settings.includes('modify_revoke')">
                     <h5>
                       <font-awesome-icon :icon="faLockAlt" class="mr-2"/>
                       Immute Revoke
                     </h5>
                     <p>The controller is allowed to make the current revoke setting permanent.</p>
                   </span>
-                  <span v-else-if="privilege === 'revoke' && token.settings['revoke']">
+                  <span v-else-if="privilege === 'revoke' && token.settings.includes('revoke')">
                     <h5>
                       <font-awesome-icon :icon="faMask" class="mr-2"/>
                       Revoke
                     </h5>
                     <p>The controller is allowed to revoke {{token.symbol}} from user accounts.</p>
                   </span>
-                  <span v-else-if="privilege === 'change_freeze' && token.settings['modify_freeze']">
+                  <span v-else-if="privilege === 'change_freeze' && token.settings.includes('modify_freeze')">
                     <h5>
                       <font-awesome-icon :icon="faSnowflake" class="mr-2"/>
                       Change Freeze
                     </h5>
                     <p>The controller can change the freeze setting of {{token.name}}. This allows controllers to freeze {{token.symbol}} in user accounts.</p>
                   </span>
-                  <span v-else-if="privilege === 'change_modify_freeze' && token.settings['modify_freeze']">
+                  <span v-else-if="privilege === 'change_modify_freeze' && token.settings.includes('modify_freeze')">
                     <h5>
                       <font-awesome-icon :icon="faLockAlt" class="mr-2"/>
                       Immute Freeze
                     </h5>
                     <p>The controller is allowed to make the current freeze setting permanent.</p>
                   </span>
-                  <span v-else-if="privilege === 'freeze' && token.settings['freeze']">
+                  <span v-else-if="privilege === 'freeze' && token.settings.includes('freeze')">
                     <h5>
                       <font-awesome-icon :icon="faSnowflake" class="mr-2"/>
                       Freeze
                     </h5>
                     <p>The controller is allowed to freeze {{token.symbol}} in user accounts.</p>
                   </span>
-                  <span v-else-if="privilege === 'change_adjust_fee' && token.settings['modify_adjust_fee']">
+                  <span v-else-if="privilege === 'change_adjust_fee' && token.settings.includes('modify_adjust_fee')">
                     <h5>
                       <font-awesome-icon :icon="faCoins" class="mr-2"/>
                       Change Adjust Fee
                     </h5>
                     <p>The controller can change the adjust fee setting of {{token.name}}. This allows controllers to change the {{token.symbol}} token fee.</p>
                   </span>
-                  <span v-else-if="privilege === 'change_modify_adjust_fee' && token.settings['modify_adjust_fee']">
+                  <span v-else-if="privilege === 'change_modify_adjust_fee' && token.settings.includes('modify_adjust_fee')">
                     <h5>
                       <font-awesome-icon :icon="faLockAlt" class="mr-2"/>
                       Immute Adjust Fee
                     </h5>
                     <p>The controller is allowed to make the current adjust fee setting permanent.</p>
                   </span>
-                  <span v-else-if="privilege === 'adjust_fee' && token.settings['adjust_fee']">
+                  <span v-else-if="privilege === 'adjust_fee' && token.settings.includes('adjust_fee')">
                     <h5>
                       <font-awesome-icon :icon="faCoins" class="mr-2"/>
                       Adjust Fee
                     </h5>
                     <p>The controller is allowed to to change the {{token.symbol}} token fee.</p>
                   </span>
-                  <span v-else-if="privilege === 'change_whitelist' && token.settings['modify_whitelist']">
+                  <span v-else-if="privilege === 'change_whitelist' && token.settings.includes('modify_whitelist')">
                     <h5>
                       <font-awesome-icon :icon="faListAlt" class="mr-2"/>
                       Change Whitelist
                     </h5>
                     <p>The controller can change the whitelist setting of {{token.name}}. This allows controllers to only allow approved accounts to use the {{token.symbol}} token.</p>
                   </span>
-                  <span v-else-if="privilege === 'change_modify_whitelist' && token.settings['modify_whitelist']">
+                  <span v-else-if="privilege === 'change_modify_whitelist' && token.settings.includes('modify_whitelist')">
                     <h5>
                       <font-awesome-icon :icon="faLockAlt" class="mr-2"/>
                       Immute Whitelist
                     </h5>
                     <p>The controller is allowed to make the current whitelist setting permanent.</p>
                   </span>
-                  <span v-else-if="privilege === 'whitelist' && token.settings['whitelist']">
+                  <span v-else-if="privilege === 'whitelist' && token.settings.includes('whitelist')">
                     <h5>
                       <font-awesome-icon :icon="faListAlt" class="mr-2"/>
                       Whitelist
@@ -336,8 +336,7 @@
         <b-row>
           <b-col cols="12" class="mb-3">
             <h4 class="text-left">
-              <span v-if="type === 'LogosAccount'">{{requestCount}} </span>
-              <span v-if="type === 'TokenAccount'">{{requests.length}} </span>
+              <span>{{requestCount}} </span>
               <span v-t="'requests'"></span>
               <small v-if='requests.length >= count'> (showing last {{requests.length}})</small>
               <small v-if='requests.length < count'> (showing all {{requests.length}})</small>
