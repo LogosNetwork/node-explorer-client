@@ -8,8 +8,8 @@ const state = {
   account: null,
   representaive: null,
   error: null,
-  balance: null,
-  rawBalance: null,
+  balance: '0',
+  rawBalance: '0',
   count: 50,
   requests: [],
   type: null,
@@ -27,10 +27,10 @@ const state = {
 
 const updateTokenBalance = (raw, tokenAccount, rpcClient, commit, state) => {
   if (state.tokenBalances[tokenAccount]) {
-    commit('setRawTokenBalance', { tokenAccount: tokenAccount, rawTokenBalance: raw.toString() })
+    commit('setRawTokenBalance', { tokenAccount: tokenAccount, rawTokenBalance: raw })
     if (state.tokenBalances[tokenAccount].tokenInfo.pending !== true &&
       typeof state.tokenBalances[tokenAccount].tokenInfo.issuerInfo.decimals !== 'undefined') {
-      let tokenBalance = rpcClient.convert.fromTo(raw.toString(), 0, state.tokenBalances[tokenAccount].tokenInfo.issuerInfo.decimals)
+      let tokenBalance = rpcClient.convert.fromTo(raw, 0, state.tokenBalances[tokenAccount].tokenInfo.issuerInfo.decimals)
       commit('setTokenBalance', {
         tokenAccount: tokenAccount,
         tokenBalance: tokenBalance
@@ -39,13 +39,13 @@ const updateTokenBalance = (raw, tokenAccount, rpcClient, commit, state) => {
   } else {
     if (state.tokens[tokenAccount]) {
       let info = {
-        balance: raw.toString(),
+        balance: raw,
         tokenInfo: state.tokens[tokenAccount]
       }
       commit('addTokenBalance', { tokenAccount: tokenAccount, info: info })
     } else {
       let info = {
-        balance: raw.toString(),
+        balance: raw,
         tokenInfo: {
           pending: true,
           tokenAccount: tokenAccount
@@ -58,7 +58,8 @@ const updateTokenBalance = (raw, tokenAccount, rpcClient, commit, state) => {
   }
 }
 
-const handleTokenRequests = (request, rpcClient) => {
+// This will parse and append the MQTT request with additional information
+const handleRequest = (request, rpcClient) => {
   if (request.type === 'send') {
     let total = bigInt(0)
     for (let trans of request.transactions) {
@@ -66,6 +67,9 @@ const handleTokenRequests = (request, rpcClient) => {
       trans.amountInLogos = rpcClient.convert.fromReason(trans.amount, 'LOGOS')
     }
     request.totalAmountLogos = rpcClient.convert.fromReason(total.toString(), 'LOGOS')
+  }
+  if (request.type === 'withdraw_logos') {
+    request.transaction.amountInLogos = rpcClient.convert.fromReason(request.transaction.amount, 'LOGOS')
   }
   if (request.type === 'burn' || request.type === 'issue_additional') {
     if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
@@ -126,19 +130,11 @@ const pullTokenInfo = (tokenAccount, rpcClient, commit) => {
 }
 
 const parseRequests = (request, rpcClient, commit, state) => {
-  if (request.type === 'send' && request.transactions && request.transactions.length > 0) {
-    commit('addRequest', handleTokenRequests(request, rpcClient))
-  } else if (request.type === 'burn' || request.type === 'update_issuer_info' ||
-    request.type === 'token_send' || request.type === 'distribute' ||
-    request.type === 'adjust_fee' || request.type === 'change_setting' ||
-    request.type === 'adjust_user_status' || request.type === 'issuance' ||
-    request.type === 'issue_additional' || request.type === 'withdraw_fee' ||
-    request.type === 'update_controller' || request.type === 'revoke' ||
-    request.type === 'immute_setting') {
+  if (request.token_id) {
     let tokenAccount = LogosWallet.LogosUtils.accountFromHexKey(request.token_id)
     if (state.tokens[tokenAccount]) {
       request.tokenInfo = state.tokens[tokenAccount]
-      commit('addRequest', handleTokenRequests(request, rpcClient))
+      commit('addRequest', handleRequest(request, rpcClient))
     } else {
       request.tokenInfo = {
         pending: true,
@@ -148,10 +144,10 @@ const parseRequests = (request, rpcClient, commit, state) => {
         commit('addToken', tokenAccount)
         pullTokenInfo(tokenAccount, rpcClient, commit)
       }
-      commit('addRequest', handleTokenRequests(request, rpcClient))
+      commit('addRequest', handleRequest(request, rpcClient))
     }
   } else {
-    commit('addRequest', request)
+    commit('addRequest', handleRequest(request, rpcClient))
   }
 }
 
@@ -222,7 +218,7 @@ const actions = {
             } catch (e) {
               val.issuerInfo = {}
             }
-            val.circulating_supply = bigInt(val.total_supply).minus(bigInt(val.token_balance))
+            val.circulating_supply = bigInt(val.total_supply).minus(bigInt(val.token_balance)).toString()
             if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
               val.balanceInTokens = rpcClient.convert.fromTo(val.token_balance, 0, val.issuerInfo.decimals)
               val.feeBalanceInTokens = rpcClient.convert.fromTo(val.token_fee_balance, 0, val.issuerInfo.decimals)
@@ -277,102 +273,62 @@ const actions = {
         pullTokenInfo(tokenAccount, rpcClient, commit)
       }
     }
-    requestData = handleTokenRequests(requestData, rpcClient)
+    requestData = handleRequest(requestData, rpcClient)
     requestData.timestamp = parseInt(requestData.timestamp)
-    // Handle Balance Changes
-    if (requestData.origin === state.account &&
-        (requestData.type === 'send' || requestData.type === 'token_send' || requestData.type === 'issuance')) { // Handle Requests that have fees that originate from this account
-      if (requestData.type === 'send') {
-        let newRawBalance = bigInt(0)
-        if (state.rawBalance) newRawBalance = bigInt(state.rawBalance).minus(bigInt(requestData.fee))
-        for (let trans of requestData.transactions) {
-          if (trans.destination !== state.account) newRawBalance = bigInt(newRawBalance).minus(bigInt(trans.amount))
-        }
-        commit('setRawBalance', newRawBalance.toString())
-        commit('setBalance', rpcClient.convert.fromReason(state.rawBalance, 'LOGOS'))
-      } else if (requestData.type === 'token_send') {
-        let newRawBalance = bigInt(0)
-        if (state.rawBalance) newRawBalance = bigInt(state.rawBalance).minus(bigInt(requestData.fee))
-        commit('setRawBalance', newRawBalance.toString())
-        commit('setBalance', rpcClient.convert.fromReason(state.rawBalance, 'LOGOS'))
-        let newRawTokenBalance = bigInt(0)
-        if (state.tokenBalances[tokenAccount]) newRawTokenBalance = bigInt(state.tokenBalances[tokenAccount].balance).minus(bigInt(requestData.token_fee))
-        for (let trans of requestData.transactions) {
-          if (trans.destination !== state.account) newRawTokenBalance = bigInt(newRawTokenBalance).minus(bigInt(trans.amount))
-        }
-        updateTokenBalance(newRawTokenBalance, tokenAccount, rpcClient, commit, state)
-      } else if (requestData.type === 'issuance') {
-        let newRawBalance = bigInt(0)
-        if (state.rawBalance) newRawBalance = bigInt(state.rawBalance).minus(bigInt(requestData.fee))
-        commit('setRawBalance', newRawBalance.toString())
-        commit('setBalance', rpcClient.convert.fromReason(state.rawBalance, 'LOGOS'))
+
+    if (tokenAccount !== null && state.account === tokenAccount) {
+      // Add requests from the MQTT for token accounts
+      let val = cloneDeep(state.tokens[tokenAccount])
+
+      // Handle Logos Fees
+      if (requestData.type !== 'issuance' &&
+        requestData.type !== 'token_send' &&
+        tokenAccount === state.account) {
+        let newRawBalance = bigInt(val.balance).minus(bigInt(requestData.fee)).toString()
+        val.balance = newRawBalance
       }
-      commit('setError', null)
-      commit('incrementRequestCount')
-      commit('setLastModified', requestData.timestamp)
-      commit('unshiftRequest', requestData)
-    } else if (requestData.origin !== state.account && (requestData.type === 'send' || requestData.type === 'token_send')) { // Handle Recieves
+
+      // Handle Requests
       if (requestData.type === 'send') {
-        let newRawBalance = bigInt(0)
-        if (state.rawBalance) newRawBalance = bigInt(state.rawBalance)
+        let newRawBalance = bigInt(val.balance)
         for (let trans of requestData.transactions) {
           if (trans.destination === state.account) newRawBalance = newRawBalance.add(bigInt(trans.amount))
         }
-        commit('setRawBalance', newRawBalance.toString())
-        commit('setBalance', rpcClient.convert.fromReason(state.rawBalance, 'LOGOS'))
-      } else if (requestData.type === 'token_send') {
-        let newRawTokenBalance = bigInt(0)
-        if (state.tokenBalances[tokenAccount]) newRawTokenBalance = bigInt(state.tokenBalances[tokenAccount].balance)
-        for (let trans of requestData.transactions) {
-          if (trans.destination === state.account) newRawTokenBalance = bigInt(newRawTokenBalance).plus(bigInt(trans.amount))
+        val.balance = newRawBalance.toString()
+      } else if (requestData.type === 'issuance') {
+        val.tokenAccount = tokenAccount
+        val.balance = '0'
+        val.controllers = requestData.controllers
+        val.fee_rate = requestData.feeRate
+        val.fee_type = requestData.feeType
+        val.frontier = null
+        val.issuance_request = requestData.hash
+        try {
+          val.issuerInfo = JSON.parse(requestData.issuer_info)
+        } catch (e) {
+          val.issuerInfo = {}
         }
-        updateTokenBalance(newRawTokenBalance, tokenAccount, rpcClient, commit, state)
-      }
-      if (state.type === 'LogosAccount' || requestData.type === 'send') {
-        if (state.requests.length === 0) {
-          dispatch('getAccountInfo', state.account)
+        val.issuer_info = requestData.issuer_info
+        val.name = requestData.name
+        val.receive_tip = requestData.hash
+        val.request_count = '1'
+        val.sequence = '0'
+        val.settings = requestData.settings
+        val.symbol = requestData.symbol
+        val.tokenAccount = state.account
+        val.token_balance = requestData.total_supply
+        val.token_fee_balance = '0'
+        val.total_supply = requestData.total_supply
+        val.type = 'TokenAccount'
+        val.circulating_supply = '0'
+        if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
+          val.balanceInTokens = rpcClient.convert.fromTo(val.token_balance, 0, val.issuerInfo.decimals)
+          val.feeBalanceInTokens = rpcClient.convert.fromTo(val.token_fee_balance, 0, val.issuerInfo.decimals)
+          val.totalSupplyInTokens = rpcClient.convert.fromTo(val.total_supply, 0, val.issuerInfo.decimals)
+          val.circulatingSupplyInTokens = rpcClient.convert.fromTo(val.circulating_supply, 0, val.issuerInfo.decimals)
+          if (val.fee_type.toLowerCase() === 'flat') val.feeInTokens = rpcClient.convert.fromTo(val.fee_rate, 0, val.issuerInfo.decimals)
         }
-        commit('setError', null)
-        commit('incrementRequestCount')
-        commit('setLastModified', requestData.timestamp)
-        commit('unshiftRequest', requestData)
-      }
-    }
-
-    // Handle other block types that may affect token balance of a Logos Account
-    if (requestData.type === 'withdraw_fee' || requestData.type === 'distribute') {
-      if (state.account === requestData.transaction.destination) {
-        let newRawTokenBalance = bigInt(0)
-        if (state.tokenBalances[tokenAccount]) newRawTokenBalance = bigInt(state.tokenBalances[tokenAccount].balance).plus(bigInt(requestData.transaction.amount))
-        updateTokenBalance(newRawTokenBalance, tokenAccount, rpcClient, commit, state)
-        commit('setError', null)
-        commit('incrementRequestCount')
-        commit('setLastModified', requestData.timestamp)
-        commit('unshiftRequest', requestData)
-      }
-    } else if (requestData.type === 'revoke') {
-      if (state.account === requestData.transaction.destination || state.account === requestData.source) {
-        let newRawTokenBalance = bigInt(0)
-        let tokenAccount = LogosWallet.LogosUtils.accountFromHexKey(requestData.token_id)
-        if (state.tokenBalances[tokenAccount]) newRawTokenBalance = bigInt(state.tokenBalances[tokenAccount].balance)
-        if (state.account === requestData.transaction.destination) {
-          newRawTokenBalance.plus(bigInt(requestData.transaction.amount))
-        }
-        if (state.account === requestData.source) {
-          newRawTokenBalance.minus(bigInt(requestData.transaction.amount))
-        }
-        updateTokenBalance(newRawTokenBalance, tokenAccount, rpcClient, commit, state)
-        commit('setError', null)
-        commit('incrementRequestCount')
-        commit('setLastModified', requestData.timestamp)
-        commit('unshiftRequest', requestData)
-      }
-    }
-
-    // Handle MQTT for Token Accounts
-    if (state.account === tokenAccount) {
-      let val = cloneDeep(state.tokens[tokenAccount])
-      if (requestData.type === 'issuance') {
+        commit('setAccountType', 'TokenAccount')
       } else if (requestData.type === 'issue_additional') {
         let totalSupply = bigInt(val.total_supply).plus(bigInt(requestData.amount)).toString()
         val.total_supply = totalSupply
@@ -397,7 +353,16 @@ const actions = {
             val.circulatingSupplyInTokens = circulatingSupplyInTokens
           }
         }
-      } else if (requestData.type === 'adjust_user_status') { // No reason to handle anything but in future maybe
+      } else if (requestData.type === 'revoke') {
+        if (state.account === requestData.transaction.destination) {
+          val.token_balance = bigInt(val.token_balance).plus(bigInt(requestData.transaction.amount)).toString()
+        }
+        if (state.account === requestData.source) {
+          val.token_balance = bigInt(val.token_balance).minus(bigInt(requestData.transaction.amount)).toString()
+        }
+        val.circulating_supply = bigInt(val.total_supply).minus(bigInt(val.token_balance)).toString()
+      } else if (requestData.type === 'adjust_user_status') {
+        // No reason to handle anything but in future maybe
       } else if (requestData.type === 'adjust_fee') {
         val.fee_rate = requestData.fee_rate
         val.fee_type = requestData.fee_type
@@ -443,6 +408,9 @@ const actions = {
         if (val.issuerInfo && typeof val.issuerInfo.decimals !== 'undefined') {
           val.feeBalanceInTokens = rpcClient.convert.fromTo(feeBalance, 0, val.issuerInfo.decimals)
         }
+      } else if (requestData.type === 'withdraw_logos') {
+        let newRawBalance = bigInt(val.balance).minus(bigInt(requestData.transaction.amount)).toString()
+        val.balance = newRawBalance
       } else if (requestData.type === 'token_send') {
         let feeBalance = bigInt(val.token_fee_balance).plus(bigInt(requestData.token_fee)).toString()
         val.token_fee_balance = feeBalance
@@ -451,16 +419,118 @@ const actions = {
         }
       }
       if (val) {
+        commit('setRawBalance', val.balance.toString())
+        commit('setBalance', rpcClient.convert.fromReason(val.balance, 'LOGOS'))
         commit('updateToken', {
           rpcClient: rpcClient,
           tokenInfo: val
         })
       }
-      if (requestData.type !== 'token_send' && requestData.type !== 'issuance') {
+      if (requestData.type !== 'token_send') {
         commit('setError', null)
         commit('incrementRequestCount')
         commit('setLastModified', requestData.timestamp)
         commit('unshiftRequest', requestData)
+      }
+    } else {
+      // Handle Logos Account MQTT
+      if (requestData.origin === state.account &&
+        (requestData.type === 'send' || requestData.type === 'token_send' || requestData.type === 'issuance')) {
+        if (requestData.type === 'send') {
+          let newRawBalance = bigInt(0)
+          if (state.rawBalance) newRawBalance = bigInt(state.rawBalance).minus(bigInt(requestData.fee))
+          for (let trans of requestData.transactions) {
+            if (trans.destination !== state.account) newRawBalance = bigInt(newRawBalance).minus(bigInt(trans.amount))
+          }
+          commit('setRawBalance', newRawBalance.toString())
+          commit('setBalance', rpcClient.convert.fromReason(state.rawBalance, 'LOGOS'))
+        } else if (requestData.type === 'token_send') {
+          let newRawBalance = bigInt(0)
+          if (state.rawBalance) newRawBalance = bigInt(state.rawBalance).minus(bigInt(requestData.fee))
+          commit('setRawBalance', newRawBalance.toString())
+          commit('setBalance', rpcClient.convert.fromReason(state.rawBalance, 'LOGOS'))
+          let newRawTokenBalance = bigInt(0)
+          if (state.tokenBalances[tokenAccount]) newRawTokenBalance = bigInt(state.tokenBalances[tokenAccount].balance).minus(bigInt(requestData.token_fee))
+          for (let trans of requestData.transactions) {
+            if (trans.destination !== state.account) newRawTokenBalance = bigInt(newRawTokenBalance).minus(bigInt(trans.amount))
+          }
+          updateTokenBalance(newRawTokenBalance.toString(), tokenAccount, rpcClient, commit, state)
+        } else if (requestData.type === 'issuance') {
+          let newRawBalance = bigInt(0)
+          if (state.rawBalance) newRawBalance = bigInt(state.rawBalance).minus(bigInt(requestData.fee))
+          commit('setRawBalance', newRawBalance.toString())
+          commit('setBalance', rpcClient.convert.fromReason(state.rawBalance, 'LOGOS'))
+        }
+        commit('setError', null)
+        commit('incrementRequestCount')
+        commit('setLastModified', requestData.timestamp)
+        commit('unshiftRequest', requestData)
+      } else if (requestData.origin !== state.account && (requestData.type === 'send' || requestData.type === 'token_send')) { // Handle Recieves
+        if (requestData.type === 'send') {
+          let newRawBalance = bigInt(0)
+          if (state.rawBalance) newRawBalance = bigInt(state.rawBalance)
+          for (let trans of requestData.transactions) {
+            if (trans.destination === state.account) newRawBalance = newRawBalance.add(bigInt(trans.amount))
+          }
+          commit('setRawBalance', newRawBalance.toString())
+          commit('setBalance', rpcClient.convert.fromReason(state.rawBalance, 'LOGOS'))
+        } else if (requestData.type === 'token_send') {
+          let newRawTokenBalance = bigInt(0)
+          if (state.tokenBalances[tokenAccount]) newRawTokenBalance = bigInt(state.tokenBalances[tokenAccount].balance)
+          for (let trans of requestData.transactions) {
+            if (trans.destination === state.account) newRawTokenBalance = bigInt(newRawTokenBalance).plus(bigInt(trans.amount))
+          }
+          updateTokenBalance(newRawTokenBalance.toString(), tokenAccount, rpcClient, commit, state)
+        }
+        if (state.type === 'LogosAccount' || requestData.type === 'send') {
+          if (state.requests.length === 0) {
+            dispatch('getAccountInfo', state.account)
+          }
+          commit('setError', null)
+          commit('incrementRequestCount')
+          commit('setLastModified', requestData.timestamp)
+          commit('unshiftRequest', requestData)
+        }
+      }
+
+      // Handle other block types that may affect token balance of a Logos Account
+      if (requestData.type === 'withdraw_fee' || requestData.type === 'distribute') {
+        if (state.account === requestData.transaction.destination) {
+          let newRawTokenBalance = bigInt(0)
+          if (state.tokenBalances[tokenAccount]) newRawTokenBalance = bigInt(state.tokenBalances[tokenAccount].balance).plus(bigInt(requestData.transaction.amount))
+          updateTokenBalance(newRawTokenBalance.toString(), tokenAccount, rpcClient, commit, state)
+          commit('setError', null)
+          commit('incrementRequestCount')
+          commit('setLastModified', requestData.timestamp)
+          commit('unshiftRequest', requestData)
+        }
+      } else if (requestData.type === 'revoke') {
+        if (state.account === requestData.transaction.destination || state.account === requestData.source) {
+          let newRawTokenBalance = bigInt(0)
+          let tokenAccount = LogosWallet.LogosUtils.accountFromHexKey(requestData.token_id)
+          if (state.tokenBalances[tokenAccount]) newRawTokenBalance = bigInt(state.tokenBalances[tokenAccount].balance)
+          if (state.account === requestData.transaction.destination) {
+            newRawTokenBalance.plus(bigInt(requestData.transaction.amount))
+          }
+          if (state.account === requestData.source) {
+            newRawTokenBalance.minus(bigInt(requestData.transaction.amount))
+          }
+          updateTokenBalance(newRawTokenBalance.toString(), tokenAccount, rpcClient, commit, state)
+          commit('setError', null)
+          commit('incrementRequestCount')
+          commit('setLastModified', requestData.timestamp)
+          commit('unshiftRequest', requestData)
+        }
+      } else if (requestData.type === 'withdraw_logos') {
+        if (state.account === requestData.transaction.destination) {
+          let newRawBalance = bigInt(0)
+          if (state.rawBalance) newRawBalance = bigInt(state.rawBalance)
+          newRawBalance = newRawBalance.add(bigInt(requestData.transaction.amount))
+          commit('setError', null)
+          commit('incrementRequestCount')
+          commit('setRawBalance', newRawBalance.toString())
+          commit('setBalance', rpcClient.convert.fromReason(state.rawBalance, 'LOGOS'))
+        }
       }
     }
   },
@@ -524,12 +594,13 @@ const mutations = {
     })
   },
   updateToken (state, data) {
+    console.log(data.tokenInfo)
     Vue.set(state.tokens, data.tokenInfo.tokenAccount, data.tokenInfo)
     for (let request of state.requests) {
       if (request.tokenInfo && request.tokenInfo.pending &&
         request.tokenInfo.tokenAccount === data.tokenInfo.tokenAccount) {
         request.tokenInfo = state.tokens[data.tokenInfo.tokenAccount]
-        request = handleTokenRequests(request, data.rpcClient)
+        request = handleRequest(request, data.rpcClient)
       }
     }
     for (let tokenBalance of Object.values(state.tokenBalances)) {
@@ -556,8 +627,8 @@ const mutations = {
     state.account = null
     state.representaive = null
     state.error = null
-    state.balance = null
-    state.rawBalance = null
+    state.balance = '0'
+    state.rawBalance = '0'
     state.count = 50
     state.requests = []
     state.hashes = {}
