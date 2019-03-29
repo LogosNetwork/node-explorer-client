@@ -12,7 +12,6 @@ const getters = {
 
 const actions = {
   getTokens ({ commit, state, rootState }, cb) {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     let savedTokens = [...state.tokens]
     let lastCreatedAt = null
     if (savedTokens && savedTokens.length > 0) {
@@ -25,14 +24,14 @@ const actions = {
     })
       .then((res) => {
         for (let token of res.data.data.tokens) {
-          token.tokenAccount = LogosWallet.LogosUtils.accountFromHexKey(token.token_id)
+          token.tokenAccount = LogosWallet.Utils.accountFromHexKey(token.token_id)
           try {
             token.issuerInfo = JSON.parse(token.issuer_info)
           } catch (e) {
             token.issuerInfo = {}
           }
           if (token.issuerInfo && typeof token.issuerInfo.decimals !== 'undefined') {
-            token.totalSupplyInToken = rpcClient.convert.fromTo(token.total_supply, 0, token.issuerInfo.decimals)
+            token.totalSupplyInToken = Logos.convert.fromTo(token.total_supply, 0, token.issuerInfo.decimals)
           }
           try {
             token.prettyInfo = JSON.stringify(JSON.parse(token.issuer_info), null, ' ')

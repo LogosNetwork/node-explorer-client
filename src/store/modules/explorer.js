@@ -34,7 +34,7 @@ const pullTokenInfo = (tokenAccount, rpcClient, commit) => {
 
 const handleRequests = (request, rpcClient, commit, state) => {
   if (request.token_id) {
-    let tokenAccount = LogosWallet.LogosUtils.accountFromHexKey(request.token_id)
+    let tokenAccount = LogosWallet.Utils.accountFromHexKey(request.token_id)
     if (state.tokens[tokenAccount]) {
       request.tokenInfo = state.tokens[tokenAccount]
     } else {
@@ -50,19 +50,22 @@ const handleRequests = (request, rpcClient, commit, state) => {
     let total = bigInt(0)
     for (let trans of request.transactions) {
       total = total.plus(trans.amount)
-      trans.amountInLogos = rpcClient.convert.fromReason(trans.amount, 'LOGOS')
+      trans.amountInLogos = Logos.convert.fromReason(trans.amount, 'LOGOS')
     }
-    request.totalAmountLogos = rpcClient.convert.fromReason(total.toString(), 'LOGOS')
+    request.totalAmountLogos = Logos.convert.fromReason(total.toString(), 'LOGOS')
   }
   if (request.type === 'burn' || request.type === 'issue_additional') {
     if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
-      request.amountInToken = rpcClient.convert.fromTo(request.amount, 0, request.tokenInfo.issuerInfo.decimals)
+      request.amountInToken = Logos.convert.fromTo(request.amount, 0, request.tokenInfo.issuerInfo.decimals)
     }
   }
   if (request.type === 'distribute' || request.type === 'withdraw_fee' || request.type === 'revoke') {
     if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
-      request.transaction.amountInToken = rpcClient.convert.fromTo(request.transaction.amount, 0, request.tokenInfo.issuerInfo.decimals)
+      request.transaction.amountInToken = Logos.convert.fromTo(request.transaction.amount, 0, request.tokenInfo.issuerInfo.decimals)
     }
+  }
+  if (request.type === 'withdraw_logos') {
+    request.transaction.amountInLogos = Logos.convert.fromReason(request.transaction.amount, 'LOGOS')
   }
   if (request.type === 'update_issuer_info') {
     try {
@@ -76,17 +79,17 @@ const handleRequests = (request, rpcClient, commit, state) => {
     for (let trans of request.transactions) {
       total = total.plus(trans.amount)
       if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
-        trans.amountInToken = rpcClient.convert.fromTo(trans.amount, 0, request.tokenInfo.issuerInfo.decimals)
+        trans.amountInToken = Logos.convert.fromTo(trans.amount, 0, request.tokenInfo.issuerInfo.decimals)
       }
     }
     request.totalAmount = total
     if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
-      request.totalAmountInToken = rpcClient.convert.fromTo(total, 0, request.tokenInfo.issuerInfo.decimals)
+      request.totalAmountInToken = Logos.convert.fromTo(total, 0, request.tokenInfo.issuerInfo.decimals)
     }
   }
   if (request.type === 'issuance') {
     if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
-      request.totalSupplyInToken = rpcClient.convert.fromTo(request.total_supply, 0, request.tokenInfo.issuerInfo.decimals)
+      request.totalSupplyInToken = Logos.convert.fromTo(request.total_supply, 0, request.tokenInfo.issuerInfo.decimals)
     }
     try {
       request.prettyInfo = JSON.stringify(JSON.parse(request.issuer_info), null, ' ')
@@ -154,7 +157,7 @@ const actions = {
     rpcClient.epochs.history(1).then(val => {
       if (val) {
         if (!val.error) {
-          val.epochs[0].feeInLogos = parseFloat(Number(rpcClient.convert.fromReason(val.epochs[0].transaction_fee_pool, 'LOGOS')).toFixed(5))
+          val.epochs[0].feeInLogos = parseFloat(Number(Logos.convert.fromReason(val.epochs[0].transaction_fee_pool, 'LOGOS')).toFixed(5))
           commit('setEpoch', val.epochs[0])
         } else {
           commit('setError', val.error)
@@ -199,7 +202,7 @@ const actions = {
     // Add token data
     let tokenAccount = null
     if (requestData.token_id) {
-      tokenAccount = LogosWallet.LogosUtils.accountFromHexKey(requestData.token_id)
+      tokenAccount = LogosWallet.Utils.accountFromHexKey(requestData.token_id)
       if (state.tokens[tokenAccount]) {
         requestData.tokenInfo = state.tokens[tokenAccount]
       } else {

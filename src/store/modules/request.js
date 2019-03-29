@@ -24,9 +24,9 @@ const actions = {
           let total = bigInt(0)
           for (let trans of request.transactions) {
             total = total.plus(trans.amount)
-            trans.amountInLogos = rpcClient.convert.fromReason(trans.amount, 'LOGOS').replace(/\.0+$/, '')
+            trans.amountInLogos = Logos.convert.fromReason(trans.amount, 'LOGOS').replace(/\.0+$/, '')
           }
-          request.totalAmountLogos = rpcClient.convert.fromReason(total.toString(), 'LOGOS').replace(/\.0+$/, '')
+          request.totalAmountLogos = Logos.convert.fromReason(total.toString(), 'LOGOS').replace(/\.0+$/, '')
           commit('setDetails', request)
         } else if (request.type === 'burn' || request.type === 'update_issuer_info' ||
           request.type === 'token_send' || request.type === 'distribute' ||
@@ -34,8 +34,8 @@ const actions = {
           request.type === 'adjust_user_status' || request.type === 'issuance' ||
           request.type === 'issue_additional' || request.type === 'withdraw_fee' ||
           request.type === 'update_controller' || request.type === 'revoke' ||
-          request.type === 'immute_setting') {
-          let tokenAddress = LogosWallet.LogosUtils.accountFromHexKey(request.token_id)
+          request.type === 'immute_setting' || request.type === 'withdraw_logos') {
+          let tokenAddress = LogosWallet.Utils.accountFromHexKey(request.token_id)
           rpcClient.accounts.info(tokenAddress).then(data => {
             data.tokenAccount = tokenAddress
             try {
@@ -48,13 +48,16 @@ const actions = {
             // Individual Token Request Handling
             if (request.type === 'burn' || request.type === 'issue_additional') {
               if (typeof data.issuerInfo.decimals !== 'undefined') {
-                request.amountInToken = rpcClient.convert.fromTo(request.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
+                request.amountInToken = Logos.convert.fromTo(request.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
               }
             }
             if (request.type === 'distribute' || request.type === 'withdraw_fee' || request.type === 'revoke') {
               if (typeof data.issuerInfo.decimals !== 'undefined') {
-                request.transaction.amountInToken = rpcClient.convert.fromTo(request.transaction.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
+                request.transaction.amountInToken = Logos.convert.fromTo(request.transaction.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
               }
+            }
+            if (request.type === 'withdraw_logos') {
+              request.transaction.amountInLogos = Logos.convert.fromReason(request.transaction.amount, 'LOGOS')
             }
             if (request.type === 'update_issuer_info') {
               try {
@@ -68,17 +71,17 @@ const actions = {
               for (let trans of request.transactions) {
                 total = total.plus(trans.amount)
                 if (typeof data.issuerInfo.decimals !== 'undefined') {
-                  trans.amountInToken = rpcClient.convert.fromTo(trans.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
+                  trans.amountInToken = Logos.convert.fromTo(trans.amount, 0, data.issuerInfo.decimals).replace(/\.0+$/, '')
                 }
               }
               request.totalAmount = total
               if (typeof data.issuerInfo.decimals !== 'undefined') {
-                request.totalAmountInToken = rpcClient.convert.fromTo(total, 0, data.issuerInfo.decimals)
+                request.totalAmountInToken = Logos.convert.fromTo(total, 0, data.issuerInfo.decimals)
               }
             }
             if (request.type === 'issuance') {
               if (typeof data.issuerInfo.decimals !== 'undefined') {
-                request.totalSupplyInToken = rpcClient.convert.fromTo(request.total_supply, 0, data.issuerInfo.decimals)
+                request.totalSupplyInToken = Logos.convert.fromTo(request.total_supply, 0, data.issuerInfo.decimals)
               }
               try {
                 request.prettyInfo = JSON.stringify(JSON.parse(request.issuer_info), null, ' ')
@@ -100,16 +103,15 @@ const actions = {
       }
     })
   },
-  addRequest ({ commit, rootState }, request) {
+  addRequest ({ commit }, request) {
     let details = request
     let prettyDetails = null
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
     prettyDetails = JSON.stringify(details, null, ' ')
     commit('setPrettyDetails', prettyDetails)
     details.totalAmountInLogos = 0
     if (details.transactions) {
       for (let trans of details.transactions) {
-        let logosVal = rpcClient.convert.fromReason(trans.amount, 'LOGOS')
+        let logosVal = Logos.convert.fromReason(trans.amount, 'LOGOS')
         details.totalAmountInLogos += logosVal
         trans.amountInLogos = logosVal
       }
