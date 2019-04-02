@@ -84,27 +84,27 @@
     <!-- Adjust Fee -->
     <span class="setting mr-2" v-if="token.settings.includes('adjust_fee') && !token.settings.includes('modify_adjust_fee')" v-b-tooltip.hover :title="`${token.name} allows controllers to adjust the fee of ${token.symbol}. This is a permanent setting and cannot be disabled.`">
       <font-awesome-layers class="fa-lg mr-4">
-        <font-awesome-icon :icon="faCoins" />
+        <font-awesome-icon :icon="faPercentage" />
         <font-awesome-icon :icon="faLockAlt" transform="shrink-6 right-14 down-2" />
       </font-awesome-layers>
     </span>
     <span class="setting mr-2" v-if="token.settings.includes('adjust_fee') && token.settings.includes('modify_adjust_fee')" v-b-tooltip.hover :title="`${token.name} allows controllers to adjust the fee of ${token.symbol}. This can be disabled by a ${token.name} controller.`">
       <font-awesome-layers class="fa-lg mr-4">
-        <font-awesome-icon :icon="faCoins" />
+        <font-awesome-icon :icon="faPercentage" />
         <font-awesome-icon :icon="faLockOpenAlt" transform="shrink-6 right-14 down-2" />
       </font-awesome-layers>
     </span>
     <span class="setting mr-2" v-if="!token.settings.includes('adjust_fee') && token.settings.includes('modify_adjust_fee')" v-b-tooltip.hover :title="`${token.name} does not allow controllers to adjust the fee of ${token.symbol}. This can be changed by a ${token.name} controller.`">
       <font-awesome-layers class="fa-lg mr-4">
         <font-awesome-icon :icon="faBan" class="text-danger"/>
-        <font-awesome-icon :icon="faCoins" transform="shrink-6"/>
+        <font-awesome-icon :icon="faPercentage" transform="shrink-6"/>
         <font-awesome-icon :icon="faLockOpenAlt" transform="shrink-6 right-14 down-2" />
       </font-awesome-layers>
     </span>
     <span class="setting mr-2" v-if="!token.settings.includes('adjust_fee') && !token.settings.includes('modify_adjust_fee')" v-b-tooltip.hover :title="`${token.name} does not allow controllers to adjust the fee of ${token.symbol}. This is a permanent settings and cannot be changed.`">
       <font-awesome-layers class="fa-lg mr-4">
         <font-awesome-icon :icon="faBan" class="text-danger"/>
-        <font-awesome-icon :icon="faCoins" transform="shrink-6"/>
+        <font-awesome-icon :icon="faPercentage" transform="shrink-6"/>
         <font-awesome-icon :icon="faLockAlt" transform="shrink-6 right-14 down-2" />
       </font-awesome-layers>
     </span>
@@ -139,12 +139,12 @@
 </template>
 
 <script>
-import { faCoins, faMagic, faSnowflake, faMask, faListAlt, faLockOpenAlt, faLockAlt, faBan } from '@fortawesome/pro-light-svg-icons'
+import { faPercentage, faMagic, faSnowflake, faMask, faListAlt, faLockOpenAlt, faLockAlt, faBan } from '@fortawesome/pro-light-svg-icons'
 export default {
   name: 'tokenSettings',
   data () {
     return {
-      faCoins,
+      faPercentage,
       faMagic,
       faSnowflake,
       faMask,

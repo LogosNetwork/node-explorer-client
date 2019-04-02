@@ -1,0 +1,63 @@
+$theme-colors: (
+  "secondary": #2E3136,
+  "primary": #7289da
+);
+:root {
+  --gray-100: #f8f9fa;
+  --gray-200: #e9ecef;
+  --gray-300: #dee2e6;
+  --gray-400: #ced4da;
+  --gray-500: #adb5bd;
+  --gray-600: #6c757d;
+  --gray-700: #495057;
+  --gray-800: #343a40;
+  --gray-900: #212529;
+  --bg: #36393F;
+  --tertiary: #2B2C31;
+}
+// Bootstrap and its default variables
+@import "../../../node_modules/bootstrap/scss/bootstrap";
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans');
+@function color($key: "blue") {
+  @return map-get($colors, $key);
+}
+@function theme-color($key: "primary") {
+  @return map-get($theme-colors, $key);
+}
+@function gray($key: "100") {
+  @return map-get($grays, $key);
+}
+body {
+  font-family: 'Noto Sans', sans-serif;
+}
+#app {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color:#525f7f;
+  background:#F5F5F5;
+}
+#content {
+  flex: 1;
+  margin-top: 54px;
+}
+@keyframes highlight {
+  0% {
+    background-color: #fff;
+  }
+  50% {
+    background-color: #fff3cd;
+  }
+  100% {
+    background-color: #fff;
+  }
+}
+.highlight {
+  animation-name: highlight;
+  animation-duration: 2s;
+}

@@ -13,7 +13,7 @@
             <b-nav-item to="/chains" exact-active-class="is-active">{{ $t('chains') }}</b-nav-item>
             <b-nav-item to="/tokens" exact-active-class="is-active">{{ $t('tokens') }}</b-nav-item>
             <b-nav-item to="/faucet" exact-active-class="is-active">{{ $t('faucet') }}</b-nav-item>
-            <b-nav-item to="/workbench" exact-active-class="is-active">{{ $t('workbench') }}</b-nav-item>
+            <b-nav-item to="/forge" exact-active-class="is-active">{{ $t('forge') }}</b-nav-item>
           </b-navbar-nav>
         </b-collapse>
       </b-navbar>
@@ -51,9 +51,9 @@ export default {
   z-index: 2;
   font-weight: bold;
   #dark {
-    background-color:#36393F;
+    background-color: var(--secondary);
     a {
-      color:#FFF;
+      color:#7289da;
       height: 38px;
     }
   }

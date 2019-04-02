@@ -251,7 +251,7 @@
                   </span>
                   <span v-else-if="privilege === 'change_adjust_fee' && token.settings.includes('modify_adjust_fee')">
                     <h5>
-                      <font-awesome-icon :icon="faCoins" class="mr-2"/>
+                      <font-awesome-icon :icon="faPercentage" class="mr-2"/>
                       Change Adjust Fee
                     </h5>
                     <p>The controller can change the adjust fee setting of {{token.name}}. This allows controllers to change the {{token.symbol}} token fee.</p>
@@ -265,7 +265,7 @@
                   </span>
                   <span v-else-if="privilege === 'adjust_fee' && token.settings.includes('adjust_fee')">
                     <h5>
-                      <font-awesome-icon :icon="faCoins" class="mr-2"/>
+                      <font-awesome-icon :icon="faPercentage" class="mr-2"/>
                       Adjust Fee
                     </h5>
                     <p>The controller is allowed to to change the {{token.symbol}} token fee.</p>
@@ -405,7 +405,7 @@ import token from '@/components/requests/token.vue'
 import TokenSettings from '@/components/requests/tokenSettings.vue'
 import bModal from 'bootstrap-vue/es/components/modal/modal'
 import axios from 'axios'
-import { faSpinner, faCoins, faCrown, faUserCircle, faMagic, faLockAlt, faMask, faSnowflake, faListAlt, faArrowDown, faFire, faEdit, faHandReceiving } from '@fortawesome/pro-light-svg-icons'
+import { faSpinner, faCoins, faCrown, faUserCircle, faMagic, faLockAlt, faMask, faSnowflake, faListAlt, faArrowDown, faFire, faEdit, faHandReceiving, faPercentage } from '@fortawesome/pro-light-svg-icons'
 Vue.use(infiniteScroll)
 Vue.component(VueQrcode.name, VueQrcode)
 
@@ -516,6 +516,7 @@ export default {
       faArrowDown,
       faEdit,
       faHandReceiving,
+      faPercentage,
       selectedController: null
     }
   },
