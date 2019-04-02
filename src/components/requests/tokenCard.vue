@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-3">
+  <div class="mb-3 shadow-sm">
     <b-link class="cardLink" :to="'/'+tokenInfo.tokenAccount">
       <b-card no-body class="text-left">
         <b-card-body>
@@ -67,6 +67,7 @@ export default {
     -webkit-transition: all .3s;
     -o-transition: all .3s;
     transition: all .3s;
+    border: 0px;
   }
   .cardLink:hover > .card {
     box-shadow: 0 10px 30px -5px rgba(10,16,34,.2);

@@ -1,8 +1,11 @@
 <template>
   <div>
     <div id="nav">
-      <b-navbar toggleable="md" v-bind:type="dark == 'true' ? 'dark' : 'light'" v-bind:id="dark == 'true' ? 'dark' : 'light'">
-        <b-navbar-brand to="/" v-t="'name'"></b-navbar-brand>
+      <b-navbar class="shadow-sm" :fixed="'top'" toggleable="md" v-bind:type="dark == 'true' ? 'dark' : 'light'" v-bind:id="dark == 'true' ? 'dark' : 'light'">
+        <b-navbar-brand to="/">
+          <font-awesome-icon size="lg" class="logosLogo align-middle" :icon="faLambda" />
+          Logos
+        </b-navbar-brand>
         <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
         <b-collapse is-nav id="nav_collapse">
           <b-navbar-nav class="ml-auto">
@@ -25,6 +28,7 @@
 </template>
 
 <script>
+import { faLambda } from '@fortawesome/pro-light-svg-icons'
 export default {
   name: 'Nav',
   props: {
@@ -32,6 +36,7 @@ export default {
   },
   data () {
     return {
+      faLambda,
       showAlert: false
     }
   }
@@ -41,25 +46,22 @@ export default {
 <style scoped lang="scss">
 #nav {
   position: relative;
-  z-index: 2;
-  background:#FFF;
-  font-weight: bold;
-  border-bottom:1px solid #ced4db;
 }
 #nav {
+  z-index: 2;
+  font-weight: bold;
   #dark {
+    background-color:#36393F;
     a {
       color:#FFF;
       height: 38px;
     }
   }
   #light {
+    background-color: #FFF;
     a {
-      color:#6b7c93;
+      color:#7289da;
       height: 38px;
-    }
-    a:hover {
-      color:#32325d;
     }
   }
 }
@@ -68,34 +70,31 @@ export default {
     #dark {
       a {
         margin-right: 1rem;
-        color:#FFF;
+        color:#7289da;
       }
       a.is-active {
         padding-bottom: 4px;
-        border-bottom: 2px solid #fff;
+        border-bottom: 2px solid #7289da;
       }
       a:not(.is-active):not(.navbar-brand):hover {
         opacity: 0.7;
         padding-bottom: 4px;
-        border-bottom: 2px solid #fff;
+        border-bottom: 2px solid #7289da;
       }
     }
     #light {
       a {
         margin-right: 1rem;
-        color:#6b7c93;
-      }
-      a:hover {
-        color:#32325d;
+        color:#7289da;
       }
       a.is-active {
         padding-bottom: 4px;
-        border-bottom: 2px solid #6b7c93;
+        border-bottom: 2px solid #7289da;
       }
       a:not(.is-active):not(.navbar-brand):hover {
         opacity: 0.7;
         padding-bottom: 4px;
-        border-bottom: 2px solid #6b7c93;
+        border-bottom: 2px solid #7289da;
       }
     }
   }
@@ -107,12 +106,12 @@ export default {
     }
     a.is-active {
       padding-bottom: 4px;
-      border-bottom: 2px solid #fff;
+      border-bottom: 2px solid #7289da;
     }
     a:not(.is-active):not(.navbar-brand):hover {
       opacity: 0.7;
       padding-bottom: 4px;
-      border-bottom: 2px solid #fff;
+      border-bottom: 2px solid #7289da;
     }
   }
 }

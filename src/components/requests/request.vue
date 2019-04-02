@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-3">
+  <div class="mb-3 shadow-sm">
     <b-link v-if="!requestInfo.inactive" class="cardLink" :to="'/'+requestInfo.hash">
       <send v-if="requestInfo.type === 'send'" :requestInfo="requestInfo" :account="account"/>
       <burn v-if="requestInfo.type === 'burn'" :requestInfo="requestInfo"/>
@@ -94,6 +94,7 @@ export default {
     -webkit-transition: all .3s;
     -o-transition: all .3s;
     transition: all .3s;
+    border: 0px;
   }
   .cardLink:hover > .card {
     box-shadow: 0 10px 30px -5px rgba(10,16,34,.2);

@@ -14,7 +14,7 @@
         <b-col cols="12" md="4" class="mb-3">
           <h5>Latest Request Block</h5>
           <b-link v-if="requestBlock" class="cardLink" :to="'/requestBlock/'+requestBlock.hash">
-            <b-card v-highlight="requestBlock.hash">
+            <b-card v-highlight="requestBlock.hash" class="shadow-sm">
               <b-row>
                 <b-col class="text-truncate">
                   <b-link :to="'/requestBlock/'+requestBlock.hash">{{requestBlock.hash}}</b-link>
@@ -36,7 +36,7 @@
         <b-col cols="12" md="4" class="mb-3">
           <h5>Current Micro Epoch</h5>
            <b-link v-if="microEpoch" class="cardLink" :to="'/microEpoch/'+microEpoch.hash">
-              <b-card v-highlight="microEpoch.hash">
+              <b-card v-highlight="microEpoch.hash" class="shadow-sm">
                 <b-row>
                   <b-col class="text-truncate">
                     <b-link :to="'/microEpoch/'+microEpoch.hash" v-if="microEpoch.timestamp !== '0'">Micro Epoch #{{microEpoch.sequence}}</b-link>
@@ -59,7 +59,7 @@
         <b-col cols="12" md="4" class="mb-3">
           <h5>Current Epoch</h5>
           <b-link v-if="epoch" class="cardLink" :to="'/epoch/'+epoch.hash">
-              <b-card v-highlight="epoch.hash">
+              <b-card v-highlight="epoch.hash" class="shadow-sm">
                 <b-row>
                   <b-col class="text-truncate">
                     <b-link :to="'/epoch/'+epoch.hash">Epoch #{{epoch.epoch_number}}</b-link>
@@ -239,13 +239,19 @@ export default {
 
 <style scoped lang="scss">
 .cardLink {
-  color: #525f7f;
+  color:#525f7f;
 }
 .cardLink:hover {
   text-decoration: none;
 }
+.cardLink > .card {
+  -webkit-transition: all .3s;
+  -o-transition: all .3s;
+  transition: all .3s;
+  border: 0px;
+}
 .cardLink:hover > .card {
-  box-shadow: 0 10px 30px -5px rgba(10, 16, 34, 0.2);
+  box-shadow: 0 10px 30px -5px rgba(10,16,34,.2) !important;
 }
 .list-enter-active, .list-leave-active {
   transition: opacity .5s;

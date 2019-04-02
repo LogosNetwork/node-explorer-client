@@ -5,7 +5,7 @@
       <b-tabs v-model="tabIndex">
         <b-tab :title="$t('request_blocks')" v-infinite-scroll="getRequestBlocks" infinite-scroll-distance="500" active>
           <b-form-select v-model="selectedDelegate" :options="rbDelegateLabels" class="mt-3" />
-          <div :key="requestBlock.hash + '_' + requestBlock.delegate" v-for="requestBlock in orderedRequestBlocks">
+          <div :key="requestBlock.hash + '_' + requestBlock.delegate" v-for="requestBlock in orderedRequestBlocks" class="shadow-sm">
             <b-link class="cardLink" :to="'/requestBlock/'+requestBlock.hash">
               <b-card class="mt-3 mb-3 text-left">
                 <b-row>
@@ -49,7 +49,7 @@
           </div>
         </b-tab>
         <b-tab :title="$t('micro_epochs')" v-infinite-scroll="getMicroEpochs" infinite-scroll-distance="500">
-          <div :key="microEpoch.hash" v-for="microEpoch in microEpochs">
+          <div :key="microEpoch.hash" v-for="microEpoch in microEpochs" class="shadow-sm">
             <b-link class="cardLink" :to="'/microEpoch/'+microEpoch.hash">
               <b-card class="mt-3 mb-3 text-left">
                 <b-row>
@@ -90,7 +90,7 @@
           </div>
         </b-tab>
         <b-tab :title="$t('epochs')" v-infinite-scroll="getEpochs" infinite-scroll-distance="500">
-          <div :key="epoch.hash" v-for="epoch in epochs">
+          <div :key="epoch.hash" v-for="epoch in epochs" class="shadow-sm">
             <b-link class="cardLink" :to="'/epoch/'+epoch.hash">
               <b-card class="mt-3 mb-3 text-left">
                 <b-row>
@@ -273,6 +273,7 @@ export default {
     -webkit-transition: all .3s;
     -o-transition: all .3s;
     transition: all .3s;
+    border: 0px;
   }
   .cardLink:hover > .card {
     box-shadow: 0 10px 30px -5px rgba(10,16,34,.2);

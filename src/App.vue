@@ -42,6 +42,7 @@ export default {
 }
 #content {
   flex: 1;
+  margin-top: 54px;
 }
 @keyframes highlight {
   0% {

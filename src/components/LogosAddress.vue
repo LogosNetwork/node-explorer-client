@@ -44,11 +44,23 @@ export default {
     address: String,
     inactive: Boolean,
     force: Boolean,
-    forceExpand: Boolean
+    forceExpand: Boolean,
+    separator: {
+      type: String,
+      default: '...'
+    },
+    prefixCount: {
+      type: Number,
+      default: 5
+    },
+    suffixCount: {
+      type: Number,
+      default: 5
+    }
   },
   computed: {
     abrvAddress: function () {
-      return this.address.substring(0, 9) + '...' + this.address.substring(59, 64)
+      return this.address.substring(0, 4 + this.prefixCount) + this.separator + this.address.substring(64 - this.suffixCount, 64)
     }
   }
 }

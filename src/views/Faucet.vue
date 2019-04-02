@@ -13,7 +13,7 @@
           </button>
         </div>
       </div>
-      <div class="card mb-5">
+      <div class="card mb-5 shadow-sm">
         <div class="card-body">
           <h3>Please enter your Logos address</h3>
           <div>This testnet faucet will automatically distribute 0.0001% of the faucet balance with a maximum of 1000 Logos.<br></div>
@@ -167,5 +167,8 @@ export default {
     top: 0;
     left: 0;
     width: 100%;
+  }
+  .card {
+    border: 0px;
   }
 </style>
