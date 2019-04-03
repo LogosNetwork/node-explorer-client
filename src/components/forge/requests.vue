@@ -29,51 +29,57 @@
       <b-collapse v-model="send" id="send" accordion="accordion" role="tabpanel">
         <b-card-body class="collapsedForm">
           <div class="mt-3">
-            <b-form @submit="createSend">
-              <b-form-group
-                id="sendFrom"
-                label="From"
-                label-for="fromSelector"
-              >
-                <v-select
-                  id="fromSelector"
-                  v-model="sendForm.from"
-                  required
-                  placeholder="Origin"
-                ></v-select>
-              </b-form-group>
+            <b-form-group
+              id="sendFrom"
+              label="From"
+              label-for="fromSelector"
+            >
+              <Multiselect
+                id="fromSelector"
+                v-model="sendForm.from"
+                required
+                tag-placeholder="Add this account"
+                :options="accounts"
+                :multiple="false"
+                :taggable="true"
+                @tag="addSendFrom"
+                placeholder="Search or add an account"
+              ></Multiselect>
+            </b-form-group>
 
-              <b-form-group id="sendTo"
-                label="To"
-                label-for="toSelector"
-              >
-                <v-select
-                  taggable
-                  push-tags
-                  id="toSelector"
-                  v-model="sendForm.to"
-                  required
-                  placeholder="Destination"
-                ></v-select>
-              </b-form-group>
+            <b-form-group id="sendTo"
+              label="To"
+              label-for="toSelector"
+            >
+              <Multiselect
+                id="toSelector"
+                v-model="sendForm.to"
+                required
+                tag-placeholder="Add this account"
+                :options="accounts"
+                :multiple="false"
+                :taggable="true"
+                @tag="addSendTo"
+                placeholder="Search or add an account"
+              ></Multiselect>
+            </b-form-group>
 
-              <b-form-group
-                id="sendAmount"
-                label="Amount"
-                label-for="amountInput"
-                :description="sendForm.amountDescription"
-              >
-                <b-form-input
-                  id="amountInput"
-                  v-model="sendForm.amount"
-                  required
-                  placeholder="Amount of Logos"
-                ></b-form-input>
-              </b-form-group>
-              <div class="text-right">
-                <b-button type="submit" variant="primary">Create Send</b-button>
-              </div>
-            </b-form>
+            <b-form-group
+              id="sendAmount"
+              label="Amount"
+              label-for="amountInput"
+              :description="sendForm.amountDescription"
+            >
+              <b-form-input
+                id="amountInput"
+                v-model="sendForm.amount"
+                required
+                placeholder="Amount in Logos"
+              ></b-form-input>
+            </b-form-group>
+            <div class="text-right">
+              <b-button type="submit" variant="primary">Create Send</b-button>
+            </div>
           </div>
         </b-card-body>
       </b-collapse>
@@ -518,7 +524,7 @@ import bCardSubtitle from 'bootstrap-vue/es/components/card/card-sub-title'
 import bCollapse from 'bootstrap-vue/es/components/collapse/collapse'
 import bFormGroup from 'bootstrap-vue/es/components/form-group/form-group'
 import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
-import vSelect from 'vue-select'
+import Multiselect from 'vue-multiselect'
 import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage, faChevronDown, faChevronUp } from '@fortawesome/pro-light-svg-icons'
 
 export default {
@@ -531,6 +537,9 @@ export default {
         amount: '',
         amountDescription: ''
       },
+      accounts: [
+        'lgs_1ggscsb3ndafjxz9ymczuziiuys5ct64tnmsjuenbio9gnmqqsznh6poxge9'
+      ],
       send: false,
       tokenSend: false,
       tokenIssuance: false,
@@ -570,11 +579,19 @@ export default {
     bFormGroup,
     bFormInput,
     bCollapse,
-    vSelect
+    Multiselect
   },
   methods: {
     createSend () {
       console.log('hello')
+    },
+    addSendTo (newAddress) {
+      this.accounts.push(newAddress)
+      this.sendForm.to = newAddress
+    },
+    addSendFrom (newAddress) {
+      this.accounts.push(newAddress)
+      this.sendForm.from = newAddress
     }
   }
 }
