@@ -28,7 +28,53 @@
       </b-button>
       <b-collapse v-model="send" id="send" accordion="accordion" role="tabpanel">
         <b-card-body class="collapsedForm">
-          <div class="mt-3">Hello World</div>
+          <div class="mt-3">
+            <b-form @submit="createSend">
+              <b-form-group
+                id="sendFrom"
+                label="From"
+                label-for="fromSelector"
+              >
+                <v-select
+                  id="fromSelector"
+                  v-model="sendForm.from"
+                  required
+                  placeholder="Origin"
+                ></v-select>
+              </b-form-group>
+
+              <b-form-group id="sendTo"
+                label="To"
+                label-for="toSelector"
+              >
+                <v-select
+                  taggable
+                  push-tags
+                  id="toSelector"
+                  v-model="sendForm.to"
+                  required
+                  placeholder="Destination"
+                ></v-select>
+              </b-form-group>
+
+              <b-form-group
+                id="sendAmount"
+                label="Amount"
+                label-for="amountInput"
+                :description="sendForm.amountDescription"
+              >
+                <b-form-input
+                  id="amountInput"
+                  v-model="sendForm.amount"
+                  required
+                  placeholder="Amount of Logos"
+                ></b-form-input>
+              </b-form-group>
+              <div class="text-right">
+                <b-button type="submit" variant="primary">Create Send</b-button>
+              </div>
+            </b-form>
+          </div>
         </b-card-body>
       </b-collapse>
     </b-card>
@@ -470,12 +516,21 @@ import bCardBody from 'bootstrap-vue/es/components/card/card-body'
 import bCardTitle from 'bootstrap-vue/es/components/card/card-title'
 import bCardSubtitle from 'bootstrap-vue/es/components/card/card-sub-title'
 import bCollapse from 'bootstrap-vue/es/components/collapse/collapse'
+import bFormGroup from 'bootstrap-vue/es/components/form-group/form-group'
+import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
+import vSelect from 'vue-select'
 import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage, faChevronDown, faChevronUp } from '@fortawesome/pro-light-svg-icons'
 
 export default {
   name: 'Lookups',
   data () {
     return {
+      sendForm: {
+        from: '',
+        to: '',
+        amount: '',
+        amountDescription: ''
+      },
       send: false,
       tokenSend: false,
       tokenIssuance: false,
@@ -512,7 +567,15 @@ export default {
     bCardBody,
     bCardTitle,
     bCardSubtitle,
-    bCollapse
+    bFormGroup,
+    bFormInput,
+    bCollapse,
+    vSelect
+  },
+  methods: {
+    createSend () {
+      console.log('hello')
+    }
   }
 }
 </script>

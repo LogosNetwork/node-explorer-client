@@ -179,6 +179,9 @@ $bg-white: #FFF;
   border-top: 0;
   border-bottom: 0;
 }
+.list-group-item {
+  background: transparent;
+}
 label.btn-link {
   cursor: pointer;
 }
