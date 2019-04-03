@@ -1,18 +1,28 @@
 <template>
   <b-container fluid class="d-flex">
     <b-row class="flex-grow flex-fill">
-      <b-col cols="auto" class="accountPanel">
+      <b-col cols="auto" class="accountPanel shadow-sm">
         <div class="d-flex justify-content-between mt-3 mb-3 align-items-center font-weight-bold">
           <h4 class="mb-0">Accounts</h4>
           <b-button class="font-weight-bolder" variant="link">+ New</b-button>
         </div>
         <div>
           <b-list-group flush>
-            <b-list-group-item class="d-flex justify-content-between align-items-center" button>
+            <b-list-group-item class="d-flex justify-content-between align-items-center">
               <span>
                 <font-awesome-icon size="lg" class="mr-2" :icon="faUser" />
-                <LogosAddress class="mr-2" :inactive="true" :force="true" address="lgs_1ggscsb3ndafjxz9ymczuziiuys5ct64tnmsjuenbio9gnmqqsznh6poxge9" />
+                <LogosAddress :inactive="true" :force="true" address="lgs_1ggscsb3ndafjxz9ymczuziiuys5ct64tnmsjuenbio9gnmqqsznh6poxge9" />
               </span>
+              <b-dropdown v-on:click.stop variant="link" size="lg" no-caret>
+                <template slot="button-content">
+                  <font-awesome-icon size="sm" :icon="faEllipsisVAlt" />
+                  <span class="sr-only">Account Options</span>
+                </template>
+                <b-dropdown-item :href="`/lgs_1ggscsb3ndafjxz9ymczuziiuys5ct64tnmsjuenbio9gnmqqsznh6poxge9`" target="_blank">Open Account Page</b-dropdown-item>
+                <b-dropdown-item href="#">Account Info</b-dropdown-item>
+                <b-dropdown-item href="#">Copy Account Address</b-dropdown-item>
+                <b-dropdown-item href="#">Remove Account</b-dropdown-item>
+              </b-dropdown>
             </b-list-group-item>
           </b-list-group>
         </div>
@@ -22,11 +32,21 @@
         </div>
         <div>
           <b-list-group flush>
-            <b-list-group-item class="d-flex justify-content-between align-items-center" button>
+            <b-list-group-item class="d-flex justify-content-between align-items-center">
               <span>
                 <font-awesome-icon size="lg" class="mr-2" :icon="faCoins" />
                 Pyr
               </span>
+              <b-dropdown v-on:click.stop variant="link" size="lg" no-caret>
+                <template slot="button-content">
+                  <font-awesome-icon size="sm" :icon="faEllipsisVAlt" />
+                  <span class="sr-only">Token Options</span>
+                </template>
+                <b-dropdown-item :href="`/lgs_1ojsaqro9xub3981p498wcjysmnzw5xamwq6gxh3dafy99sm56y1irwhw4x9`" target="_blank">Open Token Page</b-dropdown-item>
+                <b-dropdown-item href="#">Token Info</b-dropdown-item>
+                <b-dropdown-item href="#">Copy Token Address</b-dropdown-item>
+                <b-dropdown-item href="#">Remove Token</b-dropdown-item>
+              </b-dropdown>
             </b-list-group-item>
           </b-list-group>
         </div>
@@ -97,10 +117,12 @@ import Wallet from '../api/wallet'
 import config from '../../config'
 import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
+import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown'
+import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item'
 import LogosAddress from '@/components/LogosAddress.vue'
 import Lookups from '@/components/forge/lookups.vue'
 import Requests from '@/components/forge/requests.vue'
-import { faUser, faEllipsisV, faCoins, faSearch, faWrench, faEye, faFont } from '@fortawesome/pro-light-svg-icons'
+import { faUser, faEllipsisVAlt, faCoins, faSearch, faWrench, faEye, faFont } from '@fortawesome/pro-light-svg-icons'
 
 Vue.use(Logos, { url: config.rpcHost, proxyURL: config.rpcProxy, debug: true })
 Vue.use(Wallet)
@@ -109,7 +131,7 @@ export default {
   data () {
     return {
       faUser,
-      faEllipsisV,
+      faEllipsisVAlt,
       faCoins,
       faSearch,
       faWrench,
@@ -122,6 +144,8 @@ export default {
   components: {
     bListGroup,
     bListGroupItem,
+    bDropdown,
+    bDropdownItem,
     LogosAddress,
     Lookups,
     Requests
@@ -167,9 +191,15 @@ label.btn-link.active {
 .accountPanel {
   background: $bg-secondary;
   min-width: 260px;
+  z-index: 1;
 }
 .actionToggle {
   background: $bg-secondary;
+}
+.actionToggle > .col {
+  z-index: 1;
+  -webkit-box-shadow: 0 0.125rem 0rem rgba(0, 0, 0, 0.075) !important;
+  box-shadow: 0 0.125rem 0rem rgba(0, 0, 0, 0.075) !important;
 }
 .actionSelector {
   background: $bg-primary;
@@ -200,6 +230,11 @@ label.btn-link.active {
 }
 .chainToggle {
   background: $bg-secondary;
+}
+.chainToggle > .col {
+  z-index: 1;
+  -webkit-box-shadow: 0 0.125rem 0rem rgba(0, 0, 0, 0.075) !important;
+  box-shadow: 0 0.125rem 0rem rgba(0, 0, 0, 0.075) !important;
 }
 .chainViewer {
   background: $bg-tertiary;

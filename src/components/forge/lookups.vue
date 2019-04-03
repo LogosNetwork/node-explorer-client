@@ -121,7 +121,7 @@
             </b-col>
             <b-col>
               <b-card-title>
-                Convert a key
+                Convert a Key
               </b-card-title>
               <b-card-subtitle>
                 Convert public keys to account names, and vice versa.

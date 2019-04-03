@@ -18,9 +18,6 @@ $theme-colors: (
 // Bootstrap and its default variables
 @import "../../../node_modules/bootstrap/scss/bootstrap";
 @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
-@function color($key: "blue") {
-  @return map-get($colors, $key);
-}
 @function theme-color($key: "primary") {
   @return map-get($theme-colors, $key);
 }
@@ -60,4 +57,9 @@ body {
 .highlight {
   animation-name: highlight;
   animation-duration: 2s;
+}
+.b-dropdown > .dropdown-toggle-no-caret {
+  padding: 0px;
+  padding-left: .5rem;
+  padding-right: .5rem;
 }
