@@ -48,7 +48,7 @@ export default {
   position: relative;
 }
 #nav {
-  z-index: 2;
+  z-index: 5;
   font-weight: bold;
   #dark {
     background-color: var(--secondary);
