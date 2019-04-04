@@ -288,7 +288,15 @@ export default {
       faEquals,
       faExpandArrows,
       faChevronDown,
-      faChevronUp
+      faChevronUp,
+      createAccount: false,
+      info: false,
+      history: false,
+      blockInfo: false,
+      expand: false,
+      convert: false,
+      generate: false,
+      validate: false
     }
   },
   components: {
