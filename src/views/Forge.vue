@@ -1,28 +1,35 @@
 <template>
   <b-container fluid class="d-flex">
     <b-row class="flex-grow flex-fill">
-      <b-col cols="auto" class="accountPanel shadow-sm">
+      <b-col xs="auto" class="accountPanel">
         <div class="d-flex justify-content-between mt-3 mb-3 align-items-center font-weight-bold">
           <h4 class="mb-0">Accounts</h4>
-          <b-button class="font-weight-bolder" variant="link">+ New</b-button>
+          <b-button class="font-weight-bolder" variant="link" v-on:click="$wallet.createAccount()">+ New</b-button>
         </div>
-        <div>
+        <div v-if="accountsArray.length > 0">
           <b-list-group flush>
-            <b-list-group-item class="d-flex justify-content-between align-items-center">
+            <b-list-group-item v-for="account in accountsArray" :key="account.address" class="d-flex justify-content-between align-items-center">
               <span>
                 <font-awesome-icon size="lg" class="mr-2" :icon="faUser" />
-                <LogosAddress :inactive="true" :force="true" address="lgs_1ggscsb3ndafjxz9ymczuziiuys5ct64tnmsjuenbio9gnmqqsznh6poxge9" />
+                <LogosAddress :inactive="true" :force="true" :address="account.address" />
               </span>
               <b-dropdown v-on:click.stop variant="link" size="lg" no-caret>
                 <template slot="button-content">
                   <font-awesome-icon size="sm" :icon="faEllipsisVAlt" />
                   <span class="sr-only">Account Options</span>
                 </template>
-                <b-dropdown-item :href="`/lgs_1ggscsb3ndafjxz9ymczuziiuys5ct64tnmsjuenbio9gnmqqsznh6poxge9`" target="_blank">Open Account Page</b-dropdown-item>
+                <b-dropdown-item :href="`/${account.address}`" target="_blank">Open Account Page</b-dropdown-item>
                 <b-dropdown-item href="#">Account Info</b-dropdown-item>
                 <b-dropdown-item href="#">Copy Account Address</b-dropdown-item>
                 <b-dropdown-item href="#">Remove Account</b-dropdown-item>
               </b-dropdown>
+            </b-list-group-item>
+          </b-list-group>
+        </div>
+        <div v-else>
+          <b-list-group flush>
+            <b-list-group-item class="d-flex justify-content-between align-items-center">
+              No Accounts, create one.
             </b-list-group-item>
           </b-list-group>
         </div>
@@ -111,10 +118,7 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import Logos from '../api/rpc'
-import Wallet from '../api/wallet'
-import config from '../../config'
+import { mapActions, mapGetters } from 'vuex'
 import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown'
@@ -124,8 +128,6 @@ import Lookups from '@/components/forge/lookups.vue'
 import Requests from '@/components/forge/requests.vue'
 import { faUser, faEllipsisVAlt, faCoins, faSearch, faWrench, faEye, faFont } from '@fortawesome/pro-light-svg-icons'
 
-Vue.use(Logos, { url: config.rpcHost, proxyURL: config.rpcProxy, debug: true })
-Vue.use(Wallet)
 export default {
   name: 'workshop',
   data () {
@@ -138,7 +140,8 @@ export default {
       faEye,
       faFont,
       selected: 'requests',
-      selectedVisual: 'visual'
+      selectedVisual: 'visual',
+      wallet: this.$wallet
     }
   },
   components: {
@@ -150,22 +153,31 @@ export default {
     Lookups,
     Requests
   },
+  computed: {
+    ...mapGetters('forge', [
+      'accountsArray'
+    ])
+  },
   methods: {
     changeSelected: function (newSelected) {
       this.selected = newSelected
     },
     changeSelectedVisual: function (newSelected) {
       this.selectedVisual = newSelected
-    }
+    },
+    ...mapActions('forge',
+      [
+        'update'
+      ]
+    )
   },
-  created: function () {
-    this.wallet = new this.$Wallet({
-      mqtt: config.mqttHost,
-      rpc: {
-        proxy: config.rpcProxy,
-        delegates: Object.values(config.delegates)
-      }
-    })
+  watch: {
+    wallet: {
+      handler: function (newWallet, oldWallet) {
+        this.update(newWallet)
+      },
+      deep: true
+    }
   }
 }
 </script>
@@ -193,7 +205,7 @@ label.btn-link.active {
 }
 .accountPanel {
   background: $bg-secondary;
-  min-width: 260px;
+  max-width: 265px;
   z-index: 1;
 }
 .actionToggle {

@@ -39,12 +39,16 @@
                 v-model="sendForm.from"
                 required
                 tag-placeholder="Add this account"
-                :options="accounts"
+                track-by="label"
+                label="label"
+                :options="combinedAccounts"
                 :multiple="false"
                 :taggable="true"
                 @tag="addSendFrom"
                 placeholder="Search or add an account"
-              ></Multiselect>
+              >
+                <template slot="singleLabel" slot-scope="{ option }"><span v-if="option.label !== option.address"><strong>{{ option.label }}</strong>  -</span> {{ option.address }}</template>
+              </Multiselect>
             </b-form-group>
 
             <b-form-group id="sendTo"
@@ -56,12 +60,16 @@
                 v-model="sendForm.to"
                 required
                 tag-placeholder="Add this account"
-                :options="accounts"
+                track-by="label"
+                label="label"
+                :options="combinedAccounts"
                 :multiple="false"
                 :taggable="true"
                 @tag="addSendTo"
                 placeholder="Search or add an account"
-              ></Multiselect>
+              >
+                <template slot="singleLabel" slot-scope="{ option }"><span v-if="option.label !== option.address"><strong>{{ option.label }}</strong>  -</span> {{ option.address }}</template>
+              </Multiselect>
             </b-form-group>
 
             <b-form-group
@@ -518,6 +526,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import bCardBody from 'bootstrap-vue/es/components/card/card-body'
 import bCardTitle from 'bootstrap-vue/es/components/card/card-title'
 import bCardSubtitle from 'bootstrap-vue/es/components/card/card-sub-title'
@@ -531,15 +540,13 @@ export default {
   name: 'Lookups',
   data () {
     return {
+      accounts: [],
       sendForm: {
         from: '',
         to: '',
         amount: '',
         amountDescription: ''
       },
-      accounts: [
-        'lgs_1ggscsb3ndafjxz9ymczuziiuys5ct64tnmsjuenbio9gnmqqsznh6poxge9'
-      ],
       send: false,
       tokenSend: false,
       tokenIssuance: false,
@@ -581,17 +588,28 @@ export default {
     bCollapse,
     Multiselect
   },
+  computed: {
+    ...mapGetters('forge', [
+      'accountsArray'
+    ]),
+    combinedAccounts: function () {
+      return this.accountsArray.concat(this.accounts)
+    }
+  },
   methods: {
     createSend () {
       console.log('hello')
     },
     addSendTo (newAddress) {
-      this.accounts.push(newAddress)
-      this.sendForm.to = newAddress
+      // Validate address
+      let newAccount = { label: newAddress, address: newAddress }
+      this.accounts.push(newAccount)
+      this.sendForm.to = newAccount
     },
     addSendFrom (newAddress) {
-      this.accounts.push(newAddress)
-      this.sendForm.from = newAddress
+      let newAccount = { label: newAddress, address: newAddress }
+      this.accounts.push(newAccount)
+      this.sendForm.from = newAccount
     }
   }
 }

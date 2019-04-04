@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import App from './App.vue'
 import VueMoment from 'vue-moment'
+import Wallet from './api/wallet'
+import config from '../config'
 import router from './router'
 import i18n from './i18n'
 import store from './store/index'
@@ -66,7 +68,13 @@ Vue.component('b-table', bTable)
 Vue.component('b-form-checkbox', bFormCheckbox)
 Vue.component('vue-headful', vueHeadful)
 Vue.use(VueMoment)
-
+Vue.use(Wallet, {
+  mqtt: config.mqttHost,
+  rpc: {
+    proxy: config.rpcProxy,
+    delegates: Object.values(config.delegates)
+  }
+})
 new Vue({
   router,
   i18n,

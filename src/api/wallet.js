@@ -3,12 +3,12 @@ import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
 export { LogosWallet }
 
 export default {
-  install (Vue) {
+  install (Vue, options) {
     if (this.installed) {
       return
     }
     this.installed = true
-    Vue.prototype.$Wallet = LogosWallet.Wallet
-    Vue.prototype.$Utils = LogosWallet.Utils
+    Vue.prototype.$wallet = new LogosWallet.Wallet(options)
+    Vue.prototype.$utils = LogosWallet.Utils
   }
 }

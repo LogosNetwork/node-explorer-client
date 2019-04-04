@@ -10,6 +10,7 @@ import epoch from './modules/epoch'
 import settings from './modules/settings'
 import request from './modules/request'
 import tokens from './modules/tokens'
+import forge from './modules/forge'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -23,7 +24,8 @@ export default new Vuex.Store({
     epoch,
     settings,
     request,
-    tokens
+    tokens,
+    forge
   },
   strict: process.env.NODE_ENV !== 'production'
 })
