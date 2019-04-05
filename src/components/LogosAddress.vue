@@ -1,5 +1,5 @@
 <template>
-  <span v-on:click.stop v-if="!inactive">
+  <span class="wordBreak" v-on:click.stop v-if="!inactive">
     <b-link class="d-lg-none" :title="address" :to="'/'+address">
       <span v-if="forceExpand">
         {{address}}
@@ -65,3 +65,8 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+.wordBreak {
+  word-break: break-word
+}
+</style>

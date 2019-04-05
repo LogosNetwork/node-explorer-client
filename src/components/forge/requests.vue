@@ -1,5 +1,19 @@
 <template>
   <div v-if="currentAccount !== null">
+
+    <b-row class="mb-3">
+      <b-col cols="12" md="9">
+        <h4>{{currentAccount.label}}</h4>
+        <small><LogosAddress :address="currentAccount.address" /></small>
+      </b-col>
+      <b-col cols="12" md="3" class="d-flex flex-column m-auto align-items-end">
+        <qrcode
+          :value="'lgs:'+currentAccount.address"
+          :options="{ size: 70, background: 'transparent' }"
+        ></qrcode>
+      </b-col>
+    </b-row>
+
     <div v-if="hasFunds">
 
       <accordion
@@ -13,6 +27,7 @@
       </accordion>
 
       <accordion
+        v-if="hasTokens"
         bgClass="bg-primary"
         accordionGroup="accordion"
         :requestIcon="faCoins"
@@ -33,6 +48,7 @@
       </accordion>
 
       <accordion
+        v-if="tokenPrivileges('issuance')"
         bgClass="bg-secondary"
         accordionGroup="accordion"
         :requestIcon="faMagic"
@@ -43,6 +59,7 @@
       </accordion>
 
       <accordion
+        v-if="tokenPrivileges('change')"
         bgClass="bg-warning"
         accordionGroup="accordion"
         :requestIcon="faExchange"
@@ -53,6 +70,7 @@
       </accordion>
 
       <accordion
+        v-if="tokenPrivileges('modify')"
         bgClass="bg-danger"
         accordionGroup="accordion"
         :requestIcon="faLockAlt"
@@ -63,6 +81,7 @@
       </accordion>
 
       <accordion
+        v-if="tokenPrivileges('revoke')"
         bgClass="bg-success"
         accordionGroup="accordion"
         :requestIcon="faMask"
@@ -73,6 +92,7 @@
       </accordion>
 
       <accordion
+        v-if="tokenPrivileges('adjustUser')"
         bgClass="bg-primary"
         accordionGroup="accordion"
         :requestIcon="faUserEdit"
@@ -83,6 +103,7 @@
       </accordion>
 
       <accordion
+        v-if="tokenPrivileges('adjust_fee')"
         bgClass="bg-info"
         accordionGroup="accordion"
         :requestIcon="faPercentage"
@@ -93,6 +114,7 @@
       </accordion>
 
       <accordion
+        v-if="tokenPrivileges('update_issuer_info')"
         bgClass="bg-secondary"
         accordionGroup="accordion"
         :requestIcon="faEdit"
@@ -103,6 +125,7 @@
       </accordion>
 
       <accordion
+        v-if="tokenPrivileges('burn')"
         bgClass="bg-warning"
         accordionGroup="accordion"
         :requestIcon="faFire"
@@ -113,6 +136,7 @@
       </accordion>
 
       <accordion
+        v-if="tokenPrivileges('distribute')"
         bgClass="bg-danger"
         accordionGroup="accordion"
         :requestIcon="faArrowDown"
@@ -123,6 +147,7 @@
       </accordion>
 
       <accordion
+        v-if="tokenPrivileges('withdraw_fee')"
         bgClass="bg-success"
         accordionGroup="accordion"
         :requestIcon="faHandReceiving"
@@ -133,6 +158,7 @@
       </accordion>
 
       <accordion
+        v-if="tokenPrivileges('withdraw_logos')"
         bgClass="bg-primary"
         accordionGroup="accordion"
         :requestIcon="faLambda"
@@ -166,7 +192,8 @@ import fund from '@/components/forge/fund.vue'
 import createAccountForm from '@/components/forge/requestForms/createAccountForm.vue'
 import sendForm from '@/components/forge/requestForms/sendForm.vue'
 import bigInt from 'big-integer'
-import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage, faChevronDown, faChevronUp } from '@fortawesome/pro-light-svg-icons'
+import LogosAddress from '@/components/LogosAddress.vue'
+import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage } from '@fortawesome/pro-light-svg-icons'
 
 export default {
   name: 'Requests',
@@ -185,13 +212,12 @@ export default {
       faFire,
       faArrowDown,
       faHandReceiving,
-      faPercentage,
-      faChevronDown,
-      faChevronUp
+      faPercentage
     }
   },
   components: {
     accordion,
+    LogosAddress,
     fund,
     createAccountForm,
     sendForm
@@ -201,7 +227,27 @@ export default {
       currentAccount: state => state.currentAccount
     }),
     hasFunds: function () {
-      return bigInt(this.currentAccount.balance).greater(0)
+      if (this.currentAccount && this.currentAccount.balance) {
+        return bigInt(this.currentAccount.balance).greater(0)
+      } else {
+        return false
+      }
+    },
+    hasTokens: function () {
+      if (this.currentAccount && this.currentAccount.tokenBalances) {
+        return Object.keys(this.currentAccount.tokenBalances).length
+      } else {
+        return false
+      }
+    }
+  },
+  methods: {
+    tokenPrivileges: function (privileges) {
+      if (Object.keys(this.$wallet.tokenAccounts).length > 0) {
+        // TODO
+      } else {
+        return false
+      }
     }
   }
 }

@@ -11,18 +11,21 @@
             <b-list-group-item
               v-bind:class="{ active: currentAccount && account.address === currentAccount.address }"
               v-for="account in accounts" :key="account.address"
-              class="d-flex justify-content-between align-items-center"
+              class="d-flex justify-content-between align-items-center mb-2"
               button
               v-on:click="setCurrentAccount(account.address)"
             >
-              <font-awesome-icon size="lg" class="mr-2" :icon="faUser" />
-              <LogosAddress :inactive="true" :force="true" :address="account.address" />
+              <div class="text-left">
+                <div>{{account.label}}</div>
+                <small><LogosAddress class="text-muted" :inactive="true" :force="true" :address="account.address" /></small>
+              </div>
               <b-dropdown v-on:click.stop variant="link" size="lg" no-caret>
                 <template slot="button-content">
-                  <font-awesome-icon size="sm" :icon="faEllipsisVAlt" />
+                  <font-awesome-icon size="lg" :icon="faEllipsisVAlt" />
                   <span class="sr-only">Account Options</span>
                 </template>
                 <b-dropdown-item :href="`/${account.address}`" target="_blank">Open Account Page</b-dropdown-item>
+                <b-dropdown-item href="#">Change Label</b-dropdown-item>
                 <b-dropdown-item href="#">Account Info</b-dropdown-item>
                 <b-dropdown-item href="#">Copy Account Address</b-dropdown-item>
                 <b-dropdown-item href="#">Remove Account</b-dropdown-item>
@@ -37,9 +40,8 @@
             </b-list-group-item>
           </b-list-group>
         </div>
-        <div class="d-flex justify-content-between mt-3 align-items-center font-weight-bold">
+        <div class="d-flex justify-content-between mt-3 mb-3 align-items-center font-weight-bold">
           <h4 class="mb-0">Tokens</h4>
-          <b-button class="font-weight-bolder" variant="link">+ New</b-button>
         </div>
         <div>
           <b-list-group flush>
@@ -203,6 +205,8 @@ $bg-white: #FFF;
 .list-group-flush > .list-group-item {
   border-top: 0;
   border-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 .list-group-item {
   background: transparent;

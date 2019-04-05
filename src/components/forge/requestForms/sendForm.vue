@@ -63,12 +63,13 @@
       <b-form-input
         id="amountInput"
         v-model="sendForm.amount"
+        autocomplete="off"
         required
         placeholder="Amount in Logos"
       ></b-form-input>
     </b-form-group>
     <div class="text-right">
-      <b-button type="submit" variant="primary">Create Send</b-button>
+      <b-button v-on:click="createSend()" type="submit" variant="primary">Create Send</b-button>
     </div>
   </div>
 </template>
@@ -120,6 +121,11 @@ export default {
         let newAccount = { label: newAddress, address: newAddress }
         this.accounts.push(newAccount)
         this.sendForm.from = newAccount
+      }
+    },
+    createSend () {
+      if (this.sendForm.to && this.sendForm.to.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
+        // TOOD
       }
     }
   }
