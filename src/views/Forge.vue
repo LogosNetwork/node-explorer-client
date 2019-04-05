@@ -9,16 +9,14 @@
         <div v-if="accounts.length > 0">
           <b-list-group flush>
             <b-list-group-item
-              v-bind:class="{ active: account.address === currentAccount.address }"
+              v-bind:class="{ active: currentAccount && account.address === currentAccount.address }"
               v-for="account in accounts" :key="account.address"
               class="d-flex justify-content-between align-items-center"
               button
-              v-on:click="$wallet.currentAccountAddress = account.address"
+              v-on:click="setCurrentAccount(account.address)"
             >
-              <span>
-                <font-awesome-icon size="lg" class="mr-2" :icon="faUser" />
-                <LogosAddress :inactive="true" :force="true" :address="account.address" />
-              </span>
+              <font-awesome-icon size="lg" class="mr-2" :icon="faUser" />
+              <LogosAddress :inactive="true" :force="true" :address="account.address" />
               <b-dropdown v-on:click.stop variant="link" size="lg" no-caret>
                 <template slot="button-content">
                   <font-awesome-icon size="sm" :icon="faEllipsisVAlt" />
@@ -172,6 +170,11 @@ export default {
     changeSelected: function (newSelected) {
       this.selected = newSelected
     },
+    setCurrentAccount: function (address) {
+      if (this.$wallet.currentAccountAddress !== address) {
+        this.$wallet.currentAccountAddress = address
+      }
+    },
     changeSelectedVisual: function (newSelected) {
       this.selectedVisual = newSelected
     },
@@ -269,4 +272,27 @@ label.btn-link.active {
 .chainViewer {
   background: $bg-tertiary;
 }
+</style>
+<style lang="scss">
+  .collapsedForm {
+    border-top:1px solid rgba(0, 0, 0, 0.075);
+    margin-left: 1.25rem;
+    margin-right: 1.25rem;
+    padding: 0;
+    padding-bottom: 1.25rem;
+  }
+  .iconHolder {
+    width: 52px;
+    height: 52px;
+  }
+  .accordionCard > .btn-link:hover,
+  .accordionCard > .btn-link:focus {
+    text-decoration: none;
+  }
+  .accordionCard {
+    -webkit-transition: all .3s;
+    -o-transition: all .3s;
+    transition: all .3s;
+    border: 0px;
+  }
 </style>
