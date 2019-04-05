@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div v-if="currentAccount !== null">
+
     <b-card no-body class="shadow-sm mb-3">
       <b-button class="w-100 text-left p-0" variant="link">
         <b-card-body v-b-toggle.send>
@@ -36,7 +37,7 @@
             >
               <Multiselect
                 id="fromSelector"
-                v-model="sendForm.from"
+                v-model="currentAccount"
                 required
                 tag-placeholder="Add this account"
                 track-by="label"
@@ -44,10 +45,16 @@
                 :options="combinedAccounts"
                 :multiple="false"
                 :taggable="true"
+                :disabled="true"
                 @tag="addSendFrom"
                 placeholder="Search or add an account"
               >
-                <template slot="singleLabel" slot-scope="{ option }"><span v-if="option.label !== option.address"><strong>{{ option.label }}</strong>  -</span> {{ option.address }}</template>
+                <template slot="singleLabel" slot-scope="{ option }">
+                  <span v-if="option.label !== option.address">
+                    <strong>{{ option.label }}</strong>  -
+                  </span>
+                  <LogosAddress :inactive="true" :force="true" :address="option.address" />
+                </template>
               </Multiselect>
             </b-form-group>
 
@@ -68,7 +75,12 @@
                 @tag="addSendTo"
                 placeholder="Search or add an account"
               >
-                <template slot="singleLabel" slot-scope="{ option }"><span v-if="option.label !== option.address"><strong>{{ option.label }}</strong>  -</span> {{ option.address }}</template>
+                <template slot="singleLabel" slot-scope="{ option }">
+                  <span v-if="option.label !== option.address">
+                    <strong>{{ option.label }}</strong>  -
+                  </span>
+                  <LogosAddress :inactive="true" :force="true" :address="option.address" />
+                </template>
               </Multiselect>
             </b-form-group>
 
@@ -76,7 +88,7 @@
               id="sendAmount"
               label="Amount"
               label-for="amountInput"
-              :description="sendForm.amountDescription"
+              :description="currentAccount ? `${currentAccount.logosBalance} Logos available to send` : `No account found`"
             >
               <b-form-input
                 id="amountInput"
@@ -523,16 +535,87 @@
     </b-card>
 
   </div>
+  <div v-else>
+    <b-card no-body class="shadow-sm mb-3">
+      <b-button class="w-100 text-left p-0" variant="link">
+        <b-card-body v-b-toggle.createAccount>
+          <b-row>
+            <b-col cols="auto">
+              <div class="iconHolder text-white rounded bg-success d-flex align-items-center justify-content-center">
+                <font-awesome-icon size="2x" :icon="faPlus" />
+              </div>
+            </b-col>
+            <b-col>
+              <b-card-title>
+                Create an account
+              </b-card-title>
+              <b-card-subtitle>
+                Create an account automatically or with a given private key.
+              </b-card-subtitle>
+            </b-col>
+            <b-col cols="auto">
+              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
+                <font-awesome-icon v-if="!send" size="lg" :icon="faChevronDown" />
+                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+              </div>
+            </b-col>
+          </b-row>
+        </b-card-body>
+      </b-button>
+      <b-collapse v-model="createAccount" id="createAccount" accordion="accordion" role="tabpanel">
+        <b-card-body class="collapsedForm">
+          <div class="mt-3">
+            <b-form-group id="createAccountCheckboxGroup">
+              <b-form-checkbox v-model="createAccountForm.usePrivateKey">Generate Account From Private Key</b-form-checkbox>
+            </b-form-group>
+
+            <b-form-group
+              v-if="!createAccountForm.usePrivateKey"
+              id="createAccountSeed"
+              label="Seed"
+              label-for="seedInput"
+            >
+              <b-form-input
+                id="seedInput"
+                v-model="seed"
+                required
+                placeholder="Seed"
+              ></b-form-input>
+            </b-form-group>
+
+            <b-form-group
+              v-if="createAccountForm.usePrivateKey"
+              id="createAccountPKey"
+              label="Private Key"
+              label-for="privateKeyInput"
+            >
+              <b-form-input
+                id="privateKeyInput"
+                v-model="createAccountForm.privateKey"
+                required
+                placeholder="Private Key of account you want to import"
+              ></b-form-input>
+            </b-form-group>
+
+            <div class="text-right">
+              <b-button type="submit" variant="primary" v-on:click="generateAccount()">Create Account</b-button>
+            </div>
+          </div>
+        </b-card-body>
+      </b-collapse>
+    </b-card>
+  </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import bCardBody from 'bootstrap-vue/es/components/card/card-body'
 import bCardTitle from 'bootstrap-vue/es/components/card/card-title'
 import bCardSubtitle from 'bootstrap-vue/es/components/card/card-sub-title'
 import bCollapse from 'bootstrap-vue/es/components/collapse/collapse'
 import bFormGroup from 'bootstrap-vue/es/components/form-group/form-group'
 import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
+import LogosAddress from '@/components/LogosAddress.vue'
 import Multiselect from 'vue-multiselect'
 import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage, faChevronDown, faChevronUp } from '@fortawesome/pro-light-svg-icons'
 
@@ -544,9 +627,13 @@ export default {
       sendForm: {
         from: '',
         to: '',
-        amount: '',
-        amountDescription: ''
+        amount: ''
       },
+      createAccountForm: {
+        usePrivateKey: false,
+        privateKey: ''
+      },
+      createAccount: false,
       send: false,
       tokenSend: false,
       tokenIssuance: false,
@@ -586,20 +673,20 @@ export default {
     bFormGroup,
     bFormInput,
     bCollapse,
-    Multiselect
+    Multiselect,
+    LogosAddress
   },
   computed: {
-    ...mapGetters('forge', [
-      'accountsArray'
-    ]),
+    ...mapState('forge', {
+      forgeAccounts: state => state.accounts,
+      currentAccount: state => state.currentAccount,
+      seed: state => state.seed
+    }),
     combinedAccounts: function () {
-      return this.accountsArray.concat(this.accounts)
+      return Array.from(Object.values(this.forgeAccounts)).concat(this.accounts)
     }
   },
   methods: {
-    createSend () {
-      console.log('hello')
-    },
     addSendTo (newAddress) {
       // Validate address
       let newAccount = { label: newAddress, address: newAddress }
@@ -610,6 +697,14 @@ export default {
       let newAccount = { label: newAddress, address: newAddress }
       this.accounts.push(newAccount)
       this.sendForm.from = newAccount
+    },
+    generateAccount () {
+      if (this.createAccountForm.privateKey) {
+        this.$wallet.createAccount({ privateKey: this.createAccountForm.privateKey })
+      } else {
+        this.$wallet.seed = this.seed
+        this.$wallet.createAccount()
+      }
     }
   }
 }

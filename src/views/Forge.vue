@@ -6,9 +6,9 @@
           <h4 class="mb-0">Accounts</h4>
           <b-button class="font-weight-bolder" variant="link" v-on:click="$wallet.createAccount()">+ New</b-button>
         </div>
-        <div v-if="accountsArray.length > 0">
+        <div v-if="accounts.length > 0">
           <b-list-group flush>
-            <b-list-group-item v-for="account in accountsArray" :key="account.address" class="d-flex justify-content-between align-items-center">
+            <b-list-group-item v-for="account in accounts" :key="account.address" class="d-flex justify-content-between align-items-center">
               <span>
                 <font-awesome-icon size="lg" class="mr-2" :icon="faUser" />
                 <LogosAddress :inactive="true" :force="true" :address="account.address" />
@@ -118,7 +118,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown'
@@ -154,9 +154,12 @@ export default {
     Requests
   },
   computed: {
-    ...mapGetters('forge', [
-      'accountsArray'
-    ])
+    ...mapState('forge', {
+      forgeAccounts: state => state.accounts
+    }),
+    accounts: function () {
+      return Array.from(Object.values(this.forgeAccounts))
+    }
   },
   methods: {
     changeSelected: function (newSelected) {

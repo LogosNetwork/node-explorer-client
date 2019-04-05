@@ -1,22 +1,16 @@
 import Vue from 'vue'
 import cloneDeep from 'lodash/cloneDeep'
+import Logos from '@logosnetwork/logos-rpc-client'
 
 const state = {
   tokens: {},
-  accounts: {}
+  walletAccounts: {},
+  accounts: {},
+  currentAccount: null,
+  seed: null
 }
 
 const getters = {
-  accountsArray: state => {
-    let result = []
-    for (let account in state.accounts) {
-      result.push({
-        address: account,
-        label: state.accounts[account].label
-      })
-    }
-    return result
-  }
 }
 
 // const pullTokenInfo = (tokenAccount, rpcClient, commit) => {
@@ -34,12 +28,38 @@ const getters = {
 const actions = {
   update ({ commit }, wallet) {
     commit('setAccounts', wallet._accounts)
+    commit('setSeed', wallet._seed)
+    commit('setCurrentAccount', wallet.account)
   }
 }
 
 const mutations = {
   setAccounts (state, accounts) {
-    state.accounts = cloneDeep(accounts)
+    state.walletAccounts = cloneDeep(accounts)
+    for (let account in state.walletAccounts) {
+      let clean = {
+        address: account,
+        label: state.walletAccounts[account].label,
+        balance: state.walletAccounts[account].balance,
+        logosBalance: Logos.convert.fromReason(state.walletAccounts[account].balance, 'LOGOS')
+      }
+      Vue.set(state.accounts, account, clean)
+    }
+  },
+  setCurrentAccount (state, account) {
+    if (account) {
+      let currentAccount = cloneDeep(account)
+      let clean = {
+        address: currentAccount.address,
+        label: currentAccount.label,
+        balance: currentAccount.balance,
+        logosBalance: Logos.convert.fromReason(currentAccount.balance, 'LOGOS')
+      }
+      state.currentAccount = clean
+    }
+  },
+  setSeed (state, seed) {
+    state.seed = cloneDeep(seed)
   },
   addToken (state, tokenAccount) {
     Vue.set(state.tokens, tokenAccount, {
