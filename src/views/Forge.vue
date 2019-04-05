@@ -8,7 +8,13 @@
         </div>
         <div v-if="accounts.length > 0">
           <b-list-group flush>
-            <b-list-group-item v-for="account in accounts" :key="account.address" class="d-flex justify-content-between align-items-center">
+            <b-list-group-item
+              v-bind:class="{ active: account.address === currentAccount.address }"
+              v-for="account in accounts" :key="account.address"
+              class="d-flex justify-content-between align-items-center"
+              button
+              v-on:click="$wallet.currentAccountAddress = account.address"
+            >
               <span>
                 <font-awesome-icon size="lg" class="mr-2" :icon="faUser" />
                 <LogosAddress :inactive="true" :force="true" :address="account.address" />
@@ -155,7 +161,8 @@ export default {
   },
   computed: {
     ...mapState('forge', {
-      forgeAccounts: state => state.accounts
+      forgeAccounts: state => state.accounts,
+      currentAccount: state => state.currentAccount
     }),
     accounts: function () {
       return Array.from(Object.values(this.forgeAccounts))
@@ -205,6 +212,11 @@ label.btn-link:not(.active) {
 }
 label.btn-link.active {
   font-weight: 900;
+}
+.list-group-item.active {
+  background-color: transparent;
+  color: var(--primary);
+  font-weight: 900
 }
 .accountPanel {
   background: $bg-secondary;

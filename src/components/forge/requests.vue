@@ -1,539 +1,562 @@
 <template>
   <div v-if="currentAccount !== null">
-
-    <b-card no-body class="shadow-sm mb-3">
-      <b-button class="w-100 text-left p-0" variant="link">
-        <b-card-body v-b-toggle.send>
-          <b-row>
-            <b-col cols="auto">
-              <div class="iconHolder text-white rounded bg-success d-flex align-items-center justify-content-center">
-                <font-awesome-icon size="2x" :icon="faPaperPlane" />
-              </div>
-            </b-col>
-            <b-col>
-              <b-card-title>
-                Send Logos
-              </b-card-title>
-              <b-card-subtitle>
-                Send logos to another account.
-              </b-card-subtitle>
-            </b-col>
-            <b-col cols="auto">
-              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-                <font-awesome-icon v-if="!send" size="lg" :icon="faChevronDown" />
-                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
-              </div>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-button>
-      <b-collapse v-model="send" id="send" accordion="accordion" role="tabpanel">
-        <b-card-body class="collapsedForm">
-          <div class="mt-3">
-            <b-form-group
-              id="sendFrom"
-              label="From"
-              label-for="fromSelector"
-            >
-              <Multiselect
-                id="fromSelector"
-                v-model="currentAccount"
-                required
-                tag-placeholder="Add this account"
-                track-by="label"
-                label="label"
-                :options="combinedAccounts"
-                :multiple="false"
-                :taggable="true"
-                :disabled="true"
-                @tag="addSendFrom"
-                placeholder="Search or add an account"
+    <div v-if="hasFunds">
+      <b-card no-body class="shadow-sm mb-3">
+        <b-button class="w-100 text-left p-0" variant="link">
+          <b-card-body v-b-toggle.send>
+            <b-row>
+              <b-col cols="auto">
+                <div class="iconHolder text-white rounded bg-success d-flex align-items-center justify-content-center">
+                  <font-awesome-icon size="2x" :icon="faPaperPlane" />
+                </div>
+              </b-col>
+              <b-col>
+                <b-card-title>
+                  Send Logos
+                </b-card-title>
+                <b-card-subtitle>
+                  Send logos to another account.
+                </b-card-subtitle>
+              </b-col>
+              <b-col cols="auto">
+                <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
+                  <font-awesome-icon v-if="!send" size="lg" :icon="faChevronDown" />
+                  <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+                </div>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-button>
+        <b-collapse v-model="send" id="send" accordion="accordion" role="tabpanel">
+          <b-card-body class="collapsedForm">
+            <div class="mt-3">
+              <b-form-group
+                id="sendFrom"
+                label="From"
+                label-for="fromSelector"
               >
-                <template slot="singleLabel" slot-scope="{ option }">
-                  <span v-if="option.label !== option.address">
-                    <strong>{{ option.label }}</strong>  -
-                  </span>
-                  <LogosAddress :inactive="true" :force="true" :address="option.address" />
-                </template>
-              </Multiselect>
-            </b-form-group>
+                <Multiselect
+                  id="fromSelector"
+                  v-model="currentAccount"
+                  required
+                  tag-placeholder="Add this account"
+                  track-by="label"
+                  label="label"
+                  :options="combinedAccounts"
+                  :multiple="false"
+                  :taggable="true"
+                  :disabled="true"
+                  @tag="addSendFrom"
+                  placeholder="Search or add an account"
+                >
+                  <template slot="singleLabel" slot-scope="{ option }">
+                    <span v-if="option.label !== option.address">
+                      <strong>{{ option.label }}</strong>  -
+                    </span>
+                    <LogosAddress :inactive="true" :force="true" :address="option.address" />
+                  </template>
+                </Multiselect>
+              </b-form-group>
 
-            <b-form-group id="sendTo"
-              label="To"
-              label-for="toSelector"
-            >
-              <Multiselect
-                id="toSelector"
-                v-model="sendForm.to"
-                required
-                tag-placeholder="Add this account"
-                track-by="label"
-                label="label"
-                :options="combinedAccounts"
-                :multiple="false"
-                :taggable="true"
-                @tag="addSendTo"
-                placeholder="Search or add an account"
+              <b-form-group id="sendTo"
+                label="To"
+                label-for="toSelector"
               >
-                <template slot="singleLabel" slot-scope="{ option }">
-                  <span v-if="option.label !== option.address">
-                    <strong>{{ option.label }}</strong>  -
-                  </span>
-                  <LogosAddress :inactive="true" :force="true" :address="option.address" />
-                </template>
-              </Multiselect>
-            </b-form-group>
+                <Multiselect
+                  id="toSelector"
+                  v-model="sendForm.to"
+                  required
+                  tag-placeholder="Add this account"
+                  track-by="label"
+                  label="label"
+                  :options="combinedAccounts"
+                  :multiple="false"
+                  :taggable="true"
+                  @tag="addSendTo"
+                  placeholder="Search or add an account"
+                >
+                  <template slot="singleLabel" slot-scope="{ option }">
+                    <span v-if="option.label !== option.address">
+                      <strong>{{ option.label }}</strong>  -
+                    </span>
+                    <LogosAddress :inactive="true" :force="true" :address="option.address" />
+                  </template>
+                </Multiselect>
+              </b-form-group>
 
-            <b-form-group
-              id="sendAmount"
-              label="Amount"
-              label-for="amountInput"
-              :description="currentAccount ? `${currentAccount.logosBalance} Logos available to send` : `No account found`"
-            >
-              <b-form-input
-                id="amountInput"
-                v-model="sendForm.amount"
-                required
-                placeholder="Amount in Logos"
-              ></b-form-input>
-            </b-form-group>
-            <div class="text-right">
-              <b-button type="submit" variant="primary">Create Send</b-button>
+              <b-form-group
+                id="sendAmount"
+                label="Amount"
+                label-for="amountInput"
+                :description="currentAccount ? `${currentAccount.logosBalance} Logos available to send` : `No account found`"
+              >
+                <b-form-input
+                  id="amountInput"
+                  v-model="sendForm.amount"
+                  required
+                  placeholder="Amount in Logos"
+                ></b-form-input>
+              </b-form-group>
+              <div class="text-right">
+                <b-button type="submit" variant="primary">Create Send</b-button>
+              </div>
             </div>
-          </div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
 
-    <b-card no-body class="shadow-sm mb-3">
-      <b-button class="w-100 text-left p-0" variant="link">
-        <b-card-body v-b-toggle.tokenSend>
-          <b-row>
-            <b-col cols="auto">
-              <div class="iconHolder text-white rounded bg-primary d-flex align-items-center justify-content-center">
-                <font-awesome-icon size="2x" :icon="faCoins" />
-              </div>
-            </b-col>
-            <b-col>
-              <b-card-title>
-                Send Tokens
-              </b-card-title>
-              <b-card-subtitle>
-                Send tokens to another account.
-              </b-card-subtitle>
-            </b-col>
-            <b-col cols="auto">
-              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-                <font-awesome-icon v-if="!tokenSend" size="lg" :icon="faChevronDown" />
-                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
-              </div>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-button>
-      <b-collapse v-model="tokenSend" id="tokenSend" accordion="accordion" role="tabpanel">
-        <b-card-body class="collapsedForm">
-          <div class="mt-3">Hello World</div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
+      <b-card no-body class="shadow-sm mb-3">
+        <b-button class="w-100 text-left p-0" variant="link">
+          <b-card-body v-b-toggle.tokenSend>
+            <b-row>
+              <b-col cols="auto">
+                <div class="iconHolder text-white rounded bg-primary d-flex align-items-center justify-content-center">
+                  <font-awesome-icon size="2x" :icon="faCoins" />
+                </div>
+              </b-col>
+              <b-col>
+                <b-card-title>
+                  Send Tokens
+                </b-card-title>
+                <b-card-subtitle>
+                  Send tokens to another account.
+                </b-card-subtitle>
+              </b-col>
+              <b-col cols="auto">
+                <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
+                  <font-awesome-icon v-if="!tokenSend" size="lg" :icon="faChevronDown" />
+                  <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+                </div>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-button>
+        <b-collapse v-model="tokenSend" id="tokenSend" accordion="accordion" role="tabpanel">
+          <b-card-body class="collapsedForm">
+            <div class="mt-3">Hello World</div>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
 
-    <b-card no-body class="shadow-sm mb-3">
-      <b-button class="w-100 text-left p-0" variant="link">
-        <b-card-body v-b-toggle.tokenIssuance>
-          <b-row>
-            <b-col cols="auto">
-              <div class="iconHolder text-white rounded bg-info d-flex align-items-center justify-content-center">
-                <font-awesome-icon size="2x" :icon="faPlus" />
-              </div>
-            </b-col>
-            <b-col>
-              <b-card-title>
-                Issue a Token
-              </b-card-title>
-              <b-card-subtitle>
-                Create and issue your token.
-              </b-card-subtitle>
-            </b-col>
-            <b-col cols="auto">
-              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-                <font-awesome-icon v-if="!tokenIssuance" size="lg" :icon="faChevronDown" />
-                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
-              </div>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-button>
-      <b-collapse v-model="tokenIssuance" id="tokenIssuance" accordion="accordion" role="tabpanel">
-        <b-card-body class="collapsedForm">
-          <div class="mt-3">Hello World</div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
+      <b-card no-body class="shadow-sm mb-3">
+        <b-button class="w-100 text-left p-0" variant="link">
+          <b-card-body v-b-toggle.tokenIssuance>
+            <b-row>
+              <b-col cols="auto">
+                <div class="iconHolder text-white rounded bg-info d-flex align-items-center justify-content-center">
+                  <font-awesome-icon size="2x" :icon="faPlus" />
+                </div>
+              </b-col>
+              <b-col>
+                <b-card-title>
+                  Issue a Token
+                </b-card-title>
+                <b-card-subtitle>
+                  Create and issue your token.
+                </b-card-subtitle>
+              </b-col>
+              <b-col cols="auto">
+                <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
+                  <font-awesome-icon v-if="!tokenIssuance" size="lg" :icon="faChevronDown" />
+                  <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+                </div>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-button>
+        <b-collapse v-model="tokenIssuance" id="tokenIssuance" accordion="accordion" role="tabpanel">
+          <b-card-body class="collapsedForm">
+            <div class="mt-3">Hello World</div>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
 
-    <b-card no-body class="shadow-sm mb-3">
-      <b-button class="w-100 text-left p-0" variant="link">
-        <b-card-body v-b-toggle.tokenAdditional>
-          <b-row>
-            <b-col cols="auto">
-              <div class="iconHolder text-white rounded bg-secondary d-flex align-items-center justify-content-center">
-                <font-awesome-icon size="2x" :icon="faMagic" />
-              </div>
-            </b-col>
-            <b-col>
-              <b-card-title>
-                Issue Additional Tokens
-              </b-card-title>
-              <b-card-subtitle>
-                Increases the total supply of a token.
-              </b-card-subtitle>
-            </b-col>
-            <b-col cols="auto">
-              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-                <font-awesome-icon v-if="!tokenAdditional" size="lg" :icon="faChevronDown" />
-                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
-              </div>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-button>
-      <b-collapse v-model="tokenAdditional" id="tokenAdditional" accordion="accordion" role="tabpanel">
-        <b-card-body class="collapsedForm">
-          <div class="mt-3">Hello World</div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
+      <b-card no-body class="shadow-sm mb-3">
+        <b-button class="w-100 text-left p-0" variant="link">
+          <b-card-body v-b-toggle.tokenAdditional>
+            <b-row>
+              <b-col cols="auto">
+                <div class="iconHolder text-white rounded bg-secondary d-flex align-items-center justify-content-center">
+                  <font-awesome-icon size="2x" :icon="faMagic" />
+                </div>
+              </b-col>
+              <b-col>
+                <b-card-title>
+                  Issue Additional Tokens
+                </b-card-title>
+                <b-card-subtitle>
+                  Increases the total supply of a token.
+                </b-card-subtitle>
+              </b-col>
+              <b-col cols="auto">
+                <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
+                  <font-awesome-icon v-if="!tokenAdditional" size="lg" :icon="faChevronDown" />
+                  <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+                </div>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-button>
+        <b-collapse v-model="tokenAdditional" id="tokenAdditional" accordion="accordion" role="tabpanel">
+          <b-card-body class="collapsedForm">
+            <div class="mt-3">Hello World</div>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
 
-    <b-card no-body class="shadow-sm mb-3">
-      <b-button class="w-100 text-left p-0" variant="link">
-        <b-card-body v-b-toggle.tokenSetting>
-          <b-row>
-            <b-col cols="auto">
-              <div class="iconHolder text-white rounded bg-warning d-flex align-items-center justify-content-center">
-                <font-awesome-icon size="2x" :icon="faExchange" />
-              </div>
-            </b-col>
-            <b-col>
-              <b-card-title>
-                Change Token Setting
-              </b-card-title>
-              <b-card-subtitle>
-                Change the settings of the given token.
-              </b-card-subtitle>
-            </b-col>
-            <b-col cols="auto">
-              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-                <font-awesome-icon v-if="!tokenSetting" size="lg" :icon="faChevronDown" />
-                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
-              </div>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-button>
-      <b-collapse v-model="tokenSetting" id="tokenSetting" accordion="accordion" role="tabpanel">
-        <b-card-body class="collapsedForm">
-          <div class="mt-3">Hello World</div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
+      <b-card no-body class="shadow-sm mb-3">
+        <b-button class="w-100 text-left p-0" variant="link">
+          <b-card-body v-b-toggle.tokenSetting>
+            <b-row>
+              <b-col cols="auto">
+                <div class="iconHolder text-white rounded bg-warning d-flex align-items-center justify-content-center">
+                  <font-awesome-icon size="2x" :icon="faExchange" />
+                </div>
+              </b-col>
+              <b-col>
+                <b-card-title>
+                  Change Token Setting
+                </b-card-title>
+                <b-card-subtitle>
+                  Change the settings of the given token.
+                </b-card-subtitle>
+              </b-col>
+              <b-col cols="auto">
+                <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
+                  <font-awesome-icon v-if="!tokenSetting" size="lg" :icon="faChevronDown" />
+                  <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+                </div>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-button>
+        <b-collapse v-model="tokenSetting" id="tokenSetting" accordion="accordion" role="tabpanel">
+          <b-card-body class="collapsedForm">
+            <div class="mt-3">Hello World</div>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
 
-    <b-card no-body class="shadow-sm mb-3">
-      <b-button class="w-100 text-left p-0" variant="link">
-        <b-card-body v-b-toggle.tokenImmuteSetting>
-          <b-row>
-            <b-col cols="auto">
-              <div class="iconHolder text-white rounded bg-danger d-flex align-items-center justify-content-center">
-                <font-awesome-icon size="2x" :icon="faLockAlt" />
-              </div>
-            </b-col>
-            <b-col>
-              <b-card-title>
-                Immute Token Setting
-              </b-card-title>
-              <b-card-subtitle>
-                Permanently immute a setting of the given token.
-              </b-card-subtitle>
-            </b-col>
-            <b-col cols="auto">
-              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-                <font-awesome-icon v-if="!tokenImmuteSetting" size="lg" :icon="faChevronDown" />
-                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
-              </div>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-button>
-      <b-collapse v-model="tokenImmuteSetting" id="tokenImmuteSetting" accordion="accordion" role="tabpanel">
-        <b-card-body class="collapsedForm">
-          <div class="mt-3">Hello World</div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
+      <b-card no-body class="shadow-sm mb-3">
+        <b-button class="w-100 text-left p-0" variant="link">
+          <b-card-body v-b-toggle.tokenImmuteSetting>
+            <b-row>
+              <b-col cols="auto">
+                <div class="iconHolder text-white rounded bg-danger d-flex align-items-center justify-content-center">
+                  <font-awesome-icon size="2x" :icon="faLockAlt" />
+                </div>
+              </b-col>
+              <b-col>
+                <b-card-title>
+                  Immute Token Setting
+                </b-card-title>
+                <b-card-subtitle>
+                  Permanently immute a setting of the given token.
+                </b-card-subtitle>
+              </b-col>
+              <b-col cols="auto">
+                <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
+                  <font-awesome-icon v-if="!tokenImmuteSetting" size="lg" :icon="faChevronDown" />
+                  <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+                </div>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-button>
+        <b-collapse v-model="tokenImmuteSetting" id="tokenImmuteSetting" accordion="accordion" role="tabpanel">
+          <b-card-body class="collapsedForm">
+            <div class="mt-3">Hello World</div>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
 
-    <b-card no-body class="shadow-sm mb-3">
-      <b-button class="w-100 text-left p-0" variant="link">
-        <b-card-body v-b-toggle.tokenRevoke>
-          <b-row>
-            <b-col cols="auto">
-              <div class="iconHolder text-white rounded bg-success d-flex align-items-center justify-content-center">
-                <font-awesome-icon size="2x" :icon="faMask" />
-              </div>
-            </b-col>
-            <b-col>
-              <b-card-title>
-                Revoke Token from User
-              </b-card-title>
-              <b-card-subtitle>
-                Remove tokens from a one account and send them to another.
-              </b-card-subtitle>
-            </b-col>
-            <b-col cols="auto">
-              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-                <font-awesome-icon v-if="!tokenRevoke" size="lg" :icon="faChevronDown" />
-                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
-              </div>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-button>
-      <b-collapse v-model="tokenRevoke" id="tokenRevoke" accordion="accordion" role="tabpanel">
-        <b-card-body class="collapsedForm">
-          <div class="mt-3">Hello World</div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
+      <b-card no-body class="shadow-sm mb-3">
+        <b-button class="w-100 text-left p-0" variant="link">
+          <b-card-body v-b-toggle.tokenRevoke>
+            <b-row>
+              <b-col cols="auto">
+                <div class="iconHolder text-white rounded bg-success d-flex align-items-center justify-content-center">
+                  <font-awesome-icon size="2x" :icon="faMask" />
+                </div>
+              </b-col>
+              <b-col>
+                <b-card-title>
+                  Revoke Token from User
+                </b-card-title>
+                <b-card-subtitle>
+                  Remove tokens from a one account and send them to another.
+                </b-card-subtitle>
+              </b-col>
+              <b-col cols="auto">
+                <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
+                  <font-awesome-icon v-if="!tokenRevoke" size="lg" :icon="faChevronDown" />
+                  <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+                </div>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-button>
+        <b-collapse v-model="tokenRevoke" id="tokenRevoke" accordion="accordion" role="tabpanel">
+          <b-card-body class="collapsedForm">
+            <div class="mt-3">Hello World</div>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
 
-    <b-card no-body class="shadow-sm mb-3">
-      <b-button class="w-100 text-left p-0" variant="link">
-        <b-card-body v-b-toggle.tokenUser>
-          <b-row>
-            <b-col cols="auto">
-              <div class="iconHolder text-white rounded bg-primary d-flex align-items-center justify-content-center">
-                <font-awesome-icon size="2x" :icon="faUserEdit" />
-              </div>
-            </b-col>
-            <b-col>
-              <b-card-title>
-                Adjust User Token Setting
-              </b-card-title>
-              <b-card-subtitle>
-                Freeze, Un-Freeze, Whitelist, or Blacklist a user.
-              </b-card-subtitle>
-            </b-col>
-            <b-col cols="auto">
-              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-                <font-awesome-icon v-if="!tokenUser" size="lg" :icon="faChevronDown" />
-                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
-              </div>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-button>
-      <b-collapse v-model="tokenUser" id="tokenUser" accordion="accordion" role="tabpanel">
-        <b-card-body class="collapsedForm">
-          <div class="mt-3">Hello World</div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
+      <b-card no-body class="shadow-sm mb-3">
+        <b-button class="w-100 text-left p-0" variant="link">
+          <b-card-body v-b-toggle.tokenUser>
+            <b-row>
+              <b-col cols="auto">
+                <div class="iconHolder text-white rounded bg-primary d-flex align-items-center justify-content-center">
+                  <font-awesome-icon size="2x" :icon="faUserEdit" />
+                </div>
+              </b-col>
+              <b-col>
+                <b-card-title>
+                  Adjust User Token Setting
+                </b-card-title>
+                <b-card-subtitle>
+                  Freeze, Un-Freeze, Whitelist, or Blacklist a user.
+                </b-card-subtitle>
+              </b-col>
+              <b-col cols="auto">
+                <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
+                  <font-awesome-icon v-if="!tokenUser" size="lg" :icon="faChevronDown" />
+                  <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+                </div>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-button>
+        <b-collapse v-model="tokenUser" id="tokenUser" accordion="accordion" role="tabpanel">
+          <b-card-body class="collapsedForm">
+            <div class="mt-3">Hello World</div>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
 
-    <b-card no-body class="shadow-sm mb-3">
-      <b-button class="w-100 text-left p-0" variant="link">
-        <b-card-body v-b-toggle.tokenFee>
-          <b-row>
-            <b-col cols="auto">
-              <div class="iconHolder text-white rounded bg-info d-flex align-items-center justify-content-center">
-                <font-awesome-icon size="2x" :icon="faPercentage" />
-              </div>
-            </b-col>
-            <b-col>
-              <b-card-title>
-                Adjust Token Fee
-              </b-card-title>
-              <b-card-subtitle>
-                Change the token fee for the given token.
-              </b-card-subtitle>
-            </b-col>
-            <b-col cols="auto">
-              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-                <font-awesome-icon v-if="!tokenFee" size="lg" :icon="faChevronDown" />
-                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
-              </div>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-button>
-      <b-collapse v-model="tokenFee" id="tokenFee" accordion="accordion" role="tabpanel">
-        <b-card-body class="collapsedForm">
-          <div class="mt-3">Hello World</div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
+      <b-card no-body class="shadow-sm mb-3">
+        <b-button class="w-100 text-left p-0" variant="link">
+          <b-card-body v-b-toggle.tokenFee>
+            <b-row>
+              <b-col cols="auto">
+                <div class="iconHolder text-white rounded bg-info d-flex align-items-center justify-content-center">
+                  <font-awesome-icon size="2x" :icon="faPercentage" />
+                </div>
+              </b-col>
+              <b-col>
+                <b-card-title>
+                  Adjust Token Fee
+                </b-card-title>
+                <b-card-subtitle>
+                  Change the token fee for the given token.
+                </b-card-subtitle>
+              </b-col>
+              <b-col cols="auto">
+                <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
+                  <font-awesome-icon v-if="!tokenFee" size="lg" :icon="faChevronDown" />
+                  <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+                </div>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-button>
+        <b-collapse v-model="tokenFee" id="tokenFee" accordion="accordion" role="tabpanel">
+          <b-card-body class="collapsedForm">
+            <div class="mt-3">Hello World</div>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
 
-    <b-card no-body class="shadow-sm mb-3">
-      <b-button class="w-100 text-left p-0" variant="link">
-        <b-card-body v-b-toggle.tokenInfo>
-          <b-row>
-            <b-col cols="auto">
-              <div class="iconHolder text-white rounded bg-secondary d-flex align-items-center justify-content-center">
-                <font-awesome-icon size="2x" :icon="faEdit" />
-              </div>
-            </b-col>
-            <b-col>
-              <b-card-title>
-                Update Token Info
-              </b-card-title>
-              <b-card-subtitle>
-                Change the token information of the given token.
-              </b-card-subtitle>
-            </b-col>
-            <b-col cols="auto">
-              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-                <font-awesome-icon v-if="!tokenInfo" size="lg" :icon="faChevronDown" />
-                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
-              </div>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-button>
-      <b-collapse v-model="tokenInfo" id="tokenInfo" accordion="accordion" role="tabpanel">
-        <b-card-body class="collapsedForm">
-          <div class="mt-3">Hello World</div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
+      <b-card no-body class="shadow-sm mb-3">
+        <b-button class="w-100 text-left p-0" variant="link">
+          <b-card-body v-b-toggle.tokenInfo>
+            <b-row>
+              <b-col cols="auto">
+                <div class="iconHolder text-white rounded bg-secondary d-flex align-items-center justify-content-center">
+                  <font-awesome-icon size="2x" :icon="faEdit" />
+                </div>
+              </b-col>
+              <b-col>
+                <b-card-title>
+                  Update Token Info
+                </b-card-title>
+                <b-card-subtitle>
+                  Change the token information of the given token.
+                </b-card-subtitle>
+              </b-col>
+              <b-col cols="auto">
+                <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
+                  <font-awesome-icon v-if="!tokenInfo" size="lg" :icon="faChevronDown" />
+                  <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+                </div>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-button>
+        <b-collapse v-model="tokenInfo" id="tokenInfo" accordion="accordion" role="tabpanel">
+          <b-card-body class="collapsedForm">
+            <div class="mt-3">Hello World</div>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
 
-    <b-card no-body class="shadow-sm mb-3">
-      <b-button class="w-100 text-left p-0" variant="link">
-        <b-card-body v-b-toggle.tokenBurn>
-          <b-row>
-            <b-col cols="auto">
-              <div class="iconHolder text-white rounded bg-warning d-flex align-items-center justify-content-center">
-                <font-awesome-icon size="2x" :icon="faFire" />
-              </div>
-            </b-col>
-            <b-col>
-              <b-card-title>
-                Burn Tokens
-              </b-card-title>
-              <b-card-subtitle>
-                Remove some tokens from the total supply.
-              </b-card-subtitle>
-            </b-col>
-            <b-col cols="auto">
-              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-                <font-awesome-icon v-if="!tokenBurn" size="lg" :icon="faChevronDown" />
-                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
-              </div>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-button>
-      <b-collapse v-model="tokenBurn" id="tokenBurn" accordion="accordion" role="tabpanel">
-        <b-card-body class="collapsedForm">
-          <div class="mt-3">Hello World</div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
+      <b-card no-body class="shadow-sm mb-3">
+        <b-button class="w-100 text-left p-0" variant="link">
+          <b-card-body v-b-toggle.tokenBurn>
+            <b-row>
+              <b-col cols="auto">
+                <div class="iconHolder text-white rounded bg-warning d-flex align-items-center justify-content-center">
+                  <font-awesome-icon size="2x" :icon="faFire" />
+                </div>
+              </b-col>
+              <b-col>
+                <b-card-title>
+                  Burn Tokens
+                </b-card-title>
+                <b-card-subtitle>
+                  Remove some tokens from the total supply.
+                </b-card-subtitle>
+              </b-col>
+              <b-col cols="auto">
+                <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
+                  <font-awesome-icon v-if="!tokenBurn" size="lg" :icon="faChevronDown" />
+                  <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+                </div>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-button>
+        <b-collapse v-model="tokenBurn" id="tokenBurn" accordion="accordion" role="tabpanel">
+          <b-card-body class="collapsedForm">
+            <div class="mt-3">Hello World</div>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
 
-    <b-card no-body class="shadow-sm mb-3">
-      <b-button class="w-100 text-left p-0" variant="link">
-        <b-card-body v-b-toggle.tokenDistribute>
-          <b-row>
-            <b-col cols="auto">
-              <div class="iconHolder text-white rounded bg-danger d-flex align-items-center justify-content-center">
-                <font-awesome-icon size="2x" :icon="faArrowDown" />
-              </div>
-            </b-col>
-            <b-col>
-              <b-card-title>
-                Distribute Tokens
-              </b-card-title>
-              <b-card-subtitle>
-                Send tokens from the token account to a user's account.
-              </b-card-subtitle>
-            </b-col>
-            <b-col cols="auto">
-              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-                <font-awesome-icon v-if="!tokenDistribute" size="lg" :icon="faChevronDown" />
-                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
-              </div>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-button>
-      <b-collapse v-model="tokenDistribute" id="tokenDistribute" accordion="accordion" role="tabpanel">
-        <b-card-body class="collapsedForm">
-          <div class="mt-3">Hello World</div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
+      <b-card no-body class="shadow-sm mb-3">
+        <b-button class="w-100 text-left p-0" variant="link">
+          <b-card-body v-b-toggle.tokenDistribute>
+            <b-row>
+              <b-col cols="auto">
+                <div class="iconHolder text-white rounded bg-danger d-flex align-items-center justify-content-center">
+                  <font-awesome-icon size="2x" :icon="faArrowDown" />
+                </div>
+              </b-col>
+              <b-col>
+                <b-card-title>
+                  Distribute Tokens
+                </b-card-title>
+                <b-card-subtitle>
+                  Send tokens from the token account to a user's account.
+                </b-card-subtitle>
+              </b-col>
+              <b-col cols="auto">
+                <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
+                  <font-awesome-icon v-if="!tokenDistribute" size="lg" :icon="faChevronDown" />
+                  <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+                </div>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-button>
+        <b-collapse v-model="tokenDistribute" id="tokenDistribute" accordion="accordion" role="tabpanel">
+          <b-card-body class="collapsedForm">
+            <div class="mt-3">Hello World</div>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
 
-    <b-card no-body class="shadow-sm mb-3">
-      <b-button class="w-100 text-left p-0" variant="link">
-        <b-card-body v-b-toggle.tokenWithdrawFee>
-          <b-row>
-            <b-col cols="auto">
-              <div class="iconHolder text-white rounded bg-success d-flex align-items-center justify-content-center">
-                <font-awesome-icon size="2x" :icon="faHandReceiving" />
-              </div>
-            </b-col>
-            <b-col>
-              <b-card-title>
-                Withdraw Fee
-              </b-card-title>
-              <b-card-subtitle>
-                Withdraw the token balance to a user's account.
-              </b-card-subtitle>
-            </b-col>
-            <b-col cols="auto">
-              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-                <font-awesome-icon v-if="!tokenWithdrawFee" size="lg" :icon="faChevronDown" />
-                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
-              </div>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-button>
-      <b-collapse v-model="tokenWithdrawFee" id="tokenWithdrawFee" accordion="accordion" role="tabpanel">
-        <b-card-body class="collapsedForm">
-          <div class="mt-3">Hello World</div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
+      <b-card no-body class="shadow-sm mb-3">
+        <b-button class="w-100 text-left p-0" variant="link">
+          <b-card-body v-b-toggle.tokenWithdrawFee>
+            <b-row>
+              <b-col cols="auto">
+                <div class="iconHolder text-white rounded bg-success d-flex align-items-center justify-content-center">
+                  <font-awesome-icon size="2x" :icon="faHandReceiving" />
+                </div>
+              </b-col>
+              <b-col>
+                <b-card-title>
+                  Withdraw Fee
+                </b-card-title>
+                <b-card-subtitle>
+                  Withdraw the token balance to a user's account.
+                </b-card-subtitle>
+              </b-col>
+              <b-col cols="auto">
+                <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
+                  <font-awesome-icon v-if="!tokenWithdrawFee" size="lg" :icon="faChevronDown" />
+                  <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+                </div>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-button>
+        <b-collapse v-model="tokenWithdrawFee" id="tokenWithdrawFee" accordion="accordion" role="tabpanel">
+          <b-card-body class="collapsedForm">
+            <div class="mt-3">Hello World</div>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
 
-    <b-card no-body class="shadow-sm mb-3">
-      <b-button class="w-100 text-left p-0" variant="link">
-        <b-card-body v-b-toggle.tokenWithdrawLogos>
-          <b-row>
-            <b-col cols="auto">
-              <div class="iconHolder text-white rounded bg-primary d-flex align-items-center justify-content-center">
-                <font-awesome-icon size="2x" :icon="faLambda" />
-              </div>
-            </b-col>
-            <b-col>
-              <b-card-title>
-                Withdraw Logos
-              </b-card-title>
-              <b-card-subtitle>
-                Withdraw the Logos balance of the token account to a user's account.
-              </b-card-subtitle>
-            </b-col>
-            <b-col cols="auto">
-              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-                <font-awesome-icon v-if="!tokenWithdrawLogos" size="lg" :icon="faChevronDown" />
-                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
-              </div>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-button>
-      <b-collapse v-model="tokenWithdrawLogos" id="tokenWithdrawLogos" accordion="accordion" role="tabpanel">
-        <b-card-body class="collapsedForm">
-          <div class="mt-3">Hello World</div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
-
+      <b-card no-body class="shadow-sm mb-3">
+        <b-button class="w-100 text-left p-0" variant="link">
+          <b-card-body v-b-toggle.tokenWithdrawLogos>
+            <b-row>
+              <b-col cols="auto">
+                <div class="iconHolder text-white rounded bg-primary d-flex align-items-center justify-content-center">
+                  <font-awesome-icon size="2x" :icon="faLambda" />
+                </div>
+              </b-col>
+              <b-col>
+                <b-card-title>
+                  Withdraw Logos
+                </b-card-title>
+                <b-card-subtitle>
+                  Withdraw the Logos balance of the token account to a user's account.
+                </b-card-subtitle>
+              </b-col>
+              <b-col cols="auto">
+                <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
+                  <font-awesome-icon v-if="!tokenWithdrawLogos" size="lg" :icon="faChevronDown" />
+                  <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+                </div>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-button>
+        <b-collapse v-model="tokenWithdrawLogos" id="tokenWithdrawLogos" accordion="accordion" role="tabpanel">
+          <b-card-body class="collapsedForm">
+            <div class="mt-3">Hello World</div>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
+    </div>
+    <div v-else>
+      <b-card no-body class="shadow-sm mb-3">
+        <b-button v-on:click="requestFaucet()" class="w-100 text-left p-0" variant="link">
+          <b-card-body>
+            <b-row>
+              <b-col cols="auto">
+                <div class="iconHolder text-white rounded bg-success d-flex align-items-center justify-content-center">
+                  <font-awesome-icon size="2x" :icon="faArrowDown" />
+                </div>
+              </b-col>
+              <b-col>
+                <b-card-title>
+                  Fund this account
+                </b-card-title>
+                <b-card-subtitle>
+                  Send Logos from the testnet faucet to this account.
+                </b-card-subtitle>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-button>
+      </b-card>
+    </div>
   </div>
   <div v-else>
     <b-card no-body class="shadow-sm mb-3">
@@ -617,6 +640,8 @@ import bFormGroup from 'bootstrap-vue/es/components/form-group/form-group'
 import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
 import LogosAddress from '@/components/LogosAddress.vue'
 import Multiselect from 'vue-multiselect'
+import bigInt from 'big-integer'
+import axios from 'axios'
 import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage, faChevronDown, faChevronUp } from '@fortawesome/pro-light-svg-icons'
 
 export default {
@@ -677,6 +702,9 @@ export default {
     LogosAddress
   },
   computed: {
+    ...mapState('settings', {
+      requestURL: state => state.requestURL
+    }),
     ...mapState('forge', {
       forgeAccounts: state => state.accounts,
       currentAccount: state => state.currentAccount,
@@ -684,6 +712,9 @@ export default {
     }),
     combinedAccounts: function () {
       return Array.from(Object.values(this.forgeAccounts)).concat(this.accounts)
+    },
+    hasFunds: function () {
+      return bigInt(this.currentAccount.balance).greater(0)
     }
   },
   methods: {
@@ -704,6 +735,16 @@ export default {
       } else {
         this.$wallet.seed = this.seed
         this.$wallet.createAccount()
+      }
+    },
+    requestFaucet () {
+      if (this.currentAccount.address.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
+        axios.post(`${this.requestURL}/faucet`, {
+          address: this.currentAccount.address
+        }).then((res) => {
+        }).catch((err) => {
+          alert(err)
+        })
       }
     }
   }
