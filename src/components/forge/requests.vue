@@ -547,7 +547,7 @@
             </b-col>
             <b-col>
               <b-card-title>
-                Create an account
+                Create an Account
               </b-card-title>
               <b-card-subtitle>
                 Create an account automatically or with a given private key.

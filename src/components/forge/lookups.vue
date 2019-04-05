@@ -1,37 +1,5 @@
 <template>
   <div>
-    <b-card no-body class="shadow-sm mb-3">
-      <b-button class="w-100 text-left p-0" variant="link">
-        <b-card-body v-b-toggle.createAccount>
-          <b-row>
-            <b-col cols="auto">
-              <div class="iconHolder rounded text-white bg-success d-flex align-items-center justify-content-center">
-                <font-awesome-icon size="2x" :icon="faPlus" />
-              </div>
-            </b-col>
-            <b-col>
-              <b-card-title>
-                Create an Account
-              </b-card-title>
-              <b-card-subtitle>
-                Create an account automatically or with a given private key.
-              </b-card-subtitle>
-            </b-col>
-            <b-col cols="auto">
-              <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-                <font-awesome-icon v-if="!createAccount" size="lg" :icon="faChevronDown" />
-                <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
-              </div>
-            </b-col>
-          </b-row>
-        </b-card-body>
-      </b-button>
-      <b-collapse v-model="createAccount" id="createAccount" accordion="accordion" role="tabpanel">
-        <b-card-body class="collapsedForm">
-          <div class="mt-3">Hello World</div>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
 
     <b-card no-body class="shadow-sm mb-3">
       <b-button class="w-100 text-left p-0" variant="link">
