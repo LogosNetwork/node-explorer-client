@@ -30,7 +30,7 @@
         </b-row>
       </b-card-body>
     </b-button>
-    <b-collapse v-model="showCollapse" :id="`collapse_${type}`" accordion="accordion" role="tabpanel">
+    <b-collapse v-bind:class="{ hideTransition: disableAnimation }" v-model="showCollapse" :id="`collapse_${type}`" accordion="accordion" role="tabpanel">
       <b-card-body class="collapsedForm">
         <slot></slot>
       </b-card-body>
@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import bCardBody from 'bootstrap-vue/es/components/card/card-body'
 import bCardTitle from 'bootstrap-vue/es/components/card/card-title'
 import bCardSubtitle from 'bootstrap-vue/es/components/card/card-sub-title'
@@ -48,6 +49,9 @@ import { faChevronDown, faChevronUp } from '@fortawesome/pro-light-svg-icons'
 export default {
   name: 'accordionComponent',
   computed: {
+    ...mapState('forge', {
+      currentAccount: state => state.currentAccount
+    }),
     background: function () {
       let x = {}
       x[this.bgClass] = true
@@ -60,6 +64,7 @@ export default {
   data () {
     return {
       showCollapse: false,
+      disableAnimation: false,
       faChevronDown,
       faChevronUp
     }
@@ -76,6 +81,22 @@ export default {
     bCardTitle,
     bCardSubtitle,
     bCollapse
+  },
+  watch: {
+    currentAccount: function (newAccount, oldAccount) {
+      if (newAccount.address !== oldAccount.address) {
+        this.disableAnimation = true
+        this.showCollapse = false
+        setTimeout(() => {
+          this.disableAnimation = false
+        }, 1)
+      }
+    }
   }
 }
 </script>
+<style scoped lang="scss">
+.hideTransition {
+  transition: none !important;
+}
+</style>

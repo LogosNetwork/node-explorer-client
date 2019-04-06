@@ -240,7 +240,7 @@ label.btn-link.active {
 }
 .actionSelector {
   background: $bg-primary;
-  overflow-y: auto;
+  overflow-y: scroll;
   max-height: calc(100vh - 123px);
 }
 .actionSelector::-webkit-scrollbar {

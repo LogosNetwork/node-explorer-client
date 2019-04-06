@@ -14,9 +14,7 @@
         label="label"
         :options="combinedAccounts"
         :multiple="false"
-        :taggable="true"
         :disabled="true"
-        @tag="addSendFrom"
         placeholder="Search or add an account"
       >
         <template slot="singleLabel" slot-scope="{ option }">
@@ -42,7 +40,7 @@
         :options="combinedAccounts"
         :multiple="false"
         :taggable="true"
-        @tag="addSendTo"
+        @tag="addSend"
         placeholder="Search or add an account"
       >
         <template slot="singleLabel" slot-scope="{ option }">
@@ -80,6 +78,8 @@ import bFormGroup from 'bootstrap-vue/es/components/form-group/form-group'
 import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
 import LogosAddress from '@/components/LogosAddress.vue'
 import Multiselect from 'vue-multiselect'
+import cloneDeep from 'lodash/cloneDeep'
+import bigInt from 'big-integer'
 
 export default {
   name: 'sendForm',
@@ -87,9 +87,8 @@ export default {
     return {
       accounts: [],
       sendForm: {
-        from: '',
-        to: '',
-        amount: ''
+        to: null,
+        amount: null
       }
     }
   },
@@ -105,27 +104,41 @@ export default {
       currentAccount: state => state.currentAccount
     }),
     combinedAccounts: function () {
-      return Array.from(Object.values(this.forgeAccounts)).concat(this.accounts)
+      let forgeAccounts = cloneDeep(this.forgeAccounts)
+      if (this.currentAccount) delete forgeAccounts[this.currentAccount.address]
+      return Array.from(Object.values(forgeAccounts)).concat(this.accounts)
     }
   },
   methods: {
-    addSendTo (newAddress) {
+    addSend (newAddress) {
       if (newAddress.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
         let newAccount = { label: newAddress, address: newAddress }
         this.accounts.push(newAccount)
         this.sendForm.to = newAccount
       }
     },
-    addSendFrom (newAddress) {
-      if (newAddress.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
-        let newAccount = { label: newAddress, address: newAddress }
-        this.accounts.push(newAccount)
-        this.sendForm.from = newAccount
-      }
-    },
     createSend () {
-      if (this.sendForm.to && this.sendForm.to.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
-        // TOOD
+      if (this.sendForm.to && this.sendForm.to.address.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
+        let amount = this.$Logos.convert.toReason(this.sendForm.amount, 'LOGOS')
+        if (bigInt(this.$wallet.account.balance)
+          .greaterOrEquals(
+            bigInt(amount).plus(bigInt(this.$utils.minimumFee))
+          )) {
+          this.$wallet.account.createSendRequest([{
+            destination: this.sendForm.to.address,
+            amount: amount
+          }])
+        }
+      }
+    }
+  },
+  watch: {
+    currentAccount: function (newAccount, oldAccount) {
+      if (newAccount.address !== oldAccount.address) {
+        for (let account of this.combinedAccounts) {
+          this.sendForm.to = account
+          break
+        }
       }
     }
   }

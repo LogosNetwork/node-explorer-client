@@ -37,25 +37,18 @@ const mutations = {
   setAccounts (state, accounts) {
     state.walletAccounts = cloneDeep(accounts)
     for (let account in state.walletAccounts) {
-      let clean = {
+      let applicationAccount = {
         address: account,
         label: state.walletAccounts[account].label,
         balance: state.walletAccounts[account].balance,
         logosBalance: Logos.convert.fromReason(state.walletAccounts[account].balance, 'LOGOS')
       }
-      Vue.set(state.accounts, account, clean)
+      Vue.set(state.accounts, account, applicationAccount)
     }
   },
   setCurrentAccount (state, account) {
     if (account) {
-      let currentAccount = cloneDeep(account)
-      let clean = {
-        address: currentAccount.address,
-        label: currentAccount.label,
-        balance: currentAccount.balance,
-        logosBalance: Logos.convert.fromReason(currentAccount.balance, 'LOGOS')
-      }
-      state.currentAccount = clean
+      state.currentAccount = state.accounts[account.address]
     }
   },
   setSeed (state, seed) {
