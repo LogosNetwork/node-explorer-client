@@ -42,6 +42,7 @@ const actions = {
         } else {
           if (accountMqttRegex(topic)) {
             dispatch('account/addRequest', message, { root: true })
+            dispatch('forge/addRequest', message, { root: true })
           } else if (requestMqttRegex(topic)) {
             dispatch('request/addRequest', message, { root: true })
           }

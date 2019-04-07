@@ -1,8 +1,11 @@
 import Vue from 'vue'
 import cloneDeep from 'lodash/cloneDeep'
 import Logos from '@logosnetwork/logos-rpc-client'
+import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
+import bigInt from 'big-integer'
 
 const state = {
+  toasts: [],
   tokens: {},
   walletAccounts: {},
   accounts: {},
@@ -13,23 +16,109 @@ const state = {
 const getters = {
 }
 
-// const pullTokenInfo = (tokenAccount, rpcClient, commit) => {
-//   rpcClient.accounts.info(tokenAccount).then(tokenInfo => {
-//     tokenInfo.tokenAccount = tokenAccount
-//     try {
-//       tokenInfo.issuerInfo = JSON.parse(tokenInfo.issuer_info)
-//     } catch (e) {
-//       tokenInfo.issuerInfo = {}
-//     }
-//     commit('updateToken', tokenInfo)
-//   })
-// }
+const pullTokenInfo = (tokenAccount, rpcClient, commit) => {
+  rpcClient.accounts.info(tokenAccount).then(tokenInfo => {
+    tokenInfo.tokenAccount = tokenAccount
+    try {
+      tokenInfo.issuerInfo = JSON.parse(tokenInfo.issuer_info)
+    } catch (e) {
+      tokenInfo.issuerInfo = {}
+    }
+    commit('updateToken', tokenInfo)
+  })
+}
+
+const createToast = (request, rpcClient, commit, state) => {
+  if (request.token_id) {
+    let tokenAccount = LogosWallet.Utils.accountFromHexKey(request.token_id)
+    if (state.tokens[tokenAccount]) {
+      request.tokenInfo = state.tokens[tokenAccount]
+    } else {
+      commit('addToken', tokenAccount)
+      request.tokenInfo = {
+        pending: true,
+        tokenAccount: tokenAccount
+      }
+      pullTokenInfo(tokenAccount, rpcClient, commit)
+    }
+  }
+
+  if (request.type === 'burn' || request.type === 'issue_additional') {
+    if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
+      request.amountInToken = Logos.convert.fromTo(request.amount, 0, request.tokenInfo.issuerInfo.decimals)
+    }
+  }
+  if (request.type === 'distribute' || request.type === 'withdraw_fee' || request.type === 'revoke') {
+    if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
+      request.transaction.amountInToken = Logos.convert.fromTo(request.transaction.amount, 0, request.tokenInfo.issuerInfo.decimals)
+    }
+  }
+  if (request.type === 'withdraw_logos') {
+    request.transaction.amountInLogos = Logos.convert.fromReason(request.transaction.amount, 'LOGOS')
+  }
+
+  for (let account in state.walletAccounts) {
+    if (request.type === 'send') {
+      let balanceChange = bigInt(0)
+      for (let trans of request.transactions) {
+        if (request.origin === account) {
+          balanceChange = balanceChange.minus(trans.amount)
+        }
+        if (trans.destination === account) {
+          balanceChange = balanceChange.plus(trans.amount)
+        }
+        trans.amountInLogos = Logos.convert.fromReason(trans.amount, 'LOGOS')
+      }
+      request.balanceChange = balanceChange.toString()
+      request.balanceChangeInLogos = Logos.convert.fromReason(balanceChange.toString(), 'LOGOS')
+      if (bigInt(balanceChange).greater(bigInt('0'))) {
+        commit('addToast', `${account} recieved ${request.balanceChangeInLogos} Logos`)
+      } else {
+        commit('addToast', `${account} sent ${request.balanceChangeInLogos} Logos`)
+      }
+    }
+    if (request.type === 'token_send') {
+      let balanceChange = bigInt(0)
+      for (let trans of request.transactions) {
+        if (request.origin === account) {
+          balanceChange = balanceChange.minus(trans.amount)
+        }
+        if (trans.destination === account) {
+          balanceChange = balanceChange.plus(trans.amount)
+        }
+        if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
+          trans.amountInToken = Logos.convert.fromTo(trans.amount, 0, request.tokenInfo.issuerInfo.decimals)
+        }
+      }
+      request.balanceChange = balanceChange.toString()
+      if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
+        request.balanceChangeInToken = Logos.convert.fromTo(balanceChange.toString(), 0, request.tokenInfo.issuerInfo.decimals)
+        if (bigInt(balanceChange).greater(bigInt('0'))) {
+          commit('addToast', `${account} recieved ${request.balanceChangeInToken} of ${request.tokenInfo.symbol}`)
+        } else {
+          commit('addToast', `${account} sent ${request.balanceChangeInToken} of ${request.tokenInfo.symbol}`)
+        }
+      } else {
+        if (bigInt(balanceChange).greater(bigInt('0'))) {
+          commit('addToast', `${account} recieved ${request.balanceChange} base units of ${request.token_id}`)
+        } else {
+          commit('addToast', `${account} sent ${request.balanceChange} base units of ${request.token_id}`)
+        }
+      }
+    }
+  }
+}
 
 const actions = {
   update ({ commit }, wallet) {
     commit('setAccounts', wallet._accounts)
     commit('setSeed', wallet._seed)
     commit('setCurrentAccount', wallet.account)
+  },
+  addRequest ({ commit, rootState, state }, request) {
+    let requestData = cloneDeep(request)
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    createToast(requestData, rpcClient, commit, state)
   }
 }
 
@@ -59,6 +148,9 @@ const mutations = {
       pending: true,
       tokenAccount: tokenAccount
     })
+  },
+  addToast (state, request) {
+    state.toasts.push(request)
   },
   updateToken (state, tokenInfo) {
     Vue.set(state.tokens, tokenInfo.tokenAccount, tokenInfo)
