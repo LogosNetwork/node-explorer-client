@@ -23,7 +23,8 @@
           </b-col>
           <b-col cols="auto">
             <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-              <font-awesome-icon size="lg" id="rotatable" :icon="faChevronDown" :rotation="!showCollapse ? '180' : ''" />
+              <font-awesome-icon v-if="!showCollapse" size="lg" id="rotatable" :icon="faChevronDown" rotation="180" />
+              <font-awesome-icon v-else size="lg" id="rotatable" :icon="faChevronDown"  />
             </div>
           </b-col>
         </b-row>
