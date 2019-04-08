@@ -23,8 +23,7 @@
           </b-col>
           <b-col cols="auto">
             <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-              <font-awesome-icon v-if="!showCollapse" size="lg" :icon="faChevronDown" />
-              <font-awesome-icon v-else size="lg" :icon="faChevronUp" />
+              <font-awesome-icon size="lg" id="rotatable" :icon="faChevronDown" :rotation="!showCollapse ? '180' : ''" />
             </div>
           </b-col>
         </b-row>
@@ -44,7 +43,7 @@ import bCardBody from 'bootstrap-vue/es/components/card/card-body'
 import bCardTitle from 'bootstrap-vue/es/components/card/card-title'
 import bCardSubtitle from 'bootstrap-vue/es/components/card/card-sub-title'
 import bCollapse from 'bootstrap-vue/es/components/collapse/collapse'
-import { faChevronDown, faChevronUp } from '@fortawesome/pro-light-svg-icons'
+import { faChevronDown } from '@fortawesome/pro-light-svg-icons'
 
 export default {
   name: 'accordionComponent',
@@ -65,8 +64,7 @@ export default {
     return {
       showCollapse: false,
       disableAnimation: false,
-      faChevronDown,
-      faChevronUp
+      faChevronDown
     }
   },
   props: {
@@ -98,5 +96,10 @@ export default {
 <style scoped lang="scss">
 .hideTransition {
   transition: none !important;
+}
+#rotatable {
+  -webkit-transition: all .3s;
+  -o-transition: all .3s;
+  transition: all .3s;
 }
 </style>
