@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import VueMoment from 'vue-moment'
+import Toasted from 'vue-toasted'
 import Wallet from './api/wallet'
 import config from '../config'
 import router from './router'
@@ -68,6 +69,10 @@ Vue.component('b-table', bTable)
 Vue.component('b-form-checkbox', bFormCheckbox)
 Vue.component('vue-headful', vueHeadful)
 Vue.use(VueMoment)
+Vue.use(Toasted, {
+  router,
+  iconPack: 'fontawesome'
+})
 Vue.use(Wallet, {
   mqtt: config.mqttHost,
   rpc: {

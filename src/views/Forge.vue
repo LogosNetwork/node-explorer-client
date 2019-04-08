@@ -43,7 +43,7 @@
         <div class="d-flex justify-content-between mt-3 mb-3 align-items-center font-weight-bold">
           <h4 class="mb-0">Tokens</h4>
         </div>
-        <div>
+        <div v-if="tokens.lenght > 0">
           <b-list-group flush>
             <b-list-group-item class="d-flex justify-content-between align-items-center">
               <span>
@@ -60,6 +60,13 @@
                 <b-dropdown-item href="#">Copy Token Address</b-dropdown-item>
                 <b-dropdown-item href="#">Remove Token</b-dropdown-item>
               </b-dropdown>
+            </b-list-group-item>
+          </b-list-group>
+        </div>
+        <div v-else>
+          <b-list-group flush>
+            <b-list-group-item class="d-flex justify-content-between align-items-center">
+              No Tokens, issue one.
             </b-list-group-item>
           </b-list-group>
         </div>
@@ -132,6 +139,7 @@ import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item'
 import LogosAddress from '@/components/LogosAddress.vue'
 import Lookups from '@/components/forge/lookups.vue'
 import Requests from '@/components/forge/requests.vue'
+import cloneDeep from 'lodash/cloneDeep'
 import { faUser, faEllipsisVAlt, faCoins, faSearch, faWrench, faEye, faFont } from '@fortawesome/pro-light-svg-icons'
 
 export default {
@@ -160,12 +168,20 @@ export default {
     Requests
   },
   computed: {
+    ...mapState('settings', {
+      mqttHost: state => state.mqttHost
+    }),
     ...mapState('forge', {
       forgeAccounts: state => state.accounts,
-      currentAccount: state => state.currentAccount
+      currentAccount: state => state.currentAccount,
+      toasts: state => state.toasts,
+      forgeTokens: state => state.tokens
     }),
     accounts: function () {
       return Array.from(Object.values(this.forgeAccounts))
+    },
+    tokens: function () {
+      return Array.from(Object.values(this.forgeTokens))
     }
   },
   methods: {
@@ -177,6 +193,12 @@ export default {
         this.$wallet.currentAccountAddress = address
       }
     },
+    replaceAddresses: function (msg) {
+      for (let account of this.$wallet.accounts) {
+        msg = msg.replace(account.address, account.label)
+      }
+      return msg
+    },
     changeSelectedVisual: function (newSelected) {
       this.selectedVisual = newSelected
     },
@@ -184,14 +206,51 @@ export default {
       [
         'update'
       ]
-    )
+    ),
+    ...mapActions('mqtt', [
+      'initalize',
+      'unsubscribe',
+      'subscribe'
+    ])
+  },
+  created: function () {
+    this.initalize({ url: this.mqttHost })
   },
   watch: {
     wallet: {
       handler: function (newWallet, oldWallet) {
+        for (let account in newWallet._accounts) {
+          if (account) {
+            this.subscribe(`account/${account}`)
+          }
+        }
         this.update(newWallet)
       },
       deep: true
+    },
+    toasts: function (newToasts, oldToasts) {
+      if (newToasts.length > 0) {
+        let newToast = cloneDeep(newToasts[newToasts.length - 1])
+        newToast.message = this.replaceAddresses(newToast.message)
+        this.$toasted.show(newToast.message, {
+          theme: 'toasted-primary',
+          position: 'bottom-right',
+          duration: 5000,
+          action: [
+            {
+              text: 'Cancel',
+              onClick: (e, toastObject) => {
+                toastObject.goAway(0)
+              }
+            },
+            {
+              text: 'View',
+              href: `/${newToast.hash}`,
+              target: '_blank'
+            }
+          ]
+        })
+      }
     }
   }
 }

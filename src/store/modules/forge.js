@@ -57,56 +57,57 @@ const createToast = (request, rpcClient, commit, state) => {
     request.transaction.amountInLogos = Logos.convert.fromReason(request.transaction.amount, 'LOGOS')
   }
 
-  for (let account in state.walletAccounts) {
-    if (request.type === 'send') {
-      let balanceChange = bigInt(0)
-      for (let trans of request.transactions) {
-        if (request.origin === account) {
-          balanceChange = balanceChange.minus(trans.amount)
-        }
-        if (trans.destination === account) {
-          balanceChange = balanceChange.plus(trans.amount)
-        }
-        trans.amountInLogos = Logos.convert.fromReason(trans.amount, 'LOGOS')
+  // Parse Toasts Messages
+  let toast = { hash: request.hash }
+  if (request.type === 'send') {
+    let balanceChange = bigInt(0)
+    for (let trans of request.transactions) {
+      if (request.origin === request.mqttDestination) {
+        balanceChange = balanceChange.minus(trans.amount)
       }
-      request.balanceChange = balanceChange.toString()
-      request.balanceChangeInLogos = Logos.convert.fromReason(balanceChange.toString(), 'LOGOS')
-      if (bigInt(balanceChange).greater(bigInt('0'))) {
-        commit('addToast', `${account} recieved ${request.balanceChangeInLogos} Logos`)
-      } else {
-        commit('addToast', `${account} sent ${request.balanceChangeInLogos} Logos`)
+      if (trans.destination === request.mqttDestination) {
+        balanceChange = balanceChange.plus(trans.amount)
+      }
+      trans.amountInLogos = Logos.convert.fromReason(trans.amount, 'LOGOS')
+    }
+    request.balanceChange = balanceChange.toString()
+    request.balanceChangeInLogos = Logos.convert.fromReason(balanceChange.abs().toString(), 'LOGOS')
+    if (balanceChange.greater(bigInt('0'))) {
+      toast.message = `${request.mqttDestination} recieved ${request.balanceChangeInLogos} Logos`
+    } else {
+      toast.message = `${request.mqttDestination} sent ${request.balanceChangeInLogos} Logos`
+    }
+  }
+  if (request.type === 'token_send') {
+    let balanceChange = bigInt(0)
+    for (let trans of request.transactions) {
+      if (request.origin === request.mqttDestination) {
+        balanceChange = balanceChange.minus(trans.amount)
+      }
+      if (trans.destination === request.mqttDestination) {
+        balanceChange = balanceChange.plus(trans.amount)
+      }
+      if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
+        trans.amountInToken = Logos.convert.fromTo(trans.amount, 0, request.tokenInfo.issuerInfo.decimals)
       }
     }
-    if (request.type === 'token_send') {
-      let balanceChange = bigInt(0)
-      for (let trans of request.transactions) {
-        if (request.origin === account) {
-          balanceChange = balanceChange.minus(trans.amount)
-        }
-        if (trans.destination === account) {
-          balanceChange = balanceChange.plus(trans.amount)
-        }
-        if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
-          trans.amountInToken = Logos.convert.fromTo(trans.amount, 0, request.tokenInfo.issuerInfo.decimals)
-        }
-      }
-      request.balanceChange = balanceChange.toString()
-      if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
-        request.balanceChangeInToken = Logos.convert.fromTo(balanceChange.toString(), 0, request.tokenInfo.issuerInfo.decimals)
-        if (bigInt(balanceChange).greater(bigInt('0'))) {
-          commit('addToast', `${account} recieved ${request.balanceChangeInToken} of ${request.tokenInfo.symbol}`)
-        } else {
-          commit('addToast', `${account} sent ${request.balanceChangeInToken} of ${request.tokenInfo.symbol}`)
-        }
+    request.balanceChange = balanceChange.toString()
+    if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
+      request.balanceChangeInToken = Logos.convert.fromTo(balanceChange.abs().toString(), 0, request.tokenInfo.issuerInfo.decimals)
+      if (balanceChange.greater(bigInt('0'))) {
+        toast.message = `${request.mqttDestination} recieved ${request.balanceChangeInToken} of ${request.tokenInfo.symbol}`
       } else {
-        if (bigInt(balanceChange).greater(bigInt('0'))) {
-          commit('addToast', `${account} recieved ${request.balanceChange} base units of ${request.token_id}`)
-        } else {
-          commit('addToast', `${account} sent ${request.balanceChange} base units of ${request.token_id}`)
-        }
+        toast.message = `${request.mqttDestination} sent ${request.balanceChangeInToken} of ${request.tokenInfo.symbol}`
+      }
+    } else {
+      if (balanceChange.greater(bigInt('0'))) {
+        toast.message = `${request.mqttDestination} recieved ${balanceChange.toString()} base units of ${request.token_id}`
+      } else {
+        toast.message = `${request.mqttDestination} sent ${balanceChange.abs().toString()} base units of ${request.token_id}`
       }
     }
   }
+  commit('addToast', toast)
 }
 
 const actions = {
@@ -149,8 +150,8 @@ const mutations = {
       tokenAccount: tokenAccount
     })
   },
-  addToast (state, request) {
-    state.toasts.push(request)
+  addToast (state, toast) {
+    state.toasts.push(toast)
   },
   updateToken (state, tokenInfo) {
     Vue.set(state.tokens, tokenInfo.tokenAccount, tokenInfo)

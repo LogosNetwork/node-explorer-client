@@ -40,7 +40,9 @@ const actions = {
             }
           }
         } else {
-          if (accountMqttRegex(topic)) {
+          let mqttDestination = accountMqttRegex(topic)
+          if (mqttDestination) {
+            message.mqttDestination = mqttDestination.account
             dispatch('account/addRequest', message, { root: true })
             dispatch('forge/addRequest', message, { root: true })
           } else if (requestMqttRegex(topic)) {
@@ -51,18 +53,20 @@ const actions = {
       client.on('connect', () => {
         console.log('connected')
         commit('setConnectionStatus', true)
-        data.cb()
+        if (data.cb) {
+          data.cb()
+        }
       })
     } else {
-      data.cb()
+      if (data.cb) {
+        data.cb()
+      }
     }
   },
   subscribe ({ state }, topic) {
     if (state.connected) {
       client.subscribe(topic, (err) => {
-        if (!err) {
-          console.log(`subscribed to ${topic}`)
-        } else {
+        if (err) {
           console.log(err)
         }
       })
@@ -71,9 +75,7 @@ const actions = {
   unsubscribe ({ state }, topic) {
     if (state.connected) {
       client.unsubscribe(topic, (err) => {
-        if (!err) {
-          console.log(`unsubscribed from ${topic}`)
-        } else {
+        if (err) {
           console.log(err)
         }
       })
