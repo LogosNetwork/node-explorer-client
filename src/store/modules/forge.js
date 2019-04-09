@@ -118,8 +118,7 @@ const actions = {
     commit('setSeed', wallet.seed)
     commit('setCurrentAccount', wallet.account)
     for (let account in wallet.accountsObject) {
-      for (let tokenID in wallet.accountsObject[account].tokenBalances) {
-        let tokenAccount = LogosWallet.Utils.accountFromHexKey(tokenID)
+      for (let tokenAccount of wallet.accountsObject[account].tokens) {
         if (!state.tokens[tokenAccount]) {
           commit('addToken', tokenAccount)
           let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })

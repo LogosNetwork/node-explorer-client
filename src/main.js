@@ -75,6 +75,7 @@ Vue.use(Toasted, {
   iconPack: 'fontawesome'
 })
 Vue.use(Wallet, {
+  fullSync: true,
   mqtt: config.mqttHost,
   rpc: {
     proxy: config.rpcProxy,

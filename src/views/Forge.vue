@@ -61,7 +61,6 @@
                 <b-dropdown-item :href="`/${token.tokenAccount}`" target="_blank">Open Token Page</b-dropdown-item>
                 <b-dropdown-item href="#">Token Info</b-dropdown-item>
                 <b-dropdown-item href="#">Copy Token Address</b-dropdown-item>
-                <b-dropdown-item href="#">Remove Token</b-dropdown-item>
               </b-dropdown>
             </b-list-group-item>
           </b-list-group>
