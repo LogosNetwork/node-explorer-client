@@ -44,7 +44,7 @@
         title="Issue a Token"
         subtitle="Create and issue your token."
       >
-        Hello World
+        <issueTokenForm/>
       </accordion>
 
       <accordion
@@ -191,6 +191,7 @@ import accordion from '@/components/forge/accordion.vue'
 import fund from '@/components/forge/fund.vue'
 import createAccountForm from '@/components/forge/requestForms/createAccountForm.vue'
 import sendForm from '@/components/forge/requestForms/sendForm.vue'
+import issueTokenForm from '@/components/forge/requestForms/issueTokenForm.vue'
 import bigInt from 'big-integer'
 import LogosAddress from '@/components/LogosAddress.vue'
 import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage } from '@fortawesome/pro-light-svg-icons'
@@ -220,7 +221,8 @@ export default {
     LogosAddress,
     fund,
     createAccountForm,
-    sendForm
+    sendForm,
+    issueTokenForm
   },
   computed: {
     ...mapState('forge', {

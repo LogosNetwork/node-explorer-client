@@ -77,8 +77,7 @@ const createToast = (request, rpcClient, commit, state) => {
     } else {
       toast.message = `${request.mqttDestination} sent ${request.balanceChangeInLogos} Logos`
     }
-  }
-  if (request.type === 'token_send') {
+  } else if (request.type === 'token_send') {
     let balanceChange = bigInt(0)
     for (let trans of request.transactions) {
       if (request.origin === request.mqttDestination) {
@@ -106,7 +105,10 @@ const createToast = (request, rpcClient, commit, state) => {
         toast.message = `${request.mqttDestination} sent ${balanceChange.abs().toString()} base units of ${request.token_id}`
       }
     }
+  } else if (request.type === 'issuance') {
+    toast.message = `${request.mqttDestination} Issued a new token ${request.name} - (${request.symbol})`
   }
+  toast.request = request
   commit('addToast', toast)
 }
 

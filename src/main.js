@@ -3,6 +3,7 @@ import App from './App.vue'
 import VueMoment from 'vue-moment'
 import Toasted from 'vue-toasted'
 import Wallet from './api/wallet'
+import RPC from './api/rpc'
 import config from '../config'
 import router from './router'
 import i18n from './i18n'
@@ -80,6 +81,7 @@ Vue.use(Wallet, {
     delegates: Object.values(config.delegates)
   }
 })
+Vue.use(RPC)
 new Vue({
   router,
   i18n,

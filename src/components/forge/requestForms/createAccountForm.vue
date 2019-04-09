@@ -8,7 +8,7 @@
       v-if="!createAccountForm.usePrivateKey"
       id="createAccountSeed"
       label="Seed"
-      label-for="seedInput"
+      label-size="lg"
     >
       <b-form-input
         id="seedInput"
@@ -22,7 +22,7 @@
       v-if="createAccountForm.usePrivateKey"
       id="createAccountPKey"
       label="Private Key"
-      label-for="privateKeyInput"
+      label-size="lg"
     >
       <b-form-input
         id="privateKeyInput"

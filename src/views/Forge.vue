@@ -43,7 +43,7 @@
         <div class="d-flex justify-content-between mt-3 mb-3 align-items-center font-weight-bold">
           <h4 class="mb-0">Tokens</h4>
         </div>
-        <div v-if="tokens.lenght > 0">
+        <div v-if="tokens.length > 0">
           <b-list-group flush>
             <b-list-group-item class="d-flex justify-content-between align-items-center">
               <span>
@@ -73,7 +73,7 @@
       </b-col>
       <b-col>
         <b-row class="h-100">
-          <b-col cols="8" class="d-flex flex-column">
+          <b-col cols="12" class="d-flex flex-column">
             <b-row class="actionToggle">
               <b-col>
                 <div class="btn-group btn-group-toggle pt-3 pb-3" data-toggle="buttons">
@@ -101,7 +101,7 @@
               </b-col>
             </b-row>
           </b-col>
-          <b-col cols="4" class="d-flex flex-column">
+          <b-col v-if="false" cols="4" class="d-flex flex-column">
             <b-row class="chainToggle">
               <b-col>
                 <div class="btn-group btn-group-toggle pt-3 pb-3" data-toggle="buttons">

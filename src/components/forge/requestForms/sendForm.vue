@@ -3,7 +3,7 @@
     <b-form-group
       id="sendFrom"
       label="From"
-      label-for="fromSelector"
+      label-size="lg"
     >
       <Multiselect
         id="fromSelector"
@@ -28,7 +28,7 @@
 
     <b-form-group id="sendTo"
       label="To"
-      label-for="toSelector"
+      label-size="lg"
     >
       <Multiselect
         id="toSelector"
@@ -55,7 +55,7 @@
     <b-form-group
       id="sendAmount"
       label="Amount"
-      label-for="amountInput"
+      label-size="lg"
       :description="currentAccount ? `${currentAccount.logosBalance} Logos available to send` : `No account found`"
     >
       <b-form-input
