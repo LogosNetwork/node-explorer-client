@@ -52,7 +52,7 @@
       </b-list-group-item>
       <b-list-group-item v-if="requestInfo.settings.length > 0">
         <strong>Settings: </strong>
-        <ul>
+        <ul class="mb-0">
           <li v-for="setting in requestInfo.settings" :key="'set'+setting">
             {{setting}}
           </li>
@@ -60,7 +60,7 @@
       </b-list-group-item>
       <b-list-group-item v-for="controller in requestInfo.controllers" :key="'controller'+controller.account">
         <strong>Controller: </strong><LogosAddress :address="controller.account" /><br/>
-        <ul>
+        <ul class="mb-0" v-if="controller.privileges !== '[]'">
           <li v-for="privilege in controller.privileges" :key="controller.account+privilege">
             {{privilege}}
           </li>
