@@ -118,6 +118,9 @@ const actions = {
     commit('setSeed', wallet._seed)
     commit('setCurrentAccount', wallet.account)
   },
+  setSeed ({ commit }, seed) {
+    commit('setSeed', seed)
+  },
   addRequest ({ commit, rootState, state }, request) {
     let requestData = cloneDeep(request)
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })

@@ -204,7 +204,8 @@ export default {
     },
     ...mapActions('forge',
       [
-        'update'
+        'update',
+        'setSeed'
       ]
     ),
     ...mapActions('mqtt', [
@@ -215,6 +216,7 @@ export default {
   },
   created: function () {
     this.initalize({ url: this.mqttHost })
+    this.setSeed(this.$wallet.seed)
   },
   watch: {
     wallet: {
