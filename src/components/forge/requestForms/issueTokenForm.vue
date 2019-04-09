@@ -484,7 +484,6 @@ export default {
       tokenOptions.controllers.forEach((controller) => {
         controller.account = controller.account.address
       })
-      console.log(tokenOptions)
       this.$wallet.account.createTokenIssuanceRequest(tokenOptions)
     }
   }
