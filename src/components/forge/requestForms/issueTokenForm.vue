@@ -464,7 +464,7 @@ export default {
     addTotalSupplyOption (amount) {
       if (bigInt(amount).lesserOrEquals(bigInt(this.$utils.MAXUINT128)) &&
         bigInt(amount).greaterOrEquals(bigInt('1'))) {
-        let newAmount = { label: amount, amount: amount, decimals: null }
+        let newAmount = { label: amount, amount: amount, decimals: 0 }
         this.totalSupplyOptions.push(newAmount)
         this.tokenOptions.totalSupply = newAmount
       }

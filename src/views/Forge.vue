@@ -45,17 +45,20 @@
         </div>
         <div v-if="tokens.length > 0">
           <b-list-group flush>
-            <b-list-group-item class="d-flex justify-content-between align-items-center">
+            <b-list-group-item
+              v-for="token in tokens" :key="token.tokenAccount"
+              class="d-flex justify-content-between align-items-center mb-2"
+            >
               <span>
                 <font-awesome-icon size="lg" class="mr-2" :icon="faCoins" />
-                Pyr
+                {{token.name}} - ({{token.symbol}})
               </span>
               <b-dropdown v-on:click.stop variant="link" size="lg" no-caret>
                 <template slot="button-content">
                   <font-awesome-icon size="sm" :icon="faEllipsisVAlt" />
                   <span class="sr-only">Token Options</span>
                 </template>
-                <b-dropdown-item :href="`/lgs_1ojsaqro9xub3981p498wcjysmnzw5xamwq6gxh3dafy99sm56y1irwhw4x9`" target="_blank">Open Token Page</b-dropdown-item>
+                <b-dropdown-item :href="`/${token.tokenAccount}`" target="_blank">Open Token Page</b-dropdown-item>
                 <b-dropdown-item href="#">Token Info</b-dropdown-item>
                 <b-dropdown-item href="#">Copy Token Address</b-dropdown-item>
                 <b-dropdown-item href="#">Remove Token</b-dropdown-item>
@@ -221,7 +224,7 @@ export default {
   watch: {
     wallet: {
       handler: function (newWallet, oldWallet) {
-        for (let account in newWallet._accounts) {
+        for (let account in newWallet.accountsObject) {
           if (account) {
             this.subscribe(`account/${account}`)
           }

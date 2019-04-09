@@ -113,10 +113,20 @@ const createToast = (request, rpcClient, commit, state) => {
 }
 
 const actions = {
-  update ({ commit }, wallet) {
-    commit('setAccounts', wallet._accounts)
-    commit('setSeed', wallet._seed)
+  update ({ commit, rootState }, wallet) {
+    commit('setAccounts', wallet.accountsObject)
+    commit('setSeed', wallet.seed)
     commit('setCurrentAccount', wallet.account)
+    for (let account in wallet.accountsObject) {
+      for (let tokenID in wallet.accountsObject[account].tokenBalances) {
+        let tokenAccount = LogosWallet.Utils.accountFromHexKey(tokenID)
+        if (!state.tokens[tokenAccount]) {
+          commit('addToken', tokenAccount)
+          let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+          pullTokenInfo(tokenAccount, rpcClient, commit)
+        }
+      }
+    }
   },
   setSeed ({ commit }, seed) {
     commit('setSeed', seed)
