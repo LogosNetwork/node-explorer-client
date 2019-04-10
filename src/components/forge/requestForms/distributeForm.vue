@@ -186,8 +186,27 @@ export default {
     }
   },
   created: function () {
-    this.selectedToken = this.distributableTokens[0]
+    if (this.distributableTokens.length > 0) {
+      this.selectedToken = this.distributableTokens[0]
+    }
     this.transaction.destination = this.currentAccount
+  },
+  watch: {
+    distributableTokens: function (newDistTks, oldDistTks) {
+      if (newDistTks.length > 0) {
+        let valid = false
+        for (let token in newDistTks) {
+          if (token.tokenAccount === this.selectedToken.token) {
+            this.selectedToken = token
+          }
+        }
+        if (valid === false) {
+          this.selectedToken = newDistTks[0]
+        }
+      } else {
+        this.selectedToken = null
+      }
+    }
   }
 }
 </script>

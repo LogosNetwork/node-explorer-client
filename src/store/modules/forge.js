@@ -108,10 +108,18 @@ const createToast = (request, rpcClient, commit, state) => {
   } else if (request.type === 'issuance') {
     toast.message = `${request.mqttDestination} Issued a new token ${request.name} - (${request.symbol})`
   } else if (request.type === 'distribute') {
-    if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
-      toast.message = `${request.mqttDestination} was distributed ${Logos.convert.fromTo(request.transaction.amount, 0, request.tokenInfo.issuerInfo.decimals)} of ${request.tokenInfo.symbol}`
+    if (request.origin === request.mqttDestination) {
+      if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
+        toast.message = `${request.mqttDestination} distributed ${Logos.convert.fromTo(request.transaction.amount, 0, request.tokenInfo.issuerInfo.decimals)} ${request.tokenInfo.symbol} to ${request.transaction.destination}`
+      } else {
+        toast.message = `${request.mqttDestination} distributed ${request.transaction.amount} base units of ${request.tokenInfo.symbol} to ${request.transaction.destination}`
+      }
     } else {
-      toast.message = `${request.mqttDestination} was distributed ${request.transaction.amount} base units of ${request.tokenInfo.symbol}`
+      if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
+        toast.message = `${request.transaction.destination} received a token distribution of ${Logos.convert.fromTo(request.transaction.amount, 0, request.tokenInfo.issuerInfo.decimals)} ${request.tokenInfo.symbol}`
+      } else {
+        toast.message = `${request.transaction.destination} received a token distribution of ${request.transaction.amount} base units of ${request.tokenInfo.symbol}`
+      }
     }
   }
   toast.request = request
@@ -119,10 +127,12 @@ const createToast = (request, rpcClient, commit, state) => {
 }
 
 const actions = {
-  update ({ commit, rootState }, wallet) {
+  update ({ commit, rootState, state }, wallet) {
     commit('setAccounts', wallet.accountsObject)
     commit('setSeed', wallet.seed)
-    commit('setCurrentAccount', wallet.account)
+    if (wallet.account && wallet.account.synced) {
+      commit('setCurrentAccount', wallet.account)
+    }
     for (let account in wallet.accountsObject) {
       for (let tokenAccount of wallet.accountsObject[account].tokens) {
         if (!state.tokens[tokenAccount]) {
@@ -130,6 +140,11 @@ const actions = {
           let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
           pullTokenInfo(tokenAccount, rpcClient, commit)
         }
+      }
+    }
+    for (let tokenAccount in wallet.tokenAccounts) {
+      if (wallet.tokenAccounts[tokenAccount].synced) {
+        commit('updateTokenData', wallet.tokenAccounts[tokenAccount])
       }
     }
   },
@@ -175,6 +190,30 @@ const mutations = {
     state.toasts.push(toast)
   },
   updateToken (state, tokenInfo) {
+    Vue.set(state.tokens, tokenInfo.tokenAccount, tokenInfo)
+  },
+  updateTokenData (state, newTokenData) {
+    let tokenInfo = cloneDeep(state.tokens[newTokenData.address])
+    tokenInfo.balance = newTokenData.balance
+    tokenInfo.fee_rate = newTokenData.feeRate
+    tokenInfo.fee_type = newTokenData.feeType
+    tokenInfo.frontier = newTokenData.previous
+    tokenInfo.issuer_info = newTokenData.issuerInfo
+    try {
+      tokenInfo.issuerInfo = JSON.parse(newTokenData.issuerInfo)
+    } catch (e) {
+      tokenInfo.issuerInfo = {}
+    }
+    if (newTokenData.receiveChain.length > 0) {
+      tokenInfo.receive_tip = newTokenData.receiveChain[0].hash
+    }
+    tokenInfo.request_count = newTokenData.requestCount + newTokenData.receiveCount
+    tokenInfo.sequence = newTokenData.sequence
+    tokenInfo.settings = LogosWallet.Utils.getSettingsJSON(newTokenData.settings)
+    tokenInfo.token_balance = newTokenData.tokenBalance
+    tokenInfo.token_fee_balance = newTokenData.tokenFeeBalance
+    tokenInfo.total_supply = newTokenData.totalSupply
+    tokenInfo.controllers = LogosWallet.Utils.getControllerJSON(newTokenData.controllers)
     Vue.set(state.tokens, tokenInfo.tokenAccount, tokenInfo)
   }
 }

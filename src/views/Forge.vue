@@ -202,7 +202,7 @@ export default {
     },
     replaceAddresses: function (msg) {
       for (let account of this.$wallet.accounts) {
-        msg = msg.replace(account.address, account.label)
+        msg = msg.replace(new RegExp(account.address, 'g'), account.label)
       }
       return msg
     },
