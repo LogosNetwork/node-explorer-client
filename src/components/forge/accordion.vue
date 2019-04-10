@@ -83,7 +83,7 @@ export default {
   },
   watch: {
     currentAccount: function (newAccount, oldAccount) {
-      if (newAccount.address !== oldAccount.address) {
+      if (newAccount && oldAccount && newAccount.address !== oldAccount.address) {
         this.disableAnimation = true
         this.showCollapse = false
         setTimeout(() => {

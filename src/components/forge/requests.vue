@@ -254,73 +254,75 @@ export default {
     tokenPrivileges: function (privilege) {
       if (this.forgeTokens) {
         for (let tokenAddress in this.forgeTokens) {
-          for (let controller of this.forgeTokens[tokenAddress].controllers) {
-            if (controller.account === this.currentAccount.address &&
-              controller.privileges instanceof Array) {
-              if (privilege === 'distribute' ||
-                privilege === 'withdraw_logos' ||
-                privilege === 'withdraw_fee' ||
-                privilege === 'burn' ||
-                privilege === 'update_issuer_info') {
-                return controller.privileges.indexOf(privilege) > -1
-              } else if (this.forgeTokens[tokenAddress].settings instanceof Array) {
-                if (privilege === 'adjust_fee' ||
-                  privilege === 'revoke' ||
-                  privilege === 'issuance') {
-                  if (controller.privileges.indexOf(privilege) > -1 &&
-                    this.forgeTokens[tokenAddress].settings.indexOf(privilege) > -1) {
-                    return true
-                  }
-                } else if (privilege === 'adjustUser') {
-                  if (controller.privileges.indexOf('whitelist') > -1 &&
-                    this.forgeTokens[tokenAddress].settings.indexOf('whitelist') > -1) {
-                    return true
-                  }
-                  if (controller.privileges.indexOf('freeze') > -1 &&
-                    this.forgeTokens[tokenAddress].settings.indexOf('freeze') > -1) {
-                    return true
-                  }
-                } else if (privilege === 'change') {
-                  if (controller.privileges.indexOf('change_issuance') > -1 &&
-                    this.forgeTokens[tokenAddress].settings.indexOf('modify_issuance') > -1) {
-                    return true
-                  }
-                  if (controller.privileges.indexOf('change_revoke') > -1 &&
-                    this.forgeTokens[tokenAddress].settings.indexOf('modify_revoke') > -1) {
-                    return true
-                  }
-                  if (controller.privileges.indexOf('change_freeze') > -1 &&
-                    this.forgeTokens[tokenAddress].settings.indexOf('modify_freeze') > -1) {
-                    return true
-                  }
-                  if (controller.privileges.indexOf('change_adjust_fee') > -1 &&
-                    this.forgeTokens[tokenAddress].settings.indexOf('modify_adjust_fee') > -1) {
-                    return true
-                  }
-                  if (controller.privileges.indexOf('change_whitelist') > -1 &&
-                    this.forgeTokens[tokenAddress].settings.indexOf('modify_whitelist') > -1) {
-                    return true
-                  }
-                } else if (privilege === 'modify') {
-                  if (controller.privileges.indexOf('change_modify_issuance') > -1 &&
-                    this.forgeTokens[tokenAddress].settings.indexOf('modify_issuance') > -1) {
-                    return true
-                  }
-                  if (controller.privileges.indexOf('change_modify_revoke') > -1 &&
-                    this.forgeTokens[tokenAddress].settings.indexOf('modify_revoke') > -1) {
-                    return true
-                  }
-                  if (controller.privileges.indexOf('change_modify_freeze') > -1 &&
-                    this.forgeTokens[tokenAddress].settings.indexOf('modify_freeze') > -1) {
-                    return true
-                  }
-                  if (controller.privileges.indexOf('change_modify_adjust_fee') > -1 &&
-                    this.forgeTokens[tokenAddress].settings.indexOf('modify_adjust_fee') > -1) {
-                    return true
-                  }
-                  if (controller.privileges.indexOf('change_modify_whitelist') > -1 &&
-                    this.forgeTokens[tokenAddress].settings.indexOf('modify_whitelist') > -1) {
-                    return true
+          if (this.forgeTokens[tokenAddress].controllers instanceof Array) {
+            for (let controller of this.forgeTokens[tokenAddress].controllers) {
+              if (controller.account === this.currentAccount.address &&
+                controller.privileges instanceof Array) {
+                if (privilege === 'distribute' ||
+                  privilege === 'withdraw_logos' ||
+                  privilege === 'withdraw_fee' ||
+                  privilege === 'burn' ||
+                  privilege === 'update_issuer_info') {
+                  return controller.privileges.indexOf(privilege) > -1
+                } else if (this.forgeTokens[tokenAddress].settings instanceof Array) {
+                  if (privilege === 'adjust_fee' ||
+                    privilege === 'revoke' ||
+                    privilege === 'issuance') {
+                    if (controller.privileges.indexOf(privilege) > -1 &&
+                      this.forgeTokens[tokenAddress].settings.indexOf(privilege) > -1) {
+                      return true
+                    }
+                  } else if (privilege === 'adjustUser') {
+                    if (controller.privileges.indexOf('whitelist') > -1 &&
+                      this.forgeTokens[tokenAddress].settings.indexOf('whitelist') > -1) {
+                      return true
+                    }
+                    if (controller.privileges.indexOf('freeze') > -1 &&
+                      this.forgeTokens[tokenAddress].settings.indexOf('freeze') > -1) {
+                      return true
+                    }
+                  } else if (privilege === 'change') {
+                    if (controller.privileges.indexOf('change_issuance') > -1 &&
+                      this.forgeTokens[tokenAddress].settings.indexOf('modify_issuance') > -1) {
+                      return true
+                    }
+                    if (controller.privileges.indexOf('change_revoke') > -1 &&
+                      this.forgeTokens[tokenAddress].settings.indexOf('modify_revoke') > -1) {
+                      return true
+                    }
+                    if (controller.privileges.indexOf('change_freeze') > -1 &&
+                      this.forgeTokens[tokenAddress].settings.indexOf('modify_freeze') > -1) {
+                      return true
+                    }
+                    if (controller.privileges.indexOf('change_adjust_fee') > -1 &&
+                      this.forgeTokens[tokenAddress].settings.indexOf('modify_adjust_fee') > -1) {
+                      return true
+                    }
+                    if (controller.privileges.indexOf('change_whitelist') > -1 &&
+                      this.forgeTokens[tokenAddress].settings.indexOf('modify_whitelist') > -1) {
+                      return true
+                    }
+                  } else if (privilege === 'modify') {
+                    if (controller.privileges.indexOf('change_modify_issuance') > -1 &&
+                      this.forgeTokens[tokenAddress].settings.indexOf('modify_issuance') > -1) {
+                      return true
+                    }
+                    if (controller.privileges.indexOf('change_modify_revoke') > -1 &&
+                      this.forgeTokens[tokenAddress].settings.indexOf('modify_revoke') > -1) {
+                      return true
+                    }
+                    if (controller.privileges.indexOf('change_modify_freeze') > -1 &&
+                      this.forgeTokens[tokenAddress].settings.indexOf('modify_freeze') > -1) {
+                      return true
+                    }
+                    if (controller.privileges.indexOf('change_modify_adjust_fee') > -1 &&
+                      this.forgeTokens[tokenAddress].settings.indexOf('modify_adjust_fee') > -1) {
+                      return true
+                    }
+                    if (controller.privileges.indexOf('change_modify_whitelist') > -1 &&
+                      this.forgeTokens[tokenAddress].settings.indexOf('modify_whitelist') > -1) {
+                      return true
+                    }
                   }
                 }
               }

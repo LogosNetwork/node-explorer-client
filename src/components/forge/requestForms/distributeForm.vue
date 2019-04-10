@@ -114,13 +114,15 @@ export default {
     distributableTokens: function () {
       let tokens = []
       for (let tokenAddress in this.forgeTokens) {
-        for (let controller of this.forgeTokens[tokenAddress].controllers) {
-          if (controller.account === this.currentAccount.address &&
-            controller.privileges instanceof Array &&
-            controller.privileges.indexOf('distribute') > -1 &&
-            bigInt(this.forgeTokens[tokenAddress].token_balance).greater(0) &&
-            bigInt(this.forgeTokens[tokenAddress].balance).greaterOrEquals(bigInt(this.$utils.minimumFee))) {
-            tokens.push(this.forgeTokens[tokenAddress])
+        if (this.forgeTokens[tokenAddress].controllers instanceof Array) {
+          for (let controller of this.forgeTokens[tokenAddress].controllers) {
+            if (controller.account === this.currentAccount.address &&
+              controller.privileges instanceof Array &&
+              controller.privileges.indexOf('distribute') > -1 &&
+              bigInt(this.forgeTokens[tokenAddress].token_balance).greater(0) &&
+              bigInt(this.forgeTokens[tokenAddress].balance).greaterOrEquals(bigInt(this.$utils.minimumFee))) {
+              tokens.push(this.forgeTokens[tokenAddress])
+            }
           }
         }
       }
