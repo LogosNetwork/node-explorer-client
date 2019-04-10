@@ -37,6 +37,7 @@
         tag-placeholder="Add this account"
         track-by="label"
         label="label"
+        :custom-label="labelWithAddress"
         :options="combinedAccounts"
         :multiple="false"
         :taggable="true"
@@ -129,6 +130,13 @@ export default {
             amount: amount
           }])
         }
+      }
+    },
+    labelWithAddress ({ label, address }) {
+      if (label !== address) {
+        return `${label} — ${address.substring(0, 9)}...${address.substring(59, 64)}`
+      } else {
+        return address
       }
     }
   },

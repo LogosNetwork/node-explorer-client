@@ -27,14 +27,14 @@
       </accordion>
 
       <accordion
-        v-if="hasTokens"
+        v-if="hasTokenBalance"
         bgClass="bg-primary"
         accordionGroup="accordion"
         :requestIcon="faCoins"
         title="Send Tokens"
         subtitle="Send tokens to another account."
       >
-        Hello World
+        Not Yet Implemented :(
       </accordion>
 
       <accordion
@@ -55,7 +55,7 @@
         title="Issue Additional Tokens"
         subtitle="Increases the total supply of a token."
       >
-        Hello World
+        Not Yet Implemented :(
       </accordion>
 
       <accordion
@@ -66,7 +66,7 @@
         title="Change Token Setting"
         subtitle="Change the settings of the given token."
       >
-        Hello World
+        Not Yet Implemented :(
       </accordion>
 
       <accordion
@@ -77,7 +77,7 @@
         title="Immute Token Setting"
         subtitle="Permanently immute a setting of the given token."
       >
-        Hello World
+        Not Yet Implemented :(
       </accordion>
 
       <accordion
@@ -88,7 +88,7 @@
         title="Revoke Token from User"
         subtitle="Remove tokens from a one account and send them to another."
       >
-        Hello World
+        Not Yet Implemented :(
       </accordion>
 
       <accordion
@@ -97,9 +97,9 @@
         accordionGroup="accordion"
         :requestIcon="faUserEdit"
         title="Adjust User Token Setting"
-        subtitle="Freeze, Un-Freeze, Whitelist, or Blacklist a user."
+        subtitle="Freeze, Un-Freeze, Whitelist, or Un-Whitelist a user."
       >
-        Hello World
+        Not Yet Implemented :(
       </accordion>
 
       <accordion
@@ -110,7 +110,7 @@
         title="Adjust Token Fee"
         subtitle="Change the token fee for the given token."
       >
-        Hello World
+        Not Yet Implemented :(
       </accordion>
 
       <accordion
@@ -121,7 +121,7 @@
         title="Update Token Info"
         subtitle="Change the token information of the given token."
       >
-        Hello World
+        Not Yet Implemented :(
       </accordion>
 
       <accordion
@@ -132,7 +132,7 @@
         title="Burn Tokens"
         subtitle="Remove some tokens from the total supply."
       >
-        Hello World
+        Not Yet Implemented :(
       </accordion>
 
       <accordion
@@ -143,7 +143,7 @@
         title="Distribute Tokens"
         subtitle="Send tokens from the token account to a user's account."
       >
-        Hello World
+        <distributeForm/>
       </accordion>
 
       <accordion
@@ -154,7 +154,7 @@
         title="Withdraw Fee"
         subtitle="Withdraw the token balance to a user's account."
       >
-        Hello World
+        Not Yet Implemented :(
       </accordion>
 
       <accordion
@@ -165,7 +165,7 @@
         title="Withdraw Logos"
         subtitle="Withdraw the Logos balance of the token account to a user's account."
       >
-        Hello World
+        Not Yet Implemented :(
       </accordion>
     </div>
     <div v-else>
@@ -192,6 +192,7 @@ import fund from '@/components/forge/fund.vue'
 import createAccountForm from '@/components/forge/requestForms/createAccountForm.vue'
 import sendForm from '@/components/forge/requestForms/sendForm.vue'
 import issueTokenForm from '@/components/forge/requestForms/issueTokenForm.vue'
+import distributeForm from '@/components/forge/requestForms/distributeForm.vue'
 import bigInt from 'big-integer'
 import LogosAddress from '@/components/LogosAddress.vue'
 import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage } from '@fortawesome/pro-light-svg-icons'
@@ -222,11 +223,13 @@ export default {
     fund,
     createAccountForm,
     sendForm,
-    issueTokenForm
+    issueTokenForm,
+    distributeForm
   },
   computed: {
     ...mapState('forge', {
-      currentAccount: state => state.currentAccount
+      currentAccount: state => state.currentAccount,
+      forgeTokens: state => state.tokens
     }),
     hasFunds: function () {
       if (this.currentAccount && this.currentAccount.balance) {
@@ -235,18 +238,96 @@ export default {
         return false
       }
     },
-    hasTokens: function () {
+    hasTokenBalance: function () {
       if (this.currentAccount && this.currentAccount.tokenBalances) {
-        return Object.keys(this.currentAccount.tokenBalances).length
+        for (let tokenID in this.currentAccount.tokenBalances) {
+          if (bigInt(this.currentAccount.tokenBalances[tokenID]).greater(0)) {
+            return true
+          }
+        }
       } else {
         return false
       }
     }
   },
   methods: {
-    tokenPrivileges: function (privileges) {
-      if (Object.keys(this.$wallet.tokenAccounts).length > 0) {
-        // TODO
+    tokenPrivileges: function (privilege) {
+      if (this.forgeTokens) {
+        for (let tokenAddress in this.forgeTokens) {
+          for (let controller of this.forgeTokens[tokenAddress].controllers) {
+            if (controller.account === this.currentAccount.address &&
+              controller.privileges instanceof Array) {
+              if (privilege === 'distribute' ||
+                privilege === 'withdraw_logos' ||
+                privilege === 'withdraw_fee' ||
+                privilege === 'burn' ||
+                privilege === 'update_issuer_info') {
+                return controller.privileges.indexOf(privilege) > -1
+              } else if (this.forgeTokens[tokenAddress].settings instanceof Array) {
+                if (privilege === 'adjust_fee' ||
+                  privilege === 'revoke' ||
+                  privilege === 'issuance') {
+                  if (controller.privileges.indexOf(privilege) > -1 &&
+                    this.forgeTokens[tokenAddress].settings.indexOf(privilege) > -1) {
+                    return true
+                  }
+                } else if (privilege === 'adjustUser') {
+                  if (controller.privileges.indexOf('whitelist') > -1 &&
+                    this.forgeTokens[tokenAddress].settings.indexOf('whitelist') > -1) {
+                    return true
+                  }
+                  if (controller.privileges.indexOf('freeze') > -1 &&
+                    this.forgeTokens[tokenAddress].settings.indexOf('freeze') > -1) {
+                    return true
+                  }
+                } else if (privilege === 'change') {
+                  if (controller.privileges.indexOf('change_issuance') > -1 &&
+                    this.forgeTokens[tokenAddress].settings.indexOf('modify_issuance') > -1) {
+                    return true
+                  }
+                  if (controller.privileges.indexOf('change_revoke') > -1 &&
+                    this.forgeTokens[tokenAddress].settings.indexOf('modify_revoke') > -1) {
+                    return true
+                  }
+                  if (controller.privileges.indexOf('change_freeze') > -1 &&
+                    this.forgeTokens[tokenAddress].settings.indexOf('modify_freeze') > -1) {
+                    return true
+                  }
+                  if (controller.privileges.indexOf('change_adjust_fee') > -1 &&
+                    this.forgeTokens[tokenAddress].settings.indexOf('modify_adjust_fee') > -1) {
+                    return true
+                  }
+                  if (controller.privileges.indexOf('change_whitelist') > -1 &&
+                    this.forgeTokens[tokenAddress].settings.indexOf('modify_whitelist') > -1) {
+                    return true
+                  }
+                } else if (privilege === 'modify') {
+                  if (controller.privileges.indexOf('change_modify_issuance') > -1 &&
+                    this.forgeTokens[tokenAddress].settings.indexOf('modify_issuance') > -1) {
+                    return true
+                  }
+                  if (controller.privileges.indexOf('change_modify_revoke') > -1 &&
+                    this.forgeTokens[tokenAddress].settings.indexOf('modify_revoke') > -1) {
+                    return true
+                  }
+                  if (controller.privileges.indexOf('change_modify_freeze') > -1 &&
+                    this.forgeTokens[tokenAddress].settings.indexOf('modify_freeze') > -1) {
+                    return true
+                  }
+                  if (controller.privileges.indexOf('change_modify_adjust_fee') > -1 &&
+                    this.forgeTokens[tokenAddress].settings.indexOf('modify_adjust_fee') > -1) {
+                    return true
+                  }
+                  if (controller.privileges.indexOf('change_modify_whitelist') > -1 &&
+                    this.forgeTokens[tokenAddress].settings.indexOf('modify_whitelist') > -1) {
+                    return true
+                  }
+                }
+              }
+            }
+          }
+        }
+        return false
       } else {
         return false
       }

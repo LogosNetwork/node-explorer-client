@@ -107,6 +107,12 @@ const createToast = (request, rpcClient, commit, state) => {
     }
   } else if (request.type === 'issuance') {
     toast.message = `${request.mqttDestination} Issued a new token ${request.name} - (${request.symbol})`
+  } else if (request.type === 'distribute') {
+    if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
+      toast.message = `${request.mqttDestination} was distributed ${Logos.convert.fromTo(request.transaction.amount, 0, request.tokenInfo.issuerInfo.decimals)} of ${request.tokenInfo.symbol}`
+    } else {
+      toast.message = `${request.mqttDestination} was distributed ${request.transaction.amount} base units of ${request.tokenInfo.symbol}`
+    }
   }
   toast.request = request
   commit('addToast', toast)
@@ -145,7 +151,8 @@ const mutations = {
         address: account,
         label: state.walletAccounts[account].label,
         balance: state.walletAccounts[account].balance,
-        logosBalance: Logos.convert.fromReason(state.walletAccounts[account].balance, 'LOGOS')
+        logosBalance: Logos.convert.fromReason(state.walletAccounts[account].balance, 'LOGOS'),
+        tokenBalances: state.walletAccounts[account].tokenBalances
       }
       Vue.set(state.accounts, account, applicationAccount)
     }

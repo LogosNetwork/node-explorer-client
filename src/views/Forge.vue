@@ -49,9 +49,13 @@
               v-for="token in tokens" :key="token.tokenAccount"
               class="d-flex justify-content-between align-items-center mb-2"
             >
-              <span>
+              <span v-if="token.name">
                 <font-awesome-icon size="lg" class="mr-2" :icon="faCoins" />
                 {{token.name}} - ({{token.symbol}})
+              </span>
+              <span v-else>
+                <font-awesome-icon size="lg" class="mr-2" :icon="faSpinner" spin />
+                Loading...
               </span>
               <b-dropdown v-on:click.stop variant="link" size="lg" no-caret>
                 <template slot="button-content">
@@ -142,7 +146,7 @@ import LogosAddress from '@/components/LogosAddress.vue'
 import Lookups from '@/components/forge/lookups.vue'
 import Requests from '@/components/forge/requests.vue'
 import cloneDeep from 'lodash/cloneDeep'
-import { faUser, faEllipsisVAlt, faCoins, faSearch, faWrench, faEye, faFont } from '@fortawesome/pro-light-svg-icons'
+import { faUser, faEllipsisVAlt, faCoins, faSearch, faWrench, faEye, faFont, faSpinner } from '@fortawesome/pro-light-svg-icons'
 
 export default {
   name: 'workshop',
@@ -155,6 +159,7 @@ export default {
       faWrench,
       faEye,
       faFont,
+      faSpinner,
       selected: 'requests',
       selectedVisual: 'visual',
       wallet: this.$wallet
