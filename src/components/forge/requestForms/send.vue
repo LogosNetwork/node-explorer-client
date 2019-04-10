@@ -1,31 +1,5 @@
 <template>
   <div>
-    <b-form-group
-      id="sendFrom"
-      label="From"
-      label-size="lg"
-    >
-      <Multiselect
-        id="fromSelector"
-        v-model="currentAccount"
-        required
-        tag-placeholder="Add this account"
-        track-by="label"
-        label="label"
-        :options="combinedAccounts"
-        :multiple="false"
-        :disabled="true"
-        placeholder="Search or add an account"
-      >
-        <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.label !== option.address">
-            <strong>{{ option.label }}</strong>  -
-          </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.address" />
-        </template>
-      </Multiselect>
-    </b-form-group>
-
     <b-form-group id="sendTo"
       label="To"
       label-size="lg"

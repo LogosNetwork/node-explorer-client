@@ -23,7 +23,7 @@
         title="Send Logos"
         subtitle="Send logos to another account."
       >
-        <sendForm/>
+        <send/>
       </accordion>
 
       <accordion
@@ -34,7 +34,7 @@
         title="Send Tokens"
         subtitle="Send tokens to another account."
       >
-        Not Yet Implemented :(
+        <tokenSend/>
       </accordion>
 
       <accordion
@@ -44,7 +44,7 @@
         title="Issue a Token"
         subtitle="Create and issue your token."
       >
-        <issueTokenForm/>
+        <issuance/>
       </accordion>
 
       <accordion
@@ -143,7 +143,7 @@
         title="Distribute Tokens"
         subtitle="Send tokens from the token account to a user's account."
       >
-        <distributeForm/>
+        <distribute/>
       </accordion>
 
       <accordion
@@ -180,7 +180,7 @@
       title="Create an Account"
       subtitle="Create an account automatically or with a given private key."
     >
-      <createAccountForm/>
+      <createAccount/>
     </accordion>
   </div>
 </template>
@@ -189,10 +189,11 @@
 import { mapState } from 'vuex'
 import accordion from '@/components/forge/accordion.vue'
 import fund from '@/components/forge/fund.vue'
-import createAccountForm from '@/components/forge/requestForms/createAccountForm.vue'
-import sendForm from '@/components/forge/requestForms/sendForm.vue'
-import issueTokenForm from '@/components/forge/requestForms/issueTokenForm.vue'
-import distributeForm from '@/components/forge/requestForms/distributeForm.vue'
+import createAccount from '@/components/forge/requestForms/createAccount.vue'
+import send from '@/components/forge/requestForms/send.vue'
+import tokenSend from '@/components/forge/requestForms/tokenSend.vue'
+import issuance from '@/components/forge/requestForms/issuance.vue'
+import distribute from '@/components/forge/requestForms/distribute.vue'
 import bigInt from 'big-integer'
 import LogosAddress from '@/components/LogosAddress.vue'
 import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage } from '@fortawesome/pro-light-svg-icons'
@@ -221,10 +222,11 @@ export default {
     accordion,
     LogosAddress,
     fund,
-    createAccountForm,
-    sendForm,
-    issueTokenForm,
-    distributeForm
+    createAccount,
+    send,
+    tokenSend,
+    issuance,
+    distribute
   },
   computed: {
     ...mapState('forge', {
@@ -241,8 +243,16 @@ export default {
     hasTokenBalance: function () {
       if (this.currentAccount && this.currentAccount.tokenBalances) {
         for (let tokenID in this.currentAccount.tokenBalances) {
-          if (bigInt(this.currentAccount.tokenBalances[tokenID]).greater(0)) {
-            return true
+          let forgeToken = this.forgeTokens[this.$utils.parseAccount(tokenID)]
+          if (forgeToken.fee_type === 'flat') {
+            if (bigInt(this.currentAccount.tokenBalances[tokenID])
+              .minus(bigInt(forgeToken.fee_rate)).greater(0)) {
+              return true
+            }
+          } else {
+            if (bigInt(this.currentAccount.tokenBalances[tokenID]).greater(0)) {
+              return true
+            }
           }
         }
       } else {

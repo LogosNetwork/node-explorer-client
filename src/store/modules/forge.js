@@ -94,9 +94,9 @@ const createToast = (request, rpcClient, commit, state) => {
     if (request.tokenInfo.issuerInfo && typeof request.tokenInfo.issuerInfo.decimals !== 'undefined') {
       request.balanceChangeInToken = Logos.convert.fromTo(balanceChange.abs().toString(), 0, request.tokenInfo.issuerInfo.decimals)
       if (balanceChange.greater(bigInt('0'))) {
-        toast.message = `${request.mqttDestination} recieved ${request.balanceChangeInToken} of ${request.tokenInfo.symbol}`
+        toast.message = `${request.mqttDestination} recieved ${request.balanceChangeInToken} ${request.tokenInfo.symbol}`
       } else {
-        toast.message = `${request.mqttDestination} sent ${request.balanceChangeInToken} of ${request.tokenInfo.symbol}`
+        toast.message = `${request.mqttDestination} sent ${request.balanceChangeInToken} ${request.tokenInfo.symbol}`
       }
     } else {
       if (balanceChange.greater(bigInt('0'))) {
