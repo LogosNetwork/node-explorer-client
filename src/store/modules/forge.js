@@ -193,28 +193,30 @@ const mutations = {
     Vue.set(state.tokens, tokenInfo.tokenAccount, tokenInfo)
   },
   updateTokenData (state, newTokenData) {
-    let tokenInfo = cloneDeep(state.tokens[newTokenData.address])
-    tokenInfo.balance = newTokenData.balance
-    tokenInfo.fee_rate = newTokenData.feeRate
-    tokenInfo.fee_type = newTokenData.feeType
-    tokenInfo.frontier = newTokenData.previous
-    tokenInfo.issuer_info = newTokenData.issuerInfo
-    try {
-      tokenInfo.issuerInfo = JSON.parse(newTokenData.issuerInfo)
-    } catch (e) {
-      tokenInfo.issuerInfo = {}
+    if (state.tokens[newTokenData.address]) {
+      let tokenInfo = cloneDeep(state.tokens[newTokenData.address])
+      tokenInfo.balance = newTokenData.balance
+      tokenInfo.fee_rate = newTokenData.feeRate
+      tokenInfo.fee_type = newTokenData.feeType
+      tokenInfo.frontier = newTokenData.previous
+      tokenInfo.issuer_info = newTokenData.issuerInfo
+      try {
+        tokenInfo.issuerInfo = JSON.parse(newTokenData.issuerInfo)
+      } catch (e) {
+        tokenInfo.issuerInfo = {}
+      }
+      if (newTokenData.receiveChain.length > 0) {
+        tokenInfo.receive_tip = newTokenData.receiveChain[0].hash
+      }
+      tokenInfo.request_count = newTokenData.requestCount + newTokenData.receiveCount
+      tokenInfo.sequence = newTokenData.sequence
+      tokenInfo.settings = LogosWallet.Utils.getSettingsJSON(newTokenData.settings)
+      tokenInfo.token_balance = newTokenData.tokenBalance
+      tokenInfo.token_fee_balance = newTokenData.tokenFeeBalance
+      tokenInfo.total_supply = newTokenData.totalSupply
+      tokenInfo.controllers = LogosWallet.Utils.getControllerJSON(newTokenData.controllers)
+      Vue.set(state.tokens, tokenInfo.tokenAccount, tokenInfo)
     }
-    if (newTokenData.receiveChain.length > 0) {
-      tokenInfo.receive_tip = newTokenData.receiveChain[0].hash
-    }
-    tokenInfo.request_count = newTokenData.requestCount + newTokenData.receiveCount
-    tokenInfo.sequence = newTokenData.sequence
-    tokenInfo.settings = LogosWallet.Utils.getSettingsJSON(newTokenData.settings)
-    tokenInfo.token_balance = newTokenData.tokenBalance
-    tokenInfo.token_fee_balance = newTokenData.tokenFeeBalance
-    tokenInfo.total_supply = newTokenData.totalSupply
-    tokenInfo.controllers = LogosWallet.Utils.getControllerJSON(newTokenData.controllers)
-    Vue.set(state.tokens, tokenInfo.tokenAccount, tokenInfo)
   }
 }
 
