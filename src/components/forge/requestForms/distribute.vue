@@ -24,6 +24,12 @@
           <LogosAddress :inactive="true" :force="true" :address="option.tokenAccount" />
         </template>
       </Multiselect>
+      <div v-if="!sufficientBalance" style="display:block" class="invalid-feedback">
+        {{selectedToken.name}} has an insufficient supply of logos to afford the fee for this transaction
+      </div>
+      <div v-if="!sufficientTokenBalance" style="display:block" class="invalid-feedback">
+        {{selectedToken.name}} has no tokens to distribute
+      </div>
     </b-form-group>
 
     <b-form-group
@@ -62,14 +68,26 @@
     >
       <b-form-input
         id="amountInput"
+        aria-describedby="amountError"
         v-model="transaction.amount"
+        :state="isValidAmount"
+        name="amount"
         autocomplete="off"
         required
         placeholder="Amount of Tokens"
       ></b-form-input>
+      <b-form-invalid-feedback id="amountError">
+        This is a required field and must be a positive decimal or integer value that is less than the token balance
+      </b-form-invalid-feedback>
     </b-form-group>
     <div class="text-right">
-      <b-button v-on:click="createDistribute()" type="submit" variant="primary">Distribute Tokens</b-button>
+      <b-button
+        v-on:click="createDistribute()"
+        type="submit"
+        :disabled="!isValidAmount || !sufficientBalance || !sufficientTokenBalance"
+        variant="primary">
+          Distribute Tokens
+      </b-button>
     </div>
   </div>
 </template>
@@ -82,7 +100,6 @@ import LogosAddress from '@/components/LogosAddress.vue'
 import Multiselect from 'vue-multiselect'
 import cloneDeep from 'lodash/cloneDeep'
 import bigInt from 'big-integer'
-
 export default {
   name: 'sendForm',
   data () {
@@ -91,7 +108,7 @@ export default {
       selectedToken: null,
       transaction: {
         destination: null,
-        amount: null
+        amount: ''
       }
     }
   },
@@ -107,6 +124,32 @@ export default {
       forgeTokens: state => state.tokens,
       currentAccount: state => state.currentAccount
     }),
+    isValidAmount: function () {
+      if (this.transaction.amount === '') return null
+      let token = this.selectedToken
+      if (!token) return null
+      let amountInRaw = cloneDeep(this.transaction.amount)
+      if (amountInRaw && token && token.issuerInfo &&
+        typeof token.issuerInfo.decimals !== 'undefined' &&
+        token.issuerInfo.decimals > 0) {
+        if (!/^([0-9]+(?:[.][0-9]*)?|\.[0-9]+)$/.test(amountInRaw)) return false
+        amountInRaw = this.$Logos.convert.fromTo(amountInRaw, token.issuerInfo.decimals, 0)
+      } else {
+        if (!/^([0-9]+)$/.test(amountInRaw)) return false
+      }
+      return (
+        bigInt(amountInRaw).greater(0) &&
+        bigInt(token.token_balance).greaterOrEquals(bigInt(amountInRaw))
+      )
+    },
+    sufficientBalance: function () {
+      if (!this.selectedToken) return null
+      return bigInt(this.selectedToken.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
+    },
+    sufficientTokenBalance: function () {
+      if (!this.selectedToken) return null
+      return bigInt(this.selectedToken.token_balance).greater(0)
+    },
     combinedAccounts: function () {
       let forgeAccounts = cloneDeep(this.forgeAccounts)
       return Array.from(Object.values(forgeAccounts)).concat(this.accounts)
@@ -118,9 +161,7 @@ export default {
           for (let controller of this.forgeTokens[tokenAddress].controllers) {
             if (controller.account === this.currentAccount.address &&
               controller.privileges instanceof Array &&
-              controller.privileges.indexOf('distribute') > -1 &&
-              bigInt(this.forgeTokens[tokenAddress].token_balance).greater(0) &&
-              bigInt(this.forgeTokens[tokenAddress].balance).greaterOrEquals(bigInt(this.$utils.minimumFee))) {
+              controller.privileges.indexOf('distribute') > -1) {
               tokens.push(this.forgeTokens[tokenAddress])
             }
           }
@@ -196,7 +237,7 @@ export default {
       if (newDistTks.length > 0) {
         let valid = false
         for (let token in newDistTks) {
-          if (this.selectedToken && token.tokenAccount === this.selectedToken.token) {
+          if (this.selectedToken && token.tokenAccount === this.selectedToken.tokenAccount) {
             this.selectedToken = token
           }
         }
