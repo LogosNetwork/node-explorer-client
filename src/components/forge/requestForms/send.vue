@@ -9,7 +9,7 @@
         v-model="sendForm.to"
         required
         tag-placeholder="Add this account"
-        track-by="label"
+        track-by="address"
         label="label"
         :custom-label="labelWithAddress"
         :options="combinedAccounts"
@@ -76,12 +76,17 @@ export default {
   computed: {
     ...mapState('forge', {
       forgeAccounts: state => state.accounts,
+      forgeTokens: state => state.tokens,
       currentAccount: state => state.currentAccount
     }),
     combinedAccounts: function () {
       let forgeAccounts = cloneDeep(this.forgeAccounts)
+      let forgeTokens = []
+      for (let token in this.forgeTokens) {
+        forgeTokens.push({ label: `${this.forgeTokens[token].name} (${this.forgeTokens[token].symbol})`, address: token })
+      }
       if (this.currentAccount) delete forgeAccounts[this.currentAccount.address]
-      return Array.from(Object.values(forgeAccounts)).concat(this.accounts)
+      return Array.from(Object.values(forgeAccounts)).concat(this.accounts).concat(forgeTokens)
     }
   },
   methods: {

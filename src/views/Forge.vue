@@ -28,7 +28,7 @@
                 <b-dropdown-item href="#">Change Label</b-dropdown-item>
                 <b-dropdown-item href="#">Account Info</b-dropdown-item>
                 <b-dropdown-item href="#">Copy Account Address</b-dropdown-item>
-                <b-dropdown-item href="#">Remove Account</b-dropdown-item>
+                <b-dropdown-item v-on:click="removeAccount(account.address)">Remove Account</b-dropdown-item>
               </b-dropdown>
             </b-list-group-item>
           </b-list-group>
@@ -205,6 +205,9 @@ export default {
         msg = msg.replace(new RegExp(account.address, 'g'), account.label)
       }
       return msg
+    },
+    removeAccount: function (address) {
+      this.$wallet.removeAccount(address)
     },
     changeSelectedVisual: function (newSelected) {
       this.selectedVisual = newSelected

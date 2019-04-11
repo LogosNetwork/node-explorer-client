@@ -317,7 +317,7 @@
                       <font-awesome-icon :icon="faArrowDown" class="mr-2"/>
                       Distribute
                     </h5>
-                    <p>The controller is allowed to distribute tokens that are inside the offical {{token.name}} token account.</p>
+                    <p>The controller is allowed to distribute tokens that are inside the official {{token.name}} token account.</p>
                   </span>
                   <span v-else-if="privilege === 'withdraw_fee'">
                     <h5>

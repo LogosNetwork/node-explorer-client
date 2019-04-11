@@ -196,7 +196,7 @@ export default {
       if (newDistTks.length > 0) {
         let valid = false
         for (let token in newDistTks) {
-          if (token.tokenAccount === this.selectedToken.token) {
+          if (this.selectedToken && token.tokenAccount === this.selectedToken.token) {
             this.selectedToken = token
           }
         }
