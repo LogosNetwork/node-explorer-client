@@ -156,6 +156,22 @@ export default {
     }
   },
   watch: {
+    combinedAccounts: function (newAccounts, oldAccounts) {
+      if (newAccounts.length > 0) {
+        let valid = false
+        for (let account of newAccounts) {
+          if (this.sendForm.to && account.address === this.sendForm.to.address) {
+            this.sendForm.to = account
+            valid = true
+          }
+        }
+        if (valid === false) {
+          this.sendForm.to = newAccounts[0]
+        }
+      } else {
+        this.sendForm.to = null
+      }
+    },
     currentAccount: function (newAccount, oldAccount) {
       if (newAccount.address !== oldAccount.address) {
         for (let account of this.combinedAccounts) {

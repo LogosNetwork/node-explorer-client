@@ -24,10 +24,13 @@
           <LogosAddress :inactive="true" :force="true" :address="option.tokenAccount" />
         </template>
       </Multiselect>
-      <div v-if="!sufficientBalance" style="display:block" class="invalid-feedback">
+      <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
+        You must select a token to distribute from
+      </div>
+      <div v-if="selectedToken && !sufficientBalance" style="display:block" class="invalid-feedback">
         {{selectedToken.name}} has an insufficient supply of logos to afford the fee for this transaction
       </div>
-      <div v-if="!sufficientTokenBalance" style="display:block" class="invalid-feedback">
+      <div v-if="selectedToken && !sufficientTokenBalance" style="display:block" class="invalid-feedback">
         {{selectedToken.name}} has no tokens to distribute
       </div>
     </b-form-group>
@@ -201,7 +204,7 @@ export default {
         } else {
           amountInBaseUnit = this.transaction.amount
         }
-        // Check if target account is open?
+        // TODO check if target account is open & whitelisted & not frozen
         if (bigInt(this.selectedToken.token_balance)
           .greaterOrEquals(bigInt(amountInBaseUnit))) {
           let data = {
@@ -236,9 +239,10 @@ export default {
     distributableTokens: function (newDistTks, oldDistTks) {
       if (newDistTks.length > 0) {
         let valid = false
-        for (let token in newDistTks) {
+        for (let token of newDistTks) {
           if (this.selectedToken && token.tokenAccount === this.selectedToken.tokenAccount) {
             this.selectedToken = token
+            valid = true
           }
         }
         if (valid === false) {

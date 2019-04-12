@@ -49,7 +49,7 @@
               v-for="token in tokens" :key="token.tokenAccount"
               class="d-flex justify-content-between align-items-center mb-2"
             >
-              <span v-if="token.name">
+              <span class="text-nowrap text-truncate" v-if="token.name">
                 <font-awesome-icon size="lg" class="mr-2" :icon="faCoins" />
                 {{token.name}} - ({{token.symbol}})
               </span>

@@ -247,9 +247,10 @@ export default {
     sendableTokens: function (newTks, oldTks) {
       if (newTks.length > 0) {
         let valid = false
-        for (let token in newTks) {
-          if (token.tokenAccount === this.selectedToken.token) {
+        for (let token of newTks) {
+          if (this.selectedToken && token.tokenAccount === this.selectedToken.tokenAccount) {
             this.selectedToken = token
+            valid = true
           }
         }
         if (valid === false) {

@@ -76,6 +76,7 @@ Vue.use(Toasted, {
 })
 Vue.use(Wallet, {
   fullSync: true,
+  syncTokens: true,
   mqtt: config.mqttHost,
   rpc: {
     proxy: config.rpcProxy,
