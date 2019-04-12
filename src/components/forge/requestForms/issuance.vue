@@ -1,32 +1,6 @@
 <template>
   <div>
     <b-form-group
-      id="origin"
-      label="Token Issuer"
-      label-size="lg"
-    >
-      <Multiselect
-        id="originSelector"
-        v-model="currentAccount"
-        required
-        tag-placeholder="Add this account"
-        track-by="label"
-        label="label"
-        :options="accounts"
-        :multiple="false"
-        :disabled="true"
-        placeholder="Search or add an account"
-      >
-        <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.label !== option.address">
-            <strong>{{ option.label }}</strong>  -
-          </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.address" />
-        </template>
-      </Multiselect>
-    </b-form-group>
-
-    <b-form-group
       id="tokenName"
       label="Token Name"
       label-size="lg"
@@ -36,9 +10,13 @@
         id="nameInput"
         v-model="tokenOptions.name"
         autocomplete="off"
-        required
+        aria-describedby="nameError"
+        :state="validName"
         placeholder="Enter a token name"
       ></b-form-input>
+      <b-form-invalid-feedback id="nameError">
+        This is a required field and must be an alphanumeric name that is less than or equal to 32 bytes
+      </b-form-invalid-feedback>
     </b-form-group>
 
     <b-form-group
@@ -51,9 +29,13 @@
         id="symbolInput"
         v-model="tokenOptions.symbol"
         autocomplete="off"
-        required
+        aria-describedby="symbolError"
+        :state="validSymbol"
         placeholder="Enter a symbol for your token"
       ></b-form-input>
+      <b-form-invalid-feedback id="symbolError">
+        This is a required field and must be an alphanumeric symbol that is less than or equal to 8 bytes
+      </b-form-invalid-feedback>
     </b-form-group>
 
     <b-form-group
@@ -82,6 +64,9 @@
           {{option.amount}}
         </template>
       </Multiselect>
+      <b-form-invalid-feedback v-if="!validSupply" style="display:block" id="totalSupplyError">
+        This is a required field and must be an integer value that is less than or equal to {{$utils.MAXUINT128}}
+      </b-form-invalid-feedback>
     </b-form-group>
 
     <b-form-group
@@ -90,12 +75,15 @@
       label-size="lg"
       description=""
     >
-      <b-form-select
+      <multiselect
         id="feeTypeInput"
+        :allow-empty="false"
+        :searchable="false"
+        deselect-label="Can't remove this value"
         v-model="tokenOptions.feeType"
         :options="feeOptions"
-        required
-      ></b-form-select>
+      >
+      </multiselect>
     </b-form-group>
 
     <b-form-group
@@ -108,9 +96,13 @@
         id="feeRateInput"
         v-model="tokenOptions.feeRate"
         autocomplete="off"
-        required
+        aria-describedby="rateError"
+        :state="validFeeRate"
         placeholder="Enter the fee rate"
       ></b-form-input>
+      <b-form-invalid-feedback id="rateError">
+        This is a required field and must be an integer value that is <span v-if='tokenOptions.feeType === "flat"'>less than {{tokenOptions.totalSupply.amount}}</span><span v-if='tokenOptions.feeType === "percentage"'>between 0 - 100</span>
+      </b-form-invalid-feedback>
     </b-form-group>
 
     <b-form-group label-size="lg" label="Token Settings">
@@ -174,6 +166,9 @@
               <LogosAddress :inactive="true" :force="true" :address="option.address" />
             </template>
           </Multiselect>
+          <b-form-invalid-feedback v-if="!isControllerValid(index)" style="display:block" id="controllerError">
+            This is a required field and must be a valid logos address, no duplicate addresses are allowed
+          </b-form-invalid-feedback>
         </b-form-group>
 
         <b-form-group :label="`Privileges`">
@@ -243,25 +238,32 @@
         </b-form-group>
       </div>
     </b-form-group>
-    <b-button v-if="tokenOptions.controllers.length < 10" @click="addController" variant="primary">
-      Add Another Controller
-    </b-button>
-    <b-button v-if="tokenOptions.controllers.length > 1" @click="removeController" variant="danger" class="ml-1">
-      Remove Last Controller
-    </b-button>
+    <div class="text-center">
+      <b-button v-if="tokenOptions.controllers.length < 10" @click="addController" variant="primary">
+        Add Another Controller
+      </b-button>
+      <b-button v-if="tokenOptions.controllers.length > 1" @click="removeController" variant="danger" class="ml-3">
+        Remove Last Controller
+      </b-button>
+    </div>
 
     <b-form-group class="mt-3" label-size="lg" :label="`Optional Issuer Info Parameters`">
       <b-form-group
         id="tokenDecimals"
         label="Token Decimals"
-        :description="`With the decimial set to ${tokenOptions.totalSupply.decimals} the total supply will be ${$Logos.convert.fromTo(tokenOptions.totalSupply.amount, 0, tokenOptions.totalSupply.decimals)} ${tokenOptions.symbol}`"
+        :description="decimalDescription"
       >
         <b-form-input
           id="tokenDecimalsInput"
           v-model="tokenOptions.totalSupply.decimals"
           autocomplete="off"
+          aria-describedby="decimalError"
+          :state="validDecimal"
           placeholder="Enter the decimal value of the display unit"
         ></b-form-input>
+        <b-form-invalid-feedback id="decimalError">
+          Optional, must be an integer value
+        </b-form-invalid-feedback>
       </b-form-group>
 
       <b-form-group
@@ -274,7 +276,12 @@
           v-model="issuerInfo.image"
           autocomplete="off"
           placeholder="Enter image url"
+          aria-describedby="imageError"
+          :state="validImage"
         ></b-form-input>
+        <b-form-invalid-feedback id="imageError">
+          Must be a valid URL
+        </b-form-invalid-feedback>
       </b-form-group>
 
       <b-form-group
@@ -287,11 +294,30 @@
           v-model="issuerInfo.website"
           autocomplete="off"
           placeholder="Enter Website URL"
+          aria-describedby="urlError"
+          :state="validURL"
         ></b-form-input>
+        <b-form-invalid-feedback id="urlError">
+          Must be a valid URL
+        </b-form-invalid-feedback>
       </b-form-group>
     </b-form-group>
     <div class="text-right">
-      <b-button v-on:click="createToken()" type="submit" variant="primary">Create Token</b-button>
+      <b-button
+        v-on:click="createToken()"
+        :disabled="!validName ||
+          !validSymbol ||
+          !validSupply ||
+          !validFeeRate ||
+          !validControllers ||
+          validDecimal === false ||
+          validImage === false ||
+          validURL === false"
+        type="submit"
+        variant="primary"
+      >
+        Create Token
+      </b-button>
     </div>
   </div>
 </template>
@@ -308,7 +334,7 @@ import Multiselect from 'vue-multiselect'
 import bigInt from 'big-integer'
 import cloneDeep from 'lodash/cloneDeep'
 import { faQuestionCircle } from '@fortawesome/pro-light-svg-icons'
-
+const urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/
 export default {
   name: 'issueTokenForm',
   data () {
@@ -316,8 +342,8 @@ export default {
       faQuestionCircle,
       accounts: [],
       issuerInfo: {
-        image: null,
-        website: null
+        image: '',
+        website: ''
       },
       emptyController: {
         account: null,
@@ -450,9 +476,78 @@ export default {
     combinedAccounts: function () {
       let forgeAccounts = cloneDeep(this.forgeAccounts)
       return Array.from(Object.values(forgeAccounts)).concat(this.accounts)
+    },
+    validName: function () {
+      return this.$utils.isAlphanumeric(this.tokenOptions.name) && this.$utils.byteCount(this.tokenOptions.name) <= 32
+    },
+    validSymbol: function () {
+      return this.$utils.isAlphanumeric(this.tokenOptions.symbol) && this.$utils.byteCount(this.tokenOptions.symbol) <= 8
+    },
+    validSupply: function () {
+      return bigInt(this.tokenOptions.totalSupply.amount).lesserOrEquals(bigInt(this.$utils.MAXUINT128))
+    },
+    validFeeRate: function () {
+      if (!/^([0-9]+)$/.test(this.tokenOptions.feeRate)) return false
+      if (this.tokenOptions.feeType === 'percentage' && bigInt(this.feeRate).lesserOrEquals(bigInt('100'))) {
+        return true
+      } else if (this.tokenOptions.feeType === 'flat' && bigInt(this.feeRate).lesserOrEquals(bigInt(this.tokenOptions.totalSupply.amount))) {
+        return true
+      }
+    },
+    validDecimal: function () {
+      if (this.tokenOptions.totalSupply.decimals === '') return null
+      return /^([0-9]+)$/.test(this.tokenOptions.totalSupply.decimals)
+    },
+    validImage: function () {
+      if (this.issuerInfo.image === '') return null
+      return urlRegex.test(this.issuerInfo.image)
+    },
+    validURL: function () {
+      if (this.issuerInfo.website === '') return null
+      return urlRegex.test(this.issuerInfo.website)
+    },
+    validControllers: function () {
+      let accounts = []
+      for (let controller of this.tokenOptions.controllers) {
+        if (!controller.account) return false
+        if (/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/.test(controller.account.address)) {
+          if (accounts.includes(controller.account.address)) {
+            return false
+          } else {
+            accounts.push(controller.account.address)
+          }
+        } else {
+          return false
+        }
+      }
+      return true
+    },
+    decimalDescription: function () {
+      if (this.validDecimal) {
+        return `With the decimial set to ${this.tokenOptions.totalSupply.decimals} the total supply will be ${this.$Logos.convert.fromTo(this.tokenOptions.totalSupply.amount, 0, this.tokenOptions.totalSupply.decimals)} ${this.tokenOptions.symbol}`
+      } else {
+        return `With no decimial set the total supply will be ${this.tokenOptions.totalSupply.amount} ${this.tokenOptions.symbol}`
+      }
     }
   },
   methods: {
+    isControllerValid: function (index) {
+      let accounts = []
+      for (let i = 0; i < this.tokenOptions.controllers.length; i++) {
+        if (!this.tokenOptions.controllers[i].account) {
+          if (i === index) return false
+        } else if (/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/.test(this.tokenOptions.controllers[i].account.address)) {
+          if (accounts.includes(this.tokenOptions.controllers[i].account.address) && i === index) {
+            return false
+          } else {
+            accounts.push(this.tokenOptions.controllers[i].account.address)
+          }
+        } else if (i === index) {
+          return false
+        }
+      }
+      return true
+    },
     addAccount (newAddress, id) {
       if (newAddress.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
         let newAccount = { label: newAddress, address: newAddress }
