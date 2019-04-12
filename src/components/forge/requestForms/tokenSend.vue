@@ -65,11 +65,23 @@
         v-model="transaction.amount"
         autocomplete="off"
         required
+        aria-describedby="amountError"
+        :state="isValidAmount"
         placeholder="Amount of Tokens"
       ></b-form-input>
+      <b-form-invalid-feedback id="amountError">
+        This is a required field and must be a positive decimal or integer value that is less than the current account's token balance
+      </b-form-invalid-feedback>
     </b-form-group>
     <div class="text-right">
-      <b-button v-on:click="createTokenSend()" type="submit" variant="primary">Send Tokens</b-button>
+      <b-button
+        v-on:click="createTokenSend()"
+        type="submit"
+        variant="primary"
+        :disabled="!isValidAmount || !transaction.destination || !selectedToken"
+      >
+        Send Tokens
+      </b-button>
     </div>
   </div>
 </template>
@@ -91,7 +103,7 @@ export default {
       selectedToken: null,
       transaction: {
         destination: null,
-        amount: null
+        amount: ''
       }
     }
   },
@@ -111,6 +123,28 @@ export default {
       let forgeAccounts = cloneDeep(this.forgeAccounts)
       if (this.currentAccount) delete forgeAccounts[this.currentAccount.address]
       return Array.from(Object.values(forgeAccounts)).concat(this.accounts)
+    },
+    isValidAmount: function () {
+      if (this.transaction.amount === '') return null
+      let token = this.selectedToken
+      if (!token) return null
+      let amountInRaw = cloneDeep(this.transaction.amount)
+      if (amountInRaw && token && token.issuerInfo &&
+        typeof token.issuerInfo.decimals !== 'undefined' &&
+        token.issuerInfo.decimals > 0) {
+        if (!/^([0-9]+(?:[.][0-9]*)?|\.[0-9]+)$/.test(amountInRaw)) return false
+        amountInRaw = this.$Logos.convert.fromTo(amountInRaw, token.issuerInfo.decimals, 0)
+      } else {
+        if (!/^([0-9]+)$/.test(amountInRaw)) return false
+      }
+      if (token.fee_type === 'flat') {
+        return (bigInt(this.currentAccount.tokenBalances[this.$utils.keyFromAccount(token.tokenAccount)])
+          .minus(bigInt(token.fee_rate))
+          .greaterOrEquals(bigInt(amountInRaw)))
+      } else {
+        return (bigInt(this.currentAccount.tokenBalances[this.$utils.keyFromAccount(token.tokenAccount)])
+          .greaterOrEquals(bigInt(amountInRaw)))
+      }
     },
     sendableTokens: function () {
       let tokens = []
@@ -138,8 +172,8 @@ export default {
           amount = this.$Logos.convert.fromTo(this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.tokenAccount)], 0, this.selectedToken.issuerInfo.decimals)
           return `${amount} ${this.selectedToken.symbol} are available to send`
         } else {
-          amount = this.selectedToken.token_balance
-          return `${amount} base units of ${this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.tokenAccount)]} are available to send`
+          amount = this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.tokenAccount)]
+          return `${amount} base units of ${this.selectedToken.name} are available to send`
         }
       }
       return 'Select a token first'
@@ -165,7 +199,7 @@ export default {
         }
         // Check if target account is open?
         if (this.selectedToken.fee_type === 'flat') {
-          if (bigInt(this.selectedToken.token_balance)
+          if (bigInt(this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.tokenAccount)])
             .minus(bigInt(this.selectedToken.fee_rate))
             .greaterOrEquals(bigInt(amountInBaseUnit))) {
             this.$wallet.account.createTokenSendRequest(
@@ -177,7 +211,7 @@ export default {
             )
           }
         } else {
-          if (bigInt(this.selectedToken.token_balance)
+          if (bigInt(this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.tokenAccount)])
             .greaterOrEquals(bigInt(amountInBaseUnit))) {
             this.$wallet.account.createTokenSendRequest(
               this.selectedToken.tokenAccount,

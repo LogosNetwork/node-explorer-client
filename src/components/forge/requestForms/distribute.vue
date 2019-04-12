@@ -68,10 +68,9 @@
     >
       <b-form-input
         id="amountInput"
-        aria-describedby="amountError"
         v-model="transaction.amount"
+        aria-describedby="amountError"
         :state="isValidAmount"
-        name="amount"
         autocomplete="off"
         required
         placeholder="Amount of Tokens"
@@ -85,7 +84,8 @@
         v-on:click="createDistribute()"
         type="submit"
         :disabled="!isValidAmount || !sufficientBalance || !sufficientTokenBalance"
-        variant="primary">
+        variant="primary"
+      >
           Distribute Tokens
       </b-button>
     </div>

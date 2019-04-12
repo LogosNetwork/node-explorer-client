@@ -37,12 +37,24 @@
         id="amountInput"
         v-model="sendForm.amount"
         autocomplete="off"
+        aria-describedby="amountError"
+        :state="isValidAmount"
         required
         placeholder="Amount in Logos"
       ></b-form-input>
+      <b-form-invalid-feedback id="amountError">
+        This is a required field and must be a positive decimal or integer value that is less than the current accounts balance
+      </b-form-invalid-feedback>
     </b-form-group>
     <div class="text-right">
-      <b-button v-on:click="createSend()" type="submit" variant="primary">Create Send</b-button>
+      <b-button
+        v-on:click="createSend()"
+        type="submit"
+        variant="primary"
+        :disabled="!isValidAmount || !sendForm.to"
+      >
+        Create Send
+      </b-button>
     </div>
   </div>
 </template>
@@ -63,7 +75,7 @@ export default {
       accounts: [],
       sendForm: {
         to: null,
-        amount: null
+        amount: ''
       }
     }
   },
@@ -87,6 +99,25 @@ export default {
       }
       if (this.currentAccount) delete forgeAccounts[this.currentAccount.address]
       return Array.from(Object.values(forgeAccounts)).concat(this.accounts).concat(forgeTokens)
+    },
+    isValidAmount: function () {
+      if (this.sendForm.amount === '') return null
+      let amountInRaw = cloneDeep(this.sendForm.amount)
+      if (amountInRaw) {
+        if (!/^([0-9]+(?:[.][0-9]*)?|\.[0-9]+)$/.test(amountInRaw)) return false
+        amountInRaw = this.$Logos.convert.toReason(amountInRaw, 'LOGOS')
+        return (
+          bigInt(amountInRaw).greater(0) &&
+          bigInt(this.$wallet.account.balance)
+            .greaterOrEquals(
+              bigInt(amountInRaw)
+                .plus(
+                  bigInt(this.$utils.minimumFee)
+                )
+            )
+        )
+      }
+      return false
     }
   },
   methods: {
@@ -117,6 +148,11 @@ export default {
       } else {
         return address
       }
+    }
+  },
+  created: function () {
+    if (this.combinedAccounts.length > 0) {
+      this.sendForm.to = this.combinedAccounts[0]
     }
   },
   watch: {
