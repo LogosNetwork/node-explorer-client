@@ -121,6 +121,12 @@ const createToast = (request, rpcClient, commit, state) => {
         toast.message = `${request.transaction.destination} received a token distribution of ${request.transaction.amount} base units of ${request.tokenInfo.symbol}`
       }
     }
+  } else if (request.type === 'adjust_user_status') {
+    if (request.origin === request.mqttDestination) {
+      toast.message = `${request.mqttDestination} set the status of ${request.account} to ${request.status}`
+    } else {
+      toast.message = `${request.mqttDestination} status was set to ${request.status}`
+    }
   }
   toast.request = request
   commit('addToast', toast)

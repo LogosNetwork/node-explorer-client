@@ -99,7 +99,7 @@
         title="Adjust User Token Setting"
         subtitle="Freeze, Un-Freeze, Whitelist, or Un-Whitelist a user."
       >
-        Not Yet Implemented :(
+        <adjustUserStatus/>
       </accordion>
 
       <accordion
@@ -192,6 +192,7 @@ import fund from '@/components/forge/fund.vue'
 import createAccount from '@/components/forge/requestForms/createAccount.vue'
 import send from '@/components/forge/requestForms/send.vue'
 import tokenSend from '@/components/forge/requestForms/tokenSend.vue'
+import adjustUserStatus from '@/components/forge/requestForms/adjustUserStatus.vue'
 import issuance from '@/components/forge/requestForms/issuance.vue'
 import distribute from '@/components/forge/requestForms/distribute.vue'
 import bigInt from 'big-integer'
@@ -226,7 +227,8 @@ export default {
     send,
     tokenSend,
     issuance,
-    distribute
+    distribute,
+    adjustUserStatus
   },
   computed: {
     ...mapState('forge', {

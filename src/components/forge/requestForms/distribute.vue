@@ -61,6 +61,9 @@
           <LogosAddress :inactive="true" :force="true" :address="option.address" />
         </template>
       </Multiselect>
+      <div v-if="!transaction.destination" style="display:block" class="invalid-feedback">
+        You must select an account to distribute to
+      </div>
     </b-form-group>
 
     <b-form-group
@@ -86,7 +89,7 @@
       <b-button
         v-on:click="createDistribute()"
         type="submit"
-        :disabled="!isValidAmount || !sufficientBalance || !sufficientTokenBalance"
+        :disabled="!isValidAmount || !sufficientBalance || !sufficientTokenBalance || !transaction.destination"
         variant="primary"
       >
           Distribute Tokens
@@ -104,7 +107,7 @@ import Multiselect from 'vue-multiselect'
 import cloneDeep from 'lodash/cloneDeep'
 import bigInt from 'big-integer'
 export default {
-  name: 'sendForm',
+  name: 'distributeForm',
   data () {
     return {
       accounts: [],
