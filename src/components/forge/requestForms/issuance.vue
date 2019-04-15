@@ -493,6 +493,7 @@ export default {
       } else if (this.tokenOptions.feeType === 'flat' && bigInt(this.feeRate).lesserOrEquals(bigInt(this.tokenOptions.totalSupply.amount))) {
         return true
       }
+      return false
     },
     validDecimal: function () {
       if (this.tokenOptions.totalSupply.decimals === '') return null

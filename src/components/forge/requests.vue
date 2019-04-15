@@ -110,7 +110,7 @@
         title="Adjust Token Fee"
         subtitle="Change the token fee for the given token."
       >
-        Not Yet Implemented :(
+        <adjustFee/>
       </accordion>
 
       <accordion
@@ -198,6 +198,7 @@ import changeSetting from '@/components/forge/requestForms/changeSetting.vue'
 import immuteSetting from '@/components/forge/requestForms/immuteSetting.vue'
 import revoke from '@/components/forge/requestForms/revoke.vue'
 import adjustUserStatus from '@/components/forge/requestForms/adjustUserStatus.vue'
+import adjustFee from '@/components/forge/requestForms/adjustFee.vue'
 import distribute from '@/components/forge/requestForms/distribute.vue'
 import bigInt from 'big-integer'
 import LogosAddress from '@/components/LogosAddress.vue'
@@ -236,6 +237,7 @@ export default {
     immuteSetting,
     revoke,
     adjustUserStatus,
+    adjustFee,
     distribute
   },
   computed: {
