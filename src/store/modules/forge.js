@@ -147,6 +147,12 @@ const createToast = (request, rpcClient, commit, state) => {
     }
   } else if (request.type === 'adjust_fee') {
     toast.message = `${request.origin} changed the fee of ${request.tokenInfo.name} to ${request.fee_type} with a fee rate of ${request.fee_type === 'percentage' ? `${request.fee_rate}% of the transaction amount` : `${request.fee_rate} base units of ${request.tokenInfo.symbol}`}`
+  } else if (request.type === 'burn') {
+    if (request.amountInToken) {
+      toast.message = `${request.origin} burned ${request.amountInToken} ${request.tokenInfo.symbol}`
+    } else {
+      toast.message = `${request.origin} burned ${request.amount} base units of ${request.tokenInfo.symbol}`
+    }
   }
   toast.request = request
   commit('addToast', toast)
