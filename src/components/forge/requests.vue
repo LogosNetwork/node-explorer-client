@@ -77,7 +77,7 @@
         title="Immute Token Setting"
         subtitle="Permanently immute a setting of the given token."
       >
-        Not Yet Implemented :(
+        <immuteSetting/>
       </accordion>
 
       <accordion
@@ -195,6 +195,7 @@ import tokenSend from '@/components/forge/requestForms/tokenSend.vue'
 import issuance from '@/components/forge/requestForms/issuance.vue'
 import issueAdditional from '@/components/forge/requestForms/issueAdditional.vue'
 import changeSetting from '@/components/forge/requestForms/changeSetting.vue'
+import immuteSetting from '@/components/forge/requestForms/immuteSetting.vue'
 import adjustUserStatus from '@/components/forge/requestForms/adjustUserStatus.vue'
 import distribute from '@/components/forge/requestForms/distribute.vue'
 import bigInt from 'big-integer'
@@ -231,6 +232,7 @@ export default {
     issuance,
     issueAdditional,
     changeSetting,
+    immuteSetting,
     adjustUserStatus,
     distribute
   },

@@ -137,6 +137,8 @@ const createToast = (request, rpcClient, commit, state) => {
     }
   } else if (request.type === 'change_setting') {
     toast.message = `${request.mqttDestination} changed the ${request.setting} setting of ${request.tokenInfo.name} to ${request.value}`
+  } else if (request.type === 'immute_setting') {
+    toast.message = `${request.mqttDestination} has locked the ${request.setting} setting to ${request.tokenInfo.settings.includes(request.setting)} for ${request.tokenInfo.name}`
   }
   toast.request = request
   commit('addToast', toast)
