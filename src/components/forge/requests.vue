@@ -55,7 +55,7 @@
         title="Issue Additional Tokens"
         subtitle="Increases the total supply of a token."
       >
-        Not Yet Implemented :(
+        <issueAdditional/>
       </accordion>
 
       <accordion
@@ -192,8 +192,9 @@ import fund from '@/components/forge/fund.vue'
 import createAccount from '@/components/forge/requestForms/createAccount.vue'
 import send from '@/components/forge/requestForms/send.vue'
 import tokenSend from '@/components/forge/requestForms/tokenSend.vue'
-import adjustUserStatus from '@/components/forge/requestForms/adjustUserStatus.vue'
 import issuance from '@/components/forge/requestForms/issuance.vue'
+import issueAdditional from '@/components/forge/requestForms/issueAdditional.vue'
+import adjustUserStatus from '@/components/forge/requestForms/adjustUserStatus.vue'
 import distribute from '@/components/forge/requestForms/distribute.vue'
 import bigInt from 'big-integer'
 import LogosAddress from '@/components/LogosAddress.vue'
@@ -227,8 +228,9 @@ export default {
     send,
     tokenSend,
     issuance,
-    distribute,
-    adjustUserStatus
+    issueAdditional,
+    adjustUserStatus,
+    distribute
   },
   computed: {
     ...mapState('forge', {
