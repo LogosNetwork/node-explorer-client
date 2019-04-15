@@ -135,6 +135,8 @@ const createToast = (request, rpcClient, commit, state) => {
         toast.message = `${request.mqttDestination} minted an additional ${request.amount} base units of ${request.tokenInfo.symbol}`
       }
     }
+  } else if (request.type === 'change_setting') {
+    toast.message = `${request.mqttDestination} changed the ${request.setting} setting of ${request.tokenInfo.name} to ${request.value}`
   }
   toast.request = request
   commit('addToast', toast)

@@ -66,7 +66,7 @@
         title="Change Token Setting"
         subtitle="Change the settings of the given token."
       >
-        Not Yet Implemented :(
+        <changeSetting/>
       </accordion>
 
       <accordion
@@ -194,6 +194,7 @@ import send from '@/components/forge/requestForms/send.vue'
 import tokenSend from '@/components/forge/requestForms/tokenSend.vue'
 import issuance from '@/components/forge/requestForms/issuance.vue'
 import issueAdditional from '@/components/forge/requestForms/issueAdditional.vue'
+import changeSetting from '@/components/forge/requestForms/changeSetting.vue'
 import adjustUserStatus from '@/components/forge/requestForms/adjustUserStatus.vue'
 import distribute from '@/components/forge/requestForms/distribute.vue'
 import bigInt from 'big-integer'
@@ -229,6 +230,7 @@ export default {
     tokenSend,
     issuance,
     issueAdditional,
+    changeSetting,
     adjustUserStatus,
     distribute
   },
