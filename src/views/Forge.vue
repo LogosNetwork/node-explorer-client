@@ -25,9 +25,9 @@
                   <span class="sr-only">Account Options</span>
                 </template>
                 <b-dropdown-item :href="`/${account.address}`" target="_blank">Open Account Page</b-dropdown-item>
-                <b-dropdown-item href="#">Change Label</b-dropdown-item>
+                <!-- <b-dropdown-item href="#">Change Label</b-dropdown-item>
                 <b-dropdown-item href="#">Account Info</b-dropdown-item>
-                <b-dropdown-item href="#">Copy Account Address</b-dropdown-item>
+                <b-dropdown-item href="#">Copy Account Address</b-dropdown-item> -->
                 <b-dropdown-item v-on:click="removeAccount(account.address)">Remove Account</b-dropdown-item>
               </b-dropdown>
             </b-list-group-item>
@@ -63,8 +63,8 @@
                   <span class="sr-only">Token Options</span>
                 </template>
                 <b-dropdown-item :href="`/${token.tokenAccount}`" target="_blank">Open Token Page</b-dropdown-item>
-                <b-dropdown-item href="#">Token Info</b-dropdown-item>
-                <b-dropdown-item href="#">Copy Token Address</b-dropdown-item>
+                <!-- <b-dropdown-item href="#">Token Info</b-dropdown-item>
+                <b-dropdown-item href="#">Copy Token Address</b-dropdown-item> -->
               </b-dropdown>
             </b-list-group-item>
           </b-list-group>
@@ -208,6 +208,7 @@ export default {
     },
     removeAccount: function (address) {
       this.$wallet.removeAccount(address)
+      // TODO UPDATE UI
     },
     changeSelectedVisual: function (newSelected) {
       this.selectedVisual = newSelected
