@@ -139,6 +139,12 @@ const createToast = (request, rpcClient, commit, state) => {
     toast.message = `${request.mqttDestination} changed the ${request.setting} setting of ${request.tokenInfo.name} to ${request.value}`
   } else if (request.type === 'immute_setting') {
     toast.message = `${request.mqttDestination} has locked the ${request.setting} setting to ${request.tokenInfo.settings.includes(request.setting)} for ${request.tokenInfo.name}`
+  } else if (request.type === 'revoke') {
+    if (request.amountInToken) {
+      toast.message = `${request.origin} revoked ${request.amountInToken} ${request.tokenInfo.symbol} from ${request.source} to ${request.transaction.destination}`
+    } else {
+      toast.message = `${request.origin} revoked ${request.transaction.amount} base units of ${request.tokenInfo.symbol} from ${request.source} to ${request.transaction.destination}`
+    }
   }
   toast.request = request
   commit('addToast', toast)

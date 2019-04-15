@@ -88,7 +88,7 @@
         title="Revoke Token from User"
         subtitle="Remove tokens from a one account and send them to another."
       >
-        Not Yet Implemented :(
+        <revoke/>
       </accordion>
 
       <accordion
@@ -196,6 +196,7 @@ import issuance from '@/components/forge/requestForms/issuance.vue'
 import issueAdditional from '@/components/forge/requestForms/issueAdditional.vue'
 import changeSetting from '@/components/forge/requestForms/changeSetting.vue'
 import immuteSetting from '@/components/forge/requestForms/immuteSetting.vue'
+import revoke from '@/components/forge/requestForms/revoke.vue'
 import adjustUserStatus from '@/components/forge/requestForms/adjustUserStatus.vue'
 import distribute from '@/components/forge/requestForms/distribute.vue'
 import bigInt from 'big-integer'
@@ -233,6 +234,7 @@ export default {
     issueAdditional,
     changeSetting,
     immuteSetting,
+    revoke,
     adjustUserStatus,
     distribute
   },

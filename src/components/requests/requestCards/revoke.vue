@@ -22,7 +22,7 @@
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item>
-        <font-awesome-icon :icon="mafaMasksk" class="text-danger mr-2"/>
+        <font-awesome-icon :icon="faMask" class="text-danger mr-2"/>
         <LogosAddress class="mr-2" :address="requestInfo.source" />
         <span class="mr-2">was revoked</span>
         <span v-if="requestInfo.transaction.amountInToken" class="text-danger mr-2">{{requestInfo.transaction.amountInToken}}</span>
