@@ -287,7 +287,7 @@ export default {
                   privilege === 'withdraw_fee' ||
                   privilege === 'burn' ||
                   privilege === 'update_issuer_info') {
-                  return controller.privileges.indexOf(privilege) > -1
+                  if (controller.privileges.indexOf(privilege) > -1) return true
                 } else if (this.forgeTokens[tokenAddress].settings instanceof Array) {
                   if (privilege === 'adjust_fee' ||
                     privilege === 'revoke' ||
@@ -353,10 +353,8 @@ export default {
             }
           }
         }
-        return false
-      } else {
-        return false
       }
+      return false
     }
   }
 }
