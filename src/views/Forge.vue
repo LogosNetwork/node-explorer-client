@@ -349,12 +349,14 @@ label.btn-link.active {
 }
 </style>
 <style lang="scss">
+  .collapsedForm:not(.card-body) {
+    padding: 0;
+    padding-bottom: 1.25rem;
+  }
   .collapsedForm {
     border-top:1px solid rgba(0, 0, 0, 0.075);
     margin-left: 1.25rem;
     margin-right: 1.25rem;
-    padding: 0;
-    padding-bottom: 1.25rem;
   }
   .iconHolder {
     width: 52px;

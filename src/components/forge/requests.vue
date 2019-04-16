@@ -186,7 +186,9 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { mapState } from 'vuex'
+import VueQrcode from '@xkeshi/vue-qrcode'
 import accordion from '@/components/forge/accordion.vue'
 import fund from '@/components/forge/fund.vue'
 import createAccount from '@/components/forge/requestForms/createAccount.vue'
@@ -204,6 +206,7 @@ import distribute from '@/components/forge/requestForms/distribute.vue'
 import bigInt from 'big-integer'
 import LogosAddress from '@/components/LogosAddress.vue'
 import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage } from '@fortawesome/pro-light-svg-icons'
+Vue.component(VueQrcode.name, VueQrcode)
 
 export default {
   name: 'Requests',
