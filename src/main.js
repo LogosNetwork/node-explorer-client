@@ -38,7 +38,7 @@ import bTable from 'bootstrap-vue/es/components/table/table'
 import bFormCheckbox from 'bootstrap-vue/es/components/form-checkbox/form-checkbox'
 
 // Icons
-import { FontAwesomeIcon, FontAwesomeLayers, FontAwesomeLayersText } from '@fortawesome/vue-fontawesome'
+import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
 Vue.config.productionTip = false
 Vue.directive('b-tooltip', vBTooltip)
@@ -46,7 +46,6 @@ Vue.directive('b-modal', vBModal)
 Vue.directive('b-toggle', vBToggle)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('font-awesome-layers', FontAwesomeLayers)
-Vue.component('font-awesome-layers-text', FontAwesomeLayersText)
 Vue.component('b-form', bForm)
 Vue.component('b-input', bFormInput)
 Vue.component('b-container', bContainer)

@@ -88,14 +88,13 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import codepad from '@/components/codepad.vue'
 let fields = [
   { key: 'index', label: 'Delegate #' },
   { key: 'hash', label: 'Hash' }
 ]
 export default {
   components: {
-    codepad
+    codepad: () => import('@/components/codepad.vue')
   },
   computed: {
     ...mapState('microEpoch', {

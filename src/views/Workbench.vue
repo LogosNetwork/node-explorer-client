@@ -98,13 +98,12 @@
 <script>
 import Vue from 'vue'
 import Logos from '../api/rpc'
-import codepad from '@/components/codepad.vue'
 import config from '../../config'
 Vue.use(Logos, { url: config.rpcHost, proxyURL: config.rpcProxy, debug: true })
 export default {
   name: 'workbench',
   components: {
-    codepad
+    codepad: () => import('@/components/codepad.vue')
   },
   data () {
     let $this = this

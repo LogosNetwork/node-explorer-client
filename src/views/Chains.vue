@@ -134,14 +134,13 @@
 import { mapActions, mapState } from 'vuex'
 import infiniteScroll from 'vue-infinite-scroll'
 import Vue from 'vue'
-import codepad from '@/components/codepad.vue'
 import orderBy from 'lodash/orderBy'
 import { faChevronDown } from '@fortawesome/pro-light-svg-icons'
 Vue.use(infiniteScroll)
 export default {
   name: 'explore',
   components: {
-    codepad
+    codepad: () => import('@/components/codepad.vue')
   },
   computed: {
     ...mapState('settings', {

@@ -192,6 +192,7 @@ const actions = {
 
 const mutations = {
   setAccounts (state, accounts) {
+    state.accounts = {}
     state.walletAccounts = cloneDeep(accounts)
     for (let account in state.walletAccounts) {
       let applicationAccount = {

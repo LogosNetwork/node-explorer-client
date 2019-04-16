@@ -208,7 +208,6 @@ export default {
     },
     removeAccount: function (address) {
       this.$wallet.removeAccount(address)
-      // TODO UPDATE UI
     },
     changeSelectedVisual: function (newSelected) {
       this.selectedVisual = newSelected
@@ -251,7 +250,7 @@ export default {
           duration: 5000,
           action: [
             {
-              text: 'Cancel',
+              text: 'Close',
               onClick: (e, toastObject) => {
                 toastObject.goAway(0)
               }

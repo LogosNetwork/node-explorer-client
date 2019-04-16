@@ -19,14 +19,13 @@
 import { mapActions, mapState } from 'vuex'
 import Vue from 'vue'
 import infiniteScroll from 'vue-infinite-scroll'
-import codepad from '@/components/codepad.vue'
 import tokenCard from '@/components/requests/tokenCard.vue'
 Vue.use(infiniteScroll)
 
 export default {
   name: 'tokens',
   components: {
-    codepad,
+    codepad: () => import('@/components/codepad.vue'),
     tokenCard
   },
   computed: {

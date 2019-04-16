@@ -52,12 +52,11 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import codepad from '@/components/codepad.vue'
 import request from '@/components/requests/request.vue'
 
 export default {
   components: {
-    codepad,
+    codepad: () => import('@/components/codepad.vue'),
     request
   },
   computed: {

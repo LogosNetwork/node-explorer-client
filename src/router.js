@@ -1,18 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Explore from './views/Explore.vue'
-import Governance from './views/Governance.vue'
-import Tokens from './views/Tokens.vue'
-import Workbench from './views/Workbench.vue'
-import Forge from './views/Forge.vue'
-import Request from './views/Request.vue'
-import microEpoch from './views/MicroEpoch.vue'
-import requestBlock from './views/RequestBlock.vue'
-import epoch from './views/Epoch.vue'
-import notFound from './views/404.vue'
-import Account from './views/Account.vue'
-import Chains from './views/Chains.vue'
-import Faucet from './views/Faucet.vue'
 
 Vue.use(Router)
 
@@ -23,73 +10,73 @@ const router = new Router({
     {
       path: '/',
       name: 'explore',
-      component: Explore
+      component: () => import('./views/Explore.vue')
     },
     {
       path: '/chains',
       name: 'chains',
-      component: Chains
+      component: () => import('./views/Chains.vue')
     },
     {
       path: '/Governance',
       name: 'governance',
-      component: Governance
+      component: () => import('./views/Governance.vue')
     },
     {
       path: '/tokens',
       name: 'tokens',
-      component: Tokens
+      component: () => import('./views/Tokens.vue')
     },
     {
       path: '/workbench',
       name: 'workbench',
-      component: Workbench
+      component: () => import('./views/Workbench.vue')
     },
     {
       path: '/forge',
       name: 'forge',
-      component: Forge
+      component: () => import('./views/Forge.vue')
     },
     {
       path: '/:account(lgs_[13456789abcdefghijkmnopqrstuwxyz]{60})',
       name: 'account',
-      component: Account,
+      component: () => import('./views/Account.vue'),
       props: true
     },
     {
       path: '/:request([0-9a-fA-F]{64})',
       name: 'request',
-      component: Request,
+      component: () => import('./views/Request.vue'),
       props: true
     },
     {
       path: '/microEpoch/:hash([0-9a-fA-F]{64})',
       name: 'microEpoch',
-      component: microEpoch,
+      component: () => import('./views/MicroEpoch.vue'),
       props: true
     },
     {
       path: '/requestBlock/:hash([0-9a-fA-F]{64})',
       name: 'requestBlock',
-      component: requestBlock,
+      component: () => import('./views/RequestBlock.vue'),
       props: true
     },
     {
       path: '/epoch/:hash([0-9a-fA-F]{64})',
       name: 'epoch',
-      component: epoch,
+      component: () => import('./views/Epoch.vue'),
       props: true
     },
     {
       path: '/faucet',
       name: 'faucet',
-      component: Faucet,
+      component: () => import('./views/Faucet.vue'),
       props: true
     },
     {
       path: '*',
       name: '404',
-      component: notFound
+      component: () => import('./views/404.vue')
     }
   ],
   scrollBehavior (to, from, savedPosition) {

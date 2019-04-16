@@ -60,7 +60,11 @@ export default {
   },
   computed: {
     abrvAddress: function () {
-      return this.address.substring(0, 4 + this.prefixCount) + this.separator + this.address.substring(64 - this.suffixCount, 64)
+      if (this.address) {
+        return this.address.substring(0, 4 + this.prefixCount) + this.separator + this.address.substring(64 - this.suffixCount, 64)
+      } else {
+        return ''
+      }
     }
   }
 }
