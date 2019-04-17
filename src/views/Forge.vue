@@ -4,7 +4,7 @@
       <b-col xs="auto" class="accountPanel">
         <div class="d-flex justify-content-between mt-3 mb-3 align-items-center font-weight-bold">
           <h4 class="mb-0">Accounts</h4>
-          <b-button class="font-weight-bolder" variant="link" v-on:click="$wallet.createAccount()">+ New</b-button>
+          <b-button class="font-weight-bolder" variant="link" v-on:click="$wallet.createAccount(null, false)">+ New</b-button>
         </div>
         <div v-if="accounts.length > 0">
           <b-list-group flush>

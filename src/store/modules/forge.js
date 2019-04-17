@@ -164,6 +164,8 @@ const createToast = (request, rpcClient, commit, state) => {
     toast.message = `${request.origin} withdrew ${request.transaction.amountInLogos} Logos to ${request.transaction.destination}`
   } else if (request.type === 'update_issuer_info') {
     toast.message = `${request.origin} updated the token information of ${request.tokenInfo.name}`
+  } else if (request.type === 'update_controller') {
+    toast.message = `${request.origin} ${request.action}ed ${request.controller.account} ${request.action === 'add' ? `to` : `from`} ${request.tokenInfo.name}'s controllers`
   }
   toast.request = request
   commit('addToast', toast)

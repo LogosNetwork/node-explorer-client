@@ -125,8 +125,19 @@
       </accordion>
 
       <accordion
-        v-if="tokenPrivileges('burn')"
+        v-if="tokenPrivileges('update_controller')"
         bgClass="bg-warning"
+        accordionGroup="accordion"
+        :requestIcon="faCrown"
+        title="Update Controllers"
+        subtitle="Add, remove, or change a controller's privileges"
+      >
+        <updateController/>
+      </accordion>
+
+      <accordion
+        v-if="tokenPrivileges('burn')"
+        bgClass="bg-danger"
         accordionGroup="accordion"
         :requestIcon="faFire"
         title="Burn Tokens"
@@ -137,7 +148,7 @@
 
       <accordion
         v-if="tokenPrivileges('distribute')"
-        bgClass="bg-danger"
+        bgClass="bg-success"
         accordionGroup="accordion"
         :requestIcon="faArrowDown"
         title="Distribute Tokens"
@@ -148,7 +159,7 @@
 
       <accordion
         v-if="tokenPrivileges('withdraw_fee')"
-        bgClass="bg-success"
+        bgClass="bg-primary"
         accordionGroup="accordion"
         :requestIcon="faHandReceiving"
         title="Withdraw Fee"
@@ -159,7 +170,7 @@
 
       <accordion
         v-if="tokenPrivileges('withdraw_logos')"
-        bgClass="bg-primary"
+        bgClass="bg-info"
         accordionGroup="accordion"
         :requestIcon="faLambda"
         title="Withdraw Logos"
@@ -202,13 +213,14 @@ import revoke from '@/components/forge/requestForms/revoke.vue'
 import adjustUserStatus from '@/components/forge/requestForms/adjustUserStatus.vue'
 import adjustFee from '@/components/forge/requestForms/adjustFee.vue'
 import updateIssuerInfo from '@/components/forge/requestForms/updateIssuerInfo.vue'
+import updateController from '@/components/forge/requestForms/updateController.vue'
 import burn from '@/components/forge/requestForms/burn.vue'
 import distribute from '@/components/forge/requestForms/distribute.vue'
 import withdrawFee from '@/components/forge/requestForms/withdrawFee.vue'
 import withdrawLogos from '@/components/forge/requestForms/withdrawLogos.vue'
 import bigInt from 'big-integer'
 import LogosAddress from '@/components/LogosAddress.vue'
-import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage } from '@fortawesome/pro-light-svg-icons'
+import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage, faCrown } from '@fortawesome/pro-light-svg-icons'
 Vue.component(VueQrcode.name, VueQrcode)
 
 export default {
@@ -228,7 +240,8 @@ export default {
       faFire,
       faArrowDown,
       faHandReceiving,
-      faPercentage
+      faPercentage,
+      faCrown
     }
   },
   components: {
@@ -246,6 +259,7 @@ export default {
     adjustUserStatus,
     adjustFee,
     updateIssuerInfo,
+    updateController,
     burn,
     distribute,
     withdrawFee,
@@ -295,6 +309,7 @@ export default {
                   privilege === 'withdraw_logos' ||
                   privilege === 'withdraw_fee' ||
                   privilege === 'burn' ||
+                  privilege === 'update_controller' ||
                   privilege === 'update_issuer_info') {
                   if (controller.privileges.indexOf(privilege) > -1) return true
                 } else if (this.forgeTokens[tokenAddress].settings instanceof Array) {
