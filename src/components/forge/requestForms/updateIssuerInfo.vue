@@ -100,7 +100,7 @@
         label="Custom Token Info"
         label-size="lg"
       >
-        <codepad id='editor' :code="issuerInfo"/>
+        <codepad :code="issuerInfo"/>
         <div v-if="!validIssuerInfo" style="display:block" class="invalid-feedback">
           Issuer Info must be less than or equal to 512 byes
         </div>

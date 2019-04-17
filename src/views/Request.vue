@@ -57,7 +57,7 @@
       <b-row v-if="!error && details !== null">
         <b-col cols="12" class="text-left">
           <h4 class="text-left" v-t="'prettyRequest'"></h4>
-          <codepad id='editor' class="text-left mb-3" v-if='details' :code='prettyDetails'/>
+          <codepad class="text-left mb-3" v-if='details' :code='prettyDetails'/>
         </b-col>
       </b-row>
       <b-row v-if="error">

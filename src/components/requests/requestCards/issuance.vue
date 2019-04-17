@@ -68,7 +68,7 @@
       </b-list-group-item>
       <b-list-group-item v-on:click.prevent>
         <strong>Issuer Info</strong><br/>
-        <codepad id='editor' class="text-left" :code="requestInfo.prettyInfo" :thin="true"/>
+        <codepad class="text-left" :code="requestInfo.prettyInfo" :thin="true"/>
       </b-list-group-item>
     </b-list-group>
   </b-card>

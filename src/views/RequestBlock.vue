@@ -43,7 +43,7 @@
     <b-row v-if="!error">
         <b-col cols="12" class="text-left">
           <h4 class="text-left" v-t="'requestBlockJSON'"></h4>
-          <codepad id='editor' class="text-left" :code="prettyDetails"/>
+          <codepad class="text-left" :code="prettyDetails"/>
         </b-col>
       </b-row>
     </b-container>

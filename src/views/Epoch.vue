@@ -81,7 +81,7 @@
       <b-row v-if="!error">
         <b-col cols="12" class="text-left">
           <h4 class="text-left" v-t="'epochJSON'"></h4>
-          <codepad id='editor' class="text-left mb-3" :code="JSON.stringify(epoch, null, ' ')"/>
+          <codepad class="text-left mb-3" :code="JSON.stringify(epoch, null, ' ')"/>
         </b-col>
       </b-row>
     </b-container>
