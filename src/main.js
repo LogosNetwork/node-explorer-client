@@ -1,17 +1,11 @@
 import Vue from 'vue'
 import App from './App.vue'
-import VueMoment from 'vue-moment'
-import Toasted from 'vue-toasted'
-import Wallet from './api/wallet'
-import RPC from './api/rpc'
-import config from '../config'
 import router from './router'
 import i18n from './i18n'
 import store from './store/index'
 import './assets/css/shame.scss'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
-import vueHeadful from 'vue-headful'
 import bForm from 'bootstrap-vue/es/components/form/form'
 import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
 import bFormInvalidFeedback from 'bootstrap-vue/es/components/form/form-invalid-feedback'
@@ -36,6 +30,7 @@ import bRow from 'bootstrap-vue/es/components/layout/row'
 import bCol from 'bootstrap-vue/es/components/layout/col'
 import bTable from 'bootstrap-vue/es/components/table/table'
 import bFormCheckbox from 'bootstrap-vue/es/components/form-checkbox/form-checkbox'
+import VueMoment from 'vue-moment'
 
 // Icons
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
@@ -67,22 +62,7 @@ Vue.component('b-nav-item', bNavItem)
 Vue.component('b-collapse', bCollapse)
 Vue.component('b-table', bTable)
 Vue.component('b-form-checkbox', bFormCheckbox)
-Vue.component('vue-headful', vueHeadful)
 Vue.use(VueMoment)
-Vue.use(Toasted, {
-  router,
-  iconPack: 'fontawesome'
-})
-Vue.use(Wallet, {
-  fullSync: true,
-  syncTokens: true,
-  mqtt: config.mqttHost,
-  rpc: {
-    proxy: config.rpcProxy,
-    delegates: Object.values(config.delegates)
-  }
-})
-Vue.use(RPC)
 new Vue({
   router,
   i18n,

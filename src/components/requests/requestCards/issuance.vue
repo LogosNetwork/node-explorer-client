@@ -58,7 +58,7 @@
           </li>
         </ul>
       </b-list-group-item>
-      <b-list-group-item v-for="controller in requestInfo.controllers" :key="'controller'+controller.account">
+      <b-list-group-item v-for="controller in requestInfo.controllers" :key="requestInfo.hash+'controller'+controller.account">
         <strong>Controller: </strong><LogosAddress :address="controller.account" /><br/>
         <ul class="mb-0" v-if="controller.privileges !== '[]'">
           <li v-for="privilege in controller.privileges" :key="controller.account+privilege">

@@ -137,7 +137,10 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
+import config from '../../config'
+import Wallet from '../api/wallet'
 import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown'
@@ -147,7 +150,21 @@ import Lookups from '@/components/forge/lookups.vue'
 import Requests from '@/components/forge/requests.vue'
 import cloneDeep from 'lodash/cloneDeep'
 import { faUser, faEllipsisVAlt, faCoins, faSearch, faWrench, faEye, faFont, faSpinner } from '@fortawesome/pro-light-svg-icons'
-
+import Toasted from 'vue-toasted'
+import RPC from '../api/rpc'
+Vue.use(Toasted, {
+  iconPack: 'fontawesome'
+})
+Vue.use(Wallet, {
+  fullSync: true,
+  syncTokens: true,
+  mqtt: config.mqttHost,
+  rpc: {
+    proxy: config.rpcProxy,
+    delegates: Object.values(config.delegates)
+  }
+})
+Vue.use(RPC)
 export default {
   name: 'workshop',
   data () {

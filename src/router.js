@@ -28,11 +28,6 @@ const router = new Router({
       component: () => import('./views/Tokens.vue')
     },
     {
-      path: '/workbench',
-      name: 'workbench',
-      component: () => import('./views/Workbench.vue')
-    },
-    {
       path: '/forge',
       name: 'forge',
       component: () => import('./views/Forge.vue')

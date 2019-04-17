@@ -153,6 +153,14 @@ const createToast = (request, rpcClient, commit, state) => {
     } else {
       toast.message = `${request.origin} burned ${request.amount} base units of ${request.tokenInfo.symbol}`
     }
+  } else if (request.type === 'withdraw_fee') {
+    if (request.transaction.amountInToken) {
+      toast.message = `${request.origin} withdrew ${request.transaction.amountInToken} ${request.tokenInfo.symbol} to ${request.transaction.destination}`
+    } else {
+      toast.message = `${request.origin} withdrew ${request.amount} base units of ${request.tokenInfo.symbol} to ${request.transaction.destination}`
+    }
+  } else if (request.type === 'withdraw_logos') {
+    toast.message = `${request.origin} withdrew ${request.transaction.amountInLogos} Logos to ${request.transaction.destination}`
   }
   toast.request = request
   commit('addToast', toast)

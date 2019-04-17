@@ -154,7 +154,7 @@
         title="Withdraw Fee"
         subtitle="Withdraw the token balance to a user's account."
       >
-        Not Yet Implemented :(
+        <withdrawFee/>
       </accordion>
 
       <accordion
@@ -165,7 +165,7 @@
         title="Withdraw Logos"
         subtitle="Withdraw the Logos balance of the token account to a user's account."
       >
-        Not Yet Implemented :(
+        <withdrawLogos/>
       </accordion>
     </div>
     <div v-else>
@@ -203,6 +203,8 @@ import adjustUserStatus from '@/components/forge/requestForms/adjustUserStatus.v
 import adjustFee from '@/components/forge/requestForms/adjustFee.vue'
 import burn from '@/components/forge/requestForms/burn.vue'
 import distribute from '@/components/forge/requestForms/distribute.vue'
+import withdrawFee from '@/components/forge/requestForms/withdrawFee.vue'
+import withdrawLogos from '@/components/forge/requestForms/withdrawLogos.vue'
 import bigInt from 'big-integer'
 import LogosAddress from '@/components/LogosAddress.vue'
 import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage } from '@fortawesome/pro-light-svg-icons'
@@ -243,7 +245,9 @@ export default {
     adjustUserStatus,
     adjustFee,
     burn,
-    distribute
+    distribute,
+    withdrawFee,
+    withdrawLogos
   },
   computed: {
     ...mapState('forge', {

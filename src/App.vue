@@ -13,11 +13,11 @@
 </template>
 
 <script>
-import Nav from '@/components/Nav.vue'
 export default {
   name: 'app',
   components: {
-    Nav
+    vueHeadful: () => import('vue-headful'),
+    Nav: () => import('@/components/Nav.vue')
   }
 }
 </script>
