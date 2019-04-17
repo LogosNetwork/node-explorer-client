@@ -78,7 +78,7 @@ export default {
         keyMap: 'sublime',
         matchBrackets: true,
         showCursorWhenSelecting: true,
-        extraKeys: { 'Ctrl': 'autocomplete' }
+        extraKeys: { 'Ctrl': 'autocomplete', 'Tab': false, 'Shift-Tab': false }
       }
     }
   },
