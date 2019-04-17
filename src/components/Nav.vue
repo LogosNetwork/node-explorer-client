@@ -53,14 +53,14 @@ export default {
   #dark {
     background-color: var(--secondary);
     a {
-      color:#7289da;
+      color:#4668da;
       height: 38px;
     }
   }
   #light {
     background-color: #FFF;
     a {
-      color:#7289da;
+      color:#4668da;
       height: 38px;
     }
   }
@@ -70,31 +70,31 @@ export default {
     #dark {
       a {
         margin-right: 1rem;
-        color:#7289da;
+        color:#4668da;
       }
       a.is-active {
         padding-bottom: 4px;
-        border-bottom: 2px solid #7289da;
+        border-bottom: 2px solid #4668da;
       }
       a:not(.is-active):not(.navbar-brand):hover {
         opacity: 0.7;
         padding-bottom: 4px;
-        border-bottom: 2px solid #7289da;
+        border-bottom: 2px solid #4668da;
       }
     }
     #light {
       a {
         margin-right: 1rem;
-        color:#7289da;
+        color:#4668da;
       }
       a.is-active {
         padding-bottom: 4px;
-        border-bottom: 2px solid #7289da;
+        border-bottom: 2px solid #4668da;
       }
       a:not(.is-active):not(.navbar-brand):hover {
         opacity: 0.7;
         padding-bottom: 4px;
-        border-bottom: 2px solid #7289da;
+        border-bottom: 2px solid #4668da;
       }
     }
   }
@@ -106,12 +106,12 @@ export default {
     }
     a.is-active {
       padding-bottom: 4px;
-      border-bottom: 2px solid #7289da;
+      border-bottom: 2px solid #4668da;
     }
     a:not(.is-active):not(.navbar-brand):hover {
       opacity: 0.7;
       padding-bottom: 4px;
-      border-bottom: 2px solid #7289da;
+      border-bottom: 2px solid #4668da;
     }
   }
 }
