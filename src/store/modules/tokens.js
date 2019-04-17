@@ -17,7 +17,7 @@ const actions = {
     if (savedTokens && savedTokens.length > 0) {
       lastCreatedAt = savedTokens[savedTokens.length - 1].createdAt
     }
-    axios.get(`${rootState.settings.requestURL}/tokens/`, {
+    axios.get(`${rootState.settings.requestURL}/api/tokens/`, {
       params: {
         previousDate: lastCreatedAt
       }
