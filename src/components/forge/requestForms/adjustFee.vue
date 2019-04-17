@@ -159,12 +159,13 @@ export default {
   created: function () {
     if (this.adjustableTokens.length > 0) {
       this.selectedToken = this.adjustableTokens[0]
-      // TODO this should be on selected token change
-      this.feeRate = this.selectedToken.fee_rate
-      this.feeType = this.selectedToken.fee_type
     }
   },
   watch: {
+    selectedToken: function (newTk, oldTk) {
+      this.feeRate = newTk.fee_rate
+      this.feeType = newTk.fee_type
+    },
     adjustableTokens: function (newTks, oldTks) {
       if (newTks.length > 0) {
         let valid = false

@@ -100,7 +100,7 @@
         label="Custom Token Info"
         label-size="lg"
       >
-        <codepad :code="issuerInfo"/>
+        <codepad/>
         <div v-if="!validIssuerInfo" style="display:block" class="invalid-feedback">
           Issuer Info must be less than or equal to 512 byes
         </div>
@@ -122,7 +122,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import bFormGroup from 'bootstrap-vue/es/components/form-group/form-group'
 import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
 import LogosAddress from '@/components/LogosAddress.vue'
@@ -156,15 +156,15 @@ export default {
       currentAccount: state => state.currentAccount
     }),
     validDecimal: function () {
-      if (this.decimals === '') return null
+      if (this.decimals === '' || this.decimals === null) return null
       return /^([0-9]+)$/.test(this.decimals)
     },
     validImage: function () {
-      if (this.image === '') return null
+      if (this.image === '' || this.image === null) return null
       return urlRegex.test(this.image)
     },
     validURL: function () {
-      if (this.website === '') return null
+      if (this.website === '' || this.website === null) return null
       return urlRegex.test(this.website)
     },
     validIssuerInfo: function () {
@@ -174,7 +174,7 @@ export default {
       if (this.validDecimal && this.selectedToken) {
         return `With the decimial set to ${this.decimals} the total supply will be ${this.$Logos.convert.fromTo(this.selectedToken.total_supply, 0, this.decimals)} ${this.selectedToken.symbol}`
       } else if (this.selectedToken) {
-        return `With no decimial set the total supply will be ${this.selectedToken.total_supply} ${this.tokenOptions.symbol}`
+        return `With no decimial set the total supply will be ${this.selectedToken.total_supply} ${this.selectedToken.symbol}`
       } else {
         return `Select a token first`
       }
@@ -216,6 +216,11 @@ export default {
         issuerInfo: issuerInfo
       })
     },
+    ...mapActions('forge',
+      [
+        'setIssuerInfo'
+      ]
+    ),
     nameWithAddress ({ name, tokenAccount }) {
       return `${name} — ${tokenAccount.substring(0, 9)}...${tokenAccount.substring(59, 64)}`
     }
@@ -223,24 +228,27 @@ export default {
   created: function () {
     if (this.updatableTokens.length > 0) {
       this.selectedToken = this.updatableTokens[0]
-      // TODO this should be on selected token change
-      if (this.selectedToken.issuerInfo) {
-        if (typeof this.selectedToken.issuerInfo.decimals !== 'undefined') {
-          this.decimals = cloneDeep(this.selectedToken.issuerInfo.decimals)
-        }
-        if (typeof this.selectedToken.issuerInfo.website !== 'undefined') {
-          this.website = cloneDeep(this.selectedToken.issuerInfo.website)
-        }
-        if (typeof this.selectedToken.issuerInfo.image !== 'undefined') {
-          this.image = cloneDeep(this.selectedToken.issuerInfo.image)
-        }
-      }
-      if (this.selectedToken.issuer_info) {
-        this.issuerInfo = cloneDeep(this.selectedToken.issuer_info)
-      }
     }
   },
   watch: {
+    selectedToken: function (newTk, oldTk) {
+      if (newTk.issuerInfo) {
+        if (typeof newTk.issuerInfo.decimals !== 'undefined') {
+          this.decimals = cloneDeep(newTk.issuerInfo.decimals)
+        }
+        if (typeof newTk.issuerInfo.website !== 'undefined') {
+          this.website = cloneDeep(newTk.issuerInfo.website)
+        }
+        if (typeof newTk.issuerInfo.image !== 'undefined') {
+          this.image = cloneDeep(newTk.issuerInfo.image)
+        }
+      }
+      if (newTk.issuer_info) {
+        this.setIssuerInfo(newTk.issuer_info)
+      } else {
+        this.setIssuerInfo('')
+      }
+    },
     updatableTokens: function (newDistTks, oldDistTks) {
       if (newDistTks.length > 0) {
         let valid = false

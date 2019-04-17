@@ -52,9 +52,6 @@ import 'codemirror/addon/fold/xml-fold.js'
 import { mapState, mapActions } from 'vuex'
 export default {
   name: 'codepad',
-  props: {
-    code: String
-  },
   components: {
     codemirror
   },
@@ -98,11 +95,14 @@ export default {
     }
   },
   created () {
-    if (this.issuerInfo === '') {
-      this.localInput = this.code
-      this.setIssuerInfo(this.localInput)
-    } else {
-      this.localInput = this.issuerInfo
+    this.localInput = this.issuerInfo
+  },
+  watch: {
+    issuerInfo: function (newInfo, oldInfo) {
+      console.log(newInfo)
+      if (this.localInput !== newInfo) {
+        this.localInput = newInfo
+      }
     }
   }
 }
