@@ -1,6 +1,6 @@
 <template>
-  <b-container fluid class="d-flex">
-    <b-row class="flex-grow flex-fill">
+  <b-container fluid class="d-flex overflow-hidden">
+    <b-row class="flex-grow flex-fill overflow-hidden">
       <b-col xs="auto" class="accountPanel">
         <div class="d-flex justify-content-between mt-3 mb-3 align-items-center font-weight-bold">
           <h4 class="mb-0">Accounts</h4>
@@ -77,7 +77,7 @@
           </b-list-group>
         </div>
       </b-col>
-      <b-col>
+      <b-col class="overflow-hidden">
         <b-row class="h-100">
           <b-col cols="12" class="d-flex flex-column">
             <b-row class="actionToggle">
@@ -97,7 +97,7 @@
               </b-col>
             </b-row>
             <b-row class="actionSelector flex-grow flex-fill">
-              <b-col class="m-5 text-left">
+              <b-col class="m-5 text-left overflow-hidden">
                 <div v-if="selected === 'lookup'">
                   <Lookups />
                 </div>

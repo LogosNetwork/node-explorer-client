@@ -7,6 +7,7 @@ import bigInt from 'big-integer'
 const state = {
   toasts: [],
   tokens: {},
+  issuerInfo: '',
   walletAccounts: {},
   accounts: {},
   currentAccount: null,
@@ -161,6 +162,8 @@ const createToast = (request, rpcClient, commit, state) => {
     }
   } else if (request.type === 'withdraw_logos') {
     toast.message = `${request.origin} withdrew ${request.transaction.amountInLogos} Logos to ${request.transaction.destination}`
+  } else if (request.type === 'update_issuer_info') {
+    toast.message = `${request.origin} updated the token information of ${request.tokenInfo.name}`
   }
   toast.request = request
   commit('addToast', toast)
@@ -191,6 +194,9 @@ const actions = {
   setSeed ({ commit }, seed) {
     commit('setSeed', seed)
   },
+  setIssuerInfo ({ commit }, info) {
+    commit('setIssuerInfo', info)
+  },
   addRequest ({ commit, rootState, state }, request) {
     let requestData = cloneDeep(request)
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
@@ -220,6 +226,9 @@ const mutations = {
   },
   setSeed (state, seed) {
     state.seed = cloneDeep(seed)
+  },
+  setIssuerInfo (state, info) {
+    state.issuerInfo = info
   },
   addToken (state, tokenAccount) {
     Vue.set(state.tokens, tokenAccount, {

@@ -159,6 +159,7 @@ export default {
   created: function () {
     if (this.adjustableTokens.length > 0) {
       this.selectedToken = this.adjustableTokens[0]
+      // TODO this should be on selected token change
       this.feeRate = this.selectedToken.fee_rate
       this.feeType = this.selectedToken.fee_type
     }

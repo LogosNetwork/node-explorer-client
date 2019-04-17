@@ -121,7 +121,7 @@
         title="Update Token Info"
         subtitle="Change the token information of the given token."
       >
-        Not Yet Implemented :(
+        <updateIssuerInfo/>
       </accordion>
 
       <accordion
@@ -201,6 +201,7 @@ import immuteSetting from '@/components/forge/requestForms/immuteSetting.vue'
 import revoke from '@/components/forge/requestForms/revoke.vue'
 import adjustUserStatus from '@/components/forge/requestForms/adjustUserStatus.vue'
 import adjustFee from '@/components/forge/requestForms/adjustFee.vue'
+import updateIssuerInfo from '@/components/forge/requestForms/updateIssuerInfo.vue'
 import burn from '@/components/forge/requestForms/burn.vue'
 import distribute from '@/components/forge/requestForms/distribute.vue'
 import withdrawFee from '@/components/forge/requestForms/withdrawFee.vue'
@@ -244,6 +245,7 @@ export default {
     revoke,
     adjustUserStatus,
     adjustFee,
+    updateIssuerInfo,
     burn,
     distribute,
     withdrawFee,
