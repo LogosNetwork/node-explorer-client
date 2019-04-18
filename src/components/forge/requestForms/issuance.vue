@@ -15,7 +15,7 @@
         placeholder="Enter a token name"
       ></b-form-input>
       <b-form-invalid-feedback id="nameError">
-        This is a required field and must be an alphanumeric name that is less than or equal to 32 bytes
+        This is a required field, must only contain alphanumeric characters, spaces, hyphens, and underscores, and must be less than or equal to 32 bytes
       </b-form-invalid-feedback>
     </b-form-group>
 
@@ -478,7 +478,7 @@ export default {
       return Array.from(Object.values(forgeAccounts)).concat(this.accounts)
     },
     validName: function () {
-      return this.$utils.isAlphanumeric(this.tokenOptions.name) && this.$utils.byteCount(this.tokenOptions.name) <= 32
+      return this.$utils.isAlphanumericExtended(this.tokenOptions.name) && this.$utils.byteCount(this.tokenOptions.name) <= 32
     },
     validSymbol: function () {
       return this.$utils.isAlphanumeric(this.tokenOptions.symbol) && this.$utils.byteCount(this.tokenOptions.symbol) <= 8

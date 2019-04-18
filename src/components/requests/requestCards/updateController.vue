@@ -26,11 +26,14 @@
       </b-list-group-item>
       <b-list-group-item>
         <strong>Controller: </strong><LogosAddress :address="requestInfo.controller.account" /><br/>
-        <ul>
+        <ul v-if="requestInfo.controller.privileges.length > 0">
           <li v-for="privilege in requestInfo.controller.privileges" :key="privilege">
-            {{privilege}}
+            {{requestInfo.action}}ed {{privilege}}
           </li>
         </ul>
+        <span v-else>
+          Was Removed from the token's controllers
+        </span>
       </b-list-group-item>
     </b-list-group>
   </b-card>

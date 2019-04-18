@@ -93,7 +93,7 @@
     </b-form-group>
 
     <b-form-group
-      v-if="action && action.action === 'add' && this.controllerAccount"
+      v-if="action && action.action !== 'remove' && this.controllerAccount"
       id="controllerPrivileges"
       label="Privileges"
       label-size="lg"
@@ -247,7 +247,7 @@ export default {
         return [
           {
             label: 'Modify Controller',
-            action: 'add'
+            action: 'modify'
           },
           {
             label: 'Remove Controller',
@@ -298,10 +298,18 @@ export default {
   methods: {
     addAccount (newAddress) {
       if (newAddress.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
+        for (let value of this.combinedAccounts) {
+          if (newAddress === value.address) {
+            this.controllerAccount = value
+            return false
+          }
+        }
         let newAccount = { label: newAddress, address: newAddress }
         this.accounts.push(newAccount)
         this.controllerAccount = newAccount
+        return true
       }
+      return false
     },
     createUpdateController () {
       let data = {
@@ -312,7 +320,34 @@ export default {
           privileges: this.privileges
         }
       }
-      this.$wallet.account.createUpdateControllerRequest(data)
+      if (this.action.action === 'add') {
+        this.$wallet.account.createUpdateControllerRequest(data)
+      } else if (this.action.action === 'remove') {
+        delete data.controller.privileges
+        this.$wallet.account.createUpdateControllerRequest(data)
+      } else if (this.action.action === 'modify') {
+        let modifiedPrivileges = this.$utils.getSettingsJSON(this.privileges)
+        let existingPrivileges = []
+        let removedPrivileges = []
+        let addedPrivileges = []
+        this.selectedToken.controllers.forEach((value, i) => {
+          if (value.account === this.controllerAccount.address) {
+            existingPrivileges = value.privileges
+          }
+        })
+        addedPrivileges = modifiedPrivileges.filter((i) => { return existingPrivileges.indexOf(i) < 0 })
+        removedPrivileges = existingPrivileges.filter((i) => { return modifiedPrivileges.indexOf(i) < 0 })
+        if (addedPrivileges.length > 0) {
+          data.action = 'add'
+          data.controller.privileges = addedPrivileges
+          this.$wallet.account.createUpdateControllerRequest(data)
+        }
+        if (removedPrivileges.length > 0) {
+          data.action = 'remove'
+          data.controller.privileges = removedPrivileges
+          this.$wallet.account.createUpdateControllerRequest(data)
+        }
+      }
     },
     nameWithAddress ({ name, tokenAccount }) {
       return `${name} — ${tokenAccount.substring(0, 9)}...${tokenAccount.substring(59, 64)}`

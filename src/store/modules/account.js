@@ -378,8 +378,30 @@ const actions = {
           if (val.fee_type.toLowerCase() === 'flat') val.feeInTokens = Logos.convert.fromTo(val.fee_rate, 0, val.issuerInfo.decimals)
         }
       } else if (requestData.type === 'update_controller') {
-        val.controllers = val.controllers.filter(controller => controller.account !== requestData.controller.account)
-        if (requestData.action === 'add') val.controllers.push(requestData.controller)
+        let updatedPrivs = requestData.controller.privileges
+        if (requestData.action === 'remove' && updatedPrivs.length === 0) {
+          val.controllers = val.controllers.filter(controller => controller.account !== requestData.controller.account)
+        } else if (requestData.action === 'remove' && updatedPrivs.length > 0) {
+          for (let controller of val.controllers) {
+            if (controller.account === requestData.controller.account) {
+              for (let priv of updatedPrivs) {
+                controller.privileges = controller.privileges.filter(privilege => privilege !== priv)
+              }
+            }
+          }
+        } else if (requestData.action === 'add') {
+          if (this.controllers.some(controller => controller.account === requestData.controller.account)) {
+            for (let controller of this.controllers) {
+              if (controller.account === requestData.controller.account) {
+                for (let priv of updatedPrivs) {
+                  if (!controller.privileges.includes(priv)) controller.privileges.push(priv)
+                }
+              }
+            }
+          } else {
+            val.controllers.push(requestData.controller)
+          }
+        }
       } else if (requestData.type === 'burn') {
         let totalSupply = bigInt(val.total_supply).minus(bigInt(requestData.amount)).toString()
         val.total_supply = totalSupply
