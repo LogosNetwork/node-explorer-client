@@ -5,8 +5,8 @@
       <b-tabs v-model="tabIndex">
         <b-tab :title="$t('request_blocks')" v-infinite-scroll="getRequestBlocks" infinite-scroll-distance="500" active>
           <b-form-select v-model="selectedDelegate" :options="rbDelegateLabels" class="mt-3" />
-          <div :key="requestBlock.hash + '_' + requestBlock.delegate" v-for="requestBlock in orderedRequestBlocks" class="shadow-sm">
-            <b-link class="cardLink" :to="'/requestBlock/'+requestBlock.hash">
+          <div :key="requestBlock.hash + '_' + requestBlock.delegate" v-for="requestBlock in orderedRequestBlocks">
+            <b-link class="cardLink shadow-sm" :to="'/requestBlock/'+requestBlock.hash">
               <b-card class="mt-3 mb-3 text-left">
                 <b-row>
                   <b-col>
@@ -49,8 +49,8 @@
           </div>
         </b-tab>
         <b-tab :title="$t('micro_epochs')" v-infinite-scroll="getMicroEpochs" infinite-scroll-distance="500">
-          <div :key="microEpoch.hash" v-for="microEpoch in microEpochs" class="shadow-sm">
-            <b-link class="cardLink" :to="'/microEpoch/'+microEpoch.hash">
+          <div :key="microEpoch.hash" v-for="microEpoch in microEpochs">
+            <b-link class="cardLink shadow-sm" :to="'/microEpoch/'+microEpoch.hash">
               <b-card class="mt-3 mb-3 text-left">
                 <b-row>
                   <b-col>
@@ -90,8 +90,8 @@
           </div>
         </b-tab>
         <b-tab :title="$t('epochs')" v-infinite-scroll="getEpochs" infinite-scroll-distance="500">
-          <div :key="epoch.hash" v-for="epoch in epochs" class="shadow-sm">
-            <b-link class="cardLink" :to="'/epoch/'+epoch.hash">
+          <div :key="epoch.hash" v-for="epoch in epochs">
+            <b-link class="cardLink shadow-sm" :to="'/epoch/'+epoch.hash">
               <b-card class="mt-3 mb-3 text-left">
                 <b-row>
                   <b-col>
@@ -267,6 +267,9 @@ export default {
   }
   .cardLink:hover {
     text-decoration: none;
+  }
+  .cardLink.shadow-sm {
+    display: block
   }
   .cardLink > .card {
     -webkit-transition: all .3s;

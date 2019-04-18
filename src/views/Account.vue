@@ -332,8 +332,8 @@
           </b-modal>
         </div>
       </div>
-      <div v-if="type" v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
-        <b-row>
+      <div v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
+        <b-row v-if="type">
           <b-col cols="12" class="mb-3">
             <h4 class="text-left">
               <span>{{requestCount}} </span>
@@ -471,7 +471,7 @@ export default {
       'reset'
     ]),
     getMoreRequests: function () {
-      if (!this.requestsBusy && this.requests && this.requests.length > 0) {
+      if (this.type && !this.requestsBusy && this.requests && this.requests.length > 0) {
         this.requestsBusy = true
         this.getRequests((response) => {
           if (response === 'out of content') {
