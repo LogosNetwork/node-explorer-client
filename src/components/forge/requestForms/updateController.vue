@@ -338,14 +338,26 @@ export default {
         addedPrivileges = modifiedPrivileges.filter((i) => { return existingPrivileges.indexOf(i) < 0 })
         removedPrivileges = existingPrivileges.filter((i) => { return modifiedPrivileges.indexOf(i) < 0 })
         if (addedPrivileges.length > 0) {
-          data.action = 'add'
-          data.controller.privileges = addedPrivileges
-          this.$wallet.account.createUpdateControllerRequest(data)
+          let addForm = {
+            tokenAccount: this.selectedToken.tokenAccount,
+            action: 'add',
+            controller: {
+              account: this.controllerAccount.address,
+              privileges: addedPrivileges
+            }
+          }
+          this.$wallet.account.createUpdateControllerRequest(addForm)
         }
         if (removedPrivileges.length > 0) {
-          data.action = 'remove'
-          data.controller.privileges = removedPrivileges
-          this.$wallet.account.createUpdateControllerRequest(data)
+          let removeForm = {
+            tokenAccount: this.selectedToken.tokenAccount,
+            action: 'remove',
+            controller: {
+              account: this.controllerAccount.address,
+              privileges: removedPrivileges
+            }
+          }
+          this.$wallet.account.createUpdateControllerRequest(removeForm)
         }
       }
     },

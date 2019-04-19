@@ -28,7 +28,7 @@
         <strong>Controller: </strong><LogosAddress :address="requestInfo.controller.account" /><br/>
         <ul v-if="requestInfo.controller.privileges.length > 0">
           <li v-for="privilege in requestInfo.controller.privileges" :key="privilege">
-            {{requestInfo.action}}ed {{privilege}}
+            {{requestInfo.action === 'add' ? 'added' : 'removed'}} {{privilege}}
           </li>
         </ul>
         <span v-else>
