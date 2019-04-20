@@ -106,6 +106,7 @@ export default {
       if (amountInRaw) {
         if (!/^([0-9]+(?:[.][0-9]*)?|\.[0-9]+)$/.test(amountInRaw)) return false
         amountInRaw = this.$Logos.convert.toReason(amountInRaw, 'LOGOS')
+        console.log(amountInRaw)
         return (
           bigInt(amountInRaw).greater(0) &&
           bigInt(this.$wallet.account.balance)

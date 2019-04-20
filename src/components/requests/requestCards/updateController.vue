@@ -4,7 +4,7 @@
       <b-card-title>
         <div class="d-flex justify-content-between">
           <div>
-            Token Update Controller Request
+            Update Controller
           </div>
           <div v-if="requestInfo.createdAt" class="timestamp text-right">
             <small>
@@ -18,14 +18,14 @@
           </div>
         </div>
       </b-card-title>
-      <token :tokenInfo="requestInfo.tokenInfo" :origin="requestInfo.origin" />
+      <token :tokenInfo="requestInfo.tokenInfo" :origin="requestInfo.origin" :small="small" />
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item>
         <strong>Action: </strong>{{requestInfo.action}}
       </b-list-group-item>
       <b-list-group-item>
-        <strong>Controller: </strong><LogosAddress :address="requestInfo.controller.account" /><br/>
+        <strong>Controller: </strong><LogosAddress :address="requestInfo.controller.account" :force="small" /><br/>
         <ul v-if="requestInfo.controller.privileges.length > 0">
           <li v-for="privilege in requestInfo.controller.privileges" :key="privilege">
             {{requestInfo.action === 'add' ? 'added' : 'removed'}} {{privilege}}
@@ -52,7 +52,11 @@ import token from '@/components/requests/token.vue'
 export default {
   name: 'updateController',
   props: {
-    requestInfo: Object
+    requestInfo: Object,
+    small: {
+      type: Boolean,
+      default: false
+    }
   },
   components: {
     'b-card-body': bCardBody,

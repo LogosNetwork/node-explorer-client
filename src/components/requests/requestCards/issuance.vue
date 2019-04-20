@@ -4,7 +4,7 @@
       <b-card-title>
         <div class="d-flex justify-content-between">
           <div>
-            Token Issuance Request
+            Token Issuance
           </div>
           <div v-if="requestInfo.createdAt" class="timestamp text-right">
             <small>
@@ -18,15 +18,15 @@
           </div>
         </div>
       </b-card-title>
-      <token :tokenInfo="requestInfo.tokenInfo" />
+      <token :tokenInfo="requestInfo.tokenInfo" :small="small" />
       <small class="text-muted">Values below only represent the token when it was first issued</small>
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item>
-        <strong>Token Account: </strong><LogosAddress :address="requestInfo.tokenInfo.tokenAccount" />
+        <strong>Token Account: </strong><LogosAddress :address="requestInfo.tokenInfo.tokenAccount" :force="small" />
       </b-list-group-item>
       <b-list-group-item>
-        <strong>Issued By: </strong><LogosAddress :address="requestInfo.origin" />
+        <strong>Issued By: </strong><LogosAddress :address="requestInfo.origin" :force="small" />
       </b-list-group-item>
       <b-list-group-item>
         <strong>Name: </strong>{{requestInfo.name}}
@@ -59,7 +59,7 @@
         </ul>
       </b-list-group-item>
       <b-list-group-item v-for="controller in requestInfo.controllers" :key="requestInfo.hash+'controller'+controller.account">
-        <strong>Controller: </strong><LogosAddress :address="controller.account" /><br/>
+        <strong>Controller: </strong><LogosAddress :address="controller.account" :force="small" /><br/>
         <ul class="mb-0" v-if="controller.privileges.length > 0">
           <li v-for="privilege in controller.privileges" :key="controller.account+privilege">
             {{privilege}}
@@ -88,7 +88,11 @@ import codepad from '@/components/codepad.vue'
 export default {
   name: 'issuance',
   props: {
-    requestInfo: Object
+    requestInfo: Object,
+    small: {
+      type: Boolean,
+      default: false
+    }
   },
   components: {
     'b-card-body': bCardBody,

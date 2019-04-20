@@ -4,10 +4,10 @@
       <b-card-title>
         <div class="d-flex justify-content-between">
           <div v-if="account && requestInfo.origin !== account">
-            Token Recieve Request
+            Token Recieve
           </div>
           <div v-if="!account || (account && requestInfo.origin === account)">
-            Token Send Request
+            Token Send
           </div>
           <div v-if="requestInfo.createdAt" class="timestamp text-right">
             <small>
@@ -21,10 +21,10 @@
           </div>
         </div>
       </b-card-title>
-      <token :tokenInfo="requestInfo.tokenInfo" />
+      <token :tokenInfo="requestInfo.tokenInfo" :small="small" />
       <b-card-text class="mt-3">
         <font-awesome-icon :icon="faPaperPlane" class="text-danger mr-2"/>
-        <LogosAddress class="mr-2" :address="requestInfo.origin" />
+        <LogosAddress class="mr-2" :address="requestInfo.origin" :force="small" />
         <span class="mr-2">sent</span>
         <span v-if="requestInfo.totalAmountInToken" class="text-danger mr-2">{{requestInfo.totalAmountInToken}}</span>
         <span v-if="typeof requestInfo.totalAmountInToken === 'undefined'" class="text-danger mr-2">{{requestInfo.totalAmount}}</span>
@@ -34,7 +34,7 @@
     <b-list-group flush>
       <b-list-group-item v-for="transaction in requestInfo.transactions" :key="transaction.hash">
         <font-awesome-icon :icon="faArrowDown" class="text-success mr-2"/>
-        <LogosAddress class="mr-2" :address="transaction.destination" />
+        <LogosAddress class="mr-2" :address="transaction.destination" :force="small" />
         <span class="mr-2">received</span>
         <span v-if="transaction.amountInToken" class="text-success mr-2">{{transaction.amountInToken}}</span>
         <span v-if="typeof transaction.amountInToken === 'undefined'" class="text-success mr-2">{{transaction.amount}}</span>
@@ -65,7 +65,11 @@ export default {
   },
   props: {
     requestInfo: Object,
-    account: String
+    account: String,
+    small: {
+      type: Boolean,
+      default: false
+    }
   },
   components: {
     'b-card-body': bCardBody,

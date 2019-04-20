@@ -4,7 +4,7 @@
       <b-card-title>
         <div class="d-flex justify-content-between">
           <div>
-            Token Withdraw Fee Request
+            Withdraw Fee
           </div>
           <div v-if="requestInfo.createdAt" class="timestamp text-right">
             <small>
@@ -18,12 +18,12 @@
           </div>
         </div>
       </b-card-title>
-      <token :tokenInfo="requestInfo.tokenInfo" :origin="requestInfo.origin" />
+      <token :tokenInfo="requestInfo.tokenInfo" :origin="requestInfo.origin" :small="small" />
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item>
         <font-awesome-icon :icon="faArrowDown" class="text-success mr-2"/>
-        <LogosAddress class="mr-2" :address="requestInfo.transaction.destination" />
+        <LogosAddress class="mr-2" :address="requestInfo.transaction.destination" :force="small" />
         <span class="mr-2">received</span>
         <span v-if="requestInfo.transaction.amountInToken" class="text-success mr-2">{{requestInfo.transaction.amountInToken}}</span>
         <span v-if="typeof requestInfo.transaction.amountInToken === 'undefined'" class="text-success mr-2">{{requestInfo.transaction.amount}}</span>
@@ -52,7 +52,11 @@ export default {
     }
   },
   props: {
-    requestInfo: Object
+    requestInfo: Object,
+    small: {
+      type: Boolean,
+      default: false
+    }
   },
   components: {
     'b-card-body': bCardBody,

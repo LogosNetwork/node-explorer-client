@@ -1,38 +1,38 @@
 <template>
   <div class="mb-3 shadow-sm">
     <b-link v-if="!requestInfo.inactive" class="cardLink" :to="'/'+requestInfo.hash">
-      <send v-if="requestInfo.type === 'send'" :requestInfo="requestInfo" :account="account"/>
-      <burn v-if="requestInfo.type === 'burn'" :requestInfo="requestInfo"/>
-      <issuerInfo v-if="requestInfo.type === 'update_issuer_info'" :requestInfo="requestInfo"/>
-      <tokenSend v-if="requestInfo.type === 'token_send'" :requestInfo="requestInfo" :account="account"/>
-      <distribute v-if="requestInfo.type === 'distribute'" :requestInfo="requestInfo"/>
-      <adjustFee v-if="requestInfo.type === 'adjust_fee'" :requestInfo="requestInfo"/>
-      <changeSetting v-if="requestInfo.type === 'change_setting'" :requestInfo="requestInfo"/>
-      <adjustUserStatus v-if="requestInfo.type === 'adjust_user_status'" :requestInfo="requestInfo"/>
-      <issuance v-if="requestInfo.type === 'issuance'" :requestInfo="requestInfo"/>
-      <issueAdditional v-if="requestInfo.type === 'issue_additional'" :requestInfo="requestInfo"/>
-      <withdrawFee v-if="requestInfo.type === 'withdraw_fee'" :requestInfo="requestInfo"/>
-      <withdrawLogos v-if="requestInfo.type === 'withdraw_logos'" :requestInfo="requestInfo"/>
-      <updateController v-if="requestInfo.type === 'update_controller'" :requestInfo="requestInfo"/>
-      <revoke v-if="requestInfo.type === 'revoke'" :requestInfo="requestInfo"/>
-      <immuteSetting v-if="requestInfo.type === 'immute_setting'" :requestInfo="requestInfo"/>
+      <send v-if="requestInfo.type === 'send'" :requestInfo="requestInfo" :account="account" :small="small"/>
+      <burn v-if="requestInfo.type === 'burn'" :requestInfo="requestInfo" :small="small"/>
+      <issuerInfo v-if="requestInfo.type === 'update_issuer_info'" :requestInfo="requestInfo" :small="small"/>
+      <tokenSend v-if="requestInfo.type === 'token_send'" :requestInfo="requestInfo" :account="account" :small="small"/>
+      <distribute v-if="requestInfo.type === 'distribute'" :requestInfo="requestInfo" :small="small"/>
+      <adjustFee v-if="requestInfo.type === 'adjust_fee'" :requestInfo="requestInfo" :small="small"/>
+      <changeSetting v-if="requestInfo.type === 'change_setting'" :requestInfo="requestInfo" :small="small"/>
+      <adjustUserStatus v-if="requestInfo.type === 'adjust_user_status'" :requestInfo="requestInfo" :small="small"/>
+      <issuance v-if="requestInfo.type === 'issuance'" :requestInfo="requestInfo" :small="small"/>
+      <issueAdditional v-if="requestInfo.type === 'issue_additional'" :requestInfo="requestInfo" :small="small"/>
+      <withdrawFee v-if="requestInfo.type === 'withdraw_fee'" :requestInfo="requestInfo" :small="small"/>
+      <withdrawLogos v-if="requestInfo.type === 'withdraw_logos'" :requestInfo="requestInfo" :small="small"/>
+      <updateController v-if="requestInfo.type === 'update_controller'" :requestInfo="requestInfo" :small="small"/>
+      <revoke v-if="requestInfo.type === 'revoke'" :requestInfo="requestInfo" :small="small"/>
+      <immuteSetting v-if="requestInfo.type === 'immute_setting'" :requestInfo="requestInfo" :small="small"/>
     </b-link>
     <div v-else>
-      <send v-if="requestInfo.type === 'send'" :requestInfo="requestInfo" :account="account"/>
-      <burn v-if="requestInfo.type === 'burn'" :requestInfo="requestInfo"/>
-      <issuerInfo v-if="requestInfo.type === 'update_issuer_info'" :requestInfo="requestInfo"/>
-      <tokenSend v-if="requestInfo.type === 'token_send'" :requestInfo="requestInfo" :account="account"/>
-      <distribute v-if="requestInfo.type === 'distribute'" :requestInfo="requestInfo"/>
-      <adjustFee v-if="requestInfo.type === 'adjust_fee'" :requestInfo="requestInfo"/>
-      <changeSetting v-if="requestInfo.type === 'change_setting'" :requestInfo="requestInfo"/>
-      <adjustUserStatus v-if="requestInfo.type === 'adjust_user_status'" :requestInfo="requestInfo"/>
-      <issuance v-if="requestInfo.type === 'issuance'" :requestInfo="requestInfo"/>
-      <issueAdditional v-if="requestInfo.type === 'issue_additional'" :requestInfo="requestInfo"/>
-      <withdrawFee v-if="requestInfo.type === 'withdraw_fee'" :requestInfo="requestInfo"/>
-      <withdrawLogos v-if="requestInfo.type === 'withdraw_logos'" :requestInfo="requestInfo"/>
-      <updateController v-if="requestInfo.type === 'update_controller'" :requestInfo="requestInfo"/>
-      <revoke v-if="requestInfo.type === 'revoke'" :requestInfo="requestInfo"/>
-      <immuteSetting v-if="requestInfo.type === 'immute_setting'" :requestInfo="requestInfo"/>
+      <send v-if="requestInfo.type === 'send'" :requestInfo="requestInfo" :account="account" :small="small"/>
+      <burn v-if="requestInfo.type === 'burn'" :requestInfo="requestInfo" :small="small"/>
+      <issuerInfo v-if="requestInfo.type === 'update_issuer_info'" :requestInfo="requestInfo" :small="small"/>
+      <tokenSend v-if="requestInfo.type === 'token_send'" :requestInfo="requestInfo" :account="account" :small="small"/>
+      <distribute v-if="requestInfo.type === 'distribute'" :requestInfo="requestInfo" :small="small"/>
+      <adjustFee v-if="requestInfo.type === 'adjust_fee'" :requestInfo="requestInfo" :small="small"/>
+      <changeSetting v-if="requestInfo.type === 'change_setting'" :requestInfo="requestInfo" :small="small"/>
+      <adjustUserStatus v-if="requestInfo.type === 'adjust_user_status'" :requestInfo="requestInfo" :small="small"/>
+      <issuance v-if="requestInfo.type === 'issuance'" :requestInfo="requestInfo" :small="small"/>
+      <issueAdditional v-if="requestInfo.type === 'issue_additional'" :requestInfo="requestInfo" :small="small"/>
+      <withdrawFee v-if="requestInfo.type === 'withdraw_fee'" :requestInfo="requestInfo" :small="small"/>
+      <withdrawLogos v-if="requestInfo.type === 'withdraw_logos'" :requestInfo="requestInfo" :small="small"/>
+      <updateController v-if="requestInfo.type === 'update_controller'" :requestInfo="requestInfo" :small="small"/>
+      <revoke v-if="requestInfo.type === 'revoke'" :requestInfo="requestInfo" :small="small"/>
+      <immuteSetting v-if="requestInfo.type === 'immute_setting'" :requestInfo="requestInfo" :small="small"/>
     </div>
   </div>
 </template>
@@ -58,7 +58,11 @@ export default {
   name: 'request',
   props: {
     requestInfo: Object,
-    account: String
+    account: String,
+    small: {
+      type: Boolean,
+      default: false
+    }
   },
   components: {
     send,

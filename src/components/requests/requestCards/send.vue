@@ -4,10 +4,10 @@
       <b-card-title>
         <div class="d-flex justify-content-between">
           <div v-if="account && requestInfo.origin !== account">
-            Recieve Request
+            Recieve
           </div>
           <div v-if="!account || (account && requestInfo.origin === account)">
-            Send Request
+            Send
           </div>
           <div v-if="requestInfo.createdAt" class="timestamp text-right">
             <small>
@@ -23,7 +23,7 @@
       </b-card-title>
       <b-card-text>
         <font-awesome-icon :icon="faPaperPlane" class="text-danger mr-2"/>
-        <LogosAddress class="mr-2" :address="requestInfo.origin" />
+        <LogosAddress class="mr-2" :address="requestInfo.origin" :force="small" />
         <span class="mr-2">sent</span>
         <span class="text-danger">{{requestInfo.totalAmountLogos}} Logos</span>
       </b-card-text>
@@ -31,7 +31,7 @@
     <b-list-group flush>
       <b-list-group-item v-for="transaction in requestInfo.transactions" :key="transaction.hash">
         <font-awesome-icon :icon="faArrowDown" class="text-success mr-2"/>
-        <LogosAddress class="mr-2" :address="transaction.destination" />
+        <LogosAddress class="mr-2" :address="transaction.destination" :force="small" />
         <span class="mr-2">received</span>
         <span class="text-success">{{transaction.amountInLogos}} Logos</span>
       </b-list-group-item>
@@ -59,7 +59,11 @@ export default {
   },
   props: {
     requestInfo: Object,
-    account: String
+    account: String,
+    small: {
+      type: Boolean,
+      default: false
+    }
   },
   components: {
     'b-card-body': bCardBody,

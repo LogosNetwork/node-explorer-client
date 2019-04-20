@@ -4,7 +4,7 @@
       <b-card-title>
         <div class="d-flex justify-content-between">
           <div>
-            Token Fee Adjustment Request
+            Fee Adjustment
           </div>
           <div v-if="requestInfo.createdAt" class="timestamp text-right">
             <small>
@@ -18,7 +18,7 @@
           </div>
         </div>
       </b-card-title>
-      <token :tokenInfo="requestInfo.tokenInfo" :origin="requestInfo.origin" />
+      <token :tokenInfo="requestInfo.tokenInfo" :origin="requestInfo.origin" :small="small" />
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item>
@@ -48,7 +48,11 @@ import token from '@/components/requests/token.vue'
 export default {
   name: 'adjustFee',
   props: {
-    requestInfo: Object
+    requestInfo: Object,
+    small: {
+      type: Boolean,
+      default: false
+    }
   },
   components: {
     'b-card-body': bCardBody,

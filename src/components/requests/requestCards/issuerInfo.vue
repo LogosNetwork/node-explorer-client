@@ -4,7 +4,7 @@
       <b-card-title>
         <div class="d-flex justify-content-between">
           <div>
-            Token Info Update Request
+            Token Info Update
           </div>
           <div v-if="requestInfo.createdAt" class="timestamp text-right">
             <small>
@@ -18,7 +18,7 @@
           </div>
         </div>
       </b-card-title>
-      <token :tokenInfo="requestInfo.tokenInfo" :origin="requestInfo.origin" />
+      <token :tokenInfo="requestInfo.tokenInfo" :origin="requestInfo.origin" :small="small" />
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item v-on:click.prevent>
@@ -41,7 +41,11 @@ import codepad from '@/components/codepad.vue'
 export default {
   name: 'issuerInfo',
   props: {
-    requestInfo: Object
+    requestInfo: Object,
+    small: {
+      type: Boolean,
+      default: false
+    }
   },
   components: {
     'b-card-body': bCardBody,

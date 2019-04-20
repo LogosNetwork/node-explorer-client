@@ -13,6 +13,7 @@
               v-for="account in accounts" :key="account.address"
               class="d-flex justify-content-between align-items-center mb-2"
               button
+              :disabled="!isSynced(account.address)"
               v-on:click="setCurrentAccount(account.address)"
             >
               <div class="text-left">
@@ -48,9 +49,15 @@
             <b-list-group-item
               v-for="token in tokens" :key="token.tokenAccount"
               class="d-flex justify-content-between align-items-center mb-2"
+              v-on:click="viewChain(token.tokenAccount, `${token.name} - ${token.symbol}`)"
+              button
             >
               <span class="text-nowrap text-truncate" v-if="token.name">
-                <font-awesome-icon size="lg" class="mr-2" :icon="faCoins" />
+                <img v-if="token.issuerInfo.image" class="avatar mr-2" :src="token.issuerInfo.image">
+                <font-awesome-layers class="fa-lg mr-2 align-middle" v-if="!token.issuerInfo.image">
+                  <font-awesome-icon :icon="faCircle" />
+                  <font-awesome-icon :icon="faCoins" transform="shrink-6" />
+                </font-awesome-layers>
                 {{token.name}} - ({{token.symbol}})
               </span>
               <span v-else>
@@ -79,7 +86,7 @@
       </b-col>
       <b-col class="overflow-hidden">
         <b-row class="h-100">
-          <b-col cols="12" class="d-flex flex-column">
+          <b-col :cols="currentAccount ? 7 : 12" class="d-flex flex-column">
             <b-row class="actionToggle">
               <b-col>
                 <div class="btn-group btn-group-toggle pt-3 pb-3" data-toggle="buttons">
@@ -97,7 +104,7 @@
               </b-col>
             </b-row>
             <b-row class="actionSelector flex-grow flex-fill">
-              <b-col class="m-5 text-left overflow-hidden">
+              <b-col class="m-3 text-left overflow-hidden">
                 <div v-if="selected === 'lookup'">
                   <Lookups />
                 </div>
@@ -107,26 +114,35 @@
               </b-col>
             </b-row>
           </b-col>
-          <b-col v-if="false" cols="4" class="d-flex flex-column">
+          <b-col v-if="currentChain" cols="5" class="d-flex flex-column">
             <b-row class="chainToggle">
               <b-col>
                 <div class="btn-group btn-group-toggle pt-3 pb-3" data-toggle="buttons">
-                  <label class="btn btn-link" v-bind:class="{ active: selectedVisual === 'visual' }">
-                    <input type="radio" name="chainFilter" id="visual" autocomplete="off" :checked="selectedVisual === 'visual'" v-on:click="changeSelectedVisual('visual')">
-                    <font-awesome-icon size="lg" class="mr-2" :icon="faEye" />
-                    <span>Visual</span>
-                  </label>
-                  <label class="btn btn-link" v-bind:class="{ active: selectedVisual === 'text' }">
-                    <input type="radio" name="chainFilter" id="text" autocomplete="off" :checked="selectedVisual === 'text'" v-on:click="changeSelectedVisual('text')">
-                    <font-awesome-icon size="lg" class="mr-2" :icon="faFont" />
-                    <span>Text</span>
+                  <label class="btn btn-link" v-bind:class="{ active: selectedVisual === 'requests' }">
+                    <input type="radio" name="chainFilter" id="requests" autocomplete="off" :checked="selectedVisual === 'requests'" v-on:click="changeSelectedVisual('requests')">
+                    <font-awesome-icon size="lg" class="mr-2" :icon="faCube" />
+                    <span>Requests</span>
                   </label>
                 </div>
               </b-col>
             </b-row>
-            <b-row class="chainViewer flex-grow flex-fill">
-              <b-col>
-
+            <b-row class="chainViewer flex-grow flex-fill" v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
+              <b-col class="m-3 text-left overflow-hidden">
+                <b-row class="mb-3">
+                  <b-col cols="9" class="d-flex flex-column m-auto align-items-start">
+                    <h4 class="m-0">{{currentChain.label}}</h4>
+                  </b-col>
+                  <b-col cols="3" class="d-flex flex-column m-auto align-items-end">
+                    <b-button v-if="currentChain && currentAccount && currentChain.address !== currentAccount.address" class="font-weight-bolder" variant="link" v-on:click="closeChain()">
+                      <font-awesome-icon size="lg" class="mr-2" :icon="faTimes" />
+                    </b-button>
+                  </b-col>
+                </b-row>
+                <div name="list" is="transition-group" v-if="currentAccount && requests.length > 0">
+                  <div v-for="request in requests" :key="request.hash">
+                    <request :requestInfo="request" :account="currentAccount.address" :small="true"/>
+                  </div>
+                </div>
               </b-col>
             </b-row>
           </b-col>
@@ -141,17 +157,20 @@ import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
 import config from '../../config'
 import Wallet from '../api/wallet'
+import infiniteScroll from 'vue-infinite-scroll'
 import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
 import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
 import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown'
 import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item'
 import LogosAddress from '@/components/LogosAddress.vue'
 import Lookups from '@/components/forge/lookups.vue'
+import request from '@/components/requests/request.vue'
 import Requests from '@/components/forge/requests.vue'
 import cloneDeep from 'lodash/cloneDeep'
-import { faUser, faEllipsisVAlt, faCoins, faSearch, faWrench, faEye, faFont, faSpinner } from '@fortawesome/pro-light-svg-icons'
+import { faUser, faEllipsisVAlt, faCoins, faSearch, faWrench, faEye, faFont, faSpinner, faCube, faTimes } from '@fortawesome/pro-light-svg-icons'
 import Toasted from 'vue-toasted'
 import RPC from '../api/rpc'
+Vue.use(infiniteScroll)
 Vue.use(Toasted, {
   iconPack: 'fontawesome'
 })
@@ -177,9 +196,13 @@ export default {
       faEye,
       faFont,
       faSpinner,
+      faTimes,
+      faCube,
+      currentChain: null,
       selected: 'requests',
-      selectedVisual: 'visual',
-      wallet: this.$wallet
+      selectedVisual: 'requests',
+      wallet: this.$wallet,
+      requestsBusy: false
     }
   },
   components: {
@@ -189,7 +212,8 @@ export default {
     bDropdownItem,
     LogosAddress,
     Lookups,
-    Requests
+    Requests,
+    request
   },
   computed: {
     ...mapState('settings', {
@@ -201,6 +225,9 @@ export default {
       toasts: state => state.toasts,
       forgeTokens: state => state.tokens
     }),
+    ...mapState('account', {
+      requests: state => state.requests
+    }),
     accounts: function () {
       return Array.from(Object.values(this.forgeAccounts))
     },
@@ -209,12 +236,24 @@ export default {
     }
   },
   methods: {
+    viewChain: function (address, label) {
+      if (!this.currentChain || this.currentChain.address !== address) {
+        this.reset()
+        this.getAccountInfo(address)
+        this.currentChain = { address: address, label: label }
+      }
+    },
+    closeChain: function () {
+      this.viewChain(this.currentAccount.address, this.currentAccount.label)
+    },
     changeSelected: function (newSelected) {
       this.selected = newSelected
     },
     setCurrentAccount: function (address) {
       if (this.$wallet.currentAccountAddress !== address) {
         this.$wallet.currentAccountAddress = address
+      } else if (this.currentChain && this.currentAccount && this.currentChain.address !== address) {
+        this.viewChain(this.currentAccount.address, this.currentAccount.label)
       }
     },
     replaceAddresses: function (msg) {
@@ -223,11 +262,26 @@ export default {
       }
       return msg
     },
+    isSynced: function (address) {
+      return this.$wallet.accountsObject[address].synced
+    },
     removeAccount: function (address) {
       this.$wallet.removeAccount(address)
     },
     changeSelectedVisual: function (newSelected) {
       this.selectedVisual = newSelected
+    },
+    getMoreRequests: function () {
+      if (this.type && !this.requestsBusy && this.requests && this.requests.length > 0) {
+        this.requestsBusy = true
+        this.getRequests((response) => {
+          if (response === 'out of content') {
+            this.requestsBusy = true
+          } else if (response === 'success') {
+            this.requestsBusy = false
+          }
+        })
+      }
     },
     ...mapActions('forge',
       [
@@ -239,6 +293,11 @@ export default {
       'initalize',
       'unsubscribe',
       'subscribe'
+    ]),
+    ...mapActions('account', [
+      'getAccountInfo',
+      'getRequests',
+      'reset'
     ])
   },
   created: function () {
@@ -246,6 +305,11 @@ export default {
     this.setSeed(this.$wallet.seed)
   },
   watch: {
+    currentAccount: function (newAccount, oldAccount) {
+      if ((newAccount && oldAccount === null) || (newAccount && oldAccount && newAccount.address !== oldAccount.address)) {
+        this.viewChain(newAccount.address, newAccount.label)
+      }
+    },
     wallet: {
       handler: function (newWallet, oldWallet) {
         for (let account in newWallet.accountsObject) {
@@ -253,7 +317,7 @@ export default {
             this.subscribe(`account/${account}`)
           }
         }
-        this.update(newWallet)
+        setTimeout(() => { this.update(newWallet) }, 0)
       },
       deep: true
     },
@@ -331,25 +395,40 @@ label.btn-link.active {
   overflow-y: scroll;
   max-height: calc(100vh - 123px);
 }
+.chainViewer::-webkit-scrollbar,
 .actionSelector::-webkit-scrollbar {
   background-color: transparent;
   width:16px
 }
+.chainViewer::-webkit-scrollbar-track,
 .actionSelector::-webkit-scrollbar-track {
   background-color: transparent;
 }
+.chainViewer::-webkit-scrollbar-track:hover {
+  background-color:$bg-tertiary;
+}
 .actionSelector::-webkit-scrollbar-track:hover {
-  background-color:#f4f4f4;
+  background-color:$bg-primary;
+}
+.chainViewer::-webkit-scrollbar-thumb {
+  background-color:#babac0;
+  border-radius:16px;
+  border:5px solid $bg-tertiary;
 }
 .actionSelector::-webkit-scrollbar-thumb {
   background-color:#babac0;
   border-radius:16px;
   border:5px solid $bg-primary;
 }
+.chainViewer::-webkit-scrollbar-thumb:hover {
+  background-color:#a0a0a5;
+  border:4px solid $bg-tertiary;
+}
 .actionSelector::-webkit-scrollbar-thumb:hover {
   background-color:#a0a0a5;
-  border:4px solid #f4f4f4;
+  border:4px solid $bg-primary;
 }
+.chainViewer::-webkit-scrollbar-button,
 .actionSelector::-webkit-scrollbar-button {
   display:none;
 }
@@ -363,6 +442,23 @@ label.btn-link.active {
 }
 .chainViewer {
   background: $bg-tertiary;
+  overflow-y: scroll;
+  max-height: calc(100vh - 123px);
+}
+.avatar {
+  width: 22px;
+  height: 22px;
+  vertical-align: top;
+}
+.card-body > .card-text > ul,
+.card-body > ul {
+  margin-bottom: 0px;
+}
+.list-enter-active, .list-leave-active {
+  transition: opacity .5s;
+}
+.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>
 <style lang="scss">

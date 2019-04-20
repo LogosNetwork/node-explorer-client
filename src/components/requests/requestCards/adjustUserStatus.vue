@@ -4,7 +4,7 @@
       <b-card-title>
         <div class="d-flex justify-content-between">
           <div>
-            Token Adjust User Status Request
+            Adjust User Status
           </div>
           <div v-if="requestInfo.createdAt" class="timestamp text-right">
             <small>
@@ -18,12 +18,12 @@
           </div>
         </div>
       </b-card-title>
-      <token :tokenInfo="requestInfo.tokenInfo" :origin="requestInfo.origin" />
+      <token :tokenInfo="requestInfo.tokenInfo" :origin="requestInfo.origin" :small="small" />
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item>
         <strong class="mr-2">{{requestInfo.status}}</strong>
-        <LogosAddress class="mr-2" :address="requestInfo.account" />
+        <LogosAddress class="mr-2" :address="requestInfo.account" :force="small" />
       </b-list-group-item>
     </b-list-group>
   </b-card>
@@ -42,7 +42,11 @@ import token from '@/components/requests/token.vue'
 export default {
   name: 'adjustUserStatus',
   props: {
-    requestInfo: Object
+    requestInfo: Object,
+    small: {
+      type: Boolean,
+      default: false
+    }
   },
   components: {
     'b-card-body': bCardBody,

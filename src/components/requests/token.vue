@@ -14,7 +14,7 @@
       <b-card-text v-if="origin">
         <font-awesome-icon size="lg" class="text-info mr-2 align-middle" :icon="faUserCircle" />
         <strong class="mr-2">Token Controller:</strong>
-        <LogosAddress class="mr-2" :address="origin" />
+        <LogosAddress class="mr-2" :address="origin" :force="small" />
       </b-card-text>
     </div>
     <div v-if="tokenInfo.pending === true">
@@ -42,7 +42,11 @@ export default {
     tokenInfo: Object,
     origin: String,
     inactive: Boolean,
-    size: String
+    size: String,
+    small: {
+      type: Boolean,
+      default: false
+    }
   },
   components: {
     'b-card-text': bCardText,
