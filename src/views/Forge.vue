@@ -104,7 +104,7 @@
               </b-col>
             </b-row>
             <b-row class="actionSelector flex-grow flex-fill">
-              <b-col class="m-3 text-left overflow-hidden">
+              <b-col class="m-3 text-left">
                 <div v-if="selected === 'lookup'">
                   <Lookups />
                 </div>
@@ -127,7 +127,7 @@
               </b-col>
             </b-row>
             <b-row class="chainViewer flex-grow flex-fill" v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
-              <b-col class="m-3 text-left overflow-hidden">
+              <b-col class="m-3 text-left">
                 <b-row class="mb-3">
                   <b-col cols="9" class="d-flex flex-column m-auto align-items-start">
                     <h4 class="m-0">{{currentChain.label}}</h4>
@@ -393,6 +393,7 @@ label.btn-link.active {
 .actionSelector {
   background: $bg-primary;
   overflow-y: scroll;
+  overflow-x: hidden;
   max-height: calc(100vh - 123px);
 }
 .chainViewer::-webkit-scrollbar,
@@ -443,6 +444,7 @@ label.btn-link.active {
 .chainViewer {
   background: $bg-tertiary;
   overflow-y: scroll;
+  overflow-x: hidden;
   max-height: calc(100vh - 123px);
 }
 .avatar {
