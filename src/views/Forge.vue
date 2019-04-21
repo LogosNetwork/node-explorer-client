@@ -167,7 +167,7 @@ import Lookups from '@/components/forge/lookups.vue'
 import request from '@/components/requests/request.vue'
 import Requests from '@/components/forge/requests.vue'
 import cloneDeep from 'lodash/cloneDeep'
-import { faUser, faEllipsisVAlt, faCoins, faSearch, faWrench, faEye, faFont, faSpinner, faCube, faTimes } from '@fortawesome/pro-light-svg-icons'
+import { faUser, faEllipsisVAlt, faCoins, faSearch, faWrench, faEye, faFont, faSpinner, faCube, faTimes, faCircle } from '@fortawesome/pro-light-svg-icons'
 import Toasted from 'vue-toasted'
 import RPC from '../api/rpc'
 Vue.use(infiniteScroll)
@@ -198,6 +198,7 @@ export default {
       faSpinner,
       faTimes,
       faCube,
+      faCircle,
       currentChain: null,
       selected: 'requests',
       selectedVisual: 'requests',
