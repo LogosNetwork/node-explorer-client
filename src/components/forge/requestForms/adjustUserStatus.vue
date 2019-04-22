@@ -108,7 +108,7 @@ import bFormGroup from 'bootstrap-vue/es/components/form-group/form-group'
 import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
 import LogosAddress from '@/components/LogosAddress.vue'
 import Multiselect from 'vue-multiselect'
-import cloneDeep from 'lodash/cloneDeep'
+import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 export default {
   name: 'adjustUserStatusForm',

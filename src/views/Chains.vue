@@ -134,7 +134,7 @@
 import { mapActions, mapState } from 'vuex'
 import infiniteScroll from 'vue-infinite-scroll'
 import Vue from 'vue'
-import orderBy from 'lodash/orderBy'
+import orderBy from 'lodash.orderby'
 import { faChevronDown } from '@fortawesome/pro-light-svg-icons'
 Vue.use(infiniteScroll)
 export default {

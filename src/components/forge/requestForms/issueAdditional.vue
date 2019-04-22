@@ -72,7 +72,7 @@ import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
 import LogosAddress from '@/components/LogosAddress.vue'
 import Multiselect from 'vue-multiselect'
 import bigInt from 'big-integer'
-import cloneDeep from 'lodash/cloneDeep'
+import cloneDeep from 'lodash.clonedeep'
 export default {
   name: 'issueAdditionalForm',
   data () {

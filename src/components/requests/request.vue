@@ -38,22 +38,6 @@
 </template>
 
 <script>
-import send from '@/components/requests/requestCards/send.vue'
-import burn from '@/components/requests/requestCards/burn.vue'
-import issuerInfo from '@/components/requests/requestCards/issuerInfo.vue'
-import distribute from '@/components/requests/requestCards/distribute.vue'
-import adjustFee from '@/components/requests/requestCards/adjustFee.vue'
-import changeSetting from '@/components/requests/requestCards/changeSetting.vue'
-import adjustUserStatus from '@/components/requests/requestCards/adjustUserStatus.vue'
-import issuance from '@/components/requests/requestCards/issuance.vue'
-import issueAdditional from '@/components/requests/requestCards/issueAdditional.vue'
-import withdrawFee from '@/components/requests/requestCards/withdrawFee.vue'
-import withdrawLogos from '@/components/requests/requestCards/withdrawLogos.vue'
-import updateController from '@/components/requests/requestCards/updateController.vue'
-import revoke from '@/components/requests/requestCards/revoke.vue'
-import immuteSetting from '@/components/requests/requestCards/immuteSetting.vue'
-import tokenSend from '@/components/requests/requestCards/tokenSend.vue'
-
 export default {
   name: 'request',
   props: {
@@ -65,21 +49,21 @@ export default {
     }
   },
   components: {
-    send,
-    burn,
-    issuerInfo,
-    distribute,
-    adjustFee,
-    changeSetting,
-    adjustUserStatus,
-    issuance,
-    issueAdditional,
-    withdrawFee,
-    withdrawLogos,
-    updateController,
-    revoke,
-    immuteSetting,
-    tokenSend
+    'send': () => import('@/components/requests/requestCards/send.vue'),
+    'burn': () => import('@/components/requests/requestCards/burn.vue'),
+    'issuerInfo': () => import('@/components/requests/requestCards/issuerInfo.vue'),
+    'distribute': () => import('@/components/requests/requestCards/distribute.vue'),
+    'adjustFee': () => import('@/components/requests/requestCards/adjustFee.vue'),
+    'changeSetting': () => import('@/components/requests/requestCards/changeSetting.vue'),
+    'adjustUserStatus': () => import('@/components/requests/requestCards/adjustUserStatus.vue'),
+    'issuance': () => import('@/components/requests/requestCards/issuance.vue'),
+    'issueAdditional': () => import('@/components/requests/requestCards/issueAdditional.vue'),
+    'withdrawFee': () => import('@/components/requests/requestCards/withdrawFee.vue'),
+    'withdrawLogos': () => import('@/components/requests/requestCards/withdrawLogos.vue'),
+    'updateController': () => import('@/components/requests/requestCards/updateController.vue'),
+    'revoke': () => import('@/components/requests/requestCards/revoke.vue'),
+    'immuteSetting': () => import('@/components/requests/requestCards/immuteSetting.vue'),
+    'tokenSend': () => import('@/components/requests/requestCards/tokenSend.vue')
   }
 }
 </script>

@@ -197,31 +197,9 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import { mapState } from 'vuex'
-import VueQrcode from '@xkeshi/vue-qrcode'
-import accordion from '@/components/forge/accordion.vue'
-import fund from '@/components/forge/fund.vue'
-import createAccount from '@/components/forge/requestForms/createAccount.vue'
-import send from '@/components/forge/requestForms/send.vue'
-import tokenSend from '@/components/forge/requestForms/tokenSend.vue'
-import issuance from '@/components/forge/requestForms/issuance.vue'
-import issueAdditional from '@/components/forge/requestForms/issueAdditional.vue'
-import changeSetting from '@/components/forge/requestForms/changeSetting.vue'
-import immuteSetting from '@/components/forge/requestForms/immuteSetting.vue'
-import revoke from '@/components/forge/requestForms/revoke.vue'
-import adjustUserStatus from '@/components/forge/requestForms/adjustUserStatus.vue'
-import adjustFee from '@/components/forge/requestForms/adjustFee.vue'
-import updateIssuerInfo from '@/components/forge/requestForms/updateIssuerInfo.vue'
-import updateController from '@/components/forge/requestForms/updateController.vue'
-import burn from '@/components/forge/requestForms/burn.vue'
-import distribute from '@/components/forge/requestForms/distribute.vue'
-import withdrawFee from '@/components/forge/requestForms/withdrawFee.vue'
-import withdrawLogos from '@/components/forge/requestForms/withdrawLogos.vue'
 import bigInt from 'big-integer'
-import LogosAddress from '@/components/LogosAddress.vue'
 import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage, faCrown } from '@fortawesome/pro-light-svg-icons'
-Vue.component(VueQrcode.name, VueQrcode)
 
 export default {
   name: 'Requests',
@@ -245,25 +223,26 @@ export default {
     }
   },
   components: {
-    accordion,
-    LogosAddress,
-    fund,
-    createAccount,
-    send,
-    tokenSend,
-    issuance,
-    issueAdditional,
-    changeSetting,
-    immuteSetting,
-    revoke,
-    adjustUserStatus,
-    adjustFee,
-    updateIssuerInfo,
-    updateController,
-    burn,
-    distribute,
-    withdrawFee,
-    withdrawLogos
+    'qrcode': () => import('@xkeshi/vue-qrcode'),
+    'accordion': () => import('@/components/forge/accordion.vue'),
+    'LogosAddress': () => import('@/components/LogosAddress.vue'),
+    'fund': () => import('@/components/forge/fund.vue'),
+    'createAccount': () => import('@/components/forge/requestForms/createAccount.vue'),
+    'send': () => import('@/components/forge/requestForms/send.vue'),
+    'tokenSend': () => import('@/components/forge/requestForms/tokenSend.vue'),
+    'issuance': () => import('@/components/forge/requestForms/issuance.vue'),
+    'issueAdditional': () => import('@/components/forge/requestForms/issueAdditional.vue'),
+    'changeSetting': () => import('@/components/forge/requestForms/changeSetting.vue'),
+    'immuteSetting': () => import('@/components/forge/requestForms/immuteSetting.vue'),
+    'revoke': () => import('@/components/forge/requestForms/revoke.vue'),
+    'adjustUserStatus': () => import('@/components/forge/requestForms/adjustUserStatus.vue'),
+    'adjustFee': () => import('@/components/forge/requestForms/adjustFee.vue'),
+    'updateIssuerInfo': () => import('@/components/forge/requestForms/updateIssuerInfo.vue'),
+    'updateController': () => import('@/components/forge/requestForms/updateController.vue'),
+    'burn': () => import('@/components/forge/requestForms/burn.vue'),
+    'distribute': () => import('@/components/forge/requestForms/distribute.vue'),
+    'withdrawFee': () => import('@/components/forge/requestForms/withdrawFee.vue'),
+    'withdrawLogos': () => import('@/components/forge/requestForms/withdrawLogos.vue')
   },
   computed: {
     ...mapState('forge', {

@@ -1,6 +1,6 @@
 import Logos from '@logosnetwork/logos-rpc-client'
 import axios from 'axios'
-import cloneDeep from 'lodash/cloneDeep'
+import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
 const state = {

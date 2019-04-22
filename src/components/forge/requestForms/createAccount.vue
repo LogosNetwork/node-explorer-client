@@ -60,7 +60,7 @@ import { mapState } from 'vuex'
 import bFormGroup from 'bootstrap-vue/es/components/form-group/form-group'
 import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
 import LogosAddress from '@/components/LogosAddress.vue'
-import cloneDeep from 'lodash/cloneDeep'
+import cloneDeep from 'lodash.clonedeep'
 
 export default {
   name: 'createAccountForm',

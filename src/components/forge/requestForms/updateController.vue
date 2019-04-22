@@ -185,7 +185,7 @@ import bFormCheckboxGroup from 'bootstrap-vue/es/components/form-checkbox/form-c
 import bFormCheckbox from 'bootstrap-vue/es/components/form-checkbox/form-checkbox'
 import LogosAddress from '@/components/LogosAddress.vue'
 import Multiselect from 'vue-multiselect'
-import cloneDeep from 'lodash/cloneDeep'
+import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 import { faQuestionCircle } from '@fortawesome/pro-light-svg-icons'
 export default {

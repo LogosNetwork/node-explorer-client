@@ -1,6 +1,6 @@
 import Logos from '@logosnetwork/logos-rpc-client'
 import bigInt from 'big-integer'
-import cloneDeep from 'lodash/cloneDeep'
+import cloneDeep from 'lodash.clonedeep'
 import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
 import Vue from 'vue'
 

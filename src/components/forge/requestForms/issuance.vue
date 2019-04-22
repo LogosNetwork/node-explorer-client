@@ -332,7 +332,7 @@ import bFormCheckbox from 'bootstrap-vue/es/components/form-checkbox/form-checkb
 import LogosAddress from '@/components/LogosAddress.vue'
 import Multiselect from 'vue-multiselect'
 import bigInt from 'big-integer'
-import cloneDeep from 'lodash/cloneDeep'
+import cloneDeep from 'lodash.clonedeep'
 import { faQuestionCircle } from '@fortawesome/pro-light-svg-icons'
 const urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/
 export default {

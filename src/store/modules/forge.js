@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import cloneDeep from 'lodash/cloneDeep'
+import cloneDeep from 'lodash.clonedeep'
 import Logos from '@logosnetwork/logos-rpc-client'
 import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
 import bigInt from 'big-integer'

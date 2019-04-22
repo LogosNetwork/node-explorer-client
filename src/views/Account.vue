@@ -392,22 +392,10 @@
 <script>
 import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
-import VueQrcode from '@xkeshi/vue-qrcode'
 import infiniteScroll from 'vue-infinite-scroll'
-import request from '@/components/requests/request.vue'
-import bCardBody from 'bootstrap-vue/es/components/card/card-body'
-import bCardTitle from 'bootstrap-vue/es/components/card/card-title'
-import bCardText from 'bootstrap-vue/es/components/card/card-text'
-import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
-import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
-import LogosAddress from '@/components/LogosAddress.vue'
-import token from '@/components/requests/token.vue'
-import TokenSettings from '@/components/requests/tokenSettings.vue'
-import bModal from 'bootstrap-vue/es/components/modal/modal'
 import axios from 'axios'
 import { faSpinner, faCoins, faCrown, faUserCircle, faMagic, faLockAlt, faMask, faSnowflake, faListAlt, faArrowDown, faFire, faEdit, faHandReceiving, faPercentage } from '@fortawesome/pro-light-svg-icons'
 Vue.use(infiniteScroll)
-Vue.component(VueQrcode.name, VueQrcode)
 
 export default {
   computed: {
@@ -439,16 +427,17 @@ export default {
     }
   },
   components: {
-    request,
-    bCardBody,
-    bCardTitle,
-    bCardText,
-    bListGroup,
-    LogosAddress,
-    bListGroupItem,
-    bModal,
-    TokenSettings,
-    token
+    'qrcode': () => import('@xkeshi/vue-qrcode'),
+    'request': () => import('@/components/requests/request.vue'),
+    'bCardBody': () => import('bootstrap-vue/es/components/card/card-body'),
+    'bCardTitle': () => import('bootstrap-vue/es/components/card/card-title'),
+    'bCardText': () => import('bootstrap-vue/es/components/card/card-text'),
+    'bListGroup': () => import('bootstrap-vue/es/components/list-group/list-group'),
+    'LogosAddress': () => import('@/components/LogosAddress.vue'),
+    'bListGroupItem': () => import('bootstrap-vue/es/components/list-group/list-group-item'),
+    'bModal': () => import('bootstrap-vue/es/components/modal/modal'),
+    'TokenSettings': () => import('@/components/requests/tokenSettings.vue'),
+    'token': () => import('@/components/requests/token.vue')
   },
   created: function () {
     this.reset()
