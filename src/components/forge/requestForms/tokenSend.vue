@@ -168,11 +168,15 @@ export default {
     availableToSend: function () {
       if (this.selectedToken) {
         let amount = null
+        let amountInBaseUnit = this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.tokenAccount)]
+        if (this.selectedToken.fee_type === 'flat') {
+          amountInBaseUnit = bigInt(amountInBaseUnit).minus(bigInt(this.selectedToken.fee_rate)).toString()
+        }
         if (this.selectedToken.issuerInfo && typeof this.selectedToken.issuerInfo.decimals !== 'undefined') {
-          amount = this.$Logos.convert.fromTo(this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.tokenAccount)], 0, this.selectedToken.issuerInfo.decimals)
+          amount = this.$Logos.convert.fromTo(amountInBaseUnit, 0, this.selectedToken.issuerInfo.decimals)
           return `${amount} ${this.selectedToken.symbol} are available to send`
         } else {
-          amount = this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.tokenAccount)]
+          amount = amountInBaseUnit
           return `${amount} base units of ${this.selectedToken.name} are available to send`
         }
       }

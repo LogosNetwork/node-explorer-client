@@ -86,7 +86,7 @@
       </b-col>
       <b-col class="overflow-hidden">
         <b-row class="h-100">
-          <b-col :cols="currentAccount ? 7 : 12" class="d-flex flex-column">
+          <b-col :cols="currentAccount || selected === 'lookup' ? 7 : 12" class="d-flex flex-column">
             <b-row class="actionToggle">
               <b-col>
                 <div class="btn-group btn-group-toggle pt-3 pb-3" data-toggle="buttons">
@@ -114,37 +114,67 @@
               </b-col>
             </b-row>
           </b-col>
-          <b-col v-if="currentChain" cols="5" class="d-flex flex-column">
-            <b-row class="chainToggle">
-              <b-col>
-                <div class="btn-group btn-group-toggle pt-3 pb-3" data-toggle="buttons">
-                  <label class="btn btn-link" v-bind:class="{ active: selectedVisual === 'requests' }">
-                    <input type="radio" name="chainFilter" id="requests" autocomplete="off" :checked="selectedVisual === 'requests'" v-on:click="changeSelectedVisual('requests')">
-                    <font-awesome-icon size="lg" class="mr-2" :icon="faCube" />
-                    <span>Requests</span>
-                  </label>
-                </div>
-              </b-col>
-            </b-row>
-            <b-row class="chainViewer flex-grow flex-fill" v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
-              <b-col class="m-3 text-left">
-                <b-row class="mb-3">
-                  <b-col cols="9" class="d-flex flex-column m-auto align-items-start">
-                    <h4 class="m-0">{{currentChain.label}}</h4>
-                  </b-col>
-                  <b-col cols="3" class="d-flex flex-column m-auto align-items-end">
-                    <b-button v-if="currentChain && currentAccount && currentChain.address !== currentAccount.address" class="font-weight-bolder" variant="link" v-on:click="closeChain()">
-                      <font-awesome-icon size="lg" class="mr-2" :icon="faTimes" />
-                    </b-button>
-                  </b-col>
-                </b-row>
-                <div name="list" is="transition-group" v-if="currentAccount && requests.length > 0">
-                  <div v-for="request in requests" :key="request.hash">
-                    <request :requestInfo="request" :account="currentAccount.address" :small="true"/>
+          <b-col v-if="currentChain || selected === 'lookup'" cols="5" class="d-flex flex-column">
+            <div v-if="selected === 'requests'" class="d-flex flex-column flex-grow flex-fill">
+              <b-row class="chainToggle">
+                <b-col>
+                  <div class="btn-group btn-group-toggle pt-3 pb-3" data-toggle="buttons">
+                    <label class="btn btn-link active">
+                      <input type="radio" name="chainFilter" id="requests" autocomplete="off" :checked="true">
+                      <font-awesome-icon size="lg" class="mr-2" :icon="faCube" />
+                      <span>Requests</span>
+                    </label>
                   </div>
-                </div>
-              </b-col>
-            </b-row>
+                </b-col>
+              </b-row>
+              <b-row class="chainViewer flex-grow flex-fill" v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
+                <b-col class="m-3 text-left">
+                  <b-row class="mb-3">
+                    <b-col cols="9" class="d-flex flex-column m-auto align-items-start">
+                      <h4 class="m-0">{{currentChain.label}}</h4>
+                    </b-col>
+                    <b-col cols="3" class="d-flex flex-column m-auto align-items-end">
+                      <b-button v-if="currentChain && currentAccount && currentChain.address !== currentAccount.address" class="font-weight-bolder" variant="link" v-on:click="closeChain()">
+                        <font-awesome-icon size="lg" class="mr-2" :icon="faTimes" />
+                      </b-button>
+                    </b-col>
+                  </b-row>
+                  <div name="list" is="transition-group" v-if="currentAccount && requests.length > 0">
+                    <div v-for="request in requests" :key="request.hash">
+                      <request :requestInfo="request" :account="currentAccount.address" :small="true"/>
+                    </div>
+                  </div>
+                </b-col>
+              </b-row>
+            </div>
+            <div v-if="selected === 'lookup'" class="d-flex flex-column flex-grow flex-fill">
+              <b-row class="chainToggle">
+                <b-col>
+                  <div class="btn-group btn-group-toggle pt-3 pb-3" data-toggle="buttons">
+                    <label class="btn btn-link" v-bind:class="{ active: selectedVisual === 'visual' }">
+                      <input type="radio" name="visualResponse" id="lookups" autocomplete="off" :checked="selectedVisual === 'visual'" v-on:click="changeSelectedVisual('visual')">
+                      <font-awesome-icon size="lg" class="mr-2" :icon="faEye" />
+                      <span>Visual</span>
+                    </label>
+                    <label class="btn btn-link" v-bind:class="{ active: selectedVisual === 'text' }">
+                      <input type="radio" name="textResponse" id="lookups" autocomplete="off" :checked="selectedVisual === 'text'" v-on:click="changeSelectedVisual('text')">
+                      <font-awesome-icon size="lg" class="mr-2" :icon="faFont" />
+                      <span>Text</span>
+                    </label>
+                  </div>
+                </b-col>
+              </b-row>
+              <b-row class="chainViewer flex-grow flex-fill">
+                <b-col class="m-3 text-left">
+                  <b-row class="mb-3">
+                    <b-col cols="12" class="d-flex flex-column m-auto align-items-start">
+                      <h4 class="m-0">{{selectedVisual}}</h4>
+                    </b-col>
+                  </b-row>
+                  <p>Not Yet Implemented</p>
+                </b-col>
+              </b-row>
+            </div>
           </b-col>
         </b-row>
       </b-col>
@@ -201,7 +231,7 @@ export default {
       faCircle,
       currentChain: null,
       selected: 'requests',
-      selectedVisual: 'requests',
+      selectedVisual: 'visual',
       wallet: this.$wallet,
       requestsBusy: false
     }

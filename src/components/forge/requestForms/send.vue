@@ -31,7 +31,7 @@
       id="sendAmount"
       label="Amount"
       label-size="lg"
-      :description="currentAccount ? `${currentAccount.logosBalance} Logos available to send` : `No account found`"
+      :description="currentAccount ? `${availableToSend} Logos available to send` : `No account found`"
     >
       <b-form-input
         id="amountInput"
@@ -100,13 +100,15 @@ export default {
       if (this.currentAccount) delete forgeAccounts[this.currentAccount.address]
       return Array.from(Object.values(forgeAccounts)).concat(this.accounts).concat(forgeTokens)
     },
+    availableToSend: function () {
+      return this.$Logos.convert.fromReason(bigInt(this.currentAccount.balance).minus(bigInt(this.$utils.minimumFee)).toString(), 'LOGOS')
+    },
     isValidAmount: function () {
       if (this.sendForm.amount === '') return null
       let amountInRaw = cloneDeep(this.sendForm.amount)
       if (amountInRaw) {
         if (!/^([0-9]+(?:[.][0-9]*)?|\.[0-9]+)$/.test(amountInRaw)) return false
         amountInRaw = this.$Logos.convert.toReason(amountInRaw, 'LOGOS')
-        console.log(amountInRaw)
         return (
           bigInt(amountInRaw).greater(0) &&
           bigInt(this.$wallet.account.balance)
