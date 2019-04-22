@@ -98,8 +98,6 @@
 import { mapActions, mapState } from 'vuex'
 import Vue from 'vue'
 import infiniteScroll from 'vue-infinite-scroll'
-import VueMoment from 'vue-moment'
-Vue.use(VueMoment)
 Vue.use(infiniteScroll)
 
 const hlCache = new Map()

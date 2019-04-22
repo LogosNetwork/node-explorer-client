@@ -46,13 +46,10 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import axios from 'axios'
 import { mapActions, mapState } from 'vuex'
 import { QrcodeStream } from 'vue-qrcode-reader'
 import { faQrcode } from '@fortawesome/pro-light-svg-icons'
-import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
-Vue.directive('b-tooltip', vBTooltip)
 export default {
   name: 'Facuet',
   components: {

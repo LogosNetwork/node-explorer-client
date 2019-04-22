@@ -395,12 +395,8 @@ import { mapActions, mapState } from 'vuex'
 import infiniteScroll from 'vue-infinite-scroll'
 import axios from 'axios'
 import { faSpinner, faCoins, faCrown, faUserCircle, faMagic, faLockAlt, faMask, faSnowflake, faListAlt, faArrowDown, faFire, faEdit, faHandReceiving, faPercentage } from '@fortawesome/pro-light-svg-icons'
-import VueMoment from 'vue-moment'
 import vBModal from 'bootstrap-vue/es/directives/modal/modal'
-import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
-Vue.directive('b-tooltip', vBTooltip)
 Vue.directive('b-modal', vBModal)
-Vue.use(VueMoment)
 Vue.use(infiniteScroll)
 
 export default {

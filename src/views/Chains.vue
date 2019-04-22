@@ -136,8 +136,6 @@ import infiniteScroll from 'vue-infinite-scroll'
 import Vue from 'vue'
 import orderBy from 'lodash.orderby'
 import { faChevronDown } from '@fortawesome/pro-light-svg-icons'
-import VueMoment from 'vue-moment'
-Vue.use(VueMoment)
 Vue.use(infiniteScroll)
 export default {
   name: 'explore',

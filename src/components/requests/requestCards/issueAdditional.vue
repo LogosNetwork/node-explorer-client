@@ -33,10 +33,7 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import VueMoment from 'vue-moment'
 import { faMagic } from '@fortawesome/pro-light-svg-icons'
-Vue.use(VueMoment)
 
 export default {
   name: 'issueAdditional',

@@ -323,13 +323,10 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import { mapState } from 'vuex'
 import bigInt from 'big-integer'
 import cloneDeep from 'lodash.clonedeep'
 import { faQuestionCircle } from '@fortawesome/pro-light-svg-icons'
-import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
-Vue.directive('b-tooltip', vBTooltip)
 const urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/
 export default {
   name: 'issueTokenForm',

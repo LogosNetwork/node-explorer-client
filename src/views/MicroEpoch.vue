@@ -88,9 +88,6 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import Vue from 'vue'
-import VueMoment from 'vue-moment'
-Vue.use(VueMoment)
 
 let fields = [
   { key: 'index', label: 'Delegate #' },

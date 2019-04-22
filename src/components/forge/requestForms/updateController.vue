@@ -177,13 +177,10 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import { mapState } from 'vuex'
 import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 import { faQuestionCircle } from '@fortawesome/pro-light-svg-icons'
-import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
-Vue.directive('b-tooltip', vBTooltip)
 
 export default {
   name: 'updateControllerForm',

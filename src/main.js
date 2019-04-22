@@ -4,13 +4,13 @@ import router from './router'
 import i18n from './i18n'
 import store from './store/index'
 import './assets/css/shame.scss'
-
-// Icons
-import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
-
+import VueMoment from 'vue-moment'
+import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
 Vue.config.productionTip = false
-Vue.component('font-awesome-icon', FontAwesomeIcon)
-Vue.component('font-awesome-layers', FontAwesomeLayers)
+Vue.use(VueMoment)
+Vue.directive('b-tooltip', vBTooltip)
+Vue.component('font-awesome-icon', () => import(/* webpackChunkName: "FontAwesomeIcon" */'@fortawesome/vue-fontawesome').then(({ FontAwesomeIcon }) => FontAwesomeIcon))
+Vue.component('font-awesome-layers', () => import(/* webpackChunkName: "FontAwesomeLayers" */'@fortawesome/vue-fontawesome').then(({ FontAwesomeLayers }) => FontAwesomeLayers))
 Vue.component('b-form', () => import(/* webpackChunkName: "b-form" */'bootstrap-vue/es/components/form/form'))
 Vue.component('b-input', () => import(/* webpackChunkName: "b-input" */'bootstrap-vue/es/components/form-input/form-input'))
 Vue.component('b-container', () => import(/* webpackChunkName: "b-container" */'bootstrap-vue/es/components/layout/container'))

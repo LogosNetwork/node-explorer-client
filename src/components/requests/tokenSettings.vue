@@ -139,10 +139,7 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import { faPercentage, faMagic, faSnowflake, faMask, faListAlt, faLockOpenAlt, faLockAlt, faBan } from '@fortawesome/pro-light-svg-icons'
-import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
-Vue.directive('b-tooltip', vBTooltip)
 
 export default {
   name: 'tokenSettings',

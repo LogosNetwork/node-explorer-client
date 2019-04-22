@@ -35,9 +35,6 @@
 
 <script>
 import { faArrowDown } from '@fortawesome/pro-light-svg-icons'
-import Vue from 'vue'
-import VueMoment from 'vue-moment'
-Vue.use(VueMoment)
 
 export default {
   name: 'withdrawLogos',
