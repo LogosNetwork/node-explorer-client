@@ -13,11 +13,13 @@
 </template>
 
 <script>
+import Nav from '@/components/Nav.vue'
+import vueHeadful from 'vue-headful'
 export default {
   name: 'app',
   components: {
-    'vueHeadful': () => import(/* webpackChunkName: "vue-headful" */'vue-headful'),
-    'Nav': () => import(/* webpackChunkName: "Nav" */'@/components/Nav.vue')
+    vueHeadful,
+    Nav
   }
 }
 </script>

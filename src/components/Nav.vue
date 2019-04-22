@@ -34,6 +34,13 @@ export default {
   props: {
     dark: String
   },
+  components: {
+    'b-navbar': () => import(/* webpackChunkName: "b-navbar" */'bootstrap-vue/es/components/navbar/navbar'),
+    'b-navbar-brand': () => import(/* webpackChunkName: "b-navbar-brand" */'bootstrap-vue/es/components/navbar/navbar-brand'),
+    'b-navbar-toggle': () => import(/* webpackChunkName: "b-navbar-toggle" */'bootstrap-vue/es/components/navbar/navbar-toggle'),
+    'b-navbar-nav': () => import(/* webpackChunkName: "b-navbar-nav" */'bootstrap-vue/es/components/navbar/navbar-nav'),
+    'b-nav-item': () => import(/* webpackChunkName: "b-nav-item" */'bootstrap-vue/es/components/nav/nav-item')
+  },
   data () {
     return {
       faLambda,
