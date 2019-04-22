@@ -52,12 +52,14 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import request from '@/components/requests/request.vue'
+import Vue from 'vue'
+import VueMoment from 'vue-moment'
+Vue.use(VueMoment)
 
 export default {
   components: {
-    codepad: () => import('@/components/codepad.vue'),
-    request
+    'codepad': () => import(/* webpackChunkName: "Codepad" */'@/components/codepad.vue'),
+    'request': () => import(/* webpackChunkName: "RequestWrapper" */'@/components/requests/request.vue')
   },
   computed: {
     ...mapState('requestBlock', {

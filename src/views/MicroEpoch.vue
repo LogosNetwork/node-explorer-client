@@ -88,13 +88,17 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import Vue from 'vue'
+import VueMoment from 'vue-moment'
+Vue.use(VueMoment)
+
 let fields = [
   { key: 'index', label: 'Delegate #' },
   { key: 'hash', label: 'Hash' }
 ]
 export default {
   components: {
-    codepad: () => import('@/components/codepad.vue')
+    'codepad': () => import(/* webpackChunkName: "Codepad" */'@/components/codepad.vue')
   },
   computed: {
     ...mapState('microEpoch', {

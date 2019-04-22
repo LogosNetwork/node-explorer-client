@@ -49,21 +49,21 @@ export default {
     }
   },
   components: {
-    'send': () => import('@/components/requests/requestCards/send.vue'),
-    'burn': () => import('@/components/requests/requestCards/burn.vue'),
-    'issuerInfo': () => import('@/components/requests/requestCards/issuerInfo.vue'),
-    'distribute': () => import('@/components/requests/requestCards/distribute.vue'),
-    'adjustFee': () => import('@/components/requests/requestCards/adjustFee.vue'),
-    'changeSetting': () => import('@/components/requests/requestCards/changeSetting.vue'),
-    'adjustUserStatus': () => import('@/components/requests/requestCards/adjustUserStatus.vue'),
-    'issuance': () => import('@/components/requests/requestCards/issuance.vue'),
-    'issueAdditional': () => import('@/components/requests/requestCards/issueAdditional.vue'),
-    'withdrawFee': () => import('@/components/requests/requestCards/withdrawFee.vue'),
-    'withdrawLogos': () => import('@/components/requests/requestCards/withdrawLogos.vue'),
-    'updateController': () => import('@/components/requests/requestCards/updateController.vue'),
-    'revoke': () => import('@/components/requests/requestCards/revoke.vue'),
-    'immuteSetting': () => import('@/components/requests/requestCards/immuteSetting.vue'),
-    'tokenSend': () => import('@/components/requests/requestCards/tokenSend.vue')
+    'send': () => import(/* webpackChunkName: "sendCard" */'@/components/requests/requestCards/send.vue'),
+    'burn': () => import(/* webpackChunkName: "burnCard" */'@/components/requests/requestCards/burn.vue'),
+    'issuerInfo': () => import(/* webpackChunkName: "issuerInfoCard" */'@/components/requests/requestCards/issuerInfo.vue'),
+    'distribute': () => import(/* webpackChunkName: "distributeCard" */'@/components/requests/requestCards/distribute.vue'),
+    'adjustFee': () => import(/* webpackChunkName: "adjustFeeCard" */'@/components/requests/requestCards/adjustFee.vue'),
+    'changeSetting': () => import(/* webpackChunkName: "changeSettingCard" */'@/components/requests/requestCards/changeSetting.vue'),
+    'adjustUserStatus': () => import(/* webpackChunkName: "adjustUserStatusCard" */'@/components/requests/requestCards/adjustUserStatus.vue'),
+    'issuance': () => import(/* webpackChunkName: "issuanceCard" */'@/components/requests/requestCards/issuance.vue'),
+    'issueAdditional': () => import(/* webpackChunkName: "issueAdditionalCard" */'@/components/requests/requestCards/issueAdditional.vue'),
+    'withdrawFee': () => import(/* webpackChunkName: "withdrawFeeCard" */'@/components/requests/requestCards/withdrawFee.vue'),
+    'withdrawLogos': () => import(/* webpackChunkName: "withdrawLogosCard" */'@/components/requests/requestCards/withdrawLogos.vue'),
+    'updateController': () => import(/* webpackChunkName: "updateControllerCard" */'@/components/requests/requestCards/updateController.vue'),
+    'revoke': () => import(/* webpackChunkName: "revokeCard" */'@/components/requests/requestCards/revoke.vue'),
+    'immuteSetting': () => import(/* webpackChunkName: "immuteSettingCard" */'@/components/requests/requestCards/immuteSetting.vue'),
+    'tokenSend': () => import(/* webpackChunkName: "tokenSendCard" */'@/components/requests/requestCards/tokenSend.vue')
   }
 }
 </script>

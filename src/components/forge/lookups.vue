@@ -73,7 +73,6 @@
 </template>
 
 <script>
-import accordion from '@/components/forge/accordion.vue'
 import { faInfo, faFastBackward, faCube, faKey, faExpandArrows, faTools, faEquals } from '@fortawesome/pro-light-svg-icons'
 
 export default {
@@ -90,7 +89,7 @@ export default {
     }
   },
   components: {
-    accordion
+    'accordion': () => import(/* webpackChunkName: "accordion" */'@/components/forge/accordion.vue')
   }
 }
 </script>

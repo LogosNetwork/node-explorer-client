@@ -4,65 +4,34 @@ import router from './router'
 import i18n from './i18n'
 import store from './store/index'
 import './assets/css/shame.scss'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-import 'vue-multiselect/dist/vue-multiselect.min.css'
-import bForm from 'bootstrap-vue/es/components/form/form'
-import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
-import bFormInvalidFeedback from 'bootstrap-vue/es/components/form/form-invalid-feedback'
-import bImgLazy from 'bootstrap-vue/es/components/image/img-lazy'
-import bNavbar from 'bootstrap-vue/es/components/navbar/navbar'
-import bNavbarBrand from 'bootstrap-vue/es/components/navbar/navbar-brand'
-import bNavbarToggle from 'bootstrap-vue/es/components/navbar/navbar-toggle'
-import bNavbarNav from 'bootstrap-vue/es/components/navbar/navbar-nav'
-import bNavItem from 'bootstrap-vue/es/components/nav/nav-item'
-import bCollapse from 'bootstrap-vue/es/components/collapse/collapse'
-import bButton from 'bootstrap-vue/es/components/button/button'
-import bTabs from 'bootstrap-vue/es/components/tabs/tabs'
-import bTab from 'bootstrap-vue/es/components/tabs/tab'
-import bCard from 'bootstrap-vue/es/components/card/card'
-import bFormSelect from 'bootstrap-vue/es/components/form-select/form-select'
-import bLink from 'bootstrap-vue/es/components/link/link'
-import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
-import vBModal from 'bootstrap-vue/es/directives/modal/modal'
-import vBToggle from 'bootstrap-vue/es/directives/toggle/toggle'
-import bContainer from 'bootstrap-vue/es/components/layout/container'
-import bRow from 'bootstrap-vue/es/components/layout/row'
-import bCol from 'bootstrap-vue/es/components/layout/col'
-import bTable from 'bootstrap-vue/es/components/table/table'
-import bFormCheckbox from 'bootstrap-vue/es/components/form-checkbox/form-checkbox'
-import VueMoment from 'vue-moment'
 
 // Icons
 import { FontAwesomeIcon, FontAwesomeLayers } from '@fortawesome/vue-fontawesome'
 
 Vue.config.productionTip = false
-Vue.directive('b-tooltip', vBTooltip)
-Vue.directive('b-modal', vBModal)
-Vue.directive('b-toggle', vBToggle)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('font-awesome-layers', FontAwesomeLayers)
-Vue.component('b-form', bForm)
-Vue.component('b-input', bFormInput)
-Vue.component('b-container', bContainer)
-Vue.component('b-row', bRow)
-Vue.component('b-col', bCol)
-Vue.component('b-link', bLink)
-Vue.component('b-button', bButton)
-Vue.component('b-tabs', bTabs)
-Vue.component('b-tab', bTab)
-Vue.component('b-card', bCard)
-Vue.component('b-form-select', bFormSelect)
-Vue.component('b-form-invalid-feedback', bFormInvalidFeedback)
-Vue.component('b-img-lazy', bImgLazy)
-Vue.component('b-navbar', bNavbar)
-Vue.component('b-navbar-brand', bNavbarBrand)
-Vue.component('b-navbar-toggle', bNavbarToggle)
-Vue.component('b-navbar-nav', bNavbarNav)
-Vue.component('b-nav-item', bNavItem)
-Vue.component('b-collapse', bCollapse)
-Vue.component('b-table', bTable)
-Vue.component('b-form-checkbox', bFormCheckbox)
-Vue.use(VueMoment)
+Vue.component('b-form', () => import(/* webpackChunkName: "b-form" */'bootstrap-vue/es/components/form/form'))
+Vue.component('b-input', () => import(/* webpackChunkName: "b-input" */'bootstrap-vue/es/components/form-input/form-input'))
+Vue.component('b-container', () => import(/* webpackChunkName: "b-container" */'bootstrap-vue/es/components/layout/container'))
+Vue.component('b-row', () => import(/* webpackChunkName: "b-row" */'bootstrap-vue/es/components/layout/row'))
+Vue.component('b-col', () => import(/* webpackChunkName: "b-col" */'bootstrap-vue/es/components/layout/col'))
+Vue.component('b-link', () => import(/* webpackChunkName: "b-link" */'bootstrap-vue/es/components/link/link'))
+Vue.component('b-button', () => import(/* webpackChunkName: "b-button" */'bootstrap-vue/es/components/button/button'))
+Vue.component('b-tabs', () => import(/* webpackChunkName: "b-tabs" */'bootstrap-vue/es/components/tabs/tabs'))
+Vue.component('b-tab', () => import(/* webpackChunkName: "b-tab" */'bootstrap-vue/es/components/tabs/tab'))
+Vue.component('b-card', () => import(/* webpackChunkName: "b-card" */'bootstrap-vue/es/components/card/card'))
+Vue.component('b-form-select', () => import(/* webpackChunkName: "b-form-select" */'bootstrap-vue/es/components/form-select/form-select'))
+Vue.component('b-form-invalid-feedback', () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback'))
+Vue.component('b-img-lazy', () => import(/* webpackChunkName: "b-img-lazy" */'bootstrap-vue/es/components/image/img-lazy'))
+Vue.component('b-navbar', () => import(/* webpackChunkName: "b-navbar" */'bootstrap-vue/es/components/navbar/navbar'))
+Vue.component('b-navbar-brand', () => import(/* webpackChunkName: "b-navbar-brand" */'bootstrap-vue/es/components/navbar/navbar-brand'))
+Vue.component('b-navbar-toggle', () => import(/* webpackChunkName: "b-navbar-toggle" */'bootstrap-vue/es/components/navbar/navbar-toggle'))
+Vue.component('b-navbar-nav', () => import(/* webpackChunkName: "b-navbar-nav" */'bootstrap-vue/es/components/navbar/navbar-nav'))
+Vue.component('b-nav-item', () => import(/* webpackChunkName: "b-nav-item" */'bootstrap-vue/es/components/nav/nav-item'))
+Vue.component('b-collapse', () => import(/* webpackChunkName: "b-collapse" */'bootstrap-vue/es/components/collapse/collapse'))
+Vue.component('b-table', () => import(/* webpackChunkName: "b-table" */'bootstrap-vue/es/components/table/table'))
+Vue.component('b-form-checkbox', () => import(/* webpackChunkName: "b-form-checkbox" */'bootstrap-vue/es/components/form-checkbox/form-checkbox'))
 new Vue({
   router,
   i18n,

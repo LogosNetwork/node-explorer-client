@@ -34,7 +34,7 @@
             <h4>Request Confirmed in: {{finalTime - startTime}}ms</h4>
           </div>
           <div v-if="scanQR" class="mt-3">
-            <qrcode-reader @init="onInit" @decode="onDecode" :paused="!scanQR"></qrcode-reader>
+            <qrcode-stream @init="onInit" @decode="onDecode" :paused="!scanQR"></qrcode-stream>
             <div class="error">
               {{ errorMessage }}
             </div>
@@ -46,14 +46,18 @@
 </template>
 
 <script>
-import axios from 'axios'
 import Vue from 'vue'
-import VueQrcodeReader from 'vue-qrcode-reader'
+import axios from 'axios'
 import { mapActions, mapState } from 'vuex'
+import { QrcodeStream } from 'vue-qrcode-reader'
 import { faQrcode } from '@fortawesome/pro-light-svg-icons'
-Vue.use(VueQrcodeReader)
+import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
+Vue.directive('b-tooltip', vBTooltip)
 export default {
   name: 'Facuet',
+  components: {
+    QrcodeStream
+  },
   computed: {
     ...mapState('settings', {
       mqttHost: state => state.mqttHost,

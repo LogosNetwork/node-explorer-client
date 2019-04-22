@@ -26,8 +26,6 @@
 </template>
 
 <script>
-import bCardText from 'bootstrap-vue/es/components/card/card-text'
-import LogosAddress from '@/components/LogosAddress.vue'
 import { faCoins, faCircle, faUserCircle } from '@fortawesome/pro-light-svg-icons'
 export default {
   name: 'token',
@@ -49,8 +47,8 @@ export default {
     }
   },
   components: {
-    'b-card-text': bCardText,
-    LogosAddress
+    'b-card-text': () => import(/* webpackChunkName: "b-card-text" */'bootstrap-vue/es/components/card/card-text'),
+    'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue')
   }
 }
 </script>

@@ -59,8 +59,6 @@ body {
   animation-name: highlight;
   animation-duration: 2s;
 }
-.b-dropdown > .dropdown-toggle-no-caret {
-  padding: 0px;
-  padding-left: .5rem;
-  padding-right: .5rem;
+.b-dropdown > .dropdown-toggle-no-caret::after {
+  display: none
 }

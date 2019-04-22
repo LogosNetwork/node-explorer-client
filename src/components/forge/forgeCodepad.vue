@@ -51,7 +51,7 @@ import 'codemirror/addon/fold/markdown-fold.js'
 import 'codemirror/addon/fold/xml-fold.js'
 import { mapState, mapActions } from 'vuex'
 export default {
-  name: 'codepad',
+  name: 'forgeCodepad',
   components: {
     codemirror
   },
@@ -99,7 +99,6 @@ export default {
   },
   watch: {
     issuerInfo: function (newInfo, oldInfo) {
-      console.log(newInfo)
       if (this.localInput !== newInfo) {
         this.localInput = newInfo
       }

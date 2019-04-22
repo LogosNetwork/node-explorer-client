@@ -34,15 +34,10 @@
 </template>
 
 <script>
-import bCardBody from 'bootstrap-vue/es/components/card/card-body'
-import bCardTitle from 'bootstrap-vue/es/components/card/card-title'
-import bCardSubtitle from 'bootstrap-vue/es/components/card/card-sub-title'
-import bCardText from 'bootstrap-vue/es/components/card/card-text'
-import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
-import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
-import LogosAddress from '@/components/LogosAddress.vue'
-import token from '@/components/requests/token.vue'
 import { faArrowDown } from '@fortawesome/pro-light-svg-icons'
+import Vue from 'vue'
+import VueMoment from 'vue-moment'
+Vue.use(VueMoment)
 
 export default {
   name: 'distribute',
@@ -59,14 +54,14 @@ export default {
     }
   },
   components: {
-    'b-card-body': bCardBody,
-    'b-card-title': bCardTitle,
-    'b-card-subtitle': bCardSubtitle,
-    'b-card-text': bCardText,
-    'b-list-group': bListGroup,
-    'b-list-group-item': bListGroupItem,
-    LogosAddress,
-    token
+    'b-card-body': () => import(/* webpackChunkName: "b-card-body" */'bootstrap-vue/es/components/card/card-body'),
+    'b-card-title': () => import(/* webpackChunkName: "b-card-title" */'bootstrap-vue/es/components/card/card-title'),
+    'b-card-subtitle': () => import(/* webpackChunkName: "b-card-subtitle" */'bootstrap-vue/es/components/card/card-sub-title'),
+    'b-card-text': () => import(/* webpackChunkName: "b-card-text" */'bootstrap-vue/es/components/card/card-text'),
+    'b-list-group': () => import(/* webpackChunkName: "b-list-group" */'bootstrap-vue/es/components/list-group/list-group'),
+    'b-list-group-item': () => import(/* webpackChunkName: "b-list-group-item" */'bootstrap-vue/es/components/list-group/list-group-item'),
+    'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
+    'token': () => import(/* webpackChunkName: "token" */'@/components/requests/token.vue')
   }
 }
 </script>

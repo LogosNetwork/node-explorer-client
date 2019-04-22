@@ -32,10 +32,9 @@
 </template>
 
 <script>
-import bCardBody from 'bootstrap-vue/es/components/card/card-body'
-import bCardTitle from 'bootstrap-vue/es/components/card/card-title'
-import bCardText from 'bootstrap-vue/es/components/card/card-text'
-import token from '@/components/requests/token.vue'
+import Vue from 'vue'
+import VueMoment from 'vue-moment'
+Vue.use(VueMoment)
 
 export default {
   name: 'tokenCard',
@@ -43,10 +42,10 @@ export default {
     tokenInfo: Object
   },
   components: {
-    'b-card-body': bCardBody,
-    'b-card-title': bCardTitle,
-    'b-card-text': bCardText,
-    token
+    'b-card-body': () => import(/* webpackChunkName: "b-card-body" */'bootstrap-vue/es/components/card/card-body'),
+    'b-card-title': () => import(/* webpackChunkName: "b-card-title" */'bootstrap-vue/es/components/card/card-title'),
+    'b-card-text': () => import(/* webpackChunkName: "b-card-text" */'bootstrap-vue/es/components/card/card-text'),
+    'token': () => import(/* webpackChunkName: "token" */'@/components/requests/token.vue')
   }
 }
 </script>

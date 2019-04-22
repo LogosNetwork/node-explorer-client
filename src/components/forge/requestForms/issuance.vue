@@ -323,17 +323,13 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { mapState } from 'vuex'
-import bFormGroup from 'bootstrap-vue/es/components/form-group/form-group'
-import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
-import bFormSelect from 'bootstrap-vue/es/components/form-select/form-select'
-import bFormCheckboxGroup from 'bootstrap-vue/es/components/form-checkbox/form-checkbox-group'
-import bFormCheckbox from 'bootstrap-vue/es/components/form-checkbox/form-checkbox'
-import LogosAddress from '@/components/LogosAddress.vue'
-import Multiselect from 'vue-multiselect'
 import bigInt from 'big-integer'
 import cloneDeep from 'lodash.clonedeep'
 import { faQuestionCircle } from '@fortawesome/pro-light-svg-icons'
+import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
+Vue.directive('b-tooltip', vBTooltip)
 const urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/
 export default {
   name: 'issueTokenForm',
@@ -457,13 +453,13 @@ export default {
     }
   },
   components: {
-    bFormGroup,
-    bFormInput,
-    bFormSelect,
-    bFormCheckboxGroup,
-    bFormCheckbox,
-    LogosAddress,
-    Multiselect
+    'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
+    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
+    'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
+    'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect'),
+    'b-form-select': () => import(/* webpackChunkName: "b-form-select" */'bootstrap-vue/es/components/form-select/form-select'),
+    'b-form-checkbox-group': () => import(/* webpackChunkName: "b-form-checkbox-group" */'bootstrap-vue/es/components/form-checkbox/form-checkbox-group'),
+    'b-form-checkbox': () => import(/* webpackChunkName: "b-form-checkbox" */'bootstrap-vue/es/components/form-checkbox/form-checkbox')
   },
   created: function () {
     this.tokenOptions.controllers[0].account = this.currentAccount

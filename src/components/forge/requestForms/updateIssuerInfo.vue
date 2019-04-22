@@ -123,10 +123,6 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import bFormGroup from 'bootstrap-vue/es/components/form-group/form-group'
-import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
-import LogosAddress from '@/components/LogosAddress.vue'
-import Multiselect from 'vue-multiselect'
 import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 const urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/
@@ -143,11 +139,11 @@ export default {
     }
   },
   components: {
-    codepad: () => import('@/components/forge/forgeCodepad.vue'),
-    bFormGroup,
-    bFormInput,
-    LogosAddress,
-    Multiselect
+    'codepad': () => import(/* webpackChunkName: "ForgeCodepad" */'@/components/forge/forgeCodepad.vue'),
+    'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
+    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
+    'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
+    'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
     ...mapState('forge', {

@@ -395,6 +395,12 @@ import { mapActions, mapState } from 'vuex'
 import infiniteScroll from 'vue-infinite-scroll'
 import axios from 'axios'
 import { faSpinner, faCoins, faCrown, faUserCircle, faMagic, faLockAlt, faMask, faSnowflake, faListAlt, faArrowDown, faFire, faEdit, faHandReceiving, faPercentage } from '@fortawesome/pro-light-svg-icons'
+import VueMoment from 'vue-moment'
+import vBModal from 'bootstrap-vue/es/directives/modal/modal'
+import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
+Vue.directive('b-tooltip', vBTooltip)
+Vue.directive('b-modal', vBModal)
+Vue.use(VueMoment)
 Vue.use(infiniteScroll)
 
 export default {
@@ -427,17 +433,17 @@ export default {
     }
   },
   components: {
-    'qrcode': () => import('@xkeshi/vue-qrcode'),
-    'request': () => import('@/components/requests/request.vue'),
-    'bCardBody': () => import('bootstrap-vue/es/components/card/card-body'),
-    'bCardTitle': () => import('bootstrap-vue/es/components/card/card-title'),
-    'bCardText': () => import('bootstrap-vue/es/components/card/card-text'),
-    'bListGroup': () => import('bootstrap-vue/es/components/list-group/list-group'),
-    'LogosAddress': () => import('@/components/LogosAddress.vue'),
-    'bListGroupItem': () => import('bootstrap-vue/es/components/list-group/list-group-item'),
-    'bModal': () => import('bootstrap-vue/es/components/modal/modal'),
-    'TokenSettings': () => import('@/components/requests/tokenSettings.vue'),
-    'token': () => import('@/components/requests/token.vue')
+    'qrcode': () => import(/* webpackChunkName: "vue-qrcode" */ '@xkeshi/vue-qrcode'),
+    'request': () => import(/* webpackChunkName: "RequestWrapper" */ '@/components/requests/request.vue'),
+    'b-card-body': () => import(/* webpackChunkName: "b-card-body" */ 'bootstrap-vue/es/components/card/card-body'),
+    'b-card-title': () => import(/* webpackChunkName: "b-card-title" */ 'bootstrap-vue/es/components/card/card-title'),
+    'b-card-text': () => import(/* webpackChunkName: "b-card-text" */ 'bootstrap-vue/es/components/card/card-text'),
+    'b-list-group': () => import(/* webpackChunkName: "b-list-group" */ 'bootstrap-vue/es/components/list-group/list-group'),
+    'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */ '@/components/LogosAddress.vue'),
+    'b-list-group-item': () => import(/* webpackChunkName: "b-list-group-item" */ 'bootstrap-vue/es/components/list-group/list-group-item'),
+    'b-modal': () => import(/* webpackChunkName: "b-modal" */ 'bootstrap-vue/es/components/modal/modal'),
+    'TokenSettings': () => import(/* webpackChunkName: "TokenSettings" */ '@/components/requests/tokenSettings.vue'),
+    'token': () => import(/* webpackChunkName: "token" */ '@/components/requests/token.vue')
   },
   created: function () {
     this.reset()

@@ -16,8 +16,8 @@
 export default {
   name: 'app',
   components: {
-    vueHeadful: () => import('vue-headful'),
-    Nav: () => import('@/components/Nav.vue')
+    'vueHeadful': () => import(/* webpackChunkName: "vue-headful" */'vue-headful'),
+    'Nav': () => import(/* webpackChunkName: "Nav" */'@/components/Nav.vue')
   }
 }
 </script>

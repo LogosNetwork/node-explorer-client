@@ -188,14 +188,6 @@ import { mapActions, mapState } from 'vuex'
 import config from '../../config'
 import Wallet from '../api/wallet'
 import infiniteScroll from 'vue-infinite-scroll'
-import bListGroup from 'bootstrap-vue/es/components/list-group/list-group'
-import bListGroupItem from 'bootstrap-vue/es/components/list-group/list-group-item'
-import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown'
-import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item'
-import LogosAddress from '@/components/LogosAddress.vue'
-import Lookups from '@/components/forge/lookups.vue'
-import request from '@/components/requests/request.vue'
-import Requests from '@/components/forge/requests.vue'
 import cloneDeep from 'lodash.clonedeep'
 import { faUser, faEllipsisVAlt, faCoins, faSearch, faWrench, faEye, faFont, faSpinner, faCube, faTimes, faCircle } from '@fortawesome/pro-light-svg-icons'
 import Toasted from 'vue-toasted'
@@ -237,14 +229,14 @@ export default {
     }
   },
   components: {
-    bListGroup,
-    bListGroupItem,
-    bDropdown,
-    bDropdownItem,
-    LogosAddress,
-    Lookups,
-    Requests,
-    request
+    'b-list-group': () => import(/* webpackChunkName: "b-list-group" */'bootstrap-vue/es/components/list-group/list-group'),
+    'b-list-group-item': () => import(/* webpackChunkName: "b-list-group-item" */'bootstrap-vue/es/components/list-group/list-group-item'),
+    'b-dropdown': () => import(/* webpackChunkName: "b-dropdown" */'bootstrap-vue/es/components/dropdown/dropdown'),
+    'b-dropdown-item': () => import(/* webpackChunkName: "b-dropdown-item" */'bootstrap-vue/es/components/dropdown/dropdown-item'),
+    'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
+    'Lookups': () => import(/* webpackChunkName: "ForgeLookups" */'@/components/forge/lookups.vue'),
+    'Requests': () => import(/* webpackChunkName: "ForgeRequests" */'@/components/forge/requests.vue'),
+    'request': () => import(/* webpackChunkName: "RequestWrapper" */'@/components/requests/request.vue')
   },
   computed: {
     ...mapState('settings', {

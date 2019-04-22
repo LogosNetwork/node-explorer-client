@@ -199,6 +199,7 @@
 <script>
 import { mapState } from 'vuex'
 import bigInt from 'big-integer'
+import 'vue-multiselect/dist/vue-multiselect.min.css'
 import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage, faCrown } from '@fortawesome/pro-light-svg-icons'
 
 export default {
@@ -223,26 +224,26 @@ export default {
     }
   },
   components: {
-    'qrcode': () => import('@xkeshi/vue-qrcode'),
-    'accordion': () => import('@/components/forge/accordion.vue'),
-    'LogosAddress': () => import('@/components/LogosAddress.vue'),
-    'fund': () => import('@/components/forge/fund.vue'),
-    'createAccount': () => import('@/components/forge/requestForms/createAccount.vue'),
-    'send': () => import('@/components/forge/requestForms/send.vue'),
-    'tokenSend': () => import('@/components/forge/requestForms/tokenSend.vue'),
-    'issuance': () => import('@/components/forge/requestForms/issuance.vue'),
-    'issueAdditional': () => import('@/components/forge/requestForms/issueAdditional.vue'),
-    'changeSetting': () => import('@/components/forge/requestForms/changeSetting.vue'),
-    'immuteSetting': () => import('@/components/forge/requestForms/immuteSetting.vue'),
-    'revoke': () => import('@/components/forge/requestForms/revoke.vue'),
-    'adjustUserStatus': () => import('@/components/forge/requestForms/adjustUserStatus.vue'),
-    'adjustFee': () => import('@/components/forge/requestForms/adjustFee.vue'),
-    'updateIssuerInfo': () => import('@/components/forge/requestForms/updateIssuerInfo.vue'),
-    'updateController': () => import('@/components/forge/requestForms/updateController.vue'),
-    'burn': () => import('@/components/forge/requestForms/burn.vue'),
-    'distribute': () => import('@/components/forge/requestForms/distribute.vue'),
-    'withdrawFee': () => import('@/components/forge/requestForms/withdrawFee.vue'),
-    'withdrawLogos': () => import('@/components/forge/requestForms/withdrawLogos.vue')
+    'qrcode': () => import(/* webpackChunkName: "vue-qrcode" */'@xkeshi/vue-qrcode'),
+    'accordion': () => import(/* webpackChunkName: "accordion" */'@/components/forge/accordion.vue'),
+    'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
+    'fund': () => import(/* webpackChunkName: "fundForm" */'@/components/forge/fund.vue'),
+    'createAccount': () => import(/* webpackChunkName: "createAccountForm" */'@/components/forge/requestForms/createAccount.vue'),
+    'send': () => import(/* webpackChunkName: "sendForm" */'@/components/forge/requestForms/send.vue'),
+    'tokenSend': () => import(/* webpackChunkName: "tokenSendForm" */'@/components/forge/requestForms/tokenSend.vue'),
+    'issuance': () => import(/* webpackChunkName: "issuanceForm" */'@/components/forge/requestForms/issuance.vue'),
+    'issueAdditional': () => import(/* webpackChunkName: "issueAdditionalForm" */'@/components/forge/requestForms/issueAdditional.vue'),
+    'changeSetting': () => import(/* webpackChunkName: "changeSettingForm" */'@/components/forge/requestForms/changeSetting.vue'),
+    'immuteSetting': () => import(/* webpackChunkName: "immuteSettingForm" */'@/components/forge/requestForms/immuteSetting.vue'),
+    'revoke': () => import(/* webpackChunkName: "revokeForm" */'@/components/forge/requestForms/revoke.vue'),
+    'adjustUserStatus': () => import(/* webpackChunkName: "adjustUserStatusForm" */'@/components/forge/requestForms/adjustUserStatus.vue'),
+    'adjustFee': () => import(/* webpackChunkName: "adjustFeeForm" */'@/components/forge/requestForms/adjustFee.vue'),
+    'updateIssuerInfo': () => import(/* webpackChunkName: "updateIssuerInfoForm" */'@/components/forge/requestForms/updateIssuerInfo.vue'),
+    'updateController': () => import(/* webpackChunkName: "updateControllerForm" */'@/components/forge/requestForms/updateController.vue'),
+    'burn': () => import(/* webpackChunkName: "burnForm" */'@/components/forge/requestForms/burn.vue'),
+    'distribute': () => import(/* webpackChunkName: "distributeForm" */'@/components/forge/requestForms/distribute.vue'),
+    'withdrawFee': () => import(/* webpackChunkName: "withdrawFeeForm" */'@/components/forge/requestForms/withdrawFee.vue'),
+    'withdrawLogos': () => import(/* webpackChunkName: "withdrawLogosForm" */'@/components/forge/requestForms/withdrawLogos.vue')
   },
   computed: {
     ...mapState('forge', {

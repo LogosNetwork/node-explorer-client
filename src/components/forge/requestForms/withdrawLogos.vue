@@ -97,10 +97,6 @@
 
 <script>
 import { mapState } from 'vuex'
-import bFormGroup from 'bootstrap-vue/es/components/form-group/form-group'
-import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
-import LogosAddress from '@/components/LogosAddress.vue'
-import Multiselect from 'vue-multiselect'
 import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 export default {
@@ -116,10 +112,10 @@ export default {
     }
   },
   components: {
-    bFormGroup,
-    bFormInput,
-    LogosAddress,
-    Multiselect
+    'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
+    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
+    'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
+    'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
     ...mapState('forge', {

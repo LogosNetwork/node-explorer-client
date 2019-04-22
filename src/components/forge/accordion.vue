@@ -40,10 +40,6 @@
 
 <script>
 import { mapState } from 'vuex'
-import bCardBody from 'bootstrap-vue/es/components/card/card-body'
-import bCardTitle from 'bootstrap-vue/es/components/card/card-title'
-import bCardSubtitle from 'bootstrap-vue/es/components/card/card-sub-title'
-import bCollapse from 'bootstrap-vue/es/components/collapse/collapse'
 import { faChevronDown } from '@fortawesome/pro-light-svg-icons'
 
 export default {
@@ -76,10 +72,10 @@ export default {
     subtitle: String
   },
   components: {
-    bCardBody,
-    bCardTitle,
-    bCardSubtitle,
-    bCollapse
+    'b-card-body': () => import(/* webpackChunkName: "b-card-body" */'bootstrap-vue/es/components/card/card-body'),
+    'b-card-title': () => import(/* webpackChunkName: "b-card-title" */'bootstrap-vue/es/components/card/card-title'),
+    'b-card-subtitle': () => import(/* webpackChunkName: "b-card-subtitle" */'bootstrap-vue/es/components/card/card-sub-title'),
+    'b-collapse': () => import(/* webpackChunkName: "b-collapse" */'bootstrap-vue/es/components/collapse/collapse')
   },
   watch: {
     currentAccount: function (newAccount, oldAccount) {

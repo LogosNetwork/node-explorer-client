@@ -98,7 +98,8 @@
 import { mapActions, mapState } from 'vuex'
 import Vue from 'vue'
 import infiniteScroll from 'vue-infinite-scroll'
-import request from '@/components/requests/request.vue'
+import VueMoment from 'vue-moment'
+Vue.use(VueMoment)
 Vue.use(infiniteScroll)
 
 const hlCache = new Map()
@@ -124,7 +125,7 @@ Vue.directive('highlight', {
 export default {
   name: 'explore',
   components: {
-    request
+    'request': () => import(/* webpackChunkName: "RequestWrapper" */ '@/components/requests/request.vue')
   },
   data () {
     return {
