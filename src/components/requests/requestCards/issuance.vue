@@ -66,7 +66,7 @@
           </li>
         </ul>
       </b-list-group-item>
-      <b-list-group-item v-on:click.prevent>
+      <b-list-group-item>
         <strong>Issuer Info</strong><br/>
         <codepad class="text-left" :code="requestInfo.prettyInfo" :thin="true"/>
       </b-list-group-item>

@@ -100,7 +100,7 @@
         label="Custom Token Info"
         label-size="lg"
       >
-        <codepad/>
+        <codepad :readOnly="false" :forge="true"/>
         <div v-if="!validIssuerInfo" style="display:block" class="invalid-feedback">
           Issuer Info must be less than or equal to 512 byes
         </div>
@@ -139,7 +139,7 @@ export default {
     }
   },
   components: {
-    'codepad': () => import(/* webpackChunkName: "ForgeCodepad" */'@/components/forge/forgeCodepad.vue'),
+    'codepad': () => import(/* webpackChunkName: "Codepad" */'@/components/codepad.vue'),
     'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
     'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
@@ -147,7 +147,7 @@ export default {
   },
   computed: {
     ...mapState('forge', {
-      updatedIssuerInfo: state => state.issuerInfo,
+      updatedIssuerInfo: state => state.tempInfo,
       forgeTokens: state => state.tokens,
       currentAccount: state => state.currentAccount
     }),

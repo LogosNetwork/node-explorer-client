@@ -3,7 +3,7 @@
     <b-button v-on:click="requestFaucet()" class="w-100 text-left p-0" variant="link">
       <b-card-body>
         <b-row>
-          <b-col cols="auto">
+          <b-col cols="auto d-none d-sm-block">
             <div class="iconHolder text-white rounded bg-success d-flex align-items-center justify-content-center">
               <font-awesome-icon size="2x" :icon="faArrowDown" />
             </div>

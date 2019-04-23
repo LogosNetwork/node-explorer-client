@@ -8,7 +8,7 @@
     >
       <b-card-body>
         <b-row>
-          <b-col cols="auto">
+          <b-col cols="auto" class="d-none d-sm-block">
             <div v-bind:class="background" class="iconHolder text-white rounded d-flex align-items-center justify-content-center" >
               <font-awesome-icon size="2x" :icon="requestIcon" />
             </div>

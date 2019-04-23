@@ -139,7 +139,7 @@
     </b-form-group>
 
     <b-form-group v-for="(controller, index) in tokenOptions.controllers" :key="index" label-size="lg" :label="`Controller ${index+1} Settings`">
-      <div class="ml-4">
+      <div class="controllerGutter">
         <b-form-group
           id="controller"
           :label="`Address`"
@@ -578,3 +578,10 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+@media (min-width: 576px) {
+  .controllerGutter {
+    margin-left: 1.5rem;
+  }
+}
+</style>

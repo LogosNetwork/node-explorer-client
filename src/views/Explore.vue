@@ -4,8 +4,8 @@
       <h5 class="text-left d-block d-sm-none" v-t="'explore_cta'"></h5>
       <h2 class="d-none d-sm-block" v-t="'explore_cta'"></h2>
       <b-form id="addressForm" class="mb-3">
-        <label class="sr-only" for="address" v-t="'searchPlaceholder'"></label>
-        <b-input @keydown.native="submitSearch" id="address" type="text" :state="searchState" aria-describedby="inputLiveFeedback" :placeholder="$t('searchPlaceholder')" v-model="address" />
+        <label class="sr-only" id="searchLabel" for="address" v-t="'searchPlaceholder'"></label>
+        <b-input aria-describedby="searchLabel inputLiveFeedback" @keydown.native="submitSearch" id="address" type="text" :state="searchState" :placeholder="$t('searchPlaceholder')" v-model="address" />
         <b-form-invalid-feedback id="inputLiveFeedback">
           Enter a Logos address or a request hash
         </b-form-invalid-feedback>

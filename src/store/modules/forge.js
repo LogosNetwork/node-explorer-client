@@ -8,6 +8,7 @@ const state = {
   toasts: [],
   tokens: {},
   issuerInfo: '',
+  tempInfo: '',
   walletAccounts: {},
   accounts: {},
   currentAccount: null,
@@ -199,6 +200,9 @@ const actions = {
   setIssuerInfo ({ commit }, info) {
     commit('setIssuerInfo', info)
   },
+  setTempInfo ({ commit }, info) {
+    commit('setTempInfo', info)
+  },
   addRequest ({ commit, rootState, state }, request) {
     let requestData = cloneDeep(request)
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
@@ -231,6 +235,9 @@ const mutations = {
   },
   setIssuerInfo (state, info) {
     state.issuerInfo = info
+  },
+  setTempInfo (state, info) {
+    state.tempInfo = info
   },
   addToken (state, tokenAccount) {
     Vue.set(state.tokens, tokenAccount, {

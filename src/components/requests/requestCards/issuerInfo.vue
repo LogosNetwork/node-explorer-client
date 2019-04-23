@@ -21,7 +21,7 @@
       <token :tokenInfo="requestInfo.tokenInfo" :origin="requestInfo.origin" :small="small" />
     </b-card-body>
     <b-list-group flush>
-      <b-list-group-item v-on:click.prevent>
+      <b-list-group-item>
         <codepad class="text-left" :code="requestInfo.prettyInfo" :thin="true"/>
       </b-list-group-item>
     </b-list-group>

@@ -2,11 +2,11 @@
   <div v-if="currentAccount !== null">
 
     <b-row class="mb-3">
-      <b-col cols="12" md="9">
+      <b-col cols="9">
         <h4>{{currentAccount.label}}</h4>
         <small><LogosAddress :address="currentAccount.address" /></small>
       </b-col>
-      <b-col cols="12" md="3" class="d-flex flex-column m-auto align-items-end">
+      <b-col cols="3" class="d-flex flex-column m-auto align-items-end">
         <qrcode
           :value="'lgs:'+currentAccount.address"
           :options="{ size: 70, background: 'transparent' }"

@@ -2,8 +2,8 @@
   <div>
     <div v-if="tokenInfo.pending !== true">
       <b-card-text v-on:click.stop>
-        <span v-if="size"><img v-bind:style="{ width: size + 'px', height: size + 'px' }" v-if="tokenInfo.issuerInfo.image" class="avatar mr-2" :src="tokenInfo.issuerInfo.image"></span>
-        <span v-else><img v-if="tokenInfo.issuerInfo.image" class="avatar mr-2" :src="tokenInfo.issuerInfo.image"></span>
+        <span v-if="size"><img :alt="`${tokenInfo.name} currency image`" v-bind:style="{ width: size + 'px', height: size + 'px' }" v-if="tokenInfo.issuerInfo.image" class="avatar mr-2" :src="tokenInfo.issuerInfo.image"></span>
+        <span v-else><img :alt="`${tokenInfo.name} currency image`" v-if="tokenInfo.issuerInfo.image" class="avatar mr-2" :src="tokenInfo.issuerInfo.image"></span>
         <font-awesome-layers class="fa-lg mr-2 align-middle" v-if="!tokenInfo.issuerInfo.image">
           <font-awesome-icon :icon="faCircle" />
           <font-awesome-icon :icon="faCoins" transform="shrink-6" />
@@ -13,7 +13,7 @@
       </b-card-text>
       <b-card-text v-if="origin">
         <font-awesome-icon size="lg" class="text-info mr-2 align-middle" :icon="faUserCircle" />
-        <strong class="mr-2">Token Controller:</strong>
+        <strong class="mr-2">Controller:</strong>
         <LogosAddress class="mr-2" :address="origin" :force="small" />
       </b-card-text>
     </div>

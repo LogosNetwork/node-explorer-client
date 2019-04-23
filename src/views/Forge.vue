@@ -1,7 +1,7 @@
 <template>
   <b-container fluid class="d-flex overflow-hidden">
     <b-row class="flex-grow flex-fill overflow-hidden">
-      <b-col xs="auto" class="accountPanel">
+      <b-col cols="auto" class="accountPanel d-none d-sm-block">
         <div class="d-flex justify-content-between mt-3 mb-3 align-items-center font-weight-bold">
           <h4 class="mb-0">Accounts</h4>
           <b-button class="font-weight-bolder" variant="link" v-on:click="$wallet.createAccount(null, false)">+ New</b-button>
@@ -53,7 +53,7 @@
               button
             >
               <span class="text-nowrap text-truncate" v-if="token.name">
-                <img v-if="token.issuerInfo.image" class="avatar mr-2" :src="token.issuerInfo.image">
+                <img :alt="`${token.name} curreny image`" v-if="token.issuerInfo.image" class="avatar mr-2" :src="token.issuerInfo.image">
                 <font-awesome-layers class="fa-lg mr-2 align-middle" v-if="!token.issuerInfo.image">
                   <font-awesome-icon :icon="faCircle" />
                   <font-awesome-icon :icon="faCoins" transform="shrink-6" />
@@ -86,7 +86,7 @@
       </b-col>
       <b-col class="overflow-hidden">
         <b-row class="h-100">
-          <b-col :cols="currentAccount || selected === 'lookup' ? 7 : 12" class="d-flex flex-column">
+          <b-col col :xl="currentChain || selected === 'lookup' ? 7 : 12" class="d-flex flex-column">
             <b-row class="actionToggle">
               <b-col>
                 <div class="btn-group btn-group-toggle pt-3 pb-3" data-toggle="buttons">
@@ -114,7 +114,7 @@
               </b-col>
             </b-row>
           </b-col>
-          <b-col v-if="currentChain || selected === 'lookup'" cols="5" class="d-flex flex-column">
+          <b-col v-if="currentChain || selected === 'lookup'" col xl="5" class="flex-column d-none d-xl-flex">
             <div v-if="selected === 'requests'" class="d-flex flex-column flex-grow flex-fill">
               <b-row class="chainToggle">
                 <b-col>
@@ -260,7 +260,7 @@ export default {
   },
   methods: {
     viewChain: function (address, label) {
-      if (!this.currentChain || this.currentChain.address !== address) {
+      if (!this.currentChain || (address && this.currentChain.address !== address)) {
         this.reset()
         this.getAccountInfo(address)
         this.currentChain = { address: address, label: label }
@@ -326,6 +326,9 @@ export default {
   created: function () {
     this.initalize({ url: this.mqttHost })
     this.setSeed(this.$wallet.seed)
+    if (!this.currentChain && this.currentAccount) {
+      this.currentChain = { address: this.currentAccount.address, label: this.currentAccount.label }
+    }
   },
   watch: {
     currentAccount: function (newAccount, oldAccount) {
@@ -418,6 +421,9 @@ label.btn-link.active {
   overflow-y: scroll;
   overflow-x: hidden;
   max-height: calc(100vh - 123px);
+}
+.actionSelector > div.col {
+  overflow-x: hidden;
 }
 .chainViewer::-webkit-scrollbar,
 .actionSelector::-webkit-scrollbar {
