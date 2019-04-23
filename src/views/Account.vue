@@ -396,6 +396,8 @@ import infiniteScroll from 'vue-infinite-scroll'
 import axios from 'axios'
 import { faSpinner, faCoins, faCrown, faUserCircle, faMagic, faLockAlt, faMask, faSnowflake, faListAlt, faArrowDown, faFire, faEdit, faHandReceiving, faPercentage } from '@fortawesome/pro-light-svg-icons'
 import vBModal from 'bootstrap-vue/es/directives/modal/modal'
+import VueMoment from 'vue-moment'
+Vue.use(VueMoment)
 Vue.directive('b-modal', vBModal)
 Vue.use(infiniteScroll)
 
