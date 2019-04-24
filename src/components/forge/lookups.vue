@@ -7,17 +7,17 @@
       title="Account & Token Info"
       subtitle="Lookup the logos balance, token balances, and frontier of an account."
     >
-      Hello World
+      <accountLookup/>
     </accordion>
 
     <accordion
       bgClass="bg-warning"
       accordionGroup="lookupAccordion"
-      :requestIcon="faFastBackward"
+      :requestIcon="faHistory"
       title="Account & Token History"
       subtitle="History of all requests sent to or from the account."
     >
-      Hello World
+      <historyLookup/>
     </accordion>
 
     <accordion
@@ -27,7 +27,7 @@
       title="Block & Request Information"
       subtitle="Info on a Request, Request Block, Micro Epoch, or Epoch with a given hash."
     >
-      Hello World
+      <block/>
     </accordion>
 
     <accordion
@@ -37,7 +37,7 @@
       title="Expand a Private Key"
       subtitle="Derive the account name and public key from a private key."
     >
-      Hello World
+      <expandKey/>
     </accordion>
 
     <accordion
@@ -47,7 +47,7 @@
       title="Convert a Key"
       subtitle="Convert public keys to account names, and vice versa."
     >
-      Hello World
+      <convertKey/>
     </accordion>
 
     <accordion
@@ -57,7 +57,7 @@
       title="Generate Work"
       subtitle="Creates the work with a given hash."
     >
-      Hello World
+      <generateWork/>
     </accordion>
 
     <accordion
@@ -67,20 +67,20 @@
       title="Validate Work"
       subtitle="Validates if the given work is valid for the given hash."
     >
-      Hello World
+      <validateWork/>
     </accordion>
   </div>
 </template>
 
 <script>
-import { faInfo, faFastBackward, faCube, faKey, faExpandArrows, faTools, faEquals } from '@fortawesome/pro-light-svg-icons'
+import { faInfo, faHistory, faCube, faKey, faExpandArrows, faTools, faEquals } from '@fortawesome/pro-light-svg-icons'
 
 export default {
   name: 'Lookups',
   data () {
     return {
       faInfo,
-      faFastBackward,
+      faHistory,
       faCube,
       faKey,
       faTools,
@@ -89,7 +89,14 @@ export default {
     }
   },
   components: {
-    'accordion': () => import(/* webpackChunkName: "accordion" */'@/components/forge/accordion.vue')
+    'accordion': () => import(/* webpackChunkName: "accordion" */'@/components/forge/accordion.vue'),
+    'expandKey': () => import(/* webpackChunkName: "expandKeyForm" */'@/components/forge/lookupForms/expandKey.vue'),
+    'convertKey': () => import(/* webpackChunkName: "convertKeyForm" */'@/components/forge/lookupForms/convertKey.vue'),
+    'block': () => import(/* webpackChunkName: "blockForm" */'@/components/forge/lookupForms/block.vue'),
+    'accountLookup': () => import(/* webpackChunkName: "accountLookupForm" */'@/components/forge/lookupForms/account.vue'),
+    'historyLookup': () => import(/* webpackChunkName: "historyLookupForm" */'@/components/forge/lookupForms/history.vue'),
+    'generateWork': () => import(/* webpackChunkName: "generateWorkForm" */'@/components/forge/lookupForms/generateWork.vue'),
+    'validateWork': () => import(/* webpackChunkName: "validateWorkForm" */'@/components/forge/lookupForms/validateWork.vue')
   }
 }
 </script>

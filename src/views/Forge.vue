@@ -86,7 +86,7 @@
       </b-col>
       <b-col class="overflow-hidden">
         <b-row class="h-100">
-          <b-col col :xl="currentChain || selected === 'lookup' ? 7 : 12" class="d-flex flex-column">
+          <b-col col :xl="renderSidePanel ? 7 : 12" class="d-flex flex-column">
             <b-row class="actionToggle">
               <b-col>
                 <div class="btn-group btn-group-toggle pt-3 pb-3" data-toggle="buttons">
@@ -114,7 +114,7 @@
               </b-col>
             </b-row>
           </b-col>
-          <b-col v-if="currentChain || selected === 'lookup'" col xl="5" class="flex-column d-none d-xl-flex">
+          <b-col v-if="renderSidePanel" col xl="5" class="flex-column d-none d-xl-flex">
             <div v-if="selected === 'requests'" class="d-flex flex-column flex-grow flex-fill">
               <b-row class="chainToggle">
                 <b-col>
@@ -151,27 +151,21 @@
               <b-row class="chainToggle">
                 <b-col>
                   <div class="btn-group btn-group-toggle pt-3 pb-3" data-toggle="buttons">
-                    <label class="btn btn-link" v-bind:class="{ active: selectedVisual === 'visual' }">
-                      <input type="radio" name="visualResponse" id="lookups" autocomplete="off" :checked="selectedVisual === 'visual'" v-on:click="changeSelectedVisual('visual')">
-                      <font-awesome-icon size="lg" class="mr-2" :icon="faEye" />
-                      <span>Visual</span>
-                    </label>
                     <label class="btn btn-link" v-bind:class="{ active: selectedVisual === 'text' }">
                       <input type="radio" name="textResponse" id="lookups" autocomplete="off" :checked="selectedVisual === 'text'" v-on:click="changeSelectedVisual('text')">
-                      <font-awesome-icon size="lg" class="mr-2" :icon="faFont" />
-                      <span>Text</span>
+                      <font-awesome-icon size="lg" class="mr-2" :icon="faHistory" />
+                      <span>Lookup History</span>
                     </label>
                   </div>
                 </b-col>
               </b-row>
               <b-row class="chainViewer flex-grow flex-fill">
                 <b-col class="m-3 text-left">
-                  <b-row class="mb-3">
-                    <b-col cols="12" class="d-flex flex-column m-auto align-items-start">
-                      <h4 class="m-0">{{selectedVisual}}</h4>
-                    </b-col>
-                  </b-row>
-                  <p>Not Yet Implemented</p>
+                  <div name="lookupList" is="transition-group" v-if="lookups && lookups.length > 0">
+                    <div v-for="(lookup, index) in lookups" :key="index">
+                      <lookupCard :lookupInfo="lookup"/>
+                    </div>
+                  </div>
                 </b-col>
               </b-row>
             </div>
@@ -189,7 +183,7 @@ import config from '../../config'
 import Wallet from '../api/wallet'
 import infiniteScroll from 'vue-infinite-scroll'
 import cloneDeep from 'lodash.clonedeep'
-import { faUser, faEllipsisVAlt, faCoins, faSearch, faWrench, faEye, faFont, faSpinner, faCube, faTimes, faCircle } from '@fortawesome/pro-light-svg-icons'
+import { faUser, faEllipsisVAlt, faCoins, faSearch, faWrench, faHistory, faSpinner, faCube, faTimes, faCircle } from '@fortawesome/pro-light-svg-icons'
 import Toasted from 'vue-toasted'
 import RPC from '../api/rpc'
 Vue.use(infiniteScroll)
@@ -205,7 +199,10 @@ Vue.use(Wallet, {
     delegates: Object.values(config.delegates)
   }
 })
-Vue.use(RPC)
+Vue.use(RPC, {
+  url: config.rpcHost,
+  proxyURL: config.rpcProxy
+})
 export default {
   name: 'workshop',
   data () {
@@ -215,15 +212,14 @@ export default {
       faCoins,
       faSearch,
       faWrench,
-      faEye,
-      faFont,
+      faHistory,
       faSpinner,
       faTimes,
       faCube,
       faCircle,
       currentChain: null,
       selected: 'requests',
-      selectedVisual: 'visual',
+      selectedVisual: 'text',
       wallet: this.$wallet,
       requestsBusy: false
     }
@@ -236,7 +232,8 @@ export default {
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'Lookups': () => import(/* webpackChunkName: "ForgeLookups" */'@/components/forge/lookups.vue'),
     'Requests': () => import(/* webpackChunkName: "ForgeRequests" */'@/components/forge/requests.vue'),
-    'request': () => import(/* webpackChunkName: "RequestWrapper" */'@/components/requests/request.vue')
+    'request': () => import(/* webpackChunkName: "RequestWrapper" */'@/components/requests/request.vue'),
+    'lookupCard': () => import(/* webpackChunkName: "LookupCard" */'@/components/forge/lookupCard.vue')
   },
   computed: {
     ...mapState('settings', {
@@ -246,11 +243,15 @@ export default {
       forgeAccounts: state => state.accounts,
       currentAccount: state => state.currentAccount,
       toasts: state => state.toasts,
-      forgeTokens: state => state.tokens
+      forgeTokens: state => state.tokens,
+      lookups: state => state.lookups
     }),
     ...mapState('account', {
       requests: state => state.requests
     }),
+    renderSidePanel: function () {
+      return (this.currentChain) || (this.selected === 'lookup' && this.lookups && this.lookups.length > 0)
+    },
     accounts: function () {
       return Array.from(Object.values(this.forgeAccounts))
     },
@@ -422,6 +423,7 @@ label.btn-link.active {
   overflow-x: hidden;
   max-height: calc(100vh - 123px);
 }
+.chainViewer > div.col,
 .actionSelector > div.col {
   overflow-x: hidden;
 }

@@ -6,6 +6,7 @@ import bigInt from 'big-integer'
 
 const state = {
   toasts: [],
+  lookups: [],
   tokens: {},
   issuerInfo: '',
   tempInfo: '',
@@ -203,6 +204,9 @@ const actions = {
   setTempInfo ({ commit }, info) {
     commit('setTempInfo', info)
   },
+  addLookup ({ commit }, lookup) {
+    commit('addLookup', lookup)
+  },
   addRequest ({ commit, rootState, state }, request) {
     let requestData = cloneDeep(request)
     let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
@@ -244,6 +248,9 @@ const mutations = {
       pending: true,
       tokenAccount: tokenAccount
     })
+  },
+  addLookup (state, lookup) {
+    state.lookups.unshift(lookup)
   },
   addToast (state, toast) {
     state.toasts.push(toast)

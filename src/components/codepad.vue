@@ -65,6 +65,11 @@ export default {
       if (this.forge && this.initalInput !== newInfo) {
         this.localInput = newInfo
       }
+    },
+    code: function (newCode, oldCode) {
+      if (!this.forge) {
+        this.localInput = newCode
+      }
     }
   },
   components: {
