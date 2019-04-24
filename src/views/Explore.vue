@@ -183,7 +183,7 @@ export default {
           })
         } else {
           if (this.address.match(/^[0-9a-fA-F]{64}$/) !== null) {
-            this.getBlockType({
+            this.getRequestType({
               hash: this.address,
               cb: blockType => {
                 if (blockType === 'request') {
@@ -216,7 +216,7 @@ export default {
       }
     },
     ...mapActions('mqtt', ['initalize', 'unsubscribe', 'subscribe']),
-    ...mapActions('explorer', ['getRequests', 'getBlockType', 'getLatestRequestBlock', 'getLatestMicroEpoch', 'getLatestEpoch']),
+    ...mapActions('explorer', ['getRequests', 'getRequestType', 'getLatestRequestBlock', 'getLatestMicroEpoch', 'getLatestEpoch']),
     getMoreRequests: function (force = false) {
       if (!this.txBusy || force) {
         this.txBusy = true
