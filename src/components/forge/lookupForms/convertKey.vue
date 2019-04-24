@@ -12,12 +12,22 @@
         aria-describedby="keyError"
         :state="validKeyOrAddress"
         placeholder="Logos Address or Public Key"
-        @input="parseInput"
       ></b-form-input>
       <b-form-invalid-feedback id="keyError">
         Logos Address or 64 Length Hexadecimal Public key is requried
       </b-form-invalid-feedback>
     </b-form-group>
+
+    <div class="text-right">
+      <b-button
+        v-on:click="parseInput()"
+        :disabled="!validKeyOrAddress"
+        type="submit"
+        variant="primary"
+      >
+        Convert
+      </b-button>
+    </div>
 
     <div class="mt-3" v-if="info">
       <div class="mt-2">Public Key: <code>{{ info.publicKey }}</code></div>

@@ -18,7 +18,6 @@
         :multiple="false"
         :taggable="true"
         @tag="addAddress"
-        @input="parseInput"
         placeholder="Account Address or Public Key"
       >
         <template slot="singleLabel" slot-scope="{ option }">
@@ -29,6 +28,17 @@
         </template>
       </Multiselect>
     </b-form-group>
+
+    <div class="text-right">
+      <b-button
+        v-on:click="parseInput()"
+        :disabled="!validKeyOrAddress"
+        type="submit"
+        variant="primary"
+      >
+        Lookup Account
+      </b-button>
+    </div>
 
     <div class="mt-3" v-if="info">
       <div class="mt-2">Address: <LogosAddress :forceExpand="true" :address="info.params[0].value" /></div>
@@ -91,13 +101,11 @@ export default {
         let newAccount = { label: newAddress, address: newAddress }
         this.accounts.push(newAccount)
         this.address = newAccount
-        this.parseInput()
       } else if (/^[0-9A-F]{64}$/i.test(newAddress)) {
         newAddress = this.$utils.accountFromHexKey(newAddress)
         let newAccount = { label: newAddress, address: newAddress }
         this.accounts.push(newAccount)
         this.address = newAccount
-        this.parseInput()
       }
     },
     parseInput () {

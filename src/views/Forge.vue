@@ -161,7 +161,7 @@
               </b-row>
               <b-row class="chainViewer flex-grow flex-fill">
                 <b-col class="m-3 text-left">
-                  <div name="lookupList" is="transition-group" v-if="lookups && lookups.length > 0">
+                  <div v-if="lookups && lookups.length > 0">
                     <div v-for="(lookup, index) in lookups" :key="index">
                       <lookupCard :lookupInfo="lookup"/>
                     </div>

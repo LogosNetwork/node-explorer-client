@@ -12,7 +12,6 @@
         aria-describedby="workError"
         :state="validWork"
         placeholder="Work to validate"
-        @input="parseInput"
       ></b-form-input>
       <b-form-invalid-feedback id="workError">
         16 Length Hexadecimal Work is requried
@@ -31,12 +30,22 @@
         aria-describedby="hashError"
         :state="validHash"
         placeholder="Hash for work validation"
-        @input="parseInput"
       ></b-form-input>
       <b-form-invalid-feedback id="hashError">
         64 Length Hexadecimal Hash is requried
       </b-form-invalid-feedback>
     </b-form-group>
+
+    <div class="text-right">
+      <b-button
+        v-on:click="parseInput()"
+        :disabled="!validHash || !validWork"
+        type="submit"
+        variant="primary"
+      >
+        Validate Work
+      </b-button>
+    </div>
 
     <div class="mt-3" v-if="info">
       <div class="mt-2">Hash: <code>{{ info.params[0].value }}</code></div>

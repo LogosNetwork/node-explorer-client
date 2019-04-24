@@ -13,13 +13,23 @@
         aria-describedby="hashError"
         :state="validHash && !error"
         placeholder="Block Hash you wish to lookup"
-        @input="parseInput"
       ></b-form-input>
       <b-form-invalid-feedback id="hashError">
         <span v-if="!error">64 Length Hexadecimal Hash is requried</span>
         <span v-else>{{error}}</span>
       </b-form-invalid-feedback>
     </b-form-group>
+
+    <div class="text-right">
+      <b-button
+        v-on:click="parseInput()"
+        :disabled="!validHash"
+        type="submit"
+        variant="primary"
+      >
+        Lookup Block
+      </b-button>
+    </div>
 
     <div class="mt-3" v-if="info">
       <div class="mt-2">

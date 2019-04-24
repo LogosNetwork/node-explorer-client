@@ -12,12 +12,22 @@
         aria-describedby="privateKeyError"
         :state="validPrivateKey"
         placeholder="Private Key you wish to expand"
-        @input="expandKey"
       ></b-form-input>
       <b-form-invalid-feedback id="privateKeyError">
         64 Length Hexadecimal Value is requried for private keys
       </b-form-invalid-feedback>
     </b-form-group>
+
+    <div class="text-right">
+      <b-button
+        v-on:click="expandKey()"
+        :disabled="!validPrivateKey"
+        type="submit"
+        variant="primary"
+      >
+        Expand
+      </b-button>
+    </div>
 
     <div class="mt-3" v-if="expandedKey">
       <div class="mt-2">Private Key: <code>{{ expandedKey.privateKey }}</code></div>
