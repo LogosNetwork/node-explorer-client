@@ -390,8 +390,8 @@ const actions = {
             }
           }
         } else if (requestData.action === 'add') {
-          if (this.controllers.some(controller => controller.account === requestData.controller.account)) {
-            for (let controller of this.controllers) {
+          if (val.controllers.some(controller => controller.account === requestData.controller.account)) {
+            for (let controller of val.controllers) {
               if (controller.account === requestData.controller.account) {
                 for (let priv of updatedPrivs) {
                   if (!controller.privileges.includes(priv)) controller.privileges.push(priv)
