@@ -429,7 +429,7 @@ $bg-white: #FFF;
 }
 @media (min-width: 1200px) {
   .affix {
-    width: calc((100vw - 386px) * 7 / 12)
+    width: calc((100vw - 387px) * 7 / 12)
   }
 }
 .scrollaffix-sidebar:not(.affix) {
