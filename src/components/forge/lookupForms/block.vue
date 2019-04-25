@@ -31,7 +31,7 @@
       </b-button>
     </div>
 
-    <div class="mt-3" v-if="info">
+    <div class="mt-3 d-xl-none" v-if="info">
       <div class="mt-2">
         {{info.type.charAt(0).toUpperCase() + info.type.slice(1)}} Hash:
         <router-link :to="`${info.type !== `request` ? `/${info.type}/` : '/'}${info.params[0].value}`">{{info.params[0].value}}</router-link>

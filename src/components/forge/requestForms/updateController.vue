@@ -316,11 +316,13 @@ export default {
       }
       if (this.action.action === 'add') {
         this.$wallet.account.createUpdateControllerRequest(data)
+        this.controllerAccount = null
       } else if (this.action.action === 'remove') {
         delete data.controller.privileges
         this.$wallet.account.createUpdateControllerRequest(data)
+        this.controllerAccount = null
       } else if (this.action.action === 'modify') {
-        let modifiedPrivileges = this.$utils.getSettingsJSON(this.privileges)
+        let modifiedPrivileges = this.$utils.convertObjectToArray(this.privileges)
         let existingPrivileges = []
         let removedPrivileges = []
         let addedPrivileges = []
@@ -378,7 +380,7 @@ export default {
     controllerAccount: function (newAccount, oldAccount) {
       if (newAccount !== null) {
         if (newAccount.privileges) {
-          this.privileges = this.$utils.getControllerFromJSON({
+          this.privileges = this.$utils.deserializeController({
             account: newAccount.address,
             privileges: newAccount.privileges
           }).privileges

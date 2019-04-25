@@ -29,7 +29,7 @@
       </b-button>
     </div>
 
-    <div class="mt-3" v-if="info">
+    <div class="mt-3 d-xl-none" v-if="info">
       <div class="mt-2">Hash: <code>{{ info.params[0].value }}</code></div>
       <codepad class="text-left mt-2" :code="info.response" :thin="true"/>
     </div>

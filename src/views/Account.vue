@@ -326,6 +326,13 @@
                     </h5>
                     <p>The controller is allowed to withdraw the collected token fees from the {{token.symbol}} token fee pool.</p>
                   </span>
+                  <span v-else-if="privilege === 'withdraw_logos'">
+                    <h5>
+                      <font-awesome-icon :icon="faLambda" class="mr-2"/>
+                      Withdraw Logos
+                    </h5>
+                    <p>The controller is allowed to withdraw the logos balance from {{token.name}}'s balance.</p>
+                  </span>
                 </div>
               </div>
             </span>
@@ -394,7 +401,7 @@ import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
 import infiniteScroll from 'vue-infinite-scroll'
 import axios from 'axios'
-import { faSpinner, faCoins, faCrown, faUserCircle, faMagic, faLockAlt, faMask, faSnowflake, faListAlt, faArrowDown, faFire, faEdit, faHandReceiving, faPercentage } from '@fortawesome/pro-light-svg-icons'
+import { faSpinner, faCoins, faCrown, faUserCircle, faMagic, faLockAlt, faMask, faSnowflake, faListAlt, faArrowDown, faFire, faEdit, faHandReceiving, faPercentage, faLambda } from '@fortawesome/pro-light-svg-icons'
 import vBModal from 'bootstrap-vue/es/directives/modal/modal'
 import VueMoment from 'vue-moment'
 Vue.use(VueMoment)
@@ -509,6 +516,7 @@ export default {
       faArrowDown,
       faEdit,
       faHandReceiving,
+      faLambda,
       faPercentage,
       selectedController: null
     }

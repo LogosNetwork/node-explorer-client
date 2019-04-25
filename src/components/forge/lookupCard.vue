@@ -1,44 +1,71 @@
 <template>
-  <div class="mb-3 shadow-sm">
-    <b-card no-body class="text-left">
+  <b-card no-body class="text-left mb-3 shadow-sm accordionCard">
+    <b-button class="w-100 text-left p-0" variant="link"
+      :class="showCollapse ? 'collapsed' : null"
+      :aria-expanded="showCollapse ? 'true' : 'false'"
+      :aria-controls="`collapse_${type}_${index}`"
+      @click="showCollapse = !showCollapse"
+    >
       <b-card-body>
-        <b-card-title>
-          <div class="d-flex justify-content-between">
-            <div>
+        <b-row class="d-flex align-items-center justify-content-center">
+          <b-col cols="auto">
+            <div class="text-muted rounded">
+              <font-awesome-icon v-if="!showCollapse" size="lg" id="rotatable" :icon="faChevronDown" rotation="180" />
+              <font-awesome-icon v-else size="lg" id="rotatable" :icon="faChevronDown"  />
+            </div>
+          </b-col>
+          <b-col>
+            <h5 class="mb-0">
               {{lookupInfo.title}}
-            </div>
-            <div v-if="lookupInfo.time" class="timestamp text-right">
-              <small>
-                <span>{{ lookupInfo.time | moment('h:mm:ss a') }}</span>
-              </small>
-            </div>
-          </div>
-        </b-card-title>
-        <b-card-text v-for="(param, index) in lookupInfo.params" :key="`params${index}`">
-          <strong>{{param.label}}: </strong>
-          <LogosAddress v-if="param.label.toLowerCase() === 'address'" :address="param.value" :force="true"/>
-          <code v-else>{{param.value}}</code>
-        </b-card-text>
+            </h5>
+          </b-col>
+          <b-col cols="auto" v-if="lookupInfo.time" class="timestamp text-right text-muted">
+            <small>
+              <span>{{ lookupInfo.time | moment('h:mm:ss a') }}</span>
+            </small>
+          </b-col>
+        </b-row>
       </b-card-body>
-      <b-list-group flush>
+    </b-button>
+    <b-collapse v-model="showCollapse" :id="`collapse_${type}_${index}`" accordion="lookups" role="tabpanel">
+      <b-list-group flush class="collapsedForm">
         <b-list-group-item>
-          <strong>Response</strong><br/>
+          <b-card-text v-for="(param, index) in lookupInfo.params" :key="`params${index}`">
+            <strong>{{param.label}}: </strong><br/>
+            <LogosAddress v-if="param.label.toLowerCase() === 'address'" :address="param.value" :force="true"/>
+            <code v-else>{{param.value}}</code>
+          </b-card-text>
+          <strong>Response: </strong><br/>
           <codepad class="text-left" :code="lookupInfo.response" :thin="true"/>
         </b-list-group-item>
       </b-list-group>
-    </b-card>
-  </div>
+    </b-collapse>
+  </b-card>
 </template>
 
 <script>
 import Vue from 'vue'
+import { faChevronDown } from '@fortawesome/pro-light-svg-icons'
 import VueMoment from 'vue-moment'
 Vue.use(VueMoment)
 
 export default {
   name: 'lookupCard',
   props: {
-    lookupInfo: Object
+    lookupInfo: Object,
+    index: Number
+  },
+  data () {
+    return {
+      showCollapse: false,
+      disableAnimation: false,
+      faChevronDown
+    }
+  },
+  computed: {
+    type: function () {
+      return this.lookupInfo.title.replace(/\s/g, '')
+    }
   },
   components: {
     'b-card-body': () => import(/* webpackChunkName: "b-card-body" */'bootstrap-vue/es/components/card/card-body'),
@@ -49,11 +76,26 @@ export default {
     'b-list-group-item': () => import(/* webpackChunkName: "b-list-group-item" */'bootstrap-vue/es/components/list-group/list-group-item'),
     'codepad': () => import(/* webpackChunkName: "Codepad" */ '@/components/codepad.vue'),
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue')
+  },
+  watch: {
+    lookupInfo: {
+      handler: function (newInfo, oldInfo) {
+        if (this.index === 0) {
+          this.showCollapse = true
+        }
+      },
+      deep: true
+    }
   }
 }
 </script>
 <style lang="scss" scoped>
   .timestamp {
     font-size: 1rem
+  }
+  #rotatable {
+    -webkit-transition: all .3s;
+    -o-transition: all .3s;
+    transition: all .3s;
   }
 </style>

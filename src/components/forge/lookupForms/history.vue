@@ -59,7 +59,7 @@
       </b-button>
     </div>
 
-    <div class="mt-3" v-if="info">
+    <div class="mt-3 d-xl-none" v-if="info">
       <div class="mt-2">Address: <LogosAddress :forceExpand="true" :address="info.params[0].value" /></div>
       <div class="mt-2">Count: {{info.params[1].value}}</div>
       <codepad class="text-left mt-2" :code="info.response" :thin="true"/>

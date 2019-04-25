@@ -16,8 +16,8 @@
               :disabled="!isSynced(account.address)"
               v-on:click="setCurrentAccount(account.address)"
             >
-              <div class="text-left">
-                <div>{{account.label}}</div>
+              <div class="text-left text-nowrap text-truncate">
+                <div class="text-truncate">{{account.label}}</div>
                 <small><LogosAddress class="text-muted" :inactive="true" :force="true" :address="account.address" /></small>
               </div>
               <b-dropdown v-on:click.stop variant="link" size="lg" no-caret>
@@ -52,27 +52,38 @@
               v-on:click="viewChain(token.tokenAccount, `${token.name} - ${token.symbol}`)"
               button
             >
-              <span class="text-nowrap text-truncate" v-if="token.name">
-                <img :alt="`${token.name} curreny image`" v-if="token.issuerInfo.image" class="avatar mr-2" :src="token.issuerInfo.image">
-                <font-awesome-layers class="fa-lg mr-2 align-middle" v-if="!token.issuerInfo.image">
-                  <font-awesome-icon :icon="faCircle" />
-                  <font-awesome-icon :icon="faCoins" transform="shrink-6" />
-                </font-awesome-layers>
-                {{token.name}} - ({{token.symbol}})
-              </span>
-              <span v-else>
+              <b-row v-if="token.name" :no-gutters="true" class="d-flex flex-wrap align-items-center w-100">
+                <b-col cols="auto" class="mr-2" v-if="token.issuerInfo.image">
+                  <img :alt="`${token.name} image`" class="avatar" :src="token.issuerInfo.image">
+                </b-col>
+                <b-col cols="auto" class="mr-2 defaultIcon" v-else>
+                  <font-awesome-layers class="fa-lg mr-2 align-middle">
+                    <font-awesome-icon :icon="faCircle" />
+                    <font-awesome-icon :icon="faCoins" transform="shrink-6" />
+                  </font-awesome-layers>
+                </b-col>
+                <b-col class="overflow-hidden">
+                  <div class="text-left text-nowrap text-truncate">
+                    <div class="text-truncate">{{token.name}} - ({{token.symbol}})</div>
+                    <small><LogosAddress class="text-muted" :inactive="true" :force="true" :address="token.tokenAccount" /></small>
+                  </div>
+                </b-col>
+                <b-col cols="auto">
+                  <b-dropdown v-on:click.stop variant="link" size="lg" no-caret>
+                    <template slot="button-content">
+                      <font-awesome-icon size="lg" :icon="faEllipsisVAlt" />
+                      <span class="sr-only">Token Options</span>
+                    </template>
+                    <b-dropdown-item :href="`/${token.tokenAccount}`" target="_blank">Open Token Page</b-dropdown-item>
+                    <!-- <b-dropdown-item href="#">Token Info</b-dropdown-item>
+                    <b-dropdown-item href="#">Copy Token Address</b-dropdown-item> -->
+                  </b-dropdown>
+                </b-col>
+              </b-row>
+              <div v-else>
                 <font-awesome-icon size="lg" class="mr-2" :icon="faSpinner" spin />
                 Loading...
-              </span>
-              <b-dropdown v-on:click.stop variant="link" size="lg" no-caret>
-                <template slot="button-content">
-                  <font-awesome-icon size="sm" :icon="faEllipsisVAlt" />
-                  <span class="sr-only">Token Options</span>
-                </template>
-                <b-dropdown-item :href="`/${token.tokenAccount}`" target="_blank">Open Token Page</b-dropdown-item>
-                <!-- <b-dropdown-item href="#">Token Info</b-dropdown-item>
-                <b-dropdown-item href="#">Copy Token Address</b-dropdown-item> -->
-              </b-dropdown>
+              </div>
             </b-list-group-item>
           </b-list-group>
         </div>
@@ -163,7 +174,7 @@
                 <b-col class="m-3 text-left">
                   <div v-if="lookups && lookups.length > 0">
                     <div v-for="(lookup, index) in lookups" :key="index">
-                      <lookupCard :lookupInfo="lookup"/>
+                      <lookupCard :lookupInfo="lookup" :index="index"/>
                     </div>
                   </div>
                 </b-col>
@@ -183,7 +194,7 @@ import config from '../../config'
 import Wallet from '../api/wallet'
 import infiniteScroll from 'vue-infinite-scroll'
 import cloneDeep from 'lodash.clonedeep'
-import { faUser, faEllipsisVAlt, faCoins, faSearch, faWrench, faHistory, faSpinner, faCube, faTimes, faCircle } from '@fortawesome/pro-light-svg-icons'
+import { faUser, faEllipsisVAlt, faSearch, faWrench, faHistory, faSpinner, faCube, faTimes, faCircle, faCoins } from '@fortawesome/pro-light-svg-icons'
 import Toasted from 'vue-toasted'
 import RPC from '../api/rpc'
 Vue.use(infiniteScroll)
@@ -209,7 +220,6 @@ export default {
     return {
       faUser,
       faEllipsisVAlt,
-      faCoins,
       faSearch,
       faWrench,
       faHistory,
@@ -217,6 +227,7 @@ export default {
       faTimes,
       faCube,
       faCircle,
+      faCoins,
       currentChain: null,
       selected: 'requests',
       selectedVisual: 'text',
@@ -352,23 +363,26 @@ export default {
       if (newToasts.length > 0) {
         let newToast = cloneDeep(newToasts[newToasts.length - 1])
         newToast.message = this.replaceAddresses(newToast.message)
+        let actions = [
+          {
+            text: 'Close',
+            onClick: (e, toastObject) => {
+              toastObject.goAway(0)
+            }
+          }
+        ]
+        if (newToast.hash) {
+          actions.push({
+            text: 'View',
+            href: `/${newToast.hash}`,
+            target: '_blank'
+          })
+        }
         this.$toasted.show(newToast.message, {
           theme: 'toasted-primary',
           position: 'bottom-right',
           duration: 5000,
-          action: [
-            {
-              text: 'Close',
-              onClick: (e, toastObject) => {
-                toastObject.goAway(0)
-              }
-            },
-            {
-              text: 'View',
-              href: `/${newToast.hash}`,
-              target: '_blank'
-            }
-          ]
+          action: actions
         })
       }
     }
@@ -406,7 +420,7 @@ label.btn-link.active {
 }
 .accountPanel {
   background: $bg-secondary;
-  max-width: 265px;
+  width: 265px;
   z-index: 1;
 }
 .actionToggle {
@@ -421,7 +435,7 @@ label.btn-link.active {
   background: $bg-primary;
   overflow-y: scroll;
   overflow-x: hidden;
-  max-height: calc(100vh - 123px);
+  max-height: calc(100vh - 124px);
 }
 .chainViewer > div.col,
 .actionSelector > div.col {
@@ -476,7 +490,10 @@ label.btn-link.active {
   background: $bg-tertiary;
   overflow-y: scroll;
   overflow-x: hidden;
-  max-height: calc(100vh - 123px);
+  max-height: calc(100vh - 124px);
+}
+.defaultIcon {
+  max-width: 24px;
 }
 .avatar {
   width: 22px;

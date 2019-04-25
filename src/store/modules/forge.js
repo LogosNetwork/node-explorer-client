@@ -251,6 +251,10 @@ const mutations = {
   },
   addLookup (state, lookup) {
     state.lookups.unshift(lookup)
+    state.toasts.push({
+      hash: null,
+      message: `Queried the RPC for ${lookup.title}`
+    })
   },
   addToast (state, toast) {
     state.toasts.push(toast)
@@ -276,11 +280,11 @@ const mutations = {
       }
       tokenInfo.request_count = newTokenData.requestCount + newTokenData.receiveCount
       tokenInfo.sequence = newTokenData.sequence
-      tokenInfo.settings = LogosWallet.Utils.getSettingsJSON(newTokenData.settings)
+      tokenInfo.settings = LogosWallet.Utils.convertObjectToArray(newTokenData.settings)
       tokenInfo.token_balance = newTokenData.tokenBalance
       tokenInfo.token_fee_balance = newTokenData.tokenFeeBalance
       tokenInfo.total_supply = newTokenData.totalSupply
-      tokenInfo.controllers = LogosWallet.Utils.getControllerJSON(newTokenData.controllers)
+      tokenInfo.controllers = LogosWallet.Utils.serializeControllers(newTokenData.controllers)
       Vue.set(state.tokens, tokenInfo.tokenAccount, tokenInfo)
     }
   }

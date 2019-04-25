@@ -29,7 +29,7 @@
       </b-button>
     </div>
 
-    <div class="mt-3" v-if="info">
+    <div class="mt-3 d-xl-none" v-if="info">
       <div class="mt-2">Public Key: <code>{{ info.publicKey }}</code></div>
       <div class="mt-2">Address: <LogosAddress :forceExpand="true" :address="info.address" /></div>
     </div>

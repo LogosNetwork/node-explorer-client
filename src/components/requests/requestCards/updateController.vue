@@ -31,8 +31,11 @@
             {{requestInfo.action === 'add' ? 'added' : 'removed'}} {{privilege}}
           </li>
         </ul>
-        <span v-else>
+        <span v-else-if="requestInfo.action === 'remove'">
           Was Removed from the token's controllers
+        </span>
+        <span v-else-if="requestInfo.action === 'add'">
+          Was Added to the token's controllers with no permissions
         </span>
       </b-list-group-item>
     </b-list-group>
