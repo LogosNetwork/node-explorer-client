@@ -422,6 +422,9 @@ $bg-white: #FFF;
   .forge {
     margin-left: 265px;
   }
+  .scrollContainer {
+    max-width: calc(100vw - 280px);
+  }
   .selectors {
     left: 280px;
     width: calc(100vw - 280px);
@@ -491,7 +494,7 @@ label.btn-link.active {
 .scrollContainer {
   margin-top: 70px;
   min-height: calc(100vh - 124px);
-  max-width: calc(100vw - 280px);
+  max-width: 100vw
 }
 .defaultIcon {
   max-width: 24px;
