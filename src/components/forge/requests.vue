@@ -81,7 +81,7 @@
       </accordion>
 
       <accordion
-        v-if="false && tokenPrivileges('revoke')"
+        v-if="tokenPrivileges('revoke')"
         bgClass="bg-success"
         accordionGroup="accordion"
         :requestIcon="faMask"
