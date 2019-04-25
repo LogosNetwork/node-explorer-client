@@ -1,6 +1,6 @@
 <template>
-  <b-container fluid class="d-flex overflow-hidden">
-    <b-row class="flex-grow flex-fill overflow-hidden">
+  <b-container fluid class="d-flex">
+    <b-row class="flex-grow flex-fill">
       <b-col cols="auto" class="accountPanel d-none d-sm-block">
         <div class="d-flex justify-content-between mt-3 mb-3 align-items-center font-weight-bold">
           <h4 class="mb-0">Accounts</h4>
@@ -62,11 +62,9 @@
                     <font-awesome-icon :icon="faCoins" transform="shrink-6" />
                   </font-awesome-layers>
                 </b-col>
-                <b-col class="overflow-hidden">
-                  <div class="text-left text-nowrap text-truncate">
-                    <div class="text-truncate">{{token.name}} - ({{token.symbol}})</div>
-                    <small><LogosAddress class="text-muted" :inactive="true" :force="true" :address="token.tokenAccount" /></small>
-                  </div>
+                <b-col class="text-overflow text-left text-nowrap text-truncate">
+                  <div class="text-truncate">{{token.name}} - ({{token.symbol}})</div>
+                  <small><LogosAddress class="text-muted" :inactive="true" :force="true" :address="token.tokenAccount" /></small>
                 </b-col>
                 <b-col cols="auto">
                   <b-dropdown v-on:click.stop variant="link" size="lg" no-caret>
@@ -95,32 +93,22 @@
           </b-list-group>
         </div>
       </b-col>
-      <b-col class="overflow-hidden">
-        <b-row class="h-100">
+      <b-col class="forge">
+        <b-row class="selectors">
           <b-col col :xl="renderSidePanel ? 7 : 12" class="d-flex flex-column">
             <b-row class="actionToggle">
               <b-col>
                 <div class="btn-group btn-group-toggle pt-3 pb-3" data-toggle="buttons">
                   <label class="btn btn-link" v-bind:class="{ active: selected === 'requests' }">
-                    <input type="radio" name="actionFilter" id="requests" autocomplete="off" :checked="selected === 'requests'" v-on:click="changeSelected('requests')">
+                    <input type="radio" name="buildRequests" id="requests" autocomplete="off" :checked="selected === 'requests'" v-on:click="changeSelected('requests')">
                     <font-awesome-icon size="lg" class="mr-2" :icon="faWrench" />
                     <span>Build Requests</span>
                   </label>
                   <label class="btn btn-link" v-bind:class="{ active: selected === 'lookup' }">
-                    <input type="radio" name="actionFilter" id="lookup" autocomplete="off" :checked="selected === 'lookup'" v-on:click="changeSelected('lookup')">
+                    <input type="radio" name="lookupInfo" id="lookup" autocomplete="off" :checked="selected === 'lookup'" v-on:click="changeSelected('lookup')">
                     <font-awesome-icon size="lg" class="mr-2" :icon="faSearch" />
                     <span>Lookup Info</span>
                   </label>
-                </div>
-              </b-col>
-            </b-row>
-            <b-row class="actionSelector flex-grow flex-fill">
-              <b-col class="m-3 text-left">
-                <div v-if="selected === 'lookup'">
-                  <Lookups />
-                </div>
-                <div v-else-if="selected === 'requests'">
-                  <Requests />
                 </div>
               </b-col>
             </b-row>
@@ -138,25 +126,6 @@
                   </div>
                 </b-col>
               </b-row>
-              <b-row class="chainViewer flex-grow flex-fill" v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
-                <b-col class="m-3 text-left">
-                  <b-row class="mb-3">
-                    <b-col cols="9" class="d-flex flex-column m-auto align-items-start">
-                      <h4 class="m-0">{{currentChain.label}}</h4>
-                    </b-col>
-                    <b-col cols="3" class="d-flex flex-column m-auto align-items-end">
-                      <b-button v-if="currentChain && currentAccount && currentChain.address !== currentAccount.address" class="font-weight-bolder" variant="link" v-on:click="closeChain()">
-                        <font-awesome-icon size="lg" class="mr-2" :icon="faTimes" />
-                      </b-button>
-                    </b-col>
-                  </b-row>
-                  <div name="list" is="transition-group" v-if="currentAccount && requests.length > 0">
-                    <div v-for="request in requests" :key="request.hash">
-                      <request :requestInfo="request" :account="currentAccount.address" :small="true"/>
-                    </div>
-                  </div>
-                </b-col>
-              </b-row>
             </div>
             <div v-if="selected === 'lookup'" class="d-flex flex-column flex-grow flex-fill">
               <b-row class="chainToggle">
@@ -170,15 +139,60 @@
                   </div>
                 </b-col>
               </b-row>
-              <b-row class="chainViewer flex-grow flex-fill">
-                <b-col class="m-3 text-left">
-                  <div v-if="lookups && lookups.length > 0">
-                    <div v-for="(lookup, index) in lookups" :key="index">
-                      <lookupCard :lookupInfo="lookup" :index="index"/>
-                    </div>
+            </div>
+          </b-col>
+        </b-row>
+        <b-row class="scrollContainer">
+          <b-col col :xl="renderSidePanel ? 7 : 12" class="d-flex flex-column">
+            <b-row class="actionSelector flex-grow flex-fill">
+              <b-col class="m-3 text-left">
+                <affix v-if="renderSidePanel" class="scrollaffix-sidebar" :offset="{ top: 124, bottom: 31 }" relative-element-selector="#sidePanel" :scroll-affix="true">
+                  <div v-if="selected === 'lookup'">
+                    <Lookups />
                   </div>
-                </b-col>
-              </b-row>
+                  <div v-else-if="selected === 'requests'">
+                    <Requests />
+                  </div>
+                </affix>
+                <div v-else>
+                  <div v-if="selected === 'lookup'">
+                    <Lookups />
+                  </div>
+                  <div v-else-if="selected === 'requests'">
+                    <Requests />
+                  </div>
+                </div>
+              </b-col>
+            </b-row>
+          </b-col>
+          <b-col id="sidePanel" v-if="renderSidePanel" col xl="5" class="flex-column d-none d-xl-flex chainViewer">
+            <div v-if="selected === 'requests'" class="d-flex flex-column flex-grow flex-fill">
+              <div class="m-3 text-left" v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
+                <b-row class="mb-3">
+                  <b-col cols="9" class="d-flex flex-column m-auto align-items-start">
+                    <h4 class="m-0">{{currentChain.label}}</h4>
+                  </b-col>
+                  <b-col cols="3" class="d-flex flex-column m-auto align-items-end">
+                    <b-button v-if="currentChain && currentAccount && currentChain.address !== currentAccount.address" class="font-weight-bolder" variant="link" v-on:click="closeChain()">
+                      <font-awesome-icon size="lg" class="mr-2" :icon="faTimes" />
+                    </b-button>
+                  </b-col>
+                </b-row>
+                <div name="list" is="transition-group" v-if="currentAccount && requests.length > 0">
+                  <div v-for="request in requests" :key="request.hash">
+                    <request :requestInfo="request" :account="currentAccount.address" :small="true"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-if="selected === 'lookup'" class="d-flex flex-column flex-grow flex-fill">
+              <div class="m-3 text-left">
+                <div v-if="lookups && lookups.length > 0">
+                  <div v-for="(lookup, index) in lookups" :key="index">
+                    <lookupCard :lookupInfo="lookup" :index="index"/>
+                  </div>
+                </div>
+              </div>
             </div>
           </b-col>
         </b-row>
@@ -244,7 +258,8 @@ export default {
     'Lookups': () => import(/* webpackChunkName: "ForgeLookups" */'@/components/forge/lookups.vue'),
     'Requests': () => import(/* webpackChunkName: "ForgeRequests" */'@/components/forge/requests.vue'),
     'request': () => import(/* webpackChunkName: "RequestWrapper" */'@/components/requests/request.vue'),
-    'lookupCard': () => import(/* webpackChunkName: "LookupCard" */'@/components/forge/lookupCard.vue')
+    'lookupCard': () => import(/* webpackChunkName: "LookupCard" */'@/components/forge/lookupCard.vue'),
+    'Affix': () => import(/* webpackChunkName: "Affix" */'vue-affix').then(({ Affix }) => Affix)
   },
   computed: {
     ...mapState('settings', {
@@ -395,6 +410,31 @@ $bg-tertiary: rgb(230, 230, 230);
 $bg-secondary: #FDFDFD;
 $bg-primary: #F5F5F5;
 $bg-white: #FFF;
+
+.selectors {
+  position: fixed;
+  top: 54px;
+  left: 0;
+  width: 100vw;
+  z-index: 2;
+}
+@media (min-width: 576px) {
+  .forge {
+    margin-left: 265px;
+  }
+  .selectors {
+    left: 280px;
+    width: calc(100vw - 280px);
+  }
+}
+@media (min-width: 1200px) {
+  .affix {
+    width: calc((100vw - 386px) * 7 / 12)
+  }
+}
+.scrollaffix-sidebar:not(.affix) {
+  position: relative;
+}
 .list-group-flush > .list-group-item {
   border-top: 0;
   border-bottom: 0;
@@ -421,7 +461,10 @@ label.btn-link.active {
 .accountPanel {
   background: $bg-secondary;
   width: 265px;
-  z-index: 1;
+  position: fixed;
+  left: 0px;
+  height: calc(100vh - 54px);
+  z-index: 2;
 }
 .actionToggle {
   background: $bg-secondary;
@@ -433,50 +476,6 @@ label.btn-link.active {
 }
 .actionSelector {
   background: $bg-primary;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  max-height: calc(100vh - 124px);
-}
-.chainViewer > div.col,
-.actionSelector > div.col {
-  overflow-x: hidden;
-}
-.chainViewer::-webkit-scrollbar,
-.actionSelector::-webkit-scrollbar {
-  background-color: transparent;
-  width:16px
-}
-.chainViewer::-webkit-scrollbar-track,
-.actionSelector::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-.chainViewer::-webkit-scrollbar-track:hover {
-  background-color:$bg-tertiary;
-}
-.actionSelector::-webkit-scrollbar-track:hover {
-  background-color:$bg-primary;
-}
-.chainViewer::-webkit-scrollbar-thumb {
-  background-color:#babac0;
-  border-radius:16px;
-  border:5px solid $bg-tertiary;
-}
-.actionSelector::-webkit-scrollbar-thumb {
-  background-color:#babac0;
-  border-radius:16px;
-  border:5px solid $bg-primary;
-}
-.chainViewer::-webkit-scrollbar-thumb:hover {
-  background-color:#a0a0a5;
-  border:4px solid $bg-tertiary;
-}
-.actionSelector::-webkit-scrollbar-thumb:hover {
-  background-color:#a0a0a5;
-  border:4px solid $bg-primary;
-}
-.chainViewer::-webkit-scrollbar-button,
-.actionSelector::-webkit-scrollbar-button {
-  display:none;
 }
 .chainToggle {
   background: $bg-secondary;
@@ -488,9 +487,11 @@ label.btn-link.active {
 }
 .chainViewer {
   background: $bg-tertiary;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  max-height: calc(100vh - 124px);
+}
+.scrollContainer {
+  margin-top: 70px;
+  min-height: calc(100vh - 124px);
+  max-width: calc(100vw - 280px);
 }
 .defaultIcon {
   max-width: 24px;

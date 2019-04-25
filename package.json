@@ -24,6 +24,7 @@
     "mqtt-regex": "^1.0.5",
     "prismjs": "^1.16.0",
     "vue": "^2.6.6",
+    "vue-affix": "^0.5.2",
     "vue-headful": "^2.0.1",
     "vue-i18n": "^8.8.1",
     "vue-infinite-scroll": "^2.0.2",

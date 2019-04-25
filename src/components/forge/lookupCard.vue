@@ -62,6 +62,11 @@ export default {
       faChevronDown
     }
   },
+  created: function () {
+    if (this.index === 0) {
+      this.showCollapse = true
+    }
+  },
   computed: {
     type: function () {
       return this.lookupInfo.title.replace(/\s/g, '')
