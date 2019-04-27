@@ -146,7 +146,8 @@
           <b-col col :xl="renderSidePanel ? 7 : 12" class="d-flex flex-column">
             <b-row class="actionSelector flex-grow flex-fill">
               <b-col class="m-3 text-left">
-                <affix v-if="renderSidePanel" class="scrollaffix-sidebar" :offset="{ top: 124, bottom: 31 }" relative-element-selector="#sidePanel" :scroll-affix="true">
+                <affix ref="scrollAffixElement" v-if="renderSidePanel" class="scrollaffix-sidebar" :offset="{ top: 124, bottom: 31 }" relative-element-selector="#sidePanel" :scroll-affix="true">
+                  <resize-observer @notify="handleResize" />
                   <div v-if="selected === 'lookup'">
                     <Lookups />
                   </div>
@@ -211,6 +212,8 @@ import { faUser, faEllipsisVAlt, faSearch, faWrench, faHistory, faSpinner, faCub
 import Toasted from 'vue-toasted'
 import store from '../store'
 import RPC from '../api/rpc'
+import 'vue-resize/dist/vue-resize.css'
+
 Vue.use(infiniteScroll)
 Vue.use(Toasted, {
   iconPack: 'fontawesome'
@@ -263,7 +266,8 @@ export default {
     'Requests': () => import(/* webpackChunkName: "ForgeRequests" */'@/components/forge/requests.vue'),
     'request': () => import(/* webpackChunkName: "RequestWrapper" */'@/components/requests/request.vue'),
     'lookupCard': () => import(/* webpackChunkName: "LookupCard" */'@/components/forge/lookupCard.vue'),
-    'Affix': () => import(/* webpackChunkName: "Affix" */'vue-affix').then(({ Affix }) => Affix)
+    'Affix': () => import(/* webpackChunkName: "Affix" */'vue-affix').then(({ Affix }) => Affix),
+    'resize-observer': () => import(/* webpackChunkName: "Resize" */'vue-resize').then(({ ResizeObserver }) => ResizeObserver)
   },
   computed: {
     ...mapState('settings', {
@@ -292,6 +296,9 @@ export default {
     }
   },
   methods: {
+    handleResize () {
+      this.$refs.scrollAffixElement.onScroll()
+    },
     viewChain: function (address, label) {
       if (!this.currentChain || (address && this.currentChain.address !== address)) {
         this.reset()
@@ -461,6 +468,7 @@ $bg-white: #FFF;
 }
 .scrollaffix-sidebar:not(.affix) {
   position: relative;
+  min-height: calc(100vh - 172px);
 }
 .list-group-flush > .list-group-item {
   border-top: 0;
