@@ -204,30 +204,34 @@
 <script>
 import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
-import config from '../../config'
 import Wallet from '../api/wallet'
 import infiniteScroll from 'vue-infinite-scroll'
 import cloneDeep from 'lodash.clonedeep'
 import { faUser, faEllipsisVAlt, faSearch, faWrench, faHistory, faSpinner, faCube, faTimes, faCircle, faCoins } from '@fortawesome/pro-light-svg-icons'
 import Toasted from 'vue-toasted'
+import store from '../store'
 import RPC from '../api/rpc'
 Vue.use(infiniteScroll)
 Vue.use(Toasted, {
   iconPack: 'fontawesome'
 })
-Vue.use(Wallet, {
+let walletOptions = {
   fullSync: true,
   syncTokens: true,
-  mqtt: config.mqttHost,
+  mqtt: store.getters['settings/mqttHost'],
   rpc: {
-    proxy: config.rpcProxy,
-    delegates: Object.values(config.delegates)
+    delegates: Object.values(store.getters['settings/delegates'])
   }
-})
-Vue.use(RPC, {
-  url: config.rpcHost,
-  proxyURL: config.rpcProxy
-})
+}
+let rpcOptions = {
+  url: store.getters['settings/rpcHost']
+}
+if (store.getters['settings/proxyURL']) {
+  rpcOptions.proxyURL = store.getters['settings/proxyURL']
+  walletOptions.rpc.proxy = store.getters['settings/proxyURL']
+}
+Vue.use(Wallet, walletOptions)
+Vue.use(RPC, rpcOptions)
 export default {
   name: 'workshop',
   data () {
@@ -351,6 +355,7 @@ export default {
     ])
   },
   created: function () {
+    this.subscribe(`delegateChange`)
     this.initalize({ url: this.mqttHost })
     this.setSeed(this.$wallet.seed)
     if (!this.currentChain && this.currentAccount) {
@@ -399,6 +404,13 @@ export default {
           duration: 5000,
           action: actions
         })
+      }
+    }
+  },
+  destroyed: function () {
+    for (let account in this.forgeAccounts) {
+      if (account) {
+        this.unsubscribe(`account/${account}`)
       }
     }
   }

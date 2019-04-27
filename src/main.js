@@ -5,6 +5,7 @@ import i18n from './i18n'
 import store from './store/index'
 import './assets/css/shame.scss'
 import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
+store.dispatch('settings/loadDelegates')
 Vue.config.productionTip = false
 Vue.directive('b-tooltip', vBTooltip)
 Vue.component('font-awesome-icon', () => import(/* webpackChunkName: "FontAwesomeIcon" */'@fortawesome/vue-fontawesome').then(({ FontAwesomeIcon }) => FontAwesomeIcon))

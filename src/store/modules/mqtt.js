@@ -1,5 +1,6 @@
 import Mqtt from 'mqtt'
 import mqttRegex from 'mqtt-regex'
+import Logos from '@logosnetwork/logos-rpc-client'
 
 let client = null
 
@@ -12,7 +13,7 @@ const getters = {
 }
 
 const actions = {
-  initalize ({ commit, state, dispatch }, data) {
+  initalize ({ commit, state, dispatch, rootState }, data) {
     if (!state.connected) {
       client = Mqtt.connect(data.url)
       client.on('close', () => {
@@ -25,7 +26,11 @@ const actions = {
       client.on('message', (topic, message) => {
         message = JSON.parse(message.toString())
         // TODO Eventually validate the signatures of the blocks to be "trustless"
-        if (topic === 'microEpoch') {
+        if (topic === 'delegateChange') {
+          commit('settings/setDelegates', message, { root: true })
+          commit('settings/setRpcHost', message['0'], { root: true })
+          this._vm.$Logos = new Logos({ url: message['0'], proxyURL: rootState.settings.proxyURL, debug: false })
+        } else if (topic === 'microEpoch') {
           commit('chains/addMicroEpoch', message, { root: true })
           commit('explorer/setMicroEpoch', message, { root: true })
         } else if (topic === 'epoch') {

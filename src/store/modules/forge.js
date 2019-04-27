@@ -184,7 +184,7 @@ const actions = {
       for (let tokenAccount of wallet.accountsObject[account].tokens) {
         if (!state.tokens[tokenAccount]) {
           commit('addToken', tokenAccount)
-          let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+          let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: false })
           pullTokenInfo(tokenAccount, rpcClient, commit)
         }
       }
@@ -209,7 +209,7 @@ const actions = {
   },
   addRequest ({ commit, rootState, state }, request) {
     let requestData = cloneDeep(request)
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: false })
     createToast(requestData, rpcClient, commit, state)
   }
 }
