@@ -267,7 +267,9 @@ export default {
   },
   computed: {
     ...mapState('settings', {
-      mqttHost: state => state.mqttHost
+      mqttHost: state => state.mqttHost,
+      rpcHost: state => state.rpcHost,
+      proxyURL: state => state.proxyURL
     }),
     ...mapState('forge', {
       forgeAccounts: state => state.accounts,
@@ -355,8 +357,11 @@ export default {
     ])
   },
   created: function () {
-    this.subscribe(`delegateChange`)
-    this.initalize({ url: this.mqttHost })
+    this.initalize({ url: this.mqttHost,
+      cb: () => {
+        this.subscribe(`delegateChange`)
+      }
+    })
     this.setSeed(this.$wallet.seed)
     if (!this.currentChain && this.currentAccount) {
       this.currentChain = { address: this.currentAccount.address, label: this.currentAccount.label }
@@ -378,6 +383,13 @@ export default {
         setTimeout(() => { this.update(newWallet) }, 0)
       },
       deep: true
+    },
+    rpcHost: function (newRpcHost, oldRpcHost) {
+      if (this.proxyURL) {
+        this.$Logos.changeServer(this.proxyURL, newRpcHost)
+      } else {
+        this.$Logos.changeServer(newRpcHost)
+      }
     },
     toasts: function (newToasts, oldToasts) {
       if (newToasts.length > 0) {
