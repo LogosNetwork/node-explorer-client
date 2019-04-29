@@ -2,7 +2,7 @@ import config from '../../../config'
 import axios from 'axios'
 
 const state = {
-  rpcHost: null,
+  rpcHost: config.rpcHost,
   delegates: null,
   proxyURL: config.rpcProxy,
   mqttHost: config.mqttHost,
