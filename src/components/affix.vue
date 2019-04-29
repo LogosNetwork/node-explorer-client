@@ -152,6 +152,10 @@ export default {
       const affixTotalHeight = this.affixHeight + this.offset.bottom + this.offset.top
       return this.scrollAffix &&
         affixTotalHeight > this.scrollContainer.innerHeight
+    },
+
+    affixIsBiggerThanRelativeElement () {
+      return this.affixHeight + this.offset.top >= this.relativeElement.offsetHeight
     }
   },
 
@@ -210,58 +214,49 @@ export default {
 
       this.updateData()
 
-      const affixIsBiggerThanRelativeElement = this.affixHeight + this.offset.top >=
-        this.relativeElement.offsetHeight
-
-      if (affixIsBiggerThanRelativeElement) {
-        if (this.scrollAffix && this.currentScrollAffix !== 'scrollaffix-top') {
-          this.changeMode('scrollAffix')
-          this.setScrollAffixTop()
-        } else if (this.currentState !== 'affix-top') {
-          this.changeMode('affix')
-          this.setAffixTop()
-        }
-
-        return
-      }
-
       if (this.shouldUseScrollAffix) {
-        this.changeMode('scrollAffix')
+        this.setMode('scrollAffix')
         this.handleScrollAffix()
 
         return
       }
 
-      this.changeMode('affix')
+      this.setMode('affix')
       this.handleAffix()
     },
 
-    changeMode (mode) {
+    setMode (mode) {
       if (this.mode !== mode) {
         this.mode = mode
         if (mode === 'affix') {
           this.currentScrollAffix = null
+          this.lastScrollAffixState = null
         } else if (mode === 'scrollAffix') {
           this.currentState = null
+          this.lastState = null
           this.initScrollAffix()
         }
       }
     },
 
     handleAffix () {
-      if (this.topOfScreen < this.relativeElmOffsetTop - this.offset.top) {
+      if (this.affixIsBiggerThanRelativeElement) {
         this.setAffixTop()
-      }
+      } else {
+        if (this.topOfScreen < this.relativeElmOffsetTop - this.offset.top) {
+          this.setAffixTop()
+        }
 
-      if (this.topOfScreen >= this.relativeElmOffsetTop - this.offset.top &&
-        this.relativeElmBottomPos - this.offset.bottom >=
-        this.topOfScreen + this.topPadding + this.affixHeight + this.offset.top) {
-        this.setAffix()
-      }
+        if (this.topOfScreen >= this.relativeElmOffsetTop - this.offset.top &&
+          this.relativeElmBottomPos - this.offset.bottom >=
+          this.topOfScreen + this.topPadding + this.affixHeight + this.offset.top) {
+          this.setAffix()
+        }
 
-      if (this.relativeElmBottomPos - this.offset.bottom < this.topOfScreen +
-        this.topPadding + this.affixHeight + this.offset.top) {
-        this.setAffixBottom()
+        if (this.relativeElmBottomPos - this.offset.bottom < this.topOfScreen +
+          this.topPadding + this.affixHeight + this.offset.top) {
+          this.setAffixBottom()
+        }
       }
 
       this.lastState = this.currentState
@@ -270,22 +265,26 @@ export default {
     handleScrollAffix () {
       this.setScrollingDirection()
 
-      if (this.screenIsBeforeRelativeElm) {
+      if (this.affixIsBiggerThanRelativeElement) {
         this.setScrollAffixTop()
-      } else if (this.screenIsPastRelativeElm) {
-        this.setScrollAffixBottom()
-      } else if (this.screenIsInsideRelativeElm) {
-        const shouldSetAffixScrolling = (this.currentScrollAffix === 'scrollaffix-top') ||
-          (this.currentScrollAffix === 'scrollaffix-bottom') ||
-          (this.currentScrollAffix === 'scrollaffix-up' && this.scrollingDown) ||
-          (this.currentScrollAffix === 'scrollaffix-down' && this.scrollingUp)
+      } else {
+        if (this.screenIsBeforeRelativeElm) {
+          this.setScrollAffixTop()
+        } else if (this.screenIsPastRelativeElm) {
+          this.setScrollAffixBottom()
+        } else if (this.screenIsInsideRelativeElm) {
+          const shouldSetAffixScrolling = (this.currentScrollAffix === 'scrollaffix-top') ||
+            (this.currentScrollAffix === 'scrollaffix-bottom') ||
+            (this.currentScrollAffix === 'scrollaffix-up' && this.scrollingDown) ||
+            (this.currentScrollAffix === 'scrollaffix-down' && this.scrollingUp)
 
-        if (this.screenIsBeforeAffix && this.scrollingUp) {
-          this.setScrollAffixUp()
-        } else if (this.screenIsPastAffix && this.scrollingDown) {
-          this.setScrollAffixDown()
-        } else if (shouldSetAffixScrolling) {
-          this.setScrollAffixScrolling()
+          if (this.screenIsBeforeAffix && this.scrollingUp) {
+            this.setScrollAffixUp()
+          } else if (this.screenIsPastAffix && this.scrollingDown) {
+            this.setScrollAffixDown()
+          } else if (shouldSetAffixScrolling) {
+            this.setScrollAffixScrolling()
+          }
         }
       }
 
@@ -452,13 +451,9 @@ export default {
     emitEvent () {
       if (this.scrollAffix && this.currentScrollAffix &&
         this.lastScrollAffixState && this.currentScrollAffix !== this.lastScrollAffixState) {
-        console.log(this.lastScrollAffixState)
-        console.log(this.currentScrollAffix)
         this.$emit(this.currentScrollAffix.replace('-', ''))
       } else if (this.lastState && this.currentState &&
         this.currentState !== this.lastState) {
-        console.log(this.lastState)
-        console.log(this.currentState)
         this.$emit(this.currentState.replace('-', ''))
       }
     },
