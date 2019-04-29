@@ -266,7 +266,7 @@ export default {
     'Requests': () => import(/* webpackChunkName: "ForgeRequests" */'@/components/forge/requests.vue'),
     'request': () => import(/* webpackChunkName: "RequestWrapper" */'@/components/requests/request.vue'),
     'lookupCard': () => import(/* webpackChunkName: "LookupCard" */'@/components/forge/lookupCard.vue'),
-    'Affix': () => import(/* webpackChunkName: "Affix" */'vue-affix').then(({ Affix }) => Affix),
+    'Affix': () => import(/* webpackChunkName: "Affix" */'@/components/affix.vue'),
     'resize-observer': () => import(/* webpackChunkName: "Resize" */'vue-resize').then(({ ResizeObserver }) => ResizeObserver)
   },
   computed: {
@@ -441,7 +441,6 @@ $bg-tertiary: rgb(230, 230, 230);
 $bg-secondary: #FDFDFD;
 $bg-primary: #F5F5F5;
 $bg-white: #FFF;
-
 .selectors {
   position: fixed;
   top: 54px;
@@ -458,7 +457,7 @@ $bg-white: #FFF;
   }
   .selectors {
     left: 280px;
-    width: calc(100vw - 280px);
+    width: calc(100vw - 265px);
   }
 }
 @media (min-width: 1200px) {
@@ -467,7 +466,6 @@ $bg-white: #FFF;
   }
 }
 .scrollaffix-sidebar:not(.affix) {
-  position: relative;
   min-height: calc(100vh - 172px);
 }
 .list-group-flush > .list-group-item {
