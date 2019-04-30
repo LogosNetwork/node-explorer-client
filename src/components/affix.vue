@@ -484,7 +484,7 @@ export default {
 
     this.updateData()
 
-    if (this.scrollAffix && this.shouldUseScrollAffix) this.initScrollAffix()
+    if (this.scrollAffix && this.shouldUseScrollAffix) this.setMode('scrollAffix')
 
     this.onScroll()
     this.scrollContainer.addEventListener('scroll', this.handleScroll)

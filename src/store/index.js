@@ -11,6 +11,12 @@ import settings from './modules/settings'
 import request from './modules/request'
 import tokens from './modules/tokens'
 import forge from './modules/forge'
+import VuexPersistence from 'vuex-persist'
+const vuexLocal = new VuexPersistence({
+  storage: window.localStorage,
+  supportCircular: true,
+  reducer: (state) => ({ forge: state.forge })
+})
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -27,5 +33,6 @@ export default new Vuex.Store({
     tokens,
     forge
   },
-  strict: process.env.NODE_ENV !== 'production'
+  strict: process.env.NODE_ENV !== 'production',
+  plugins: [vuexLocal.plugin]
 })
