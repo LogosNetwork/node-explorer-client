@@ -39,7 +39,8 @@ export default {
     'b-navbar-brand': () => import(/* webpackChunkName: "b-navbar-brand" */'bootstrap-vue/es/components/navbar/navbar-brand'),
     'b-navbar-toggle': () => import(/* webpackChunkName: "b-navbar-toggle" */'bootstrap-vue/es/components/navbar/navbar-toggle'),
     'b-navbar-nav': () => import(/* webpackChunkName: "b-navbar-nav" */'bootstrap-vue/es/components/navbar/navbar-nav'),
-    'b-nav-item': () => import(/* webpackChunkName: "b-nav-item" */'bootstrap-vue/es/components/nav/nav-item')
+    'b-nav-item': () => import(/* webpackChunkName: "b-nav-item" */'bootstrap-vue/es/components/nav/nav-item'),
+    'b-collapse': () => import(/* webpackChunkName: "b-collapse" */'bootstrap-vue/es/components/collapse/collapse')
   },
   data () {
     return {

@@ -4,7 +4,7 @@
       <b-row class="text-left pt-5">
         <b-col cols="12" md="8" class="mb-3">
           <h3 class="text-left" v-t="'request'"></h3>
-          <code style="background-color:#FFF;color:#ff3860;padding:6px">{{request}}</code>
+          <code>{{request}}</code>
         </b-col>
       </b-row>
       <b-row v-if="!error && details && details.origin" class="mt-3">
@@ -127,4 +127,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+code {
+  padding: 6px;
+  background-color: #FFF;
+}
 </style>

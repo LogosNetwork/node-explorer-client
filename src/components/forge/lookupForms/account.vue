@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'accountLookupForm',
@@ -74,10 +74,12 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    ...mapState('forge', {
-      forgeAccounts: state => state.accounts,
-      forgeTokens: state => state.tokens
-    }),
+    forgeAccounts: function () {
+      return this.$wallet.accountsObject
+    },
+    forgeTokens: function () {
+      return this.$wallet.tokenAccounts
+    },
     combinedAccounts: function () {
       let forgeTokens = []
       for (let token in this.forgeTokens) {

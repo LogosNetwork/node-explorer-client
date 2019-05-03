@@ -56,7 +56,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import cloneDeep from 'lodash.clonedeep'
 
 export default {
@@ -72,7 +71,9 @@ export default {
   },
   components: {
     'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
-    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input')
+    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
+    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback'),
+    'b-form-checkbox': () => import(/* webpackChunkName: "b-form-checkbox" */'bootstrap-vue/es/components/form-checkbox/form-checkbox')
   },
   created: function () {
     if (this.seed) {
@@ -80,9 +81,9 @@ export default {
     }
   },
   computed: {
-    ...mapState('forge', {
-      seed: state => state.seed
-    }),
+    seed: function () {
+      return this.$wallet.seed
+    },
     validSeed () {
       if (this.localSeed === '') return null
       return /^[0-9A-F]{64}$/i.test(this.localSeed)

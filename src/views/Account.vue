@@ -8,7 +8,7 @@
               <h3 class="text-left">Unopened Account</h3>
               <b-button v-on:click="requestFaucet()" class="fundBtn d-md-none" size="sm" variant="outline-primary">Fund Account</b-button>
             </div>
-            <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
+            <code>{{account}}</code>
             <h4 v-if="error" class="pt-3" style="color:red">This account has not been opened yet</h4>
           </b-col>
           <b-col cols="12" md="4" class="mb-3" id="qrHolder">
@@ -24,7 +24,7 @@
               <h3 class="text-left" v-t="'account'"></h3>
               <b-button v-on:click="requestFaucet()" class="fundBtn d-md-none" size="sm" variant="outline-primary">Fund Account</b-button>
             </div>
-            <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
+            <code>{{account}}</code>
             <h3 v-if="balance !== null && selected === 'all' || selected === 'lgs'" class="pt-3" style="color:green">{{balance}} LOGOS</h3>
             <h3 v-if="tokenBalances !== null && selected !== 'all' && selected !== 'lgs'" class="pt-3" style="color:green">
               <span v-if="tokenBalances[selected] && tokenBalances[selected].tokenInfo.pending !== true">
@@ -60,7 +60,7 @@
             </h3>
             <b-button v-on:click="requestFaucet()" class="fundBtn" size="sm" variant="outline-primary">Fund Account</b-button>
           </div>
-          <code style="background-color:#FFF;color:#ff3860;padding:6px">{{account}}</code>
+          <code>{{account}}</code>
         </div>
         <b-row>
           <b-col lg="6" md="12" class="mb-3">
@@ -403,9 +403,11 @@ import infiniteScroll from 'vue-infinite-scroll'
 import axios from 'axios'
 import { faSpinner, faCoins, faCrown, faUserCircle, faMagic, faLockAlt, faMask, faSnowflake, faListAlt, faArrowDown, faFire, faEdit, faHandReceiving, faPercentage, faLambda } from '@fortawesome/pro-light-svg-icons'
 import vBModal from 'bootstrap-vue/es/directives/modal/modal'
+import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
 import VueMoment from 'vue-moment'
 Vue.use(VueMoment)
 Vue.directive('b-modal', vBModal)
+Vue.directive('b-tooltip', vBTooltip)
 Vue.use(infiniteScroll)
 
 export default {
@@ -541,6 +543,10 @@ export default {
   }
   .btn:not(:disabled) {
     cursor: pointer;
+  }
+  code {
+    background-color: #FFF;
+    padding: 6px;
   }
   .avatar {
     width: 20px;

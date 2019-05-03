@@ -9,7 +9,7 @@
         id="tokenSelector"
         v-model="selectedToken"
         required
-        track-by="tokenAccount"
+        track-by="address"
         label="name"
         :custom-label="nameWithAddress"
         :options="burnableTokens"
@@ -18,10 +18,10 @@
         placeholder="Search for a token"
       >
         <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.tokenAccount">
+          <span v-if="option.name !== option.address">
             <strong>{{ option.name }}</strong>  -
           </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.tokenAccount" />
+          <LogosAddress :inactive="true" :force="true" :address="option.address" />
         </template>
       </Multiselect>
       <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
@@ -68,8 +68,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 export default {
   name: 'burnForm',
@@ -83,29 +81,40 @@ export default {
     'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
     'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
+    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback'),
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    ...mapState('forge', {
-      forgeTokens: state => state.tokens,
-      currentAccount: state => state.currentAccount
-    }),
+    forgeTokens: function () {
+      return this.$wallet.tokenAccounts
+    },
+    issuerInfo: function () {
+      if (!this.selectedToken) return null
+      try {
+        return JSON.parse(this.selectedToken.issuerInfo)
+      } catch (e) {
+        return {}
+      }
+    },
+    currentAccount: function () {
+      return this.$wallet.account
+    },
     isValidAmount: function () {
       if (this.amount === '') return null
-      let token = this.selectedToken
-      if (!token) return null
-      let amountInRaw = cloneDeep(this.amount)
-      if (amountInRaw && token && token.issuerInfo &&
-        typeof token.issuerInfo.decimals !== 'undefined' &&
-        token.issuerInfo.decimals > 0) {
-        if (!/^([0-9]+(?:[.][0-9]*)?|\.[0-9]+)$/.test(amountInRaw)) return false
-        amountInRaw = this.$Logos.convert.fromTo(amountInRaw, token.issuerInfo.decimals, 0)
+      if (!this.selectedToken) return null
+      let amountInRaw = null
+      if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined' &&
+        this.issuerInfo.decimals > 0) {
+        if (!/^([0-9]+(?:[.][0-9]*)?|\.[0-9]+)$/.test(this.amount)) return false
+        amountInRaw = this.$Logos.convert.fromTo(this.amount, this.issuerInfo.decimals, 0)
       } else {
+        amountInRaw = this.amount
         if (!/^([0-9]+)$/.test(amountInRaw)) return false
       }
+      if (amountInRaw === null) return false
       return (
         bigInt(amountInRaw).greater(0) &&
-        bigInt(token.token_balance).greaterOrEquals(bigInt(amountInRaw))
+        bigInt(this.selectedToken.tokenBalance).greaterOrEquals(bigInt(amountInRaw))
       )
     },
     sufficientBalance: function () {
@@ -114,18 +123,15 @@ export default {
     },
     sufficientTokenBalance: function () {
       if (!this.selectedToken) return null
-      return bigInt(this.selectedToken.token_balance).greater(0)
+      return bigInt(this.selectedToken.tokenBalance).greater(0)
     },
     burnableTokens: function () {
       let tokens = []
       for (let tokenAddress in this.forgeTokens) {
-        if (this.forgeTokens[tokenAddress].controllers instanceof Array) {
-          for (let controller of this.forgeTokens[tokenAddress].controllers) {
-            if (controller.account === this.currentAccount.address &&
-              controller.privileges instanceof Array &&
-              controller.privileges.indexOf('burn') > -1) {
-              tokens.push(this.forgeTokens[tokenAddress])
-            }
+        for (let controller in this.forgeTokens[tokenAddress].controllers) {
+          if (this.forgeTokens[tokenAddress].controllers[controller].account === this.currentAccount.address &&
+            this.forgeTokens[tokenAddress].controllers[controller].privileges.burn) {
+            tokens.push(this.forgeTokens[tokenAddress])
           }
         }
       }
@@ -134,11 +140,11 @@ export default {
     availableToBurn: function () {
       if (this.selectedToken) {
         let amount = null
-        if (this.selectedToken.issuerInfo && typeof this.selectedToken.issuerInfo.decimals !== 'undefined') {
-          amount = this.$Logos.convert.fromTo(this.selectedToken.token_balance, 0, this.selectedToken.issuerInfo.decimals)
+        if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined') {
+          amount = this.$Logos.convert.fromTo(this.selectedToken.tokenBalance, 0, this.issuerInfo.decimals)
           return `${amount} ${this.selectedToken.symbol} are available to burn`
         } else {
-          amount = this.selectedToken.token_balance
+          amount = this.selectedToken.tokenBalance
           return `${amount} base units of ${this.selectedToken.symbol} are available to burn`
         }
       }
@@ -149,20 +155,20 @@ export default {
     createBurn () {
       if (this.isValidAmount && this.sufficientBalance && this.sufficientTokenBalance) {
         let amountInBaseUnit = null
-        if (this.selectedToken.issuerInfo && typeof this.selectedToken.issuerInfo.decimals !== 'undefined') {
-          amountInBaseUnit = this.$Logos.convert.fromTo(this.amount, this.selectedToken.issuerInfo.decimals, 0)
+        if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined') {
+          amountInBaseUnit = this.$Logos.convert.fromTo(this.amount, this.issuerInfo.decimals, 0)
         } else {
           amountInBaseUnit = this.amount
         }
         let data = {
-          tokenAccount: this.selectedToken.tokenAccount,
+          tokenAccount: this.selectedToken.address,
           amount: amountInBaseUnit
         }
         this.$wallet.account.createBurnRequest(data)
       }
     },
-    nameWithAddress ({ name, tokenAccount }) {
-      return `${name} — ${tokenAccount.substring(0, 9)}...${tokenAccount.substring(59, 64)}`
+    nameWithAddress ({ name, address }) {
+      return `${name} — ${address.substring(0, 9)}...${address.substring(59, 64)}`
     }
   },
   created: function () {
@@ -171,21 +177,22 @@ export default {
     }
   },
   watch: {
-    burnableTokens: function (newDistTks, oldDistTks) {
-      if (newDistTks.length > 0) {
-        let valid = false
-        for (let token of newDistTks) {
-          if (this.selectedToken && token.tokenAccount === this.selectedToken.tokenAccount) {
-            this.selectedToken = token
-            valid = true
+    burnableTokens: {
+      handler: function (newTks, oldTks) {
+        if (newTks.length > 0) {
+          let found = false
+          for (let tkAccount of newTks) {
+            if (this.selectedToken && tkAccount.address === this.selectedToken.address) {
+              this.selectedToken = tkAccount
+              found = true
+            }
           }
+          if (!found) this.selectedToken = newTks[0]
+        } else {
+          this.selectedToken = null
         }
-        if (valid === false) {
-          this.selectedToken = newDistTks[0]
-        }
-      } else {
-        this.selectedToken = null
-      }
+      },
+      deep: true
     }
   }
 }

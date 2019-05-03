@@ -10,8 +10,8 @@
         <b-row class="d-flex align-items-center justify-content-center">
           <b-col cols="auto">
             <div class="text-muted rounded">
-              <font-awesome-icon v-if="!showCollapse" size="lg" id="rotatable" :icon="faChevronDown" rotation="180" />
-              <font-awesome-icon v-else size="lg" id="rotatable" :icon="faChevronDown"  />
+              <font-awesome-icon v-if="!showCollapse" size="lg" class="rotatable" :icon="faChevronDown" rotation="180" />
+              <font-awesome-icon v-else size="lg" class="rotatable" :icon="faChevronDown"  />
             </div>
           </b-col>
           <b-col>
@@ -80,7 +80,8 @@ export default {
     'b-list-group': () => import(/* webpackChunkName: "b-list-group" */'bootstrap-vue/es/components/list-group/list-group'),
     'b-list-group-item': () => import(/* webpackChunkName: "b-list-group-item" */'bootstrap-vue/es/components/list-group/list-group-item'),
     'codepad': () => import(/* webpackChunkName: "Codepad" */ '@/components/codepad.vue'),
-    'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue')
+    'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
+    'b-collapse': () => import(/* webpackChunkName: "b-collapse" */'bootstrap-vue/es/components/collapse/collapse')
   },
   watch: {
     lookupInfo: {
@@ -98,7 +99,7 @@ export default {
   .timestamp {
     font-size: 1rem
   }
-  #rotatable {
+  .rotatable {
     -webkit-transition: all .3s;
     -o-transition: all .3s;
     transition: all .3s;

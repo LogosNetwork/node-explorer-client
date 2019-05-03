@@ -4,7 +4,7 @@
       <b-row class="text-left pt-5">
         <b-col cols="12">
           <h3 class="text-left" v-t="'request_block'"></h3>
-          <code style="background-color:#FFF;color:#ff3860;padding:6px">{{requestBlock.hash}}</code>
+          <code>{{requestBlock.hash}}</code>
           <h4 v-if="error" class="pt-3" style="color:red">This request block does not exist</h4>
         </b-col>
       </b-row>
@@ -88,4 +88,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+code {
+  padding: 6px;
+  background-color: #FFF;
+}
 </style>

@@ -19,7 +19,7 @@
           <div>This testnet faucet will automatically distribute 0.0001% of the faucet balance with a maximum of 1000 Logos.<br></div>
           <div class="form-group">
             <div class="input-group input-group-lg mb-3">
-              <b-input id="address" type="text" :state="searchState" aria-describedby="addressHelp" placeholder="lgs_address" v-model="address" />
+              <b-form-input id="address" type="text" :state="searchState" aria-describedby="addressHelp" placeholder="lgs_address" v-model="address" />
               <div class="input-group-append">
                 <b-button v-b-tooltip.hover title="Scan a QR Code Address" :pressed="scanQR" variant="primary" v-on:click="toggleQRCode()" class="btn btn-default btn-sm">
                   <font-awesome-icon :icon="faQrcode"/>
@@ -46,14 +46,19 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import axios from 'axios'
 import { mapActions, mapState } from 'vuex'
 import { QrcodeStream } from 'vue-qrcode-reader'
 import { faQrcode } from '@fortawesome/pro-light-svg-icons'
+import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
+Vue.directive('b-tooltip', vBTooltip)
+
 export default {
   name: 'Facuet',
   components: {
-    QrcodeStream
+    QrcodeStream,
+    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input')
   },
   computed: {
     ...mapState('settings', {
@@ -136,9 +141,7 @@ export default {
       this.scanQR = !this.scanQR
     },
     onInit (promise) {
-      promise.then(() => {
-        console.log('Successfully initilized! Ready for scanning now!')
-      })
+      promise.then()
         .catch(error => {
           if (error.name === 'NotAllowedError') {
             this.errorMessage = 'Hey! I need access to your camera'

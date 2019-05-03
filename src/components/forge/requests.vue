@@ -1,5 +1,5 @@
 <template>
-  <div v-if="currentAccount !== null">
+  <div v-if="currentAccount">
 
     <b-row class="mb-3">
       <b-col cols="9">
@@ -19,6 +19,7 @@
       <accordion
         bgClass="bg-success"
         accordionGroup="accordion"
+        :slotMinHeight="290"
         :requestIcon="faPaperPlane"
         title="Send Logos"
         subtitle="Send logos to another account."
@@ -30,6 +31,7 @@
         v-if="hasTokenBalance"
         bgClass="bg-primary"
         accordionGroup="accordion"
+        :slotMinHeight="388"
         :requestIcon="faCoins"
         title="Send Tokens"
         subtitle="Send tokens to another account."
@@ -40,6 +42,7 @@
       <accordion
         bgClass="bg-info"
         accordionGroup="accordion"
+        :slotMinHeight="1702"
         :requestIcon="faPlus"
         title="Issue a Token"
         subtitle="Create and issue your token."
@@ -51,6 +54,7 @@
         v-if="tokenPrivileges('issuance')"
         bgClass="bg-secondary"
         accordionGroup="accordion"
+        :slotMinHeight="290"
         :requestIcon="faMagic"
         title="Issue Additional Tokens"
         subtitle="Increases the total supply of a token."
@@ -62,6 +66,7 @@
         v-if="tokenPrivileges('change')"
         bgClass="bg-warning"
         accordionGroup="accordion"
+        :slotMinHeight="269"
         :requestIcon="faExchange"
         title="Change Token Setting"
         subtitle="Change the settings of the given token."
@@ -73,6 +78,7 @@
         v-if="tokenPrivileges('modify')"
         bgClass="bg-danger"
         accordionGroup="accordion"
+        :slotMinHeight="292"
         :requestIcon="faLockAlt"
         title="Immute Token Setting"
         subtitle="Permanently immute a setting of the given token."
@@ -84,6 +90,7 @@
         v-if="tokenPrivileges('revoke')"
         bgClass="bg-success"
         accordionGroup="accordion"
+        :slotMinHeight="480"
         :requestIcon="faMask"
         title="Revoke Token from User"
         subtitle="Remove tokens from a one account and send them to another."
@@ -95,6 +102,7 @@
         v-if="tokenPrivileges('adjustUser')"
         bgClass="bg-primary"
         accordionGroup="accordion"
+        :slotMinHeight="364"
         :requestIcon="faUserEdit"
         title="Adjust User Token Setting"
         subtitle="Freeze, Un-Freeze, Whitelist, or Un-Whitelist a user."
@@ -106,6 +114,7 @@
         v-if="tokenPrivileges('adjust_fee')"
         bgClass="bg-info"
         accordionGroup="accordion"
+        :slotMinHeight="385"
         :requestIcon="faPercentage"
         title="Adjust Token Fee"
         subtitle="Change the token fee for the given token."
@@ -117,6 +126,7 @@
         v-if="tokenPrivileges('update_issuer_info')"
         bgClass="bg-secondary"
         accordionGroup="accordion"
+        :slotMinHeight="394"
         :requestIcon="faEdit"
         title="Update Token Info"
         subtitle="Change the token information of the given token."
@@ -128,6 +138,7 @@
         v-if="tokenPrivileges('update_controller')"
         bgClass="bg-warning"
         accordionGroup="accordion"
+        :slotMinHeight="295"
         :requestIcon="faCrown"
         title="Update Controllers"
         subtitle="Add, remove, or change a controller's privileges"
@@ -139,6 +150,7 @@
         v-if="tokenPrivileges('burn')"
         bgClass="bg-danger"
         accordionGroup="accordion"
+        :slotMinHeight="290"
         :requestIcon="faFire"
         title="Burn Tokens"
         subtitle="Remove some tokens from the total supply."
@@ -150,6 +162,7 @@
         v-if="tokenPrivileges('distribute')"
         bgClass="bg-success"
         accordionGroup="accordion"
+        :slotMinHeight="385"
         :requestIcon="faArrowDown"
         title="Distribute Tokens"
         subtitle="Send tokens from the token account to a user's account."
@@ -161,6 +174,7 @@
         v-if="tokenPrivileges('withdraw_fee')"
         bgClass="bg-primary"
         accordionGroup="accordion"
+        :slotMinHeight="385"
         :requestIcon="faHandReceiving"
         title="Withdraw Fee"
         subtitle="Withdraw the token balance to a user's account."
@@ -172,6 +186,7 @@
         v-if="tokenPrivileges('withdraw_logos')"
         bgClass="bg-info"
         accordionGroup="accordion"
+        :slotMinHeight="385"
         :requestIcon="faLambda"
         title="Withdraw Logos"
         subtitle="Withdraw the Logos balance of the token account to a user's account."
@@ -197,7 +212,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import bigInt from 'big-integer'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
 import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage, faCrown } from '@fortawesome/pro-light-svg-icons'
@@ -246,10 +260,12 @@ export default {
     'withdrawLogos': () => import(/* webpackChunkName: "withdrawLogosForm" */'@/components/forge/requestForms/withdrawLogos.vue')
   },
   computed: {
-    ...mapState('forge', {
-      currentAccount: state => state.currentAccount,
-      forgeTokens: state => state.tokens
-    }),
+    forgeTokens: function () {
+      return this.$wallet.tokenAccounts
+    },
+    currentAccount: function () {
+      return this.$wallet.account
+    },
     hasFunds: function () {
       if (this.currentAccount && this.currentAccount.balance) {
         return bigInt(this.currentAccount.balance).greater(0)
@@ -261,9 +277,9 @@ export default {
       if (this.currentAccount && this.currentAccount.tokenBalances) {
         for (let tokenID in this.currentAccount.tokenBalances) {
           let forgeToken = this.forgeTokens[this.$utils.parseAccount(tokenID)]
-          if (forgeToken.fee_type === 'flat') {
+          if (forgeToken.feeType === 'flat') {
             if (bigInt(this.currentAccount.tokenBalances[tokenID])
-              .minus(bigInt(forgeToken.fee_rate)).greater(0)) {
+              .minus(bigInt(forgeToken.feeRate)).greater(0)) {
               return true
             }
           } else {
@@ -281,77 +297,43 @@ export default {
     tokenPrivileges: function (privilege) {
       if (this.forgeTokens) {
         for (let tokenAddress in this.forgeTokens) {
-          if (this.forgeTokens[tokenAddress].controllers instanceof Array) {
-            for (let controller of this.forgeTokens[tokenAddress].controllers) {
-              if (controller.account === this.currentAccount.address &&
-                controller.privileges instanceof Array) {
-                if (privilege === 'distribute' ||
-                  privilege === 'withdraw_logos' ||
-                  privilege === 'withdraw_fee' ||
-                  privilege === 'burn' ||
-                  privilege === 'update_controller' ||
-                  privilege === 'update_issuer_info') {
-                  if (controller.privileges.indexOf(privilege) > -1) return true
-                } else if (this.forgeTokens[tokenAddress].settings instanceof Array) {
-                  if (privilege === 'adjust_fee' ||
-                    privilege === 'revoke' ||
-                    privilege === 'issuance') {
-                    if (controller.privileges.indexOf(privilege) > -1 &&
-                      this.forgeTokens[tokenAddress].settings.indexOf(privilege) > -1) {
-                      return true
-                    }
-                  } else if (privilege === 'adjustUser') {
-                    if (controller.privileges.indexOf('whitelist') > -1 &&
-                      this.forgeTokens[tokenAddress].settings.indexOf('whitelist') > -1) {
-                      return true
-                    }
-                    if (controller.privileges.indexOf('freeze') > -1 &&
-                      this.forgeTokens[tokenAddress].settings.indexOf('freeze') > -1) {
-                      return true
-                    }
-                  } else if (privilege === 'change') {
-                    if (controller.privileges.indexOf('change_issuance') > -1 &&
-                      this.forgeTokens[tokenAddress].settings.indexOf('modify_issuance') > -1) {
-                      return true
-                    }
-                    if (controller.privileges.indexOf('change_revoke') > -1 &&
-                      this.forgeTokens[tokenAddress].settings.indexOf('modify_revoke') > -1) {
-                      return true
-                    }
-                    if (controller.privileges.indexOf('change_freeze') > -1 &&
-                      this.forgeTokens[tokenAddress].settings.indexOf('modify_freeze') > -1) {
-                      return true
-                    }
-                    if (controller.privileges.indexOf('change_adjust_fee') > -1 &&
-                      this.forgeTokens[tokenAddress].settings.indexOf('modify_adjust_fee') > -1) {
-                      return true
-                    }
-                    if (controller.privileges.indexOf('change_whitelist') > -1 &&
-                      this.forgeTokens[tokenAddress].settings.indexOf('modify_whitelist') > -1) {
-                      return true
-                    }
-                  } else if (privilege === 'modify') {
-                    if (controller.privileges.indexOf('change_modify_issuance') > -1 &&
-                      this.forgeTokens[tokenAddress].settings.indexOf('modify_issuance') > -1) {
-                      return true
-                    }
-                    if (controller.privileges.indexOf('change_modify_revoke') > -1 &&
-                      this.forgeTokens[tokenAddress].settings.indexOf('modify_revoke') > -1) {
-                      return true
-                    }
-                    if (controller.privileges.indexOf('change_modify_freeze') > -1 &&
-                      this.forgeTokens[tokenAddress].settings.indexOf('modify_freeze') > -1) {
-                      return true
-                    }
-                    if (controller.privileges.indexOf('change_modify_adjust_fee') > -1 &&
-                      this.forgeTokens[tokenAddress].settings.indexOf('modify_adjust_fee') > -1) {
-                      return true
-                    }
-                    if (controller.privileges.indexOf('change_modify_whitelist') > -1 &&
-                      this.forgeTokens[tokenAddress].settings.indexOf('modify_whitelist') > -1) {
-                      return true
-                    }
-                  }
+          let token = this.forgeTokens[tokenAddress]
+          for (let controllerAddress in token.controllers) {
+            let controller = token.controllers[controllerAddress]
+            if (controller.account === this.currentAccount.address) {
+              if (privilege === 'distribute' ||
+                privilege === 'withdraw_logos' ||
+                privilege === 'withdraw_fee' ||
+                privilege === 'burn' ||
+                privilege === 'update_controller' ||
+                privilege === 'update_issuer_info') {
+                return controller.privileges[privilege]
+              } else {
+                if (privilege === 'adjust_fee' ||
+                  privilege === 'revoke' ||
+                  privilege === 'issuance') {
+                  return controller.privileges[privilege] && token.settings[privilege]
+                } else if (privilege === 'adjustUser') {
+                  return (
+                    (controller.privileges.whitelist && token.settings.whitelist) ||
+                    (controller.privileges.freeze && token.settings.freeze)
+                  )
+                } else if (privilege === 'change') {
+                  return (
+                    (controller.privileges.change_issuance && token.settings.modify_issuance) ||
+                    (controller.privileges.change_revoke && token.settings.modify_revoke) ||
+                    (controller.privileges.change_freeze && token.settings.modify_freeze) ||
+                    (controller.privileges.change_adjust_fee && token.settings.modify_adjust_fee) ||
+                    (controller.privileges.change_whitelist && token.settings.modify_whitelist)
+                  )
+                } else if (privilege === 'modify') {
+                  return (
+                    (controller.privileges.change_modify_issuance && token.settings.modify_issuance) ||
+                    (controller.privileges.change_modify_revoke && token.settings.modify_revoke) ||
+                    (controller.privileges.change_modify_freeze && token.settings.modify_freeze) ||
+                    (controller.privileges.change_modify_adjust_fee && token.settings.modify_adjust_fee) ||
+                    (controller.privileges.change_modify_whitelist && token.settings.modify_whitelist)
+                  )
                 }
               }
             }

@@ -60,7 +60,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 
@@ -78,15 +77,20 @@ export default {
   components: {
     'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
     'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
+    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback'),
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    ...mapState('forge', {
-      forgeAccounts: state => state.accounts,
-      forgeTokens: state => state.tokens,
-      currentAccount: state => state.currentAccount
-    }),
+    forgeAccounts: function () {
+      return this.$wallet.accountsObject
+    },
+    forgeTokens: function () {
+      return this.$wallet.tokenAccounts
+    },
+    currentAccount: function () {
+      return this.$wallet.account
+    },
     combinedAccounts: function () {
       let forgeAccounts = cloneDeep(this.forgeAccounts)
       let forgeTokens = []

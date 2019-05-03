@@ -43,9 +43,9 @@ export default {
     ...mapState('settings', {
       requestURL: state => state.requestURL
     }),
-    ...mapState('forge', {
-      currentAccount: state => state.currentAccount
-    })
+    currentAccount: function () {
+      return this.$wallet.account
+    }
   },
   methods: {
     requestFaucet () {

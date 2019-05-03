@@ -9,7 +9,7 @@
         id="tokenSelector"
         v-model="selectedToken"
         required
-        track-by="tokenAccount"
+        track-by="address"
         label="name"
         :custom-label="nameWithAddress"
         :options="withdrawableTokens"
@@ -18,10 +18,10 @@
         placeholder="Search for a token"
       >
         <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.tokenAccount">
+          <span v-if="option.name !== option.address">
             <strong>{{ option.name }}</strong>  -
           </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.tokenAccount" />
+          <LogosAddress :inactive="true" :force="true" :address="option.address" />
         </template>
       </Multiselect>
       <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
@@ -96,7 +96,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 export default {
@@ -114,15 +113,20 @@ export default {
   components: {
     'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
     'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
+    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback'),
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    ...mapState('forge', {
-      forgeAccounts: state => state.accounts,
-      forgeTokens: state => state.tokens,
-      currentAccount: state => state.currentAccount
-    }),
+    forgeAccounts: function () {
+      return this.$wallet.accountsObject
+    },
+    forgeTokens: function () {
+      return this.$wallet.tokenAccounts
+    },
+    currentAccount: function () {
+      return this.$wallet.account
+    },
     isValidAmount: function () {
       if (this.transaction.amount === '') return null
       if (!this.selectedToken) return null
@@ -145,13 +149,12 @@ export default {
     withdrawableTokens: function () {
       let tokens = []
       for (let tokenAddress in this.forgeTokens) {
-        if (this.forgeTokens[tokenAddress].controllers instanceof Array) {
-          for (let controller of this.forgeTokens[tokenAddress].controllers) {
-            if (controller.account === this.currentAccount.address &&
-              controller.privileges instanceof Array &&
-              controller.privileges.indexOf('withdraw_logos') > -1) {
-              tokens.push(this.forgeTokens[tokenAddress])
-            }
+        let token = this.forgeTokens[tokenAddress]
+        for (let controllerAddress in token.controllers) {
+          let controller = token.controllers[controllerAddress]
+          if (controller.account === this.currentAccount.address &&
+            controller.privileges.withdraw_logos) {
+            tokens.push(token)
           }
         }
       }
@@ -181,7 +184,7 @@ export default {
         let amountInRaw = cloneDeep(this.transaction.amount)
         amountInRaw = this.$Logos.convert.toReason(amountInRaw, 'LOGOS')
         let data = {
-          tokenAccount: this.selectedToken.tokenAccount,
+          tokenAccount: this.selectedToken.address,
           transaction: {
             destination: this.transaction.destination.address,
             amount: amountInRaw
@@ -190,8 +193,8 @@ export default {
         this.$wallet.account.createWithdrawLogosRequest(data)
       }
     },
-    nameWithAddress ({ name, tokenAccount }) {
-      return `${name} — ${tokenAccount.substring(0, 9)}...${tokenAccount.substring(59, 64)}`
+    nameWithAddress ({ name, address }) {
+      return `${name} — ${address.substring(0, 9)}...${address.substring(59, 64)}`
     },
     labelWithAddress ({ label, address }) {
       if (label !== address) {
@@ -208,21 +211,24 @@ export default {
     this.transaction.destination = this.currentAccount
   },
   watch: {
-    withdrawableTokens: function (newDistTks, oldDistTks) {
-      if (newDistTks.length > 0) {
-        let valid = false
-        for (let token of newDistTks) {
-          if (this.selectedToken && token.tokenAccount === this.selectedToken.tokenAccount) {
-            this.selectedToken = token
-            valid = true
+    withdrawableTokens: {
+      handler: function (newDistTks, oldDistTks) {
+        if (newDistTks.length > 0) {
+          let valid = false
+          for (let token of newDistTks) {
+            if (this.selectedToken && token.address === this.selectedToken.address) {
+              this.selectedToken = token
+              valid = true
+            }
           }
+          if (valid === false) {
+            this.selectedToken = newDistTks[0]
+          }
+        } else {
+          this.selectedToken = null
         }
-        if (valid === false) {
-          this.selectedToken = newDistTks[0]
-        }
-      } else {
-        this.selectedToken = null
-      }
+      },
+      deep: true
     }
   }
 }

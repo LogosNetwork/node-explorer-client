@@ -9,7 +9,7 @@
         id="destinationSelector"
         v-model="selectedToken"
         required
-        track-by="tokenAccount"
+        track-by="address"
         label="name"
         :custom-label="nameWithAddress"
         :options="sendableTokens"
@@ -18,10 +18,10 @@
         placeholder="Search for a token"
       >
         <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.tokenAccount">
+          <span v-if="option.name !== option.address">
             <strong>{{ option.name }}</strong>  -
           </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.tokenAccount" />
+          <LogosAddress :inactive="true" :force="true" :address="option.address" />
         </template>
       </Multiselect>
     </b-form-group>
@@ -87,7 +87,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 
@@ -106,15 +105,28 @@ export default {
   components: {
     'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
     'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
+    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback'),
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    ...mapState('forge', {
-      forgeAccounts: state => state.accounts,
-      forgeTokens: state => state.tokens,
-      currentAccount: state => state.currentAccount
-    }),
+    forgeAccounts: function () {
+      return this.$wallet.accountsObject
+    },
+    forgeTokens: function () {
+      return this.$wallet.tokenAccounts
+    },
+    issuerInfo: function () {
+      if (!this.selectedToken) return null
+      try {
+        return JSON.parse(this.selectedToken.issuerInfo)
+      } catch (e) {
+        return {}
+      }
+    },
+    currentAccount: function () {
+      return this.$wallet.account
+    },
     combinedAccounts: function () {
       let forgeAccounts = cloneDeep(this.forgeAccounts)
       if (this.currentAccount) delete forgeAccounts[this.currentAccount.address]
@@ -122,23 +134,23 @@ export default {
     },
     isValidAmount: function () {
       if (this.transaction.amount === '') return null
-      let token = this.selectedToken
-      if (!token) return null
-      let amountInRaw = cloneDeep(this.transaction.amount)
-      if (amountInRaw && token && token.issuerInfo &&
-        typeof token.issuerInfo.decimals !== 'undefined' &&
-        token.issuerInfo.decimals > 0) {
-        if (!/^([0-9]+(?:[.][0-9]*)?|\.[0-9]+)$/.test(amountInRaw)) return false
-        amountInRaw = this.$Logos.convert.fromTo(amountInRaw, token.issuerInfo.decimals, 0)
+      if (!this.selectedToken) return null
+      let amountInRaw = null
+      if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined' &&
+        this.issuerInfo.decimals > 0) {
+        if (!/^([0-9]+(?:[.][0-9]*)?|\.[0-9]+)$/.test(this.transaction.amount)) return false
+        amountInRaw = this.$Logos.convert.fromTo(this.transaction.amount, this.issuerInfo.decimals, 0)
       } else {
+        amountInRaw = this.transaction.amount
         if (!/^([0-9]+)$/.test(amountInRaw)) return false
       }
-      if (token.fee_type === 'flat') {
-        return (bigInt(this.currentAccount.tokenBalances[this.$utils.keyFromAccount(token.tokenAccount)])
-          .minus(bigInt(token.fee_rate))
+      if (amountInRaw === null) return false
+      if (this.selectedToken.feeType === 'flat') {
+        return (bigInt(this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.address)])
+          .minus(bigInt(this.selectedToken.feeRate))
           .greaterOrEquals(bigInt(amountInRaw)))
       } else {
-        return (bigInt(this.currentAccount.tokenBalances[this.$utils.keyFromAccount(token.tokenAccount)])
+        return (bigInt(this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.address)])
           .greaterOrEquals(bigInt(amountInRaw)))
       }
     },
@@ -147,9 +159,9 @@ export default {
       if (this.currentAccount && this.currentAccount.tokenBalances) {
         for (let tokenID in this.currentAccount.tokenBalances) {
           let forgeToken = this.forgeTokens[this.$utils.parseAccount(tokenID)]
-          if (forgeToken.fee_type === 'flat') {
+          if (forgeToken.feeType === 'flat') {
             if (bigInt(this.currentAccount.tokenBalances[tokenID])
-              .minus(bigInt(forgeToken.fee_rate)).greater(0)) {
+              .minus(bigInt(forgeToken.feeRate)).greater(0)) {
               tokens.push(forgeToken)
             }
           } else {
@@ -164,12 +176,12 @@ export default {
     availableToSend: function () {
       if (this.selectedToken) {
         let amount = null
-        let amountInBaseUnit = this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.tokenAccount)]
-        if (this.selectedToken.fee_type === 'flat') {
-          amountInBaseUnit = bigInt(amountInBaseUnit).minus(bigInt(this.selectedToken.fee_rate)).toString()
+        let amountInBaseUnit = this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.address)]
+        if (this.selectedToken.feeType === 'flat') {
+          amountInBaseUnit = bigInt(amountInBaseUnit).minus(bigInt(this.selectedToken.feeRate)).toString()
         }
-        if (this.selectedToken.issuerInfo && typeof this.selectedToken.issuerInfo.decimals !== 'undefined') {
-          amount = this.$Logos.convert.fromTo(amountInBaseUnit, 0, this.selectedToken.issuerInfo.decimals)
+        if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined') {
+          amount = this.$Logos.convert.fromTo(amountInBaseUnit, 0, this.issuerInfo.decimals)
           return `${amount} ${this.selectedToken.symbol} are available to send`
         } else {
           amount = amountInBaseUnit
@@ -192,18 +204,18 @@ export default {
         this.transaction.amount &&
         this.transaction.destination.address.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
         let amountInBaseUnit = null
-        if (this.selectedToken.issuerInfo && typeof this.selectedToken.issuerInfo.decimals !== 'undefined') {
-          amountInBaseUnit = this.$Logos.convert.fromTo(this.transaction.amount, this.selectedToken.issuerInfo.decimals, 0)
+        if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined') {
+          amountInBaseUnit = this.$Logos.convert.fromTo(this.transaction.amount, this.issuerInfo.decimals, 0)
         } else {
           amountInBaseUnit = this.transaction.amount
         }
         // Check if target account is open?
-        if (this.selectedToken.fee_type === 'flat') {
-          if (bigInt(this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.tokenAccount)])
-            .minus(bigInt(this.selectedToken.fee_rate))
+        if (this.selectedToken.feeType === 'flat') {
+          if (bigInt(this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.address)])
+            .minus(bigInt(this.selectedToken.feeRate))
             .greaterOrEquals(bigInt(amountInBaseUnit))) {
             this.$wallet.account.createTokenSendRequest(
-              this.selectedToken.tokenAccount,
+              this.selectedToken.address,
               [{
                 destination: this.transaction.destination.address,
                 amount: amountInBaseUnit
@@ -211,10 +223,10 @@ export default {
             )
           }
         } else {
-          if (bigInt(this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.tokenAccount)])
+          if (bigInt(this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.address)])
             .greaterOrEquals(bigInt(amountInBaseUnit))) {
             this.$wallet.account.createTokenSendRequest(
-              this.selectedToken.tokenAccount,
+              this.selectedToken.address,
               [{
                 destination: this.transaction.destination.address,
                 amount: amountInBaseUnit
@@ -224,8 +236,8 @@ export default {
         }
       }
     },
-    nameWithAddress ({ name, tokenAccount }) {
-      return `${name} — ${tokenAccount.substring(0, 9)}...${tokenAccount.substring(59, 64)}`
+    nameWithAddress ({ name, address }) {
+      return `${name} — ${address.substring(0, 9)}...${address.substring(59, 64)}`
     },
     labelWithAddress ({ label, address }) {
       if (label !== address) {
@@ -244,21 +256,24 @@ export default {
     }
   },
   watch: {
-    sendableTokens: function (newTks, oldTks) {
-      if (newTks.length > 0) {
-        let valid = false
-        for (let token of newTks) {
-          if (this.selectedToken && token.tokenAccount === this.selectedToken.tokenAccount) {
-            this.selectedToken = token
-            valid = true
+    sendableTokens: {
+      handler: function (newTks, oldTks) {
+        if (newTks.length > 0) {
+          let valid = false
+          for (let token of newTks) {
+            if (this.selectedToken && token.address === this.selectedToken.address) {
+              this.selectedToken = token
+              valid = true
+            }
           }
+          if (valid === false) {
+            this.selectedToken = newTks[0]
+          }
+        } else {
+          this.selectedToken = null
         }
-        if (valid === false) {
-          this.selectedToken = newTks[0]
-        }
-      } else {
-        this.selectedToken = null
-      }
+      },
+      deep: true
     }
   }
 }

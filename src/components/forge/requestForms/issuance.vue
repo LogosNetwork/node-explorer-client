@@ -323,10 +323,12 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import Vue from 'vue'
 import bigInt from 'big-integer'
 import cloneDeep from 'lodash.clonedeep'
 import { faQuestionCircle } from '@fortawesome/pro-light-svg-icons'
+import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
+Vue.directive('b-tooltip', vBTooltip)
 const urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/
 export default {
   name: 'issueTokenForm',
@@ -452,9 +454,9 @@ export default {
   components: {
     'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
     'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
+    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback'),
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect'),
-    'b-form-select': () => import(/* webpackChunkName: "b-form-select" */'bootstrap-vue/es/components/form-select/form-select'),
     'b-form-checkbox-group': () => import(/* webpackChunkName: "b-form-checkbox-group" */'bootstrap-vue/es/components/form-checkbox/form-checkbox-group'),
     'b-form-checkbox': () => import(/* webpackChunkName: "b-form-checkbox" */'bootstrap-vue/es/components/form-checkbox/form-checkbox')
   },
@@ -462,13 +464,14 @@ export default {
     this.tokenOptions.controllers[0].account = this.currentAccount
   },
   computed: {
-    ...mapState('forge', {
-      forgeAccounts: state => state.accounts,
-      currentAccount: state => state.currentAccount
-    }),
+    forgeAccounts: function () {
+      return this.$wallet.accountsObject
+    },
+    currentAccount: function () {
+      return this.$wallet.account
+    },
     combinedAccounts: function () {
-      let forgeAccounts = cloneDeep(this.forgeAccounts)
-      return Array.from(Object.values(forgeAccounts)).concat(this.accounts)
+      return Array.from(Object.values(this.forgeAccounts)).concat(this.accounts)
     },
     validName: function () {
       return this.$utils.isAlphanumericExtended(this.tokenOptions.name) && this.$utils.byteCount(this.tokenOptions.name) <= 32

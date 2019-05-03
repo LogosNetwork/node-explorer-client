@@ -9,7 +9,7 @@
         id="destinationSelector"
         v-model="selectedToken"
         required
-        track-by="tokenAccount"
+        track-by="address"
         label="name"
         :custom-label="nameWithAddress"
         :options="adjustableTokens"
@@ -18,10 +18,10 @@
         placeholder="Search for a token"
       >
         <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.tokenAccount">
+          <span v-if="option.name !== option.address">
             <strong>{{ option.name }}</strong>  -
           </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.tokenAccount" />
+          <LogosAddress :inactive="true" :force="true" :address="option.address" />
         </template>
       </Multiselect>
       <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
@@ -103,8 +103,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 export default {
   name: 'adjustUserStatusForm',
@@ -123,34 +121,39 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    ...mapState('forge', {
-      forgeAccounts: state => state.accounts,
-      forgeTokens: state => state.tokens,
-      currentAccount: state => state.currentAccount
-    }),
+    forgeAccounts: function () {
+      return this.$wallet.accountsObject
+    },
+    forgeTokens: function () {
+      return this.$wallet.tokenAccounts
+    },
+    currentAccount: function () {
+      return this.$wallet.account
+    },
     sufficientBalance: function () {
       if (!this.selectedToken) return null
       return bigInt(this.selectedToken.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
     },
     combinedAccounts: function () {
-      let forgeAccounts = cloneDeep(this.forgeAccounts)
-      return Array.from(Object.values(forgeAccounts)).concat(this.accounts)
+      let forgeTokens = []
+      for (let token in this.forgeTokens) {
+        if (this.selectedToken && this.selectedToken.address !== token) {
+          forgeTokens.push({ label: `${this.forgeTokens[token].name} (${this.forgeTokens[token].symbol})`, address: token })
+        }
+      }
+      return Array.from(Object.values(this.forgeAccounts)).concat(this.accounts).concat(forgeTokens)
     },
     adjustableTokens: function () {
       let tokens = []
       for (let tokenAddress in this.forgeTokens) {
-        if (this.forgeTokens[tokenAddress].controllers instanceof Array) {
-          for (let controller of this.forgeTokens[tokenAddress].controllers) {
-            if (controller.account === this.currentAccount.address) {
-              if (this.forgeTokens[tokenAddress].settings.includes('whitelist') &&
-              controller.privileges instanceof Array &&
-              controller.privileges.includes('whitelist')) {
-                tokens.push(this.forgeTokens[tokenAddress])
-              } else if (this.forgeTokens[tokenAddress].settings.includes('freeze') &&
-              controller.privileges instanceof Array &&
-              controller.privileges.includes('freeze')) {
-                tokens.push(this.forgeTokens[tokenAddress])
-              }
+        for (let controller in this.forgeTokens[tokenAddress].controllers) {
+          if (this.forgeTokens[tokenAddress].controllers[controller].account === this.currentAccount.address) {
+            if (this.forgeTokens[tokenAddress].settings.whitelist &&
+              this.forgeTokens[tokenAddress].controllers[controller].privileges.whitelist) {
+              tokens.push(this.forgeTokens[tokenAddress])
+            } else if (this.forgeTokens[tokenAddress].settings.freeze &&
+              this.forgeTokens[tokenAddress].controllers[controller].privileges.freeze) {
+              tokens.push(this.forgeTokens[tokenAddress])
             }
           }
         }
@@ -160,11 +163,10 @@ export default {
     adjustableStatuses: function () {
       let statuses = []
       if (this.selectedToken) {
-        for (let controller of this.selectedToken.controllers) {
-          if (controller.account === this.currentAccount.address) {
-            if (this.selectedToken.settings.includes('whitelist') &&
-              controller.privileges instanceof Array &&
-              controller.privileges.includes('whitelist')) {
+        for (let controller in this.selectedToken.controllers) {
+          if (this.selectedToken.controllers[controller].account === this.currentAccount.address) {
+            if (this.selectedToken.settings.whitelist &&
+              this.selectedToken.controllers[controller].privileges.whitelist) {
               statuses.push({
                 label: 'Whitelist',
                 action: 'whitelisted'
@@ -174,9 +176,8 @@ export default {
                 action: 'not_whitelisted'
               })
             }
-            if (this.selectedToken.settings.includes('freeze') &&
-              controller.privileges instanceof Array &&
-              controller.privileges.includes('freeze')) {
+            if (this.selectedToken.settings.freeze &&
+              this.selectedToken.controllers[controller].privileges.freeze) {
               statuses.push({
                 label: 'Freeze',
                 action: 'frozen'
@@ -203,14 +204,14 @@ export default {
     createAdjustUserStatus () {
       if (this.sufficientBalance && this.selectedToken && this.status && this.account) {
         this.$wallet.account.createAdjustUserStatusRequest({
-          tokenAccount: this.selectedToken.tokenAccount,
+          tokenAccount: this.selectedToken.address,
           account: this.account.address,
           status: this.status.action
         })
       }
     },
-    nameWithAddress ({ name, tokenAccount }) {
-      return `${name} — ${tokenAccount.substring(0, 9)}...${tokenAccount.substring(59, 64)}`
+    nameWithAddress ({ name, address }) {
+      return `${name} — ${address.substring(0, 9)}...${address.substring(59, 64)}`
     },
     labelWithAddress ({ label, address }) {
       if (label !== address) {
@@ -224,24 +225,28 @@ export default {
     if (this.adjustableTokens.length > 0) {
       this.selectedToken = this.adjustableTokens[0]
     }
+    if (this.adjustableStatuses.length > 0) {
+      this.status = this.adjustableStatuses[0]
+    }
     this.account = this.currentAccount
   },
   watch: {
-    adjustableTokens: function (newTks, oldTks) {
-      if (newTks.length > 0) {
-        let valid = false
-        for (let token of newTks) {
-          if (this.selectedToken && token.tokenAccount === this.selectedToken.tokenAccount) {
-            this.selectedToken = token
-            valid = true
+    adjustableTokens: {
+      handler: function (newTks, oldTks) {
+        if (newTks.length > 0) {
+          let valid = false
+          for (let token of newTks) {
+            if (this.selectedToken && token.address === this.selectedToken.address) {
+              this.selectedToken = token
+              valid = true
+            }
           }
+          if (!valid) this.selectedToken = newTks[0]
+        } else {
+          this.selectedToken = null
         }
-        if (valid === false) {
-          this.selectedToken = newTks[0]
-        }
-      } else {
-        this.selectedToken = null
-      }
+      },
+      deep: true
     }
   }
 }

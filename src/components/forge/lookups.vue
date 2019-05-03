@@ -3,6 +3,7 @@
     <accordion
       bgClass="bg-info"
       accordionGroup="lookupAccordion"
+      :slotMinHeight="197"
       :requestIcon="faInfo"
       title="Account & Token Info"
       subtitle="Lookup the logos balance, token balances, and frontier of an account."
@@ -13,6 +14,7 @@
     <accordion
       bgClass="bg-warning"
       accordionGroup="lookupAccordion"
+      :slotMinHeight="313"
       :requestIcon="faHistory"
       title="Account & Token History"
       subtitle="History of all requests sent to or from the account."
@@ -23,6 +25,7 @@
     <accordion
       bgClass="bg-primary"
       accordionGroup="lookupAccordion"
+      :slotMinHeight="197"
       :requestIcon="faCube"
       title="Block & Request Information"
       subtitle="Info on a Request, Request Block, Micro Epoch, or Epoch with a given hash."
@@ -63,6 +66,7 @@
     <accordion
       bgClass="bg-primary"
       accordionGroup="lookupAccordion"
+      :slotMinHeight="265"
       :requestIcon="faEquals"
       title="Validate Work"
       subtitle="Validates if the given work is valid for the given hash."

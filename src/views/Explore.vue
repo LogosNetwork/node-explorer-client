@@ -5,7 +5,7 @@
       <h2 class="d-none d-sm-block" v-t="'explore_cta'"></h2>
       <b-form id="addressForm" class="mb-3">
         <label class="sr-only" id="searchLabel" for="address" v-t="'searchPlaceholder'"></label>
-        <b-input aria-describedby="searchLabel inputLiveFeedback" @keydown.native="submitSearch" id="address" type="text" :state="searchState" :placeholder="$t('searchPlaceholder')" v-model="address" />
+        <b-form-input aria-describedby="searchLabel inputLiveFeedback" @keydown.native="submitSearch" id="address" type="text" :state="searchState" :placeholder="$t('searchPlaceholder')" v-model="address" />
         <b-form-invalid-feedback id="inputLiveFeedback">
           Enter a Logos address or a request hash
         </b-form-invalid-feedback>
@@ -125,7 +125,10 @@ Vue.directive('highlight', {
 export default {
   name: 'explore',
   components: {
-    'request': () => import(/* webpackChunkName: "RequestWrapper" */ '@/components/requests/request.vue')
+    'request': () => import(/* webpackChunkName: "RequestWrapper" */ '@/components/requests/request.vue'),
+    'b-form': () => import(/* webpackChunkName: "b-form" */'bootstrap-vue/es/components/form/form'),
+    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
+    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback')
   },
   data () {
     return {

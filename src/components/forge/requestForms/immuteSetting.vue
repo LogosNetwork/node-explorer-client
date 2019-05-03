@@ -9,7 +9,7 @@
         id="tokenSelector"
         v-model="selectedToken"
         required
-        track-by="tokenAccount"
+        track-by="address"
         label="name"
         :custom-label="nameWithAddress"
         :options="immutableTokens"
@@ -18,10 +18,10 @@
         placeholder="Search for a token"
       >
         <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.tokenAccount">
+          <span v-if="option.name !== option.address">
             <strong>{{ option.name }}</strong>  -
           </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.tokenAccount" />
+          <LogosAddress :inactive="true" :force="true" :address="option.address" />
         </template>
       </Multiselect>
       <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
@@ -74,7 +74,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import bigInt from 'big-integer'
 export default {
   name: 'immuteSettingForm',
@@ -91,11 +90,15 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    ...mapState('forge', {
-      forgeAccounts: state => state.accounts,
-      forgeTokens: state => state.tokens,
-      currentAccount: state => state.currentAccount
-    }),
+    forgeAccounts: function () {
+      return this.$wallet.accountsObject
+    },
+    forgeTokens: function () {
+      return this.$wallet.tokenAccounts
+    },
+    currentAccount: function () {
+      return this.$wallet.account
+    },
     sufficientBalance: function () {
       if (!this.selectedToken) return null
       return bigInt(this.selectedToken.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
@@ -103,30 +106,25 @@ export default {
     immutableTokens: function () {
       let tokens = []
       for (let tokenAddress in this.forgeTokens) {
-        if (this.forgeTokens[tokenAddress].controllers instanceof Array) {
-          for (let controller of this.forgeTokens[tokenAddress].controllers) {
-            if (controller.account === this.currentAccount.address) {
-              if (this.forgeTokens[tokenAddress].settings.includes('modify_issuance') &&
-              controller.privileges instanceof Array &&
-              controller.privileges.includes('change_modify_issuance')) {
-                tokens.push(this.forgeTokens[tokenAddress])
-              } else if (this.forgeTokens[tokenAddress].settings.includes('modify_revoke') &&
-              controller.privileges instanceof Array &&
-              controller.privileges.includes('change_modify_revoke')) {
-                tokens.push(this.forgeTokens[tokenAddress])
-              } else if (this.forgeTokens[tokenAddress].settings.includes('modify_freeze') &&
-              controller.privileges instanceof Array &&
-              controller.privileges.includes('change_modify_freeze')) {
-                tokens.push(this.forgeTokens[tokenAddress])
-              } else if (this.forgeTokens[tokenAddress].settings.includes('modify_adjust_fee') &&
-              controller.privileges instanceof Array &&
-              controller.privileges.includes('change_modify_adjust_fee')) {
-                tokens.push(this.forgeTokens[tokenAddress])
-              } else if (this.forgeTokens[tokenAddress].settings.includes('modify_whitelist') &&
-              controller.privileges instanceof Array &&
-              controller.privileges.includes('change_modify_whitelist')) {
-                tokens.push(this.forgeTokens[tokenAddress])
-              }
+        let token = this.forgeTokens[tokenAddress]
+        for (let controllerAddress in token.controllers) {
+          let controller = token.controllers[controllerAddress]
+          if (controller.account === this.currentAccount.address) {
+            if (token.settings.modify_issuance &&
+              controller.privileges.change_modify_issuance) {
+              tokens.push(token)
+            } else if (token.settings.modify_revoke &&
+              controller.privileges.change_modify_revoke) {
+              tokens.push(token)
+            } else if (token.settings.modify_freeze &&
+              controller.privileges.change_modify_freeze) {
+              tokens.push(token)
+            } else if (token.settings.modify_adjust_fee &&
+              controller.privileges.change_modify_adjust_fee) {
+              tokens.push(token)
+            } else if (token.settings.modify_whitelist &&
+              controller.privileges.change_modify_whitelist) {
+              tokens.push(token)
             }
           }
         }
@@ -136,15 +134,15 @@ export default {
     immutableDescription: function () {
       if (this.setting) {
         if (this.setting.action === 'issuance') {
-          return `Immuting issuance will lock the issuance setting to ${this.selectedToken.settings.includes('issuance')}`
+          return `Immuting issuance will lock the issuance setting to ${this.selectedToken.settings.issuance}`
         } else if (this.setting.action === 'revoke') {
-          return `Immuting revoke will lock the revoke setting to ${this.selectedToken.settings.includes('revoke')}`
+          return `Immuting revoke will lock the revoke setting to ${this.selectedToken.settings.revoke}`
         } else if (this.setting.action === 'freeze') {
-          return `Immuting freeze will lock the freeze setting to ${this.selectedToken.settings.includes('freeze')}`
+          return `Immuting freeze will lock the freeze setting to ${this.selectedToken.settings.freeze}`
         } else if (this.setting.action === 'adjust_fee') {
-          return `Immuting fee adjustments will lock the fee adjustment setting to ${this.selectedToken.settings.includes('adjust_fee')}`
+          return `Immuting fee adjustments will lock the fee adjustment setting to ${this.selectedToken.settings.adjust_fee}`
         } else if (this.setting.action === 'whitelist') {
-          return `Immuting whitelist will lock the whitelist setting to ${this.selectedToken.settings.includes('whitelist')}`
+          return `Immuting whitelist will lock the whitelist setting to ${this.selectedToken.settings.whitelist}`
         }
       }
       return null
@@ -152,44 +150,40 @@ export default {
     immutableSettings: function () {
       let settings = []
       if (this.selectedToken) {
-        for (let controller of this.selectedToken.controllers) {
+        for (let controllerAddress in this.selectedToken.controllers) {
+          let controller = this.selectedToken.controllers[controllerAddress]
           if (controller.account === this.currentAccount.address) {
-            if (this.selectedToken.settings.includes('modify_issuance') &&
-              controller.privileges instanceof Array &&
-              controller.privileges.includes('change_modify_issuance')) {
+            if (this.selectedToken.settings.modify_issuance &&
+              controller.privileges.change_modify_issuance) {
               settings.push({
                 label: 'Immute Issuance',
                 action: 'issuance'
               })
             }
-            if (this.selectedToken.settings.includes('modify_revoke') &&
-              controller.privileges instanceof Array &&
-              controller.privileges.includes('change_modify_revoke')) {
+            if (this.selectedToken.settings.modify_revoke &&
+              controller.privileges.change_modify_revoke) {
               settings.push({
                 label: 'Immute Revoke',
                 action: 'revoke'
               })
             }
-            if (this.selectedToken.settings.includes('modify_freeze') &&
-              controller.privileges instanceof Array &&
-              controller.privileges.includes('change_modify_freeze')) {
+            if (this.selectedToken.settings.modify_freeze &&
+              controller.privileges.change_modify_freeze) {
               settings.push({
                 label: 'Immute Freeze',
                 action: 'freeze',
                 value: false
               })
             }
-            if (this.selectedToken.settings.includes('modify_adjust_fee') &&
-              controller.privileges instanceof Array &&
-              controller.privileges.includes('change_modify_adjust_fee')) {
+            if (this.selectedToken.settings.modify_adjust_fee &&
+              controller.privileges.change_modify_adjust_fee) {
               settings.push({
                 label: 'Immute Fee Adjustments',
                 action: 'adjust_fee'
               })
             }
-            if (this.selectedToken.settings.includes('modify_whitelist') &&
-              controller.privileges instanceof Array &&
-              controller.privileges.includes('change_modify_whitelist')) {
+            if (this.selectedToken.settings.modify_whitelist &&
+              controller.privileges.change_modify_whitelist) {
               settings.push({
                 label: 'Immute Whitelist',
                 action: 'whitelist'
@@ -205,13 +199,13 @@ export default {
     createImmuteSetting () {
       if (this.sufficientBalance && this.selectedToken && this.setting) {
         this.$wallet.account.createImmuteSettingRequest({
-          tokenAccount: this.selectedToken.tokenAccount,
+          tokenAccount: this.selectedToken.address,
           setting: this.setting.action
         })
       }
     },
-    nameWithAddress ({ name, tokenAccount }) {
-      return `${name} — ${tokenAccount.substring(0, 9)}...${tokenAccount.substring(59, 64)}`
+    nameWithAddress ({ name, address }) {
+      return `${name} — ${address.substring(0, 9)}...${address.substring(59, 64)}`
     }
   },
   created: function () {
@@ -223,31 +217,34 @@ export default {
     }
   },
   watch: {
-    immutableTokens: function (newTks, oldTks) {
-      if (newTks.length > 0) {
-        let foundToken = false
-        for (let token of newTks) {
-          if (this.selectedToken && token.tokenAccount === this.selectedToken.tokenAccount) {
-            this.selectedToken = token
-            let foundSetting = false
-            for (let setting of this.immutableSettings) {
-              if (this.setting && this.setting.action === setting.action) {
-                this.setting = setting
-                foundSetting = true
+    immutableTokens: {
+      handler: function (newTks, oldTks) {
+        if (newTks.length > 0) {
+          let foundToken = false
+          for (let token of newTks) {
+            if (this.selectedToken && token.tokenAccount === this.selectedToken.tokenAccount) {
+              this.selectedToken = token
+              let foundSetting = false
+              for (let setting of this.immutableSettings) {
+                if (this.setting && this.setting.action === setting.action) {
+                  this.setting = setting
+                  foundSetting = true
+                }
               }
+              if (!foundSetting) {
+                this.setting = this.immutableSettings[0]
+              }
+              foundToken = true
             }
-            if (!foundSetting) {
-              this.setting = this.immutableSettings[0]
-            }
-            foundToken = true
           }
+          if (foundToken === false) {
+            this.selectedToken = newTks[0]
+          }
+        } else {
+          this.selectedToken = null
         }
-        if (foundToken === false) {
-          this.selectedToken = newTks[0]
-        }
-      } else {
-        this.selectedToken = null
-      }
+      },
+      deep: true
     }
   }
 }

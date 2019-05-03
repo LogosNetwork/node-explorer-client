@@ -4,7 +4,7 @@
       <b-row class="text-left pt-5">
         <b-col cols="12" class="mt-3">
           <h3 class="text-left">Micro Epoch #{{microEpoch.sequence}}</h3>
-          <code style="background-color:#FFF;color:#ff3860;padding:6px">{{microEpoch.hash}}</code>
+          <code>{{microEpoch.hash}}</code>
           <h4 v-if="error" class="pt-3" style="color:red">This micro epoch does not exist</h4>
         </b-col>
       </b-row>
@@ -98,7 +98,8 @@ let fields = [
 ]
 export default {
   components: {
-    'codepad': () => import(/* webpackChunkName: "Codepad" */'@/components/codepad.vue')
+    'codepad': () => import(/* webpackChunkName: "Codepad" */'@/components/codepad.vue'),
+    'b-table': () => import(/* webpackChunkName: "b-table" */'bootstrap-vue/es/components/table/table')
   },
   computed: {
     ...mapState('microEpoch', {
@@ -131,4 +132,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+code {
+  padding: 6px;
+  background-color: #FFF;
+}
 </style>

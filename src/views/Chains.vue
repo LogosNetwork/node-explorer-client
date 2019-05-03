@@ -142,7 +142,10 @@ Vue.use(infiniteScroll)
 export default {
   name: 'explore',
   components: {
-    'codepad': () => import(/* webpackChunkName: "Codepad" */ '@/components/codepad.vue')
+    'codepad': () => import(/* webpackChunkName: "Codepad" */ '@/components/codepad.vue'),
+    'b-tabs': () => import(/* webpackChunkName: "b-tabs" */'bootstrap-vue/es/components/tabs/tabs'),
+    'b-tab': () => import(/* webpackChunkName: "b-tab" */'bootstrap-vue/es/components/tabs/tab'),
+    'b-form-select': () => import(/* webpackChunkName: "b-form-select" */'bootstrap-vue/es/components/form-select/form-select')
   },
   computed: {
     ...mapState('settings', {

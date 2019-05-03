@@ -9,7 +9,7 @@
         id="tokenSelector"
         v-model="selectedToken"
         required
-        track-by="tokenAccount"
+        track-by="address"
         label="name"
         :custom-label="nameWithAddress"
         :options="revokableTokens"
@@ -18,10 +18,10 @@
         placeholder="Search for a token"
       >
         <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.tokenAccount">
+          <span v-if="option.name !== option.address">
             <strong>{{ option.name }}</strong>  -
           </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.tokenAccount" />
+          <LogosAddress :inactive="true" :force="true" :address="option.address" />
         </template>
       </Multiselect>
       <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
@@ -127,8 +127,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 export default {
   name: 'revokeForm',
@@ -146,15 +144,28 @@ export default {
   components: {
     'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
     'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
+    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback'),
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    ...mapState('forge', {
-      forgeAccounts: state => state.accounts,
-      forgeTokens: state => state.tokens,
-      currentAccount: state => state.currentAccount
-    }),
+    forgeAccounts: function () {
+      return this.$wallet.accountsObject
+    },
+    forgeTokens: function () {
+      return this.$wallet.tokenAccounts
+    },
+    issuerInfo: function () {
+      if (!this.selectedToken) return null
+      try {
+        return JSON.parse(this.selectedToken.issuerInfo)
+      } catch (e) {
+        return {}
+      }
+    },
+    currentAccount: function () {
+      return this.$wallet.account
+    },
     sufficientBalance: function () {
       if (!this.selectedToken) return null
       return bigInt(this.selectedToken.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
@@ -163,41 +174,41 @@ export default {
       if (!this.source) return false
       if (!this.source.tokenBalances) return false
       if (!this.selectedToken) return null
-      return (this.source.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.tokenAccount)])
+      return (this.source.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.address)])
     },
     isValidAmount: function () {
       if (!this.source) return null
       if (!this.selectedToken) return null
       if (this.transaction.amount === '') return null
-      let tokenBalance = this.source.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.tokenAccount)]
-      let amountInRaw = cloneDeep(this.transaction.amount)
-      if (amountInRaw && this.selectedToken && this.selectedToken.issuerInfo &&
-        typeof this.selectedToken.issuerInfo.decimals !== 'undefined' &&
-        this.selectedToken.issuerInfo.decimals > 0) {
-        if (!/^([0-9]+(?:[.][0-9]*)?|\.[0-9]+)$/.test(amountInRaw)) return false
-        amountInRaw = this.$Logos.convert.fromTo(this.transaction.amount, this.selectedToken.issuerInfo.decimals, 0)
+      let tokenBalance = this.source.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.address)]
+      let amountInRaw = null
+      if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined' &&
+        this.issuerInfo.decimals > 0) {
+        if (!/^([0-9]+(?:[.][0-9]*)?|\.[0-9]+)$/.test(this.transaction.amount)) return false
+        amountInRaw = this.$Logos.convert.fromTo(this.transaction.amount, this.issuerInfo.decimals, 0)
       } else {
+        amountInRaw = this.transaction.amount
         if (!/^([0-9]+)$/.test(amountInRaw)) return false
       }
+      if (amountInRaw === null) return false
       return (
         bigInt(amountInRaw).greater(0) &&
         bigInt(amountInRaw).lesserOrEquals(bigInt(tokenBalance))
       )
     },
     combinedAccounts: function () {
-      let forgeAccounts = cloneDeep(this.forgeAccounts)
-      return Array.from(Object.values(forgeAccounts)).concat(this.accounts)
+      return Array.from(Object.values(this.forgeAccounts)).concat(this.accounts)
     },
     revokableTokens: function () {
       let tokens = []
       for (let tokenAddress in this.forgeTokens) {
-        if (this.forgeTokens[tokenAddress].settings.includes('revoke') &&
-          this.forgeTokens[tokenAddress].controllers instanceof Array) {
-          for (let controller of this.forgeTokens[tokenAddress].controllers) {
+        let token = this.forgeTokens[tokenAddress]
+        if (token.settings.revoke) {
+          for (let controllerAddress in token.controllers) {
+            let controller = token.controllers[controllerAddress]
             if (controller.account === this.currentAccount.address &&
-              controller.privileges instanceof Array &&
-              controller.privileges.indexOf('revoke') > -1) {
-              tokens.push(this.forgeTokens[tokenAddress])
+              controller.privileges.revoke) {
+              tokens.push(token)
             }
           }
         }
@@ -207,11 +218,11 @@ export default {
     availableToRevoke: function () {
       if (this.selectedToken && this.validSource) {
         let amount = null
-        if (this.selectedToken.issuerInfo && typeof this.selectedToken.issuerInfo.decimals !== 'undefined') {
-          amount = this.$Logos.convert.fromTo(this.source.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.tokenAccount)], 0, this.selectedToken.issuerInfo.decimals)
+        if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined') {
+          amount = this.$Logos.convert.fromTo(this.source.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.address)], 0, this.issuerInfo.decimals)
           return `${amount} ${this.selectedToken.symbol} are available to revoke`
         } else {
-          amount = this.source.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.tokenAccount)]
+          amount = this.source.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.address)]
           return `${amount} base units of ${this.selectedToken.name} are available to revoke`
         }
       }
@@ -259,22 +270,21 @@ export default {
     },
     createRevoke () {
       // TODO check if destination account is open & whitelisted & not frozen
-      let amountInRaw = cloneDeep(this.transaction.amount)
-      if (amountInRaw && this.selectedToken && this.selectedToken.issuerInfo &&
-        typeof this.selectedToken.issuerInfo.decimals !== 'undefined' &&
-        this.selectedToken.issuerInfo.decimals > 0) {
-        amountInRaw = this.$Logos.convert.fromTo(this.transaction.amount, this.selectedToken.issuerInfo.decimals, 0)
-      }
+
       let data = {
-        tokenAccount: this.selectedToken.tokenAccount,
+        tokenAccount: this.selectedToken.address,
         source: this.source.address,
         transaction: {
-          destination: this.transaction.destination.address,
-          amount: amountInRaw
+          destination: this.transaction.destination.address
         }
       }
+      if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined' && this.issuerInfo.decimals > 0) {
+        data.transaction.amount = this.$Logos.convert.fromTo(this.transaction.amount, this.issuerInfo.decimals, 0)
+      } else {
+        data.transaction.amount = this.transaction.amount
+      }
       this.$wallet.account.createRevokeRequest(data)
-      let kfa = this.$utils.keyFromAccount(this.selectedToken.tokenAccount)
+      let kfa = this.$utils.keyFromAccount(this.selectedToken.address)
       for (let account of this.accounts) {
         if (account.label === account.address) {
           if (account.address === data.source) {
@@ -287,8 +297,8 @@ export default {
         }
       }
     },
-    nameWithAddress ({ name, tokenAccount }) {
-      return `${name} — ${tokenAccount.substring(0, 9)}...${tokenAccount.substring(59, 64)}`
+    nameWithAddress ({ name, address }) {
+      return `${name} — ${address.substring(0, 9)}...${address.substring(59, 64)}`
     },
     labelWithAddress ({ label, address }) {
       if (label !== address) {
@@ -305,21 +315,24 @@ export default {
     this.transaction.destination = this.currentAccount
   },
   watch: {
-    revokableTokens: function (newDistTks, oldDistTks) {
-      if (newDistTks.length > 0) {
-        let valid = false
-        for (let token of newDistTks) {
-          if (this.selectedToken && token.tokenAccount === this.selectedToken.tokenAccount) {
-            this.selectedToken = token
-            valid = true
+    revokableTokens: {
+      handler: function (newDistTks, oldDistTks) {
+        if (newDistTks.length > 0) {
+          let valid = false
+          for (let token of newDistTks) {
+            if (this.selectedToken && token.address === this.selectedToken.address) {
+              this.selectedToken = token
+              valid = true
+            }
           }
+          if (valid === false) {
+            this.selectedToken = newDistTks[0]
+          }
+        } else {
+          this.selectedToken = null
         }
-        if (valid === false) {
-          this.selectedToken = newDistTks[0]
-        }
-      } else {
-        this.selectedToken = null
-      }
+      },
+      deep: true
     }
   }
 }

@@ -9,7 +9,7 @@
         id="tokenSelector"
         v-model="selectedToken"
         required
-        track-by="tokenAccount"
+        track-by="address"
         label="name"
         :custom-label="nameWithAddress"
         :options="issuableTokens"
@@ -18,10 +18,10 @@
         placeholder="Search for a token"
       >
         <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.tokenAccount">
+          <span v-if="option.name !== option.address">
             <strong>{{ option.name }}</strong>  -
           </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.tokenAccount" />
+          <LogosAddress :inactive="true" :force="true" :address="option.address" />
         </template>
       </Multiselect>
       <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
@@ -66,7 +66,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import bigInt from 'big-integer'
 import cloneDeep from 'lodash.clonedeep'
 export default {
@@ -80,30 +79,41 @@ export default {
   components: {
     'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
     'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
+    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback'),
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    ...mapState('forge', {
-      forgeTokens: state => state.tokens,
-      currentAccount: state => state.currentAccount
-    }),
+    forgeTokens: function () {
+      return this.$wallet.tokenAccounts
+    },
+    issuerInfo: function () {
+      if (!this.selectedToken) return null
+      try {
+        return JSON.parse(this.selectedToken.issuerInfo)
+      } catch (e) {
+        return {}
+      }
+    },
+    currentAccount: function () {
+      return this.$wallet.account
+    },
     isValidAmount: function () {
       if (this.amount === '') return null
-      let token = this.selectedToken
-      if (!token) return null
-      let amountInRaw = cloneDeep(this.amount)
-      if (amountInRaw && token && token.issuerInfo &&
-        typeof token.issuerInfo.decimals !== 'undefined' &&
-        token.issuerInfo.decimals > 0) {
-        if (!/^([0-9]+(?:[.][0-9]*)?|\.[0-9]+)$/.test(amountInRaw)) return false
-        amountInRaw = this.$Logos.convert.fromTo(amountInRaw, token.issuerInfo.decimals, 0)
+      if (!this.selectedToken) return null
+      let amountInRaw = null
+      if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined' &&
+        this.issuerInfo.decimals > 0) {
+        if (!/^([0-9]+(?:[.][0-9]*)?|\.[0-9]+)$/.test(this.amount)) return false
+        amountInRaw = this.$Logos.convert.fromTo(this.amount, this.issuerInfo.decimals, 0)
       } else {
+        amountInRaw = this.amount
         if (!/^([0-9]+)$/.test(amountInRaw)) return false
       }
+      if (amountInRaw === null) return false
       return (
         bigInt(amountInRaw).greater(0) &&
-        bigInt(this.$utils.MAXUINT128).minus(bigInt(token.total_supply)).greaterOrEquals(bigInt(amountInRaw))
+        bigInt(this.$utils.MAXUINT128).minus(bigInt(this.selectedToken.totalSupply)).greaterOrEquals(bigInt(amountInRaw))
       )
     },
     sufficientBalance: function () {
@@ -111,29 +121,26 @@ export default {
       return bigInt(this.selectedToken.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
     },
     availableToIssue: function () {
-      let token = this.selectedToken
-      if (!token) return null
-      let amountInRaw = bigInt(this.$utils.MAXUINT128).minus(bigInt(token.total_supply))
-      if (amountInRaw && token && token.issuerInfo &&
-        typeof token.issuerInfo.decimals !== 'undefined' &&
-        token.issuerInfo.decimals > 0) {
-        amountInRaw = this.$Logos.convert.fromTo(amountInRaw, 0, token.issuerInfo.decimals)
-        return `You can issue an additional ${amountInRaw} ${token.symbol}`
-      } else {
-        return `You can issue an additional ${amountInRaw} base units of ${token.symbol}`
+      if (this.selectedToken) {
+        let amountInRaw = bigInt(this.$utils.MAXUINT128).minus(bigInt(this.selectedToken.totalSupply))
+        if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined') {
+          amountInRaw = this.$Logos.convert.fromTo(amountInRaw, 0, this.issuerInfo.decimals)
+          return `You can issue an additional ${amountInRaw} ${this.selectedToken.symbol}`
+        } else {
+          return `You can issue an additional ${amountInRaw} base units of ${this.selectedToken.symbol}`
+        }
       }
+      return 'Select a token first'
     },
     issuableTokens: function () {
       let tokens = []
       for (let tokenAddress in this.forgeTokens) {
-        if (this.forgeTokens[tokenAddress].controllers instanceof Array) {
-          for (let controller of this.forgeTokens[tokenAddress].controllers) {
-            if (controller.account === this.currentAccount.address) {
-              if (this.forgeTokens[tokenAddress].settings.includes('issuance') &&
-              controller.privileges instanceof Array &&
-              controller.privileges.includes('issuance')) {
-                tokens.push(this.forgeTokens[tokenAddress])
-              }
+        let token = this.forgeTokens[tokenAddress]
+        for (let controllerAddress in token.controllers) {
+          let controller = token.controllers[controllerAddress]
+          if (controller.account === this.currentAccount.address) {
+            if (token.settings.issuance && controller.privileges.issuance) {
+              tokens.push(token)
             }
           }
         }
@@ -144,22 +151,21 @@ export default {
   methods: {
     createIssueAdditional () {
       if (this.sufficientBalance && this.selectedToken && this.amount && this.isValidAmount) {
-        let token = this.selectedToken
         let amountInRaw = cloneDeep(this.amount)
-        if (amountInRaw && token && token.issuerInfo &&
-          typeof token.issuerInfo.decimals !== 'undefined' &&
-          token.issuerInfo.decimals > 0) {
-          amountInRaw = this.$Logos.convert.fromTo(amountInRaw, token.issuerInfo.decimals, 0)
+        if (amountInRaw && this.issuerInfo &&
+          typeof this.issuerInfo.decimals !== 'undefined' &&
+          this.issuerInfo.decimals > 0) {
+          amountInRaw = this.$Logos.convert.fromTo(amountInRaw, this.issuerInfo.decimals, 0)
         }
         let data = {
-          tokenAccount: this.selectedToken.tokenAccount,
+          tokenAccount: this.selectedToken.address,
           amount: amountInRaw
         }
         this.$wallet.account.createIssueAdditionalRequest(data)
       }
     },
-    nameWithAddress ({ name, tokenAccount }) {
-      return `${name} — ${tokenAccount.substring(0, 9)}...${tokenAccount.substring(59, 64)}`
+    nameWithAddress ({ name, address }) {
+      return `${name} — ${address.substring(0, 9)}...${address.substring(59, 64)}`
     }
   },
   created: function () {
@@ -168,21 +174,24 @@ export default {
     }
   },
   watch: {
-    issuableTokens: function (newTks, oldTks) {
-      if (newTks.length > 0) {
-        let valid = false
-        for (let token of newTks) {
-          if (this.selectedToken && token.tokenAccount === this.selectedToken.tokenAccount) {
-            this.selectedToken = token
-            valid = true
+    issuableTokens: {
+      handler: function (newTks, oldTks) {
+        if (newTks.length > 0) {
+          let valid = false
+          for (let token of newTks) {
+            if (this.selectedToken && token.address === this.selectedToken.address) {
+              this.selectedToken = token
+              valid = true
+            }
           }
+          if (valid === false) {
+            this.selectedToken = newTks[0]
+          }
+        } else {
+          this.selectedToken = null
         }
-        if (valid === false) {
-          this.selectedToken = newTks[0]
-        }
-      } else {
-        this.selectedToken = null
-      }
+      },
+      deep: true
     }
   }
 }

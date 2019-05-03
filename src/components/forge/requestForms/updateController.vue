@@ -9,7 +9,7 @@
         id="tokenSelector"
         v-model="selectedToken"
         required
-        track-by="tokenAccount"
+        track-by="address"
         label="name"
         :allow-empty="false"
         deselect-label="Can't remove this value"
@@ -20,10 +20,10 @@
         placeholder="Search for a token"
       >
         <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.tokenAccount">
+          <span v-if="option.name !== option.address">
             <strong>{{ option.name }}</strong>  -
           </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.tokenAccount" />
+          <LogosAddress :inactive="true" :force="true" :address="option.address" />
         </template>
       </Multiselect>
       <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
@@ -116,49 +116,49 @@
       <b-form-checkbox v-model="privileges.withdraw_logos" name="Withdraw Logos" switch>
         Withdraw Logos <span v-b-tooltip.hover :title="`Withdraw Logos allows the controller to withdraw any Logos contained in the token account`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
-      <b-form-checkbox v-if="selectedToken.settings.includes('issuance') || selectedToken.settings.includes('modify_issuance')" v-model="privileges.issuance" name="Issuance" switch>
+      <b-form-checkbox v-if="selectedToken.settings.issuance || selectedToken.settings.modify_issuance" v-model="privileges.issuance" name="Issuance" switch>
         Issuance <span v-b-tooltip.hover :title="`Issuance allows the controller to mint new tokens to the token account, increasing the total supply`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
-      <b-form-checkbox v-if="selectedToken.settings.includes('modify_issuance')" v-model="privileges.change_issuance" name="Change Issuance" switch>
+      <b-form-checkbox v-if="selectedToken.settings.modify_issuance" v-model="privileges.change_issuance" name="Change Issuance" switch>
         Change Issuance <span v-b-tooltip.hover :title="`Change Issuance allows the controller to enable or disable issuance for the token`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
-      <b-form-checkbox v-if="selectedToken.settings.includes('modify_issuance')" v-model="privileges.change_modify_issuance" name="Change Modify Issuance" switch>
+      <b-form-checkbox v-if="selectedToken.settings.modify_issuance" v-model="privileges.change_modify_issuance" name="Change Modify Issuance" switch>
         Immute Issuance <span v-b-tooltip.hover :title="`Immute Issuance will lock the current issuance setting and make it permanent`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
-      <b-form-checkbox v-if="selectedToken.settings.includes('revoke') || selectedToken.settings.includes('modify_revoke')" v-model="privileges.revoke" name="Revoke" switch>
+      <b-form-checkbox v-if="selectedToken.settings.revoke || selectedToken.settings.modify_revoke" v-model="privileges.revoke" name="Revoke" switch>
         Revoke <span v-b-tooltip.hover :title="`Revoke allows the controller to remove tokens from any users account and send them to a different destination`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
-      <b-form-checkbox v-if="selectedToken.settings.includes('modify_revoke')" v-model="privileges.change_revoke" name="Change Revoke" switch>
+      <b-form-checkbox v-if="selectedToken.settings.modify_revoke" v-model="privileges.change_revoke" name="Change Revoke" switch>
         Change Revoke <span v-b-tooltip.hover :title="`Change Revoke allows the controller to enable or disable revoke for the token`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
-      <b-form-checkbox v-if="selectedToken.settings.includes('modify_revoke')" v-model="privileges.change_modify_revoke" name="Modify Revoke" switch>
+      <b-form-checkbox v-if="selectedToken.settings.modify_revoke" v-model="privileges.change_modify_revoke" name="Modify Revoke" switch>
         Immute Revoke <span v-b-tooltip.hover :title="`Immute Revoke will lock the current revoke setting and make it permanent`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
-      <b-form-checkbox v-if="selectedToken.settings.includes('freeze') || selectedToken.settings.includes('modify_freeze')" v-model="privileges.freeze" name="Freeze" switch>
+      <b-form-checkbox v-if="selectedToken.settings.freeze || selectedToken.settings.modify_freeze" v-model="privileges.freeze" name="Freeze" switch>
         Freeze <span v-b-tooltip.hover :title="`Freeze allows the controller to freeze any account which will prevent them from sending or receiving this token`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
-      <b-form-checkbox v-if="selectedToken.settings.includes('modify_freeze')" v-model="privileges.change_freeze" name="Change Freeze" switch>
+      <b-form-checkbox v-if="selectedToken.settings.modify_freeze" v-model="privileges.change_freeze" name="Change Freeze" switch>
         Change Freeze <span v-b-tooltip.hover :title="`Change Freeze allows the controller to enable or disable account freezing for the token`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
-      <b-form-checkbox v-if="selectedToken.settings.includes('modify_freeze')" v-model="privileges.change_modify_freeze" name="Modify Freeze" switch>
+      <b-form-checkbox v-if="selectedToken.settings.modify_freeze" v-model="privileges.change_modify_freeze" name="Modify Freeze" switch>
         Immute Freeze <span v-b-tooltip.hover :title="`Immute Freeze will lock the current freeze setting and make it permanent`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
-      <b-form-checkbox v-if="selectedToken.settings.includes('adjust_fee') || selectedToken.settings.includes('modify_adjust_fee')" v-model="privileges.adjust_fee" name="Adjust Fee" switch>
+      <b-form-checkbox v-if="selectedToken.settings.adjust_fee || selectedToken.settings.modify_adjust_fee" v-model="privileges.adjust_fee" name="Adjust Fee" switch>
         Adjust Fee <span v-b-tooltip.hover :title="`Adjust Fee allows the controller to adjust the fee type and fee rate of the token`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
-      <b-form-checkbox v-if="selectedToken.settings.includes('modify_adjust_fee')" v-model="privileges.change_adjust_fee" name="Change Adjust Fee" switch>
+      <b-form-checkbox v-if="selectedToken.settings.modify_adjust_fee" v-model="privileges.change_adjust_fee" name="Change Adjust Fee" switch>
         Change Adjust Fee <span v-b-tooltip.hover :title="`Change Adjust Fee allows the controller to enable or disable the ability to adjust fees for the token`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
-      <b-form-checkbox v-if="selectedToken.settings.includes('modify_adjust_fee')" v-model="privileges.change_modify_adjust_fee" name="Modify Adjust Fee" switch>
+      <b-form-checkbox v-if="selectedToken.settings.modify_adjust_fee" v-model="privileges.change_modify_adjust_fee" name="Modify Adjust Fee" switch>
         Immute Adjust Fee <span v-b-tooltip.hover :title="`Immute Adjust Fee will lock the current adjust fee setting and make it permanent`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
-      <b-form-checkbox v-if="selectedToken.settings.includes('whitelist') || selectedToken.settings.includes('modify_whitelist')" v-model="privileges.whitelist" name="Whitelist" switch>
+      <b-form-checkbox v-if="selectedToken.settings.whitelist || selectedToken.settings.modify_whitelist" v-model="privileges.whitelist" name="Whitelist" switch>
         Whitelist <span v-b-tooltip.hover :title="`Whitelist allows the controller to whitelist or un-whitelist any account for this token`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
-      <b-form-checkbox v-if="selectedToken.settings.includes('modify_whitelist')" v-model="privileges.change_whitelist" name="Change Whitelist" switch>
+      <b-form-checkbox v-if="selectedToken.settings.modify_whitelist" v-model="privileges.change_whitelist" name="Change Whitelist" switch>
         Change Whitelist <span v-b-tooltip.hover :title="`Change Whitelist allows the controller to enable or disable the whitelist for the token`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
-      <b-form-checkbox v-if="selectedToken.settings.includes('modify_whitelist')" v-model="privileges.change_modify_whitelist" name="Modify Whitelist" switch>
+      <b-form-checkbox v-if="selectedToken.settings.modify_whitelist" v-model="privileges.change_modify_whitelist" name="Modify Whitelist" switch>
         Immute Whitelist <span v-b-tooltip.hover :title="`Immute Whitelist will lock the current whitelist setting and make it permanent`"><font-awesome-icon size="sm" :icon="faQuestionCircle" /></span>
       </b-form-checkbox>
     </b-form-group>
@@ -177,11 +177,12 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import Vue from 'vue'
 import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 import { faQuestionCircle } from '@fortawesome/pro-light-svg-icons'
-
+import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
+Vue.directive('b-tooltip', vBTooltip)
 export default {
   name: 'updateControllerForm',
   data () {
@@ -222,16 +223,19 @@ export default {
     'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect'),
-    'b-form-select': () => import(/* webpackChunkName: "b-form-select" */'bootstrap-vue/es/components/form-select/form-select'),
     'b-form-checkbox-group': () => import(/* webpackChunkName: "b-form-checkbox-group" */'bootstrap-vue/es/components/form-checkbox/form-checkbox-group'),
     'b-form-checkbox': () => import(/* webpackChunkName: "b-form-checkbox" */'bootstrap-vue/es/components/form-checkbox/form-checkbox')
   },
   computed: {
-    ...mapState('forge', {
-      forgeAccounts: state => state.accounts,
-      forgeTokens: state => state.tokens,
-      currentAccount: state => state.currentAccount
-    }),
+    forgeAccounts: function () {
+      return this.$wallet.accountsObject
+    },
+    forgeTokens: function () {
+      return this.$wallet.tokenAccounts
+    },
+    currentAccount: function () {
+      return this.$wallet.account
+    },
     sufficientBalance: function () {
       if (!this.selectedToken) return null
       return bigInt(this.selectedToken.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
@@ -276,13 +280,12 @@ export default {
     updateableTokens: function () {
       let tokens = []
       for (let tokenAddress in this.forgeTokens) {
-        if (this.forgeTokens[tokenAddress].controllers instanceof Array) {
-          for (let controller of this.forgeTokens[tokenAddress].controllers) {
-            if (controller.account === this.currentAccount.address &&
-              controller.privileges instanceof Array &&
-              controller.privileges.indexOf('update_controller') > -1) {
-              tokens.push(this.forgeTokens[tokenAddress])
-            }
+        let token = this.forgeTokens[tokenAddress]
+        for (let controllerAddress in token.controllers) {
+          let controller = token.controllers[controllerAddress]
+          if (controller.account === this.currentAccount.address &&
+            controller.privileges.update_controller) {
+            tokens.push(token)
           }
         }
       }
@@ -307,7 +310,7 @@ export default {
     },
     createUpdateController () {
       let data = {
-        tokenAccount: this.selectedToken.tokenAccount,
+        tokenAccount: this.selectedToken.address,
         action: this.action.action,
         controller: {
           account: this.controllerAccount.address,
@@ -326,16 +329,17 @@ export default {
         let existingPrivileges = []
         let removedPrivileges = []
         let addedPrivileges = []
-        this.selectedToken.controllers.forEach((value, i) => {
-          if (value.account === this.controllerAccount.address) {
-            existingPrivileges = value.privileges
+        for (let controllerAddress in this.selectedToken.controllers) {
+          let controller = this.selectedToken.controllers[controllerAddress]
+          if (controller.account === this.controllerAccount.address) {
+            existingPrivileges = this.$utils.convertObjectToArray(controller.privileges)
           }
-        })
+        }
         addedPrivileges = modifiedPrivileges.filter((i) => { return existingPrivileges.indexOf(i) < 0 })
         removedPrivileges = existingPrivileges.filter((i) => { return modifiedPrivileges.indexOf(i) < 0 })
         if (addedPrivileges.length > 0) {
           let addForm = {
-            tokenAccount: this.selectedToken.tokenAccount,
+            tokenAccount: this.selectedToken.address,
             action: 'add',
             controller: {
               account: this.controllerAccount.address,
@@ -346,7 +350,7 @@ export default {
         }
         if (removedPrivileges.length > 0) {
           let removeForm = {
-            tokenAccount: this.selectedToken.tokenAccount,
+            tokenAccount: this.selectedToken.address,
             action: 'remove',
             controller: {
               account: this.controllerAccount.address,
@@ -357,8 +361,8 @@ export default {
         }
       }
     },
-    nameWithAddress ({ name, tokenAccount }) {
-      return `${name} — ${tokenAccount.substring(0, 9)}...${tokenAccount.substring(59, 64)}`
+    nameWithAddress ({ name, address }) {
+      return `${name} — ${address.substring(0, 9)}...${address.substring(59, 64)}`
     },
     labelWithAddress ({ label, address }) {
       if (label !== address) {
@@ -377,34 +381,36 @@ export default {
     }
   },
   watch: {
-    controllerAccount: function (newAccount, oldAccount) {
-      if (newAccount !== null) {
-        if (newAccount.privileges) {
-          this.privileges = this.$utils.deserializeController({
-            account: newAccount.address,
-            privileges: newAccount.privileges
-          }).privileges
-        } else {
-          this.privileges = this.defaultPrivileges
+    controllerAccount: {
+      handler: function (newAccount, oldAccount) {
+        if (newAccount !== null) {
+          if (!newAccount.privileges) {
+            this.privileges = this.defaultPrivileges
+          } else {
+            this.privileges = cloneDeep(newAccount.privileges)
+          }
+          this.action = this.actionOptions[0]
         }
-        this.action = this.actionOptions[0]
       }
     },
-    updateableTokens: function (newTks, oldTks) {
-      if (newTks.length > 0) {
-        let valid = false
-        for (let token of newTks) {
-          if (this.selectedToken && token.tokenAccount === this.selectedToken.tokenAccount) {
-            this.selectedToken = token
-            valid = true
+    updateableTokens: {
+      handler: function (newTks, oldTks) {
+        if (newTks.length > 0) {
+          let valid = false
+          for (let token of newTks) {
+            if (this.selectedToken && token.address === this.selectedToken.address) {
+              this.selectedToken = token
+              valid = true
+            }
           }
+          if (valid === false) {
+            this.selectedToken = newTks[0]
+          }
+        } else {
+          this.selectedToken = null
         }
-        if (valid === false) {
-          this.selectedToken = newTks[0]
-        }
-      } else {
-        this.selectedToken = null
-      }
+      },
+      deep: true
     }
   }
 }

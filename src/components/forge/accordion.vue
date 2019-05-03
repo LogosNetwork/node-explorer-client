@@ -23,31 +23,31 @@
           </b-col>
           <b-col cols="auto">
             <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
-              <font-awesome-icon v-if="!showCollapse" size="lg" id="rotatable" :icon="faChevronDown" rotation="180" />
-              <font-awesome-icon v-else size="lg" id="rotatable" :icon="faChevronDown"  />
+              <font-awesome-icon v-if="!showCollapse" size="lg" class="rotatable" :icon="faChevronDown" rotation="180" />
+              <font-awesome-icon v-else size="lg" class="rotatable" :icon="faChevronDown"  />
             </div>
           </b-col>
         </b-row>
       </b-card-body>
     </b-button>
-    <b-collapse v-bind:class="{ hideTransition: disableAnimation }" v-model="showCollapse" :id="`collapse_${type}`" accordion="accordion" role="tabpanel">
-      <b-card-body class="collapsedForm">
-        <slot></slot>
+    <b-collapse v-bind:class="{ hideTransition: disableAnimation }" v-model="showCollapse" @hide="updateSlot()" @show="updateSlot()" :id="`collapse_${type}`" accordion="accordion" role="tabpanel">
+      <b-card-body v-bind:style="{ minHeight: slotMinHeight + 'px' }" class="collapsedForm">
+        <slot v-if="loadSlot" v-show="showSlot"></slot>
       </b-card-body>
     </b-collapse>
   </b-card>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import Vue from 'vue'
 import { faChevronDown } from '@fortawesome/pro-light-svg-icons'
 
 export default {
   name: 'accordionComponent',
   computed: {
-    ...mapState('forge', {
-      currentAccount: state => state.currentAccount
-    }),
+    currentAccount: function () {
+      return this.$wallet.account
+    },
     background: function () {
       let x = {}
       x[this.bgClass] = true
@@ -60,8 +60,22 @@ export default {
   data () {
     return {
       showCollapse: false,
+      loadSlot: false,
+      showSlot: false,
       disableAnimation: false,
       faChevronDown
+    }
+  },
+  methods: {
+    updateSlot: function () {
+      if (this.showCollapse === false) {
+        setTimeout(() => {
+          this.showSlot = false
+        }, 300)
+      } else {
+        this.showSlot = true
+        this.loadSlot = true
+      }
     }
   },
   props: {
@@ -69,6 +83,10 @@ export default {
     accordionGroup: String,
     requestIcon: Object,
     title: String,
+    slotMinHeight: {
+      type: Number,
+      default: 172
+    },
     subtitle: String
   },
   components: {
@@ -82,9 +100,9 @@ export default {
       if (newAccount && oldAccount && newAccount.address !== oldAccount.address) {
         this.disableAnimation = true
         this.showCollapse = false
-        setTimeout(() => {
+        Vue.nextTick(() => {
           this.disableAnimation = false
-        }, 1)
+        })
       }
     }
   }
@@ -94,7 +112,7 @@ export default {
 .hideTransition {
   transition: none !important;
 }
-#rotatable {
+.rotatable {
   -webkit-transition: all .3s;
   -o-transition: all .3s;
   transition: all .3s;
