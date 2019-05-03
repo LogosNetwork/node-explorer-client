@@ -13,7 +13,6 @@
         ></qrcode>
       </b-col>
     </b-row>
-
     <div v-if="hasFunds">
 
       <accordion

@@ -16,21 +16,29 @@
               :disabled="!isSynced(account.address)"
               v-on:click="setCurrentAccount(account.address)"
             >
-              <div class="text-left text-nowrap text-truncate">
-                <div class="text-truncate">{{account.label}}</div>
-                <small><LogosAddress class="text-muted" :inactive="true" :force="true" :address="account.address" /></small>
+              <b-row v-if="account && account.synced" :no-gutters="true" class="w-100">
+                <b-col cols="12" class="d-flex justify-content-between flex-wrap align-items-center w-100">
+                  <div class="text-left text-nowrap text-truncate">
+                    <div class="text-truncate">{{account.label}}</div>
+                    <small><LogosAddress class="text-muted" :inactive="true" :force="true" :address="account.address" /></small>
+                  </div>
+                  <b-dropdown v-on:click.stop variant="link" size="lg" no-caret>
+                    <template slot="button-content">
+                      <font-awesome-icon size="lg" :icon="faEllipsisVAlt" />
+                      <span class="sr-only">Account Options</span>
+                    </template>
+                    <b-dropdown-item :href="`/${account.address}`" target="_blank">Open Account Page</b-dropdown-item>
+                    <!-- <b-dropdown-item href="#">Change Label</b-dropdown-item>
+                    <b-dropdown-item href="#">Account Info</b-dropdown-item>
+                    <b-dropdown-item href="#">Copy Account Address</b-dropdown-item> -->
+                    <b-dropdown-item v-on:click="removeAccount(account.address)">Remove Account</b-dropdown-item>
+                  </b-dropdown>
+                </b-col>
+              </b-row>
+              <div class="loadingToken" v-else>
+                <font-awesome-icon size="lg" class="mr-2" :icon="faSpinner" spin />
+                Syncing {{account.label}}
               </div>
-              <b-dropdown v-on:click.stop variant="link" size="lg" no-caret>
-                <template slot="button-content">
-                  <font-awesome-icon size="lg" :icon="faEllipsisVAlt" />
-                  <span class="sr-only">Account Options</span>
-                </template>
-                <b-dropdown-item :href="`/${account.address}`" target="_blank">Open Account Page</b-dropdown-item>
-                <!-- <b-dropdown-item href="#">Change Label</b-dropdown-item>
-                <b-dropdown-item href="#">Account Info</b-dropdown-item>
-                <b-dropdown-item href="#">Copy Account Address</b-dropdown-item> -->
-                <b-dropdown-item v-on:click="removeAccount(account.address)">Remove Account</b-dropdown-item>
-              </b-dropdown>
             </b-list-group-item>
           </b-list-group>
         </div>
@@ -78,9 +86,9 @@
                   </b-dropdown>
                 </b-col>
               </b-row>
-              <div v-else>
+              <div class="loadingToken" v-else>
                 <font-awesome-icon size="lg" class="mr-2" :icon="faSpinner" spin />
-                Loading...
+                Syncing {{token.symbol}}
               </div>
             </b-list-group-item>
           </b-list-group>
@@ -519,6 +527,11 @@ label.btn-link.active {
   z-index: 1;
   -webkit-box-shadow: 0 0.125rem 0rem rgba(0, 0, 0, 0.075) !important;
   box-shadow: 0 0.125rem 0rem rgba(0, 0, 0, 0.075) !important;
+}
+.loadingToken {
+  height: 48px;
+  width: 100%;
+  padding-top: 12px;
 }
 .chainViewer {
   background: $bg-tertiary;
