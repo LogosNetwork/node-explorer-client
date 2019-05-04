@@ -13,10 +13,10 @@
               v-for="account in accounts" :key="account.address"
               class="d-flex justify-content-between align-items-center mb-2"
               button
-              :disabled="!isSynced(account.address)"
+              :disabled="!account.synced"
               v-on:click="setCurrentAccount(account.address)"
             >
-              <b-row v-if="account && account.synced" :no-gutters="true" class="w-100">
+              <b-row v-if="account" :no-gutters="true" class="w-100">
                 <b-col cols="12" class="d-flex justify-content-between flex-wrap align-items-center w-100">
                   <div class="text-left text-nowrap text-truncate">
                     <div class="text-truncate">{{account.label}}</div>
@@ -57,10 +57,10 @@
             <b-list-group-item
               v-for="token in tokens" :key="token.address"
               class="d-flex justify-content-between align-items-center mb-2"
-              v-on:click="viewChain(token.address, `${token.name} - ${token.symbol}`)"
+              v-on:click="setChainAccount(token)"
               button
             >
-              <b-row v-if="token.name && token.synced" :no-gutters="true" class="d-flex flex-wrap align-items-center w-100">
+              <b-row v-if="token.name" :no-gutters="true" class="d-flex flex-wrap align-items-center w-100">
                 <b-col cols="auto" class="mr-2" v-if="token.issuerInfo.image">
                   <img :alt="`${token.name} image`" class="avatar" :src="token.issuerInfo.image">
                 </b-col>
@@ -179,17 +179,18 @@
               <div class="m-3 text-left" v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
                 <b-row class="mb-3">
                   <b-col cols="9" class="d-flex flex-column m-auto align-items-start">
-                    <h4 class="m-0">{{currentChain.label}}</h4>
+                    <h4 class="m-0" v-if="currentChainAccount && currentChainAccount.label">{{currentChainAccount.label}}</h4>
+                    <h4 class="m-0" v-else-if="currentChainAccount && currentChainAccount.name">{{currentChainAccount.name}} - {{currentChainAccount.symbol}}</h4>
                   </b-col>
                   <b-col cols="3" class="d-flex flex-column m-auto align-items-end">
-                    <b-button v-if="currentChain && currentAccount && currentChain.address !== currentAccount.address" class="font-weight-bolder" variant="link" v-on:click="closeChain()">
+                    <b-button v-if="currentChainAccount && currentAccount && currentChainAccount.address !== currentAccount.address" class="font-weight-bolder" variant="link" v-on:click="closeChain()">
                       <font-awesome-icon size="lg" class="mr-2" :icon="faTimes" />
                     </b-button>
                   </b-col>
                 </b-row>
-                <div name="list" is="transition-group" v-if="currentAccount && requests.length > 0">
+                <div name="list" is="transition-group" v-if="currentChainAccount && requests && requests.length > 0">
                   <div v-for="request in requests" :key="request.hash">
-                    <request :requestInfo="request" :account="currentAccount.address" :small="true"/>
+                    <request :requestInfo="request" :account="currentChainAccount.address" :small="true"/>
                   </div>
                 </div>
               </div>
@@ -219,8 +220,10 @@ import cloneDeep from 'lodash.clonedeep'
 import { faUser, faEllipsisVAlt, faSearch, faWrench, faHistory, faSpinner, faCube, faTimes, faCircle, faCoins } from '@fortawesome/pro-light-svg-icons'
 import Toasted from 'vue-toasted'
 import RPC from '../api/rpc'
+import bigInt from 'big-integer'
 import 'vue-resize/dist/vue-resize.css'
-
+import request from '@/components/requests/request.vue'
+import requests from '@/components/forge/requests.vue'
 Vue.use(infiniteScroll)
 Vue.use(Toasted, {
   iconPack: 'fontawesome'
@@ -241,7 +244,7 @@ export default {
       faCube,
       faCircle,
       faCoins,
-      currentChain: null,
+      currentChainAccount: null,
       selected: 'requests',
       selectedVisual: 'text',
       wallet: this.$wallet,
@@ -255,8 +258,8 @@ export default {
     'b-dropdown-item': () => import(/* webpackChunkName: "b-dropdown-item" */'bootstrap-vue/es/components/dropdown/dropdown-item'),
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'Lookups': () => import(/* webpackChunkName: "ForgeLookups" */'@/components/forge/lookups.vue'),
-    'Requests': () => import(/* webpackChunkName: "ForgeRequests" */'@/components/forge/requests.vue'),
-    'request': () => import(/* webpackChunkName: "RequestWrapper" */'@/components/requests/request.vue'),
+    'Requests': requests,
+    'request': request,
     'lookupCard': () => import(/* webpackChunkName: "LookupCard" */'@/components/forge/lookupCard.vue'),
     'Affix': () => import(/* webpackChunkName: "Affix" */'@/components/affix.vue'),
     'resize-observer': () => import(/* webpackChunkName: "Resize" */'vue-resize').then(({ ResizeObserver }) => ResizeObserver),
@@ -285,8 +288,38 @@ export default {
     currentAccount: function () {
       return this.$wallet.account
     },
+    chains: function () {
+      let requests = {}
+      for (let tokenAddress in this.forgeTokens) {
+        requests[tokenAddress].chain = this.forgeTokens[tokenAddress].chain
+        requests[tokenAddress].receiveChain = this.forgeTokens[tokenAddress].receiveChain
+      }
+      for (let address in this.forgeAccounts) {
+        requests[address].chain = this.forgeAccounts[address].chain
+        requests[address].receiveChain = this.forgeAccounts[address].receiveChain
+      }
+      return requests
+    },
+    requests: function () {
+      let myRequests = this.currentChainAccount.chain.concat(this.currentChainAccount.receiveChain)
+      myRequests.sort((a, b) => {
+        if (bigInt(a.timestamp).greater(bigInt(b.timestamp))) {
+          return -1
+        } else if (bigInt(a.timestamp).lesser(bigInt(b.timestamp))) {
+          return 1
+        }
+        return 0
+      })
+      let hashes = []
+      let deduped = myRequests.filter(request => {
+        let valid = !hashes.includes(request.hash)
+        hashes.push(request.hash)
+        return valid
+      })
+      return deduped
+    },
     renderSidePanel: function () {
-      return (this.currentChain) || (this.selected === 'lookup' && this.lookups && this.lookups.length > 0)
+      return (this.currentChainAccount) || (this.selected === 'lookup' && this.lookups && this.lookups.length > 0)
     },
     accounts: function () {
       if (this.forgeAccounts) {
@@ -303,20 +336,16 @@ export default {
     handleResize () {
       this.$refs.scrollAffixElement.onScroll()
     },
-    viewChain: function (address, label) {
-      if (!this.currentChain || (address && this.currentChain.address !== address)) {
-        if (address !== this.chainAccount) {
-          this.reset()
-          this.getAccountInfo(address)
-        }
-        this.currentChain = { address: address, label: label }
+    setChainAccount: function (account) {
+      if (!this.currentChainAccount || this.currentChainAccount.address !== account.address) {
+        this.currentChainAccount = account
       }
     },
     recordData () {
       this.setWalletData(this.$wallet.toJSON())
     },
     closeChain: function () {
-      this.viewChain(this.currentAccount.address, this.currentAccount.label)
+      this.setChainAccount(this.currentAccount)
     },
     changeSelected: function (newSelected) {
       this.selected = newSelected
@@ -324,8 +353,8 @@ export default {
     setCurrentAccount: function (address) {
       if (this.$wallet.currentAccountAddress !== address) {
         this.$wallet.currentAccountAddress = address
-      } else if (this.currentChain && this.currentAccount && this.currentChain.address !== address) {
-        this.viewChain(this.currentAccount.address, this.currentAccount.label)
+      } else if (this.currentChainAccount && this.currentAccount && this.currentChainAccount.address !== address) {
+        this.setChainAccount(this.currentAccount)
       }
     },
     replaceAddresses: function (msg) {
@@ -333,9 +362,6 @@ export default {
         msg = msg.replace(new RegExp(account.address, 'g'), account.label)
       }
       return msg
-    },
-    isSynced: function (address) {
-      return this.$wallet.accountsObject[address] && this.$wallet.accountsObject[address].synced
     },
     removeAccount: function (address) {
       this.$wallet.removeAccount(address)
@@ -355,20 +381,13 @@ export default {
         })
       }
     },
-    ...mapActions('forge',
-      [
-        'setWalletData'
-      ]
-    ),
+    ...mapActions('forge', [
+      'setWalletData',
+      'createToast'
+    ]),
     ...mapActions('mqtt', [
       'initalize',
-      'unsubscribe',
       'subscribe'
-    ]),
-    ...mapActions('forge/account', [
-      'getAccountInfo',
-      'getRequests',
-      'reset'
     ])
   },
   mounted: function () {
@@ -382,16 +401,16 @@ export default {
   created: function () {
     this.$wallet.sync()
     if (this.$wallet.currentAccountAddress) {
-      this.viewChain(this.$wallet.currentAccountAddress, this.$wallet.account.label)
+      this.setChainAccount(this.$wallet.account)
     }
-    if (!this.currentChain && this.currentAccount) {
-      this.currentChain = { address: this.currentAccount.address, label: this.currentAccount.label }
+    if (!this.currentChainAccount && this.currentAccount) {
+      this.currentChainAccount = this.currentAccount
     }
   },
   watch: {
     currentAccount: function (newAccount, oldAccount) {
       if ((newAccount && oldAccount === null) || (newAccount && oldAccount && newAccount.address !== oldAccount.address)) {
-        this.viewChain(newAccount.address, newAccount.label)
+        this.setChainAccount(newAccount)
       }
     },
     rpcHost: function (newRpcHost, oldRpcHost) {
@@ -427,16 +446,18 @@ export default {
           action: actions
         })
       }
+    },
+    chains: {
+      handler: function (newRequests, oldRequests) {
+        console.log(oldRequests)
+        console.log(newRequests)
+      },
+      deep: true
     }
   },
   beforeDestroy: function () {
     window.removeEventListener('beforeunload', this.recordData)
     this.recordData()
-    for (let account in this.forgeAccounts) {
-      if (account) {
-        this.unsubscribe(`account/${account}`)
-      }
-    }
   }
 }
 </script>

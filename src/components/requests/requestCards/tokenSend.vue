@@ -46,6 +46,7 @@
 
 <script>
 import { faPaperPlane, faArrowDown } from '@fortawesome/pro-light-svg-icons'
+import token from '@/components/requests/token.vue'
 
 export default {
   name: 'tokenSend',
@@ -71,7 +72,7 @@ export default {
     'b-list-group': () => import(/* webpackChunkName: "b-list-group" */'bootstrap-vue/es/components/list-group/list-group'),
     'b-list-group-item': () => import(/* webpackChunkName: "b-list-group-item" */'bootstrap-vue/es/components/list-group/list-group-item'),
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
-    'token': () => import(/* webpackChunkName: "token" */'@/components/requests/token.vue')
+    'token': token
   }
 }
 </script>

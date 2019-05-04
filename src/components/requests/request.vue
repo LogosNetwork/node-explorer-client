@@ -1,38 +1,38 @@
 <template>
   <div class="mb-3 shadow-sm">
-    <b-link v-if="!requestInfo.inactive" class="cardLink" :to="'/'+requestInfo.hash">
-      <send v-if="requestInfo.type === 'send'" :requestInfo="requestInfo" :account="account" :small="small"/>
-      <burn v-if="requestInfo.type === 'burn'" :requestInfo="requestInfo" :small="small"/>
-      <issuerInfo v-if="requestInfo.type === 'update_issuer_info'" :requestInfo="requestInfo" :small="small"/>
-      <tokenSend v-if="requestInfo.type === 'token_send'" :requestInfo="requestInfo" :account="account" :small="small"/>
-      <distribute v-if="requestInfo.type === 'distribute'" :requestInfo="requestInfo" :small="small"/>
-      <adjustFee v-if="requestInfo.type === 'adjust_fee'" :requestInfo="requestInfo" :small="small"/>
-      <changeSetting v-if="requestInfo.type === 'change_setting'" :requestInfo="requestInfo" :small="small"/>
-      <adjustUserStatus v-if="requestInfo.type === 'adjust_user_status'" :requestInfo="requestInfo" :small="small"/>
-      <issuance v-if="requestInfo.type === 'issuance'" :requestInfo="requestInfo" :small="small"/>
-      <issueAdditional v-if="requestInfo.type === 'issue_additional'" :requestInfo="requestInfo" :small="small"/>
-      <withdrawFee v-if="requestInfo.type === 'withdraw_fee'" :requestInfo="requestInfo" :small="small"/>
-      <withdrawLogos v-if="requestInfo.type === 'withdraw_logos'" :requestInfo="requestInfo" :small="small"/>
-      <updateController v-if="requestInfo.type === 'update_controller'" :requestInfo="requestInfo" :small="small"/>
-      <revoke v-if="requestInfo.type === 'revoke'" :requestInfo="requestInfo" :small="small"/>
-      <immuteSetting v-if="requestInfo.type === 'immute_setting'" :requestInfo="requestInfo" :small="small"/>
+    <b-link v-if="!request.inactive" class="cardLink" :to="'/'+request.hash">
+      <send v-if="request.type === 'send'" :requestInfo="request" :account="account" :small="small"/>
+      <burn v-if="request.type === 'burn'" :requestInfo="request" :small="small"/>
+      <issuerInfo v-if="request.type === 'update_issuer_info'" :requestInfo="request" :small="small"/>
+      <tokenSend v-if="request.type === 'token_send'" :requestInfo="request" :account="account" :small="small"/>
+      <distribute v-if="request.type === 'distribute'" :requestInfo="request" :small="small"/>
+      <adjustFee v-if="request.type === 'adjust_fee'" :requestInfo="request" :small="small"/>
+      <changeSetting v-if="request.type === 'change_setting'" :requestInfo="request" :small="small"/>
+      <adjustUserStatus v-if="request.type === 'adjust_user_status'" :requestInfo="request" :small="small"/>
+      <issuance v-if="request.type === 'issuance'" :requestInfo="request" :small="small"/>
+      <issueAdditional v-if="request.type === 'issue_additional'" :requestInfo="request" :small="small"/>
+      <withdrawFee v-if="request.type === 'withdraw_fee'" :requestInfo="request" :small="small"/>
+      <withdrawLogos v-if="request.type === 'withdraw_logos'" :requestInfo="request" :small="small"/>
+      <updateController v-if="request.type === 'update_controller'" :requestInfo="request" :small="small"/>
+      <revoke v-if="request.type === 'revoke'" :requestInfo="request" :small="small"/>
+      <immuteSetting v-if="request.type === 'immute_setting'" :requestInfo="request" :small="small"/>
     </b-link>
     <div v-else>
-      <send v-if="requestInfo.type === 'send'" :requestInfo="requestInfo" :account="account" :small="small"/>
-      <burn v-if="requestInfo.type === 'burn'" :requestInfo="requestInfo" :small="small"/>
-      <issuerInfo v-if="requestInfo.type === 'update_issuer_info'" :requestInfo="requestInfo" :small="small"/>
-      <tokenSend v-if="requestInfo.type === 'token_send'" :requestInfo="requestInfo" :account="account" :small="small"/>
-      <distribute v-if="requestInfo.type === 'distribute'" :requestInfo="requestInfo" :small="small"/>
-      <adjustFee v-if="requestInfo.type === 'adjust_fee'" :requestInfo="requestInfo" :small="small"/>
-      <changeSetting v-if="requestInfo.type === 'change_setting'" :requestInfo="requestInfo" :small="small"/>
-      <adjustUserStatus v-if="requestInfo.type === 'adjust_user_status'" :requestInfo="requestInfo" :small="small"/>
-      <issuance v-if="requestInfo.type === 'issuance'" :requestInfo="requestInfo" :small="small"/>
-      <issueAdditional v-if="requestInfo.type === 'issue_additional'" :requestInfo="requestInfo" :small="small"/>
-      <withdrawFee v-if="requestInfo.type === 'withdraw_fee'" :requestInfo="requestInfo" :small="small"/>
-      <withdrawLogos v-if="requestInfo.type === 'withdraw_logos'" :requestInfo="requestInfo" :small="small"/>
-      <updateController v-if="requestInfo.type === 'update_controller'" :requestInfo="requestInfo" :small="small"/>
-      <revoke v-if="requestInfo.type === 'revoke'" :requestInfo="requestInfo" :small="small"/>
-      <immuteSetting v-if="requestInfo.type === 'immute_setting'" :requestInfo="requestInfo" :small="small"/>
+      <send v-if="request.type === 'send'" :requestInfo="request" :account="account" :small="small"/>
+      <burn v-if="request.type === 'burn'" :requestInfo="request" :small="small"/>
+      <issuerInfo v-if="request.type === 'update_issuer_info'" :requestInfo="request" :small="small"/>
+      <tokenSend v-if="request.type === 'token_send'" :requestInfo="request" :account="account" :small="small"/>
+      <distribute v-if="request.type === 'distribute'" :requestInfo="request" :small="small"/>
+      <adjustFee v-if="request.type === 'adjust_fee'" :requestInfo="request" :small="small"/>
+      <changeSetting v-if="request.type === 'change_setting'" :requestInfo="request" :small="small"/>
+      <adjustUserStatus v-if="request.type === 'adjust_user_status'" :requestInfo="request" :small="small"/>
+      <issuance v-if="request.type === 'issuance'" :requestInfo="request" :small="small"/>
+      <issueAdditional v-if="request.type === 'issue_additional'" :requestInfo="request" :small="small"/>
+      <withdrawFee v-if="request.type === 'withdraw_fee'" :requestInfo="request" :small="small"/>
+      <withdrawLogos v-if="request.type === 'withdraw_logos'" :requestInfo="request" :small="small"/>
+      <updateController v-if="request.type === 'update_controller'" :requestInfo="request" :small="small"/>
+      <revoke v-if="request.type === 'revoke'" :requestInfo="request" :small="small"/>
+      <immuteSetting v-if="request.type === 'immute_setting'" :requestInfo="request" :small="small"/>
     </div>
   </div>
 </template>
@@ -50,6 +50,60 @@ export default {
     small: {
       type: Boolean,
       default: false
+    }
+  },
+  computed: {
+    request: function () {
+      if (this.requestInfo.constructor.name !== 'Object') {
+        let request = JSON.parse(this.requestInfo.toJSON())
+        if (request.token_id) {
+          let tokenAddress = this.$utils.accountFromHexKey(request.token_id)
+          let tokenAccount = this.$wallet.tokenAccounts[tokenAddress]
+          request.tokenInfo = {
+            name: tokenAccount.name,
+            symbol: tokenAccount.symbol,
+            tokenAccount: tokenAddress
+          }
+          try {
+            request.tokenInfo.issuerInfo = JSON.parse(tokenAccount.issuerInfo)
+          } catch (e) {
+            request.tokenInfo.issuerInfo = null
+          }
+          if (this.requestInfo.constructor.name === 'Issuance') {
+            try {
+              request.prettyInfo = JSON.stringify(JSON.parse(request.issuer_info), null, 2)
+            } catch (e) {
+              request.prettyInfo = request.issuer_info
+            }
+          } else if (this.requestInfo.constructor.name === 'WithdrawLogos') {
+            request.transaction.amountInLogos = this.$Logos.convert.fromReason(request.transaction.amount, 'LOGOS')
+          } else if (request.transaction) {
+            if (request.tokenInfo.issuerInfo &&
+              typeof request.tokenInfo.issuerInfo.decimals !== 'undefined' &&
+              request.tokenInfo.issuerInfo.decimals > 0) {
+              request.transaction.amountInToken = this.$Logos.convert.fromTo(request.transaction.amount, request.tokenInfo.issuerInfo.decimals, 0)
+            }
+          } else if (request.transactions) {
+            request.totalAmount = this.requestInfo.totalAmount
+            if (request.tokenInfo.issuerInfo &&
+              typeof request.tokenInfo.issuerInfo.decimals !== 'undefined' &&
+              request.tokenInfo.issuerInfo.decimals > 0) {
+              request.totalAmountInToken = this.$Logos.convert.fromTo(request.totalAmount, request.tokenInfo.issuerInfo.decimals, 0)
+              for (let transaction of request.transactions) {
+                transaction.amountInToken = this.$Logos.convert.fromTo(transaction.amount, request.tokenInfo.issuerInfo.decimals, 0)
+              }
+            }
+          }
+        } else if (request.transactions) {
+          request.totalAmountLogos = this.$Logos.convert.fromReason(this.requestInfo.totalAmount, 'LOGOS')
+          for (let transaction of request.transactions) {
+            transaction.amountInLogos = this.$Logos.convert.fromReason(transaction.amount, 'LOGOS')
+          }
+        }
+        return request
+      } else {
+        return this.requestInfo
+      }
     }
   },
   components: {

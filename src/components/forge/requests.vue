@@ -213,6 +213,7 @@
 <script>
 import bigInt from 'big-integer'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
+import qrcode from '@xkeshi/vue-qrcode'
 import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUserEdit, faPaperPlane, faEdit, faFire, faArrowDown, faHandReceiving, faPercentage, faCrown } from '@fortawesome/pro-light-svg-icons'
 
 export default {
@@ -237,7 +238,7 @@ export default {
     }
   },
   components: {
-    'qrcode': () => import(/* webpackChunkName: "vue-qrcode" */'@xkeshi/vue-qrcode'),
+    'qrcode': qrcode,
     'accordion': () => import(/* webpackChunkName: "accordion" */'@/components/forge/accordion.vue'),
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'fund': () => import(/* webpackChunkName: "fundForm" */'@/components/forge/fund.vue'),
