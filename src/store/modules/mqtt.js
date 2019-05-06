@@ -49,10 +49,6 @@ const actions = {
             if (message.mqttDestination === rootState.account.account) {
               dispatch('account/addRequest', message, { root: true })
             }
-            if (message.mqttDestination === rootState.forge.account.account) {
-              dispatch('forge/account/addRequest', message, { root: true })
-            }
-            dispatch('forge/addRequest', message, { root: true })
           } else if (requestMqttRegex(topic)) {
             dispatch('request/addRequest', message, { root: true })
           }

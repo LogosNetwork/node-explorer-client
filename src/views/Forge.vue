@@ -291,32 +291,15 @@ export default {
     chains: function () {
       let requests = {}
       for (let tokenAddress in this.forgeTokens) {
-        requests[tokenAddress].chain = this.forgeTokens[tokenAddress].chain
-        requests[tokenAddress].receiveChain = this.forgeTokens[tokenAddress].receiveChain
+        requests[tokenAddress] = this.history(this.forgeTokens[tokenAddress])
       }
       for (let address in this.forgeAccounts) {
-        requests[address].chain = this.forgeAccounts[address].chain
-        requests[address].receiveChain = this.forgeAccounts[address].receiveChain
+        requests[address] = this.history(this.forgeAccounts[address])
       }
       return requests
     },
     requests: function () {
-      let myRequests = this.currentChainAccount.chain.concat(this.currentChainAccount.receiveChain)
-      myRequests.sort((a, b) => {
-        if (bigInt(a.timestamp).greater(bigInt(b.timestamp))) {
-          return -1
-        } else if (bigInt(a.timestamp).lesser(bigInt(b.timestamp))) {
-          return 1
-        }
-        return 0
-      })
-      let hashes = []
-      let deduped = myRequests.filter(request => {
-        let valid = !hashes.includes(request.hash)
-        hashes.push(request.hash)
-        return valid
-      })
-      return deduped
+      return this.history(this.currentChainAccount)
     },
     renderSidePanel: function () {
       return (this.currentChainAccount) || (this.selected === 'lookup' && this.lookups && this.lookups.length > 0)
@@ -335,6 +318,24 @@ export default {
   methods: {
     handleResize () {
       this.$refs.scrollAffixElement.onScroll()
+    },
+    history (account) {
+      let myRequests = account.chain.concat(account.receiveChain)
+      myRequests.sort((a, b) => {
+        if (bigInt(a.timestamp).greater(bigInt(b.timestamp))) {
+          return -1
+        } else if (bigInt(a.timestamp).lesser(bigInt(b.timestamp))) {
+          return 1
+        }
+        return 0
+      })
+      let hashes = []
+      let deduped = myRequests.filter(request => {
+        let valid = !hashes.includes(request.hash)
+        hashes.push(request.hash)
+        return valid
+      })
+      return deduped
     },
     setChainAccount: function (account) {
       if (!this.currentChainAccount || this.currentChainAccount.address !== account.address) {
@@ -358,8 +359,13 @@ export default {
       }
     },
     replaceAddresses: function (msg) {
-      for (let account of this.$wallet.accounts) {
-        msg = msg.replace(new RegExp(account.address, 'g'), account.label)
+      if (msg) {
+        for (let account in this.forgeAccounts) {
+          msg = msg.replace(new RegExp(account, 'g'), this.forgeAccounts[account].label)
+        }
+        for (let account in this.forgeTokens) {
+          msg = msg.replace(new RegExp(account, 'g'), this.forgeTokens[account].name)
+        }
       }
       return msg
     },
@@ -447,12 +453,18 @@ export default {
         })
       }
     },
-    chains: {
-      handler: function (newRequests, oldRequests) {
-        console.log(oldRequests)
-        console.log(newRequests)
-      },
-      deep: true
+    chains: function (newRequests, oldRequests) {
+      for (let address in oldRequests) {
+        let newRequestCount = newRequests[address].length - oldRequests[address].length
+        if (newRequestCount > 0) {
+          for (let i = 0; i < newRequestCount; i++) {
+            this.createToast({
+              address: address,
+              request: newRequests[address][i]
+            })
+          }
+        }
+      }
     }
   },
   beforeDestroy: function () {

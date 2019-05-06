@@ -1,10 +1,9 @@
-import cloneDeep from 'lodash.clonedeep'
 import Logos from '@logosnetwork/logos-rpc-client'
 import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
 import bigInt from 'big-integer'
 
 const state = {
-  toasts: [],
+  toasts: {},
   lookups: [],
   issuerInfo: '',
   tempInfo: '',
@@ -15,19 +14,19 @@ const getters = {
   walletData: state => state.walletData
 }
 
-const createToast = (request, commit) => {
-  console.log('creating toast')
-  let tokenAccount = LogosWallet.Utils.accountFromHexKey(request.token_id)
-  let tokenInfo = this._vm.$wallet.tokenAccounts[tokenAccount]
+const parseToast = (request, address, vm, commit) => {
+  request = JSON.parse(request.toJSON())
+  let tokenInfo = null
   let issuerInfo = null
-  try {
-    issuerInfo = JSON.parse(tokenInfo.issuerInfo)
-  } catch (e) {
-    issuerInfo = null
+  if (request.token_id) {
+    tokenInfo = vm.$wallet.tokenAccounts[LogosWallet.Utils.accountFromHexKey(request.token_id)]
+    try {
+      issuerInfo = JSON.parse(tokenInfo.issuerInfo)
+    } catch (e) {
+      issuerInfo = null
+    }
   }
-  console.log(request)
-  console.log(tokenAccount)
-  console.log(issuerInfo)
+
   if (request.type === 'burn' || request.type === 'issue_additional') {
     if (issuerInfo && typeof issuerInfo.decimals !== 'undefined') {
       request.amountInToken = Logos.convert.fromTo(request.amount, 0, issuerInfo.decimals)
@@ -47,10 +46,10 @@ const createToast = (request, commit) => {
   if (request.type === 'send') {
     let balanceChange = bigInt(0)
     for (let trans of request.transactions) {
-      if (request.origin === request.mqttDestination) {
+      if (request.origin === address) {
         balanceChange = balanceChange.minus(trans.amount)
       }
-      if (trans.destination === request.mqttDestination) {
+      if (trans.destination === address) {
         balanceChange = balanceChange.plus(trans.amount)
       }
       trans.amountInLogos = Logos.convert.fromReason(trans.amount, 'LOGOS')
@@ -58,17 +57,17 @@ const createToast = (request, commit) => {
     request.balanceChange = balanceChange.toString()
     request.balanceChangeInLogos = Logos.convert.fromReason(balanceChange.abs().toString(), 'LOGOS')
     if (balanceChange.greater(bigInt('0'))) {
-      toast.message = `${request.mqttDestination} recieved ${request.balanceChangeInLogos} Logos`
+      toast.message = `${address} recieved ${request.balanceChangeInLogos} Logos`
     } else {
-      toast.message = `${request.mqttDestination} sent ${request.balanceChangeInLogos} Logos`
+      toast.message = `${address} sent ${request.balanceChangeInLogos} Logos`
     }
   } else if (request.type === 'token_send') {
     let balanceChange = bigInt(0)
     for (let trans of request.transactions) {
-      if (request.origin === request.mqttDestination) {
+      if (request.origin === address) {
         balanceChange = balanceChange.minus(trans.amount)
       }
-      if (trans.destination === request.mqttDestination) {
+      if (trans.destination === address) {
         balanceChange = balanceChange.plus(trans.amount)
       }
       if (issuerInfo && typeof issuerInfo.decimals !== 'undefined') {
@@ -79,25 +78,25 @@ const createToast = (request, commit) => {
     if (issuerInfo && typeof issuerInfo.decimals !== 'undefined') {
       request.balanceChangeInToken = Logos.convert.fromTo(balanceChange.abs().toString(), 0, issuerInfo.decimals)
       if (balanceChange.greater(bigInt('0'))) {
-        toast.message = `${request.mqttDestination} recieved ${request.balanceChangeInToken} ${tokenInfo.symbol}`
+        toast.message = `${address} recieved ${request.balanceChangeInToken} ${tokenInfo.symbol}`
       } else {
-        toast.message = `${request.mqttDestination} sent ${request.balanceChangeInToken} ${tokenInfo.symbol}`
+        toast.message = `${address} sent ${request.balanceChangeInToken} ${tokenInfo.symbol}`
       }
     } else {
       if (balanceChange.greater(bigInt('0'))) {
-        toast.message = `${request.mqttDestination} recieved ${balanceChange.toString()} base units of ${request.token_id}`
+        toast.message = `${address} recieved ${balanceChange.toString()} base units of ${request.token_id}`
       } else {
-        toast.message = `${request.mqttDestination} sent ${balanceChange.abs().toString()} base units of ${request.token_id}`
+        toast.message = `${address} sent ${balanceChange.abs().toString()} base units of ${request.token_id}`
       }
     }
   } else if (request.type === 'issuance') {
-    toast.message = `${request.mqttDestination} Issued a new token ${request.name} - (${request.symbol})`
+    toast.message = `${address} Issued a new token ${request.name} - (${request.symbol})`
   } else if (request.type === 'distribute') {
-    if (request.origin === request.mqttDestination) {
+    if (request.origin === address) {
       if (issuerInfo && typeof issuerInfo.decimals !== 'undefined') {
-        toast.message = `${request.mqttDestination} distributed ${Logos.convert.fromTo(request.transaction.amount, 0, issuerInfo.decimals)} ${tokenInfo.symbol} to ${request.transaction.destination}`
+        toast.message = `${address} distributed ${Logos.convert.fromTo(request.transaction.amount, 0, issuerInfo.decimals)} ${tokenInfo.symbol} to ${request.transaction.destination}`
       } else {
-        toast.message = `${request.mqttDestination} distributed ${request.transaction.amount} base units of ${tokenInfo.symbol} to ${request.transaction.destination}`
+        toast.message = `${address} distributed ${request.transaction.amount} base units of ${tokenInfo.symbol} to ${request.transaction.destination}`
       }
     } else {
       if (issuerInfo && typeof issuerInfo.decimals !== 'undefined') {
@@ -107,23 +106,21 @@ const createToast = (request, commit) => {
       }
     }
   } else if (request.type === 'adjust_user_status') {
-    if (request.origin === request.mqttDestination) {
-      toast.message = `${request.mqttDestination} set the status of ${request.account} to ${request.status}`
+    if (request.origin === address) {
+      toast.message = `${address} set the status of ${request.account} to ${request.status}`
     } else {
-      toast.message = `${request.mqttDestination} status was set to ${request.status}`
+      toast.message = `${request.account} status was set to ${request.status}`
     }
   } else if (request.type === 'issue_additional') {
-    if (request.origin === request.mqttDestination) {
-      if (request.amountInToken) {
-        toast.message = `${request.mqttDestination} minted an additional ${request.amountInToken} ${tokenInfo.symbol}`
-      } else {
-        toast.message = `${request.mqttDestination} minted an additional ${request.amount} base units of ${tokenInfo.symbol}`
-      }
+    if (request.amountInToken) {
+      toast.message = `${address} minted an additional ${request.amountInToken} ${tokenInfo.symbol}`
+    } else {
+      toast.message = `${address} minted an additional ${request.amount} base units of ${tokenInfo.symbol}`
     }
   } else if (request.type === 'change_setting') {
-    toast.message = `${request.mqttDestination} changed the ${request.setting} setting of ${tokenInfo.name} to ${request.value}`
+    toast.message = `${address} changed the ${request.setting} setting of ${tokenInfo.name} to ${request.value}`
   } else if (request.type === 'immute_setting') {
-    toast.message = `${request.mqttDestination} has locked the ${request.setting} setting to ${tokenInfo.settings.includes(request.setting)} for ${tokenInfo.name}`
+    toast.message = `${address} has locked the ${request.setting} setting to ${tokenInfo.settings[request.setting]} for ${tokenInfo.name}`
   } else if (request.type === 'revoke') {
     if (request.amountInToken) {
       toast.message = `${request.origin} revoked ${request.amountInToken} ${tokenInfo.symbol} from ${request.source} to ${request.transaction.destination}`
@@ -168,10 +165,8 @@ const actions = {
   addLookup ({ commit }, lookup) {
     commit('addLookup', lookup)
   },
-  addRequest ({ commit, rootState, state }, request) {
-    let requestData = cloneDeep(request)
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: false })
-    createToast(requestData, rpcClient, commit, state)
+  createToast ({ commit }, request) {
+    parseToast(request.request, request.address, this._vm, commit)
   }
 }
 

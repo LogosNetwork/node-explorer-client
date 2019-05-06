@@ -132,7 +132,7 @@ export default {
       return tokens
     },
     immutableDescription: function () {
-      if (this.setting) {
+      if (this.setting && this.selectedToken) {
         if (this.setting.action === 'issuance') {
           return `Immuting issuance will lock the issuance setting to ${this.selectedToken.settings.issuance}`
         } else if (this.setting.action === 'revoke') {
