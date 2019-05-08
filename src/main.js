@@ -11,6 +11,7 @@ import BCol from 'bootstrap-vue/es/components/layout/col'
 import BLink from 'bootstrap-vue/es/components/link/link'
 import BCard from 'bootstrap-vue/es/components/card/card'
 import BButton from 'bootstrap-vue/es/components/button/button'
+import LogosAddress from '@/components/LogosAddress.vue'
 
 store.dispatch('settings/loadDelegates')
 Vue.config.productionTip = false
@@ -21,6 +22,7 @@ Vue.component('b-col', BCol)
 Vue.component('b-link', BLink)
 Vue.component('b-button', BButton)
 Vue.component('b-card', BCard)
+Vue.component('LogosAddress', LogosAddress)
 new Vue({
   router,
   i18n,

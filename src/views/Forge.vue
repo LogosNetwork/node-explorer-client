@@ -153,7 +153,7 @@
         <b-row class="scrollContainer">
           <b-col col :xl="renderSidePanel ? 7 : 12" class="d-flex flex-column">
             <b-row class="actionSelector flex-grow flex-fill">
-              <b-col class="m-3 text-left">
+              <b-col class="m-3 text-left overflow-hidden">
                 <affix ref="scrollAffixElement" v-if="renderSidePanel" class="scrollaffix-sidebar" :offset="{ top: 124, bottom: 31 }" relative-element-selector="#sidePanel" :scroll-affix="true">
                   <resize-observer @notify="handleResize" />
                   <div v-if="selected === 'lookup'">
@@ -188,10 +188,11 @@
                     </b-button>
                   </b-col>
                 </b-row>
-                <div name="list" is="transition-group" v-if="currentChainAccount && requests && requests.length > 0">
-                  <div v-for="request in requests" :key="request.hash">
+                <div v-if="currentChainAccount && requests && requests.length > 0">
+                  <requestList :requests="requests" :address="currentChainAccount.address" :small="true"/>
+                  <!-- <div v-for="request in requests" :key="request.hash">
                     <request :requestInfo="request" :account="currentChainAccount.address" :small="true"/>
-                  </div>
+                  </div> -->
                 </div>
               </div>
             </div>
@@ -222,7 +223,7 @@ import Toasted from 'vue-toasted'
 import RPC from '../api/rpc'
 import bigInt from 'big-integer'
 import 'vue-resize/dist/vue-resize.css'
-import request from '@/components/requests/request.vue'
+import requestList from '@/components/requests/requestList.vue'
 import requests from '@/components/forge/requests.vue'
 Vue.use(infiniteScroll)
 Vue.use(Toasted, {
@@ -259,7 +260,7 @@ export default {
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'Lookups': () => import(/* webpackChunkName: "ForgeLookups" */'@/components/forge/lookups.vue'),
     'Requests': requests,
-    'request': request,
+    'requestList': requestList,
     'lookupCard': () => import(/* webpackChunkName: "LookupCard" */'@/components/forge/lookupCard.vue'),
     'Affix': () => import(/* webpackChunkName: "Affix" */'@/components/affix.vue'),
     'resize-observer': () => import(/* webpackChunkName: "Resize" */'vue-resize').then(({ ResizeObserver }) => ResizeObserver),

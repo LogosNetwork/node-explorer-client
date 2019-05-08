@@ -36,6 +36,7 @@
     "vue-resize": "^0.4.5",
     "vue-router": "^3.0.6",
     "vue-toasted": "^1.1.26",
+    "vue-virtual-scroll-list": "git+https://github.com/Stormtv/vue-virtual-scroll-list.git",
     "vuex": "^3.1.0",
     "vuex-persist": "^2.0.0"
   },
