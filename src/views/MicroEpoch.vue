@@ -63,7 +63,7 @@
           <h4 class="text-left">
             <span v-t="'tips_batchblocks'"></span>
           </h4>
-          <p class="text-left" v-if='microEpoch.timestamp !== "0"'><span v-t="'microEpochCreatedOn'"></span> <strong> {{parseInt(microEpoch.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</strong></p>
+          <p class="text-left" v-if='microEpoch.timestamp !== "0"'><span v-t="'microEpochCreatedOn'"></span> <strong> {{parseInt(microEpoch.timestamp) | moment('calendar')}}</strong></p>
           <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="microEpoch.tips">
             <template slot="index" slot-scope="data">
               <div class="text-truncate">{{data.index}}</div>

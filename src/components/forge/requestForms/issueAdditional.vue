@@ -25,7 +25,7 @@
         </template>
       </Multiselect>
       <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
-        You must select a token to issue additional tokens
+        You must select a token to mint additional tokens
       </div>
       <div v-if="selectedToken && !sufficientBalance" style="display:block" class="invalid-feedback">
         {{selectedToken.name}} has an insufficient supply of logos to afford the fee for this transaction
@@ -59,7 +59,7 @@
         :disabled="!sufficientBalance || !selectedToken || !amount || !isValidAmount"
         variant="primary"
       >
-          Issue Additional Tokens
+          Mint Tokens
       </b-button>
     </div>
   </div>
@@ -125,9 +125,9 @@ export default {
         let amountInRaw = bigInt(this.$utils.MAXUINT128).minus(bigInt(this.selectedToken.totalSupply))
         if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined') {
           amountInRaw = this.$Logos.convert.fromTo(amountInRaw, 0, this.issuerInfo.decimals)
-          return `You can issue an additional ${amountInRaw} ${this.selectedToken.symbol}`
+          return `You can mint an additional ${amountInRaw} ${this.selectedToken.symbol}`
         } else {
-          return `You can issue an additional ${amountInRaw} base units of ${this.selectedToken.symbol}`
+          return `You can mint an additional ${amountInRaw} base units of ${this.selectedToken.symbol}`
         }
       }
       return 'Select a token first'

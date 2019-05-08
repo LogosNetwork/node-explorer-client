@@ -191,7 +191,7 @@
                       <font-awesome-icon :icon="faMagic" class="mr-2"/>
                       Change Issuance
                     </h5>
-                    <p>The controller can change the issuance setting of {{token.name}}. This allows controllers to issue additional {{token.symbol}}.</p>
+                    <p>The controller can change the issuance setting of {{token.name}}. This allows controllers to mint additional {{token.symbol}}.</p>
                   </span>
                   <span v-else-if="privilege === 'change_modify_issuance' && token.settings.includes('modify_issuance')">
                     <h5>
@@ -205,7 +205,7 @@
                       <font-awesome-icon :icon="faMagic" class="mr-2"/>
                       Issuance
                     </h5>
-                    <p>The controller is allowed to issue additional {{token.symbol}}.</p>
+                    <p>The controller is allowed to Mint additional {{token.symbol}}.</p>
                   </span>
                   <span v-else-if="privilege === 'change_revoke' && token.settings.includes('modify_revoke')">
                     <h5>

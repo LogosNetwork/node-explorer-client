@@ -14,7 +14,7 @@
                   </b-col>
                   <b-col class="text-right">
                     <small>
-                      <span> {{parseInt(requestBlock.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</span>
+                      <span> {{parseInt(requestBlock.timestamp) | moment('calendar')}}</span>
                     </small>
                   </b-col>
                 </b-row>
@@ -59,7 +59,7 @@
                   </b-col>
                   <b-col class="text-right">
                     <small>
-                      <span v-if="microEpoch.timestamp !== '0'"> {{parseInt(microEpoch.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</span>
+                      <span v-if="microEpoch.timestamp !== '0'"> {{parseInt(microEpoch.timestamp) | moment('calendar')}}</span>
                       <span v-if="microEpoch.timestamp === '0'"> Genesis Micro Epoch</span>
                     </small>
                   </b-col>
@@ -100,7 +100,7 @@
                   </b-col>
                   <b-col class="text-right">
                     <small>
-                      <span v-if="epoch.timestamp !== '0'"> {{parseInt(epoch.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</span>
+                      <span v-if="epoch.timestamp !== '0'"> {{parseInt(epoch.timestamp) | moment('calendar')}}</span>
                       <span v-if="epoch.timestamp === '0'"> Genesis Epoch</span>
                     </small>
                   </b-col>

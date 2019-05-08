@@ -55,7 +55,7 @@
         accordionGroup="accordion"
         :slotMinHeight="290"
         :requestIcon="faMagic"
-        title="Issue Additional Tokens"
+        title="Mint Additional Tokens"
         subtitle="Increases the total supply of a token."
       >
         <issueAdditional/>

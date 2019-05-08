@@ -22,7 +22,7 @@
               </b-row>
               <b-row>
                 <b-col>
-                  <span> {{parseInt(requestBlock.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</span>
+                  <span> {{parseInt(requestBlock.timestamp) | moment('calendar')}}</span>
                 </b-col>
               </b-row>
               <b-row>

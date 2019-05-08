@@ -34,7 +34,7 @@
             <span>{{requestBlock.request_count}} </span>
             <span v-t="'requests'"></span>
           </h4>
-          <p class="text-left"><span v-t="'requestBlockCreatedOn'"></span> <strong> {{parseInt(requestBlock.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</strong></p>
+          <p class="text-left"><span v-t="'requestBlockCreatedOn'"></span> <strong> {{parseInt(requestBlock.timestamp) | moment('calendar')}}</strong></p>
           <div v-for="(request, index) in requestBlock.requests" :key='index'>
             <request :requestInfo="request"/>
           </div>

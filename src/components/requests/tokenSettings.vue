@@ -1,26 +1,26 @@
 <template>
   <span>
     <!-- Issuance -->
-    <span class="setting mr-2" v-if="token.settings.includes('issuance') && !token.settings.includes('modify_issuance')" v-b-tooltip.hover :title="`${token.name} allows controllers to issue more ${token.symbol}. This is a permanent setting and cannot be disabled.`">
+    <span class="setting mr-2" v-if="token.settings.includes('issuance') && !token.settings.includes('modify_issuance')" v-b-tooltip.hover :title="`${token.name} allows controllers to mint more ${token.symbol}. This is a permanent setting and cannot be disabled.`">
       <font-awesome-layers class="fa-lg mr-4">
         <font-awesome-icon :icon="faMagic" />
         <font-awesome-icon :icon="faLockAlt" transform="shrink-6 right-15 down-2" />
       </font-awesome-layers>
     </span>
-    <span class="setting mr-2" v-if="token.settings.includes('issuance') && token.settings.includes('modify_issuance')" v-b-tooltip.hover :title="`${token.name} allows controllers to issue more ${token.symbol}. This can be disabled by a ${token.name} controller.`">
+    <span class="setting mr-2" v-if="token.settings.includes('issuance') && token.settings.includes('modify_issuance')" v-b-tooltip.hover :title="`${token.name} allows controllers to mint more ${token.symbol}. This can be disabled by a ${token.name} controller.`">
       <font-awesome-layers class="fa-lg mr-4">
         <font-awesome-icon :icon="faMagic" />
         <font-awesome-icon :icon="faLockOpenAlt" transform="shrink-6 right-15 down-2" />
       </font-awesome-layers>
     </span>
-    <span class="setting mr-2" v-if="!token.settings.includes('issuance') && token.settings.includes('modify_issuance')" v-b-tooltip.hover :title="`${token.name} does not allow controllers to issue more ${token.symbol}. This can be changed by a ${token.name} controller.`">
+    <span class="setting mr-2" v-if="!token.settings.includes('issuance') && token.settings.includes('modify_issuance')" v-b-tooltip.hover :title="`${token.name} does not allow controllers to mint more ${token.symbol}. This can be changed by a ${token.name} controller.`">
       <font-awesome-layers class="fa-lg mr-4">
         <font-awesome-icon :icon="faBan" class="text-danger"/>
         <font-awesome-icon :icon="faMagic" transform="shrink-6"/>
         <font-awesome-icon :icon="faLockOpenAlt" transform="shrink-6 right-15 down-2" />
       </font-awesome-layers>
     </span>
-    <span class="setting mr-2" v-if="!token.settings.includes('issuance') && !token.settings.includes('modify_issuance')" v-b-tooltip.hover :title="`${token.name} does not allow controllers to issue more ${token.symbol}. This is a permanent settings and cannot be changed.`">
+    <span class="setting mr-2" v-if="!token.settings.includes('issuance') && !token.settings.includes('modify_issuance')" v-b-tooltip.hover :title="`${token.name} does not allow controllers to mint more ${token.symbol}. This is a permanent settings and cannot be changed.`">
       <font-awesome-layers class="fa-lg mr-4">
         <font-awesome-icon :icon="faBan" class="text-danger"/>
         <font-awesome-icon :icon="faMagic" transform="shrink-6"/>

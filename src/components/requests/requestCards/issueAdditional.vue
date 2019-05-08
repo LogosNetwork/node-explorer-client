@@ -4,16 +4,16 @@
       <b-card-title>
         <div class="d-flex justify-content-between">
           <div>
-            Issue Additional Tokens
+            Mint Tokens
           </div>
           <div v-if="requestInfo.createdAt" class="timestamp text-right">
             <small>
-              <span>{{ requestInfo.createdAt | moment('ddd, D MMM YYYY h:mm:ssa') }}</span>
+              <span>{{ requestInfo.createdAt | moment('calendar') }}</span>
             </small>
           </div>
           <div v-if="requestInfo.timestamp" class="timestamp text-right">
             <small>
-              <span>{{ parseInt(requestInfo.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa') }}</span>
+              <span>{{ parseInt(requestInfo.timestamp) | moment('calendar') }}</span>
             </small>
           </div>
         </div>
@@ -23,7 +23,7 @@
     <b-list-group flush>
       <b-list-group-item>
         <font-awesome-icon :icon="faMagic" class="text-success mr-2"/>
-        <strong class="mr-2">Added</strong>
+        <strong class="mr-2">Minted</strong>
         <span v-if="requestInfo.amountInToken" class="text-success mr-2">{{requestInfo.amountInToken}}</span>
         <span v-if="typeof requestInfo.amountInToken === 'undefined'" class="text-success mr-2">{{requestInfo.amount}}</span>
         <span>{{requestInfo.tokenInfo.symbol}}</span>

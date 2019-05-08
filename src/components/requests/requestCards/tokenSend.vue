@@ -11,12 +11,12 @@
           </div>
           <div v-if="requestInfo.createdAt" class="timestamp text-right">
             <small>
-              <span>{{ requestInfo.createdAt | moment('ddd, D MMM YYYY h:mm:ssa') }}</span>
+              <span>{{ requestInfo.createdAt | moment('calendar') }}</span>
             </small>
           </div>
           <div v-if="requestInfo.timestamp" class="timestamp text-right">
             <small>
-              <span>{{ parseInt(requestInfo.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa') }}</span>
+              <span>{{ parseInt(requestInfo.timestamp) | moment('calendar') }}</span>
             </small>
           </div>
         </div>

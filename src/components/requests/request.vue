@@ -75,6 +75,12 @@ export default {
             } catch (e) {
               request.prettyInfo = request.issuer_info
             }
+          } else if (this.requestInfo.constructor.name === 'UpdateIssuerInfo') {
+            try {
+              request.prettyInfo = JSON.stringify(JSON.parse(request.new_info), null, 2)
+            } catch (e) {
+              request.prettyInfo = request.issuer_info
+            }
           } else if (this.requestInfo.constructor.name === 'WithdrawLogos') {
             request.transaction.amountInLogos = this.$Logos.convert.fromReason(request.transaction.amount, 'LOGOS')
           } else if (request.transaction) {

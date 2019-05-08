@@ -341,6 +341,7 @@ export default {
     setChainAccount: function (account) {
       if (!this.currentChainAccount || this.currentChainAccount.address !== account.address) {
         this.currentChainAccount = account
+        window.scrollTo(0, 0)
       }
     },
     recordData () {

@@ -8,12 +8,12 @@
           </div>
           <div v-if="requestInfo.createdAt" class="timestamp text-right">
             <small>
-              <span>{{ requestInfo.createdAt | moment('ddd, D MMM YYYY h:mm:ssa') }}</span>
+              <span>{{ requestInfo.createdAt | moment('calendar') }}</span>
             </small>
           </div>
           <div v-if="requestInfo.timestamp" class="timestamp text-right">
             <small>
-              <span>{{ parseInt(requestInfo.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa') }}</span>
+              <span>{{ parseInt(requestInfo.timestamp) | moment('calendar') }}</span>
             </small>
           </div>
         </div>
@@ -49,7 +49,7 @@ export default {
     'b-list-group': () => import(/* webpackChunkName: "b-list-group" */'bootstrap-vue/es/components/list-group/list-group'),
     'b-list-group-item': () => import(/* webpackChunkName: "b-list-group-item" */'bootstrap-vue/es/components/list-group/list-group-item'),
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
-    'token': () => token
+    'token': token
   }
 }
 </script>

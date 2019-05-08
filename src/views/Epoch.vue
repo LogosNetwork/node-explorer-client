@@ -53,7 +53,7 @@
           <h4 class="text-left">
             <span v-t="'epoch_delegates'"></span>
           </h4>
-          <p class="text-left" v-if="epoch.timestamp !== '0'"><span v-t="'epochCreatedOn'"></span> <strong> {{parseInt(epoch.timestamp) | moment('ddd, D MMM YYYY h:mm:ssa')}}</strong></p>
+          <p class="text-left" v-if="epoch.timestamp !== '0'"><span v-t="'epochCreatedOn'"></span> <strong> {{parseInt(epoch.timestamp) | moment('calendar')}}</strong></p>
           <b-table style="background:#FFF" bordered small fixed :fields="fields" :items="epoch.delegates">
             <template slot="index" slot-scope="data">
               <div class="text-truncate">
