@@ -15,7 +15,8 @@ export default {
       walletOptions.rpc = {
         delegates: Object.values(store.getters['settings/delegates'])
       }
-      walletOptions.validateSync = true
+      walletOptions.validateSync = false
+      walletOptions.tokenSync = true
     } else {
       walletOptions = {
         tokenSync: true,
