@@ -15,10 +15,11 @@ export default {
       walletOptions.rpc = {
         delegates: Object.values(store.getters['settings/delegates'])
       }
+      walletOptions.validateSync = true
     } else {
       walletOptions = {
-        fullSync: true,
-        syncTokens: true,
+        tokenSync: true,
+        validateSync: false,
         mqtt: store.getters['settings/mqttHost'],
         rpc: {
           delegates: Object.values(store.getters['settings/delegates'])

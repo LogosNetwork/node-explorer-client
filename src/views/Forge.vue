@@ -190,9 +190,6 @@
                 </b-row>
                 <div v-if="currentChainAccount && requests && requests.length > 0">
                   <requestList :requests="requests" :address="currentChainAccount.address" :small="true"/>
-                  <!-- <div v-for="request in requests" :key="request.hash">
-                    <request :requestInfo="request" :account="currentChainAccount.address" :small="true"/>
-                  </div> -->
                 </div>
               </div>
             </div>
