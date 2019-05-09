@@ -1,6 +1,6 @@
 <template>
   <virtual-list v-if="requests && requests.length > 0"
-    :size="153" :remain="4"
+    :size="153" :remain="remains"
     ref="vlist"
     :item="request"
     :itemcount="requests.length"
@@ -24,10 +24,23 @@ export default {
   },
   data () {
     return {
-      request: Request
+      request: Request,
+      remains: this.updateRemains()
     }
   },
+  mounted () {
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.updateRemains)
+    })
+  },
+  beforeDestroy () {
+    window.removeEventListener('resize', this.updateRemains)
+  },
   methods: {
+    updateRemains () {
+      this.remains = Math.ceil(document.documentElement.clientHeight / 153)
+      return this.remains
+    },
     getItemProps (itemIndex) {
       let data = {
         key: this.requests[itemIndex].hash,
