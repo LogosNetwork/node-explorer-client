@@ -176,7 +176,7 @@
           </b-col>
           <b-col id="sidePanel" v-if="renderSidePanel" col xl="5" class="flex-column d-none d-xl-flex chainViewer">
             <div v-if="selected === 'requests'" class="d-flex flex-column flex-grow flex-fill">
-              <div class="m-3 text-left" v-infinite-scroll="getMoreRequests" infinite-scroll-distance="500">
+              <div class="m-3 text-left">
                 <b-row class="mb-3">
                   <b-col cols="9" class="d-flex flex-column m-auto align-items-start">
                     <h4 class="m-0" v-if="currentChainAccount && currentChainAccount.label">{{currentChainAccount.label}}</h4>
@@ -213,7 +213,6 @@
 import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
 import Wallet from '../api/wallet'
-import infiniteScroll from 'vue-infinite-scroll'
 import cloneDeep from 'lodash.clonedeep'
 import { faUser, faEllipsisVAlt, faSearch, faWrench, faHistory, faSpinner, faCube, faTimes, faCircle, faCoins } from '@fortawesome/pro-light-svg-icons'
 import Toasted from 'vue-toasted'
@@ -222,7 +221,6 @@ import bigInt from 'big-integer'
 import 'vue-resize/dist/vue-resize.css'
 import requestList from '@/components/requests/requestList.vue'
 import requests from '@/components/forge/requests.vue'
-Vue.use(infiniteScroll)
 Vue.use(Toasted, {
   iconPack: 'fontawesome'
 })
@@ -245,7 +243,6 @@ export default {
       currentChainAccount: null,
       selected: 'requests',
       selectedVisual: 'text',
-      wallet: this.$wallet,
       requestsBusy: false
     }
   },
@@ -273,10 +270,6 @@ export default {
     ...mapState('forge', {
       toasts: state => state.toasts,
       lookups: state => state.lookups
-    }),
-    ...mapState('forge/account', {
-      chainAccount: state => state.account,
-      requests: state => state.requests
     }),
     forgeTokens: function () {
       return this.$wallet.tokenAccounts
@@ -374,18 +367,6 @@ export default {
     },
     changeSelectedVisual: function (newSelected) {
       this.selectedVisual = newSelected
-    },
-    getMoreRequests: function () {
-      if (this.type && !this.requestsBusy && this.requests && this.requests.length > 0) {
-        this.requestsBusy = true
-        this.getRequests((response) => {
-          if (response === 'out of content') {
-            this.requestsBusy = true
-          } else if (response === 'success') {
-            this.requestsBusy = false
-          }
-        })
-      }
     },
     ...mapActions('forge', [
       'setWalletData',
