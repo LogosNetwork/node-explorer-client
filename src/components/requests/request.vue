@@ -87,16 +87,16 @@ export default {
             if (request.tokenInfo.issuerInfo &&
               typeof request.tokenInfo.issuerInfo.decimals !== 'undefined' &&
               request.tokenInfo.issuerInfo.decimals > 0) {
-              request.transaction.amountInToken = this.$Logos.convert.fromTo(request.transaction.amount, request.tokenInfo.issuerInfo.decimals, 0)
+              request.transaction.amountInToken = this.$Logos.convert.fromTo(request.transaction.amount, 0, request.tokenInfo.issuerInfo.decimals)
             }
           } else if (request.transactions) {
             request.totalAmount = this.requestInfo.totalAmount
             if (request.tokenInfo.issuerInfo &&
               typeof request.tokenInfo.issuerInfo.decimals !== 'undefined' &&
               request.tokenInfo.issuerInfo.decimals > 0) {
-              request.totalAmountInToken = this.$Logos.convert.fromTo(request.totalAmount, request.tokenInfo.issuerInfo.decimals, 0)
+              request.totalAmountInToken = this.$Logos.convert.fromTo(request.totalAmount, 0, request.tokenInfo.issuerInfo.decimals)
               for (let transaction of request.transactions) {
-                transaction.amountInToken = this.$Logos.convert.fromTo(transaction.amount, request.tokenInfo.issuerInfo.decimals, 0)
+                transaction.amountInToken = this.$Logos.convert.fromTo(transaction.amount, 0, request.tokenInfo.issuerInfo.decimals)
               }
             }
           }
