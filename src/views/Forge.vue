@@ -4,7 +4,7 @@
       <b-col cols="auto" class="accountPanel d-none d-sm-block">
         <div class="d-flex justify-content-between mt-3 mb-3 align-items-center font-weight-bold">
           <h4 class="mb-0">Accounts</h4>
-          <b-button class="font-weight-bolder" variant="link" v-on:click="$wallet.createAccount(null, false)">+ New</b-button>
+          <b-button class="font-weight-bolder" variant="link" v-on:click="createAccount">+ New</b-button>
         </div>
         <div v-if="accounts.length > 0">
           <b-list-group flush>
@@ -241,6 +241,7 @@ export default {
       faCircle,
       faCoins,
       currentChainAccount: null,
+      wallet: this.$wallet,
       selected: 'requests',
       selectedVisual: 'text',
       requestsBusy: false
@@ -272,13 +273,13 @@ export default {
       lookups: state => state.lookups
     }),
     forgeTokens: function () {
-      return this.$wallet.tokenAccounts
+      return this.wallet.tokenAccounts
     },
     forgeAccounts: function () {
-      return this.$wallet.accountsObject
+      return this.wallet.accountsObject
     },
     currentAccount: function () {
-      return this.$wallet.account
+      return this.wallet.account
     },
     chains: function () {
       let requests = {}
@@ -336,7 +337,7 @@ export default {
       }
     },
     recordData () {
-      this.setWalletData(this.$wallet.toJSON())
+      this.setWalletData(this.wallet.toJSON())
     },
     closeChain: function () {
       this.setChainAccount(this.currentAccount)
@@ -345,8 +346,8 @@ export default {
       this.selected = newSelected
     },
     setCurrentAccount: function (address) {
-      if (this.$wallet.currentAccountAddress !== address) {
-        this.$wallet.currentAccountAddress = address
+      if (this.wallet.currentAccountAddress !== address) {
+        this.wallet.currentAccountAddress = address
       } else if (this.currentChainAccount && this.currentAccount && this.currentChainAccount.address !== address) {
         this.setChainAccount(this.currentAccount)
       }
@@ -363,7 +364,10 @@ export default {
       return msg
     },
     removeAccount: function (address) {
-      this.$wallet.removeAccount(address)
+      this.wallet.removeAccount(address)
+    },
+    createAccount: function () {
+      this.wallet.createAccount(null, false)
     },
     changeSelectedVisual: function (newSelected) {
       this.selectedVisual = newSelected
@@ -386,9 +390,9 @@ export default {
     })
   },
   created: function () {
-    this.$wallet.sync()
-    if (this.$wallet.currentAccountAddress) {
-      this.setChainAccount(this.$wallet.account)
+    this.wallet.sync()
+    if (this.wallet.currentAccountAddress) {
+      this.setChainAccount(this.wallet.account)
     }
     if (!this.currentChainAccount && this.currentAccount) {
       this.currentChainAccount = this.currentAccount
@@ -408,7 +412,7 @@ export default {
       }
     },
     delegates: function (newDelegates, oldDelegates) {
-      this.$wallet.rpc.delegates = newDelegates
+      this.wallet.rpc.delegates = newDelegates
     },
     toasts: function (newToasts, oldToasts) {
       if (oldToasts !== null && newToasts.length > 0) {
@@ -438,7 +442,7 @@ export default {
       }
     },
     chains: function (newRequests, oldRequests) {
-      if (this.$wallet.synced) {
+      if (this.wallet.synced) {
         for (let address in oldRequests) {
           let newRequestCount = newRequests[address].length - oldRequests[address].length
           if (newRequestCount > 0) {
