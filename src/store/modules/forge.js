@@ -3,7 +3,7 @@ import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
 import bigInt from 'big-integer'
 
 const state = {
-  toasts: {},
+  toasts: [],
   lookups: [],
   issuerInfo: '',
   tempInfo: '',

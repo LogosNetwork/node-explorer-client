@@ -12,19 +12,18 @@ export default {
     if (store.getters['forge/walletData']) {
       walletOptions = JSON.parse(store.getters['forge/walletData'])
       walletOptions.mqtt = store.getters['settings/mqttHost']
-      walletOptions.rpc = {
-        delegates: Object.values(store.getters['settings/delegates'])
-      }
       walletOptions.validateSync = false
       walletOptions.tokenSync = true
     } else {
       walletOptions = {
         tokenSync: true,
         validateSync: false,
-        mqtt: store.getters['settings/mqttHost'],
-        rpc: {
-          delegates: Object.values(store.getters['settings/delegates'])
-        }
+        mqtt: store.getters['settings/mqttHost']
+      }
+    }
+    if (store.getters['settings/delegates']) {
+      walletOptions.rpc = {
+        delegates: Object.values(store.getters['settings/delegates'])
       }
     }
     if (store.getters['settings/proxyURL']) {

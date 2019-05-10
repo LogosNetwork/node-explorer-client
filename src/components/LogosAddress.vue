@@ -71,6 +71,6 @@ export default {
 </script>
 <style scoped lang="scss">
 .wordBreak {
-  word-break: break-word
+  word-break: break-all
 }
 </style>

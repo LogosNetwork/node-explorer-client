@@ -185,8 +185,10 @@ export default {
     this.getRequestBlocks(true)
     this.getMicroEpochs(true)
     this.getEpochs(true)
-    for (let i = 0; i < Object.keys(this.delegates).length; i++) {
-      this.rbDelegateLabels.push({ value: i, text: `Request Blocks for delegate ${i}: ${this.delegates[i]}` })
+    if (this.delegates) {
+      for (let i = 0; i < Object.keys(this.delegates).length; i++) {
+        this.rbDelegateLabels.push({ value: i, text: `Request Blocks for delegate ${i}: ${this.delegates[i]}` })
+      }
     }
   },
   methods: {

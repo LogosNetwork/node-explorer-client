@@ -267,7 +267,8 @@ export default {
     ...mapState('settings', {
       mqttHost: state => state.mqttHost,
       rpcHost: state => state.rpcHost,
-      proxyURL: state => state.proxyURL
+      proxyURL: state => state.proxyURL,
+      delegates: state => state.delegates
     }),
     ...mapState('forge', {
       toasts: state => state.toasts,
@@ -425,8 +426,11 @@ export default {
         this.$Logos.changeServer(newRpcHost)
       }
     },
+    delegates: function (newDelegates, oldDelegates) {
+      this.$wallet.rpc.delegates = newDelegates
+    },
     toasts: function (newToasts, oldToasts) {
-      if (newToasts.length > 0) {
+      if (oldToasts !== null && newToasts.length > 0) {
         let newToast = cloneDeep(newToasts[newToasts.length - 1])
         newToast.message = this.replaceAddresses(newToast.message)
         let actions = [
@@ -453,14 +457,16 @@ export default {
       }
     },
     chains: function (newRequests, oldRequests) {
-      for (let address in oldRequests) {
-        let newRequestCount = newRequests[address].length - oldRequests[address].length
-        if (newRequestCount > 0) {
-          for (let i = 0; i < newRequestCount; i++) {
-            this.createToast({
-              address: address,
-              request: newRequests[address][i]
-            })
+      if (this.$wallet.synced) {
+        for (let address in oldRequests) {
+          let newRequestCount = newRequests[address].length - oldRequests[address].length
+          if (newRequestCount > 0) {
+            for (let i = 0; i < newRequestCount; i++) {
+              this.createToast({
+                address: address,
+                request: newRequests[address][i]
+              })
+            }
           }
         }
       }
