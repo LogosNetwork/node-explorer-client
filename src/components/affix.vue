@@ -267,24 +267,22 @@ export default {
 
       if (this.affixIsBiggerThanRelativeElement) {
         this.setScrollAffixTop()
-      } else {
-        if (this.screenIsBeforeRelativeElm) {
-          this.setScrollAffixTop()
-        } else if (this.screenIsPastRelativeElm) {
-          this.setScrollAffixBottom()
-        } else if (this.screenIsInsideRelativeElm) {
-          const shouldSetAffixScrolling = (this.currentScrollAffix === 'scrollaffix-top') ||
-            (this.currentScrollAffix === 'scrollaffix-bottom') ||
-            (this.currentScrollAffix === 'scrollaffix-up' && this.scrollingDown) ||
-            (this.currentScrollAffix === 'scrollaffix-down' && this.scrollingUp)
+      } else if (this.screenIsBeforeRelativeElm) {
+        this.setScrollAffixTop()
+      } else if (this.screenIsPastRelativeElm) {
+        this.setScrollAffixBottom()
+      } else if (this.screenIsInsideRelativeElm) {
+        const shouldSetAffixScrolling = (this.currentScrollAffix === 'scrollaffix-top') ||
+          (this.currentScrollAffix === 'scrollaffix-bottom') ||
+          (this.currentScrollAffix === 'scrollaffix-up' && this.scrollingDown) ||
+          (this.currentScrollAffix === 'scrollaffix-down' && this.scrollingUp)
 
-          if (this.screenIsBeforeAffix && this.scrollingUp) {
-            this.setScrollAffixUp()
-          } else if (this.screenIsPastAffix && this.scrollingDown) {
-            this.setScrollAffixDown()
-          } else if (shouldSetAffixScrolling) {
-            this.setScrollAffixScrolling()
-          }
+        if (this.screenIsBeforeAffix && this.scrollingUp) {
+          this.setScrollAffixUp()
+        } else if (this.screenIsPastAffix && this.scrollingDown) {
+          this.setScrollAffixDown()
+        } else if (shouldSetAffixScrolling) {
+          this.setScrollAffixScrolling()
         }
       }
 
@@ -383,7 +381,7 @@ export default {
       if (this.topOfScreen > this.lastDistanceFromTop) {
         this.scrollingDown = true
         this.scrollingUp = false
-      } else {
+      } else if (this.topOfScreen < this.lastDistanceFromTop) {
         this.scrollingUp = true
         this.scrollingDown = false
       }

@@ -154,7 +154,7 @@
           <b-col col :xl="renderSidePanel ? 7 : 12" class="d-flex flex-column">
             <b-row class="actionSelector flex-grow flex-fill">
               <b-col class="m-3 text-left overflow-hidden">
-                <affix ref="scrollAffixElement" v-if="renderSidePanel" class="scrollaffix-sidebar" :offset="{ top: 124, bottom: 31 }" relative-element-selector="#sidePanel" :scroll-affix="true">
+                <affix ref="scrollAffixElement" v-if="renderSidePanel" class="scrollaffix-sidebar" :offset="{ top: 124, bottom: 30 }" relative-element-selector="#sidePanel" :scroll-affix="true">
                   <resize-observer @notify="handleResize" />
                   <div v-if="selected === 'lookup'">
                     <Lookups />
