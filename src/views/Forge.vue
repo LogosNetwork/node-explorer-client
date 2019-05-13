@@ -28,7 +28,7 @@
                       <span class="sr-only">Account Options</span>
                     </template>
                     <b-dropdown-item :href="`/${account.address}`" target="_blank">Open Account Page</b-dropdown-item>
-                    <b-dropdown-item v-on:click="removeAccount(account.address)">Remove Account</b-dropdown-item>
+                    <b-dropdown-item v-on:click.stop.prevent="removeAccount(account.address)">Remove Account</b-dropdown-item>
                   </b-dropdown>
                 </b-col>
               </b-row>
@@ -210,6 +210,10 @@ export default {
   name: 'workshop',
   data () {
     return {
+      wallet: this.$wallet,
+      selected: 'requests',
+      selectedVisual: 'text',
+      requestsBusy: false,
       faUser,
       faEllipsisVAlt,
       faSearch,
@@ -219,11 +223,7 @@ export default {
       faTimes,
       faCube,
       faCircle,
-      faCoins,
-      wallet: this.$wallet,
-      selected: 'requests',
-      selectedVisual: 'text',
-      requestsBusy: false
+      faCoins
     }
   },
   components: {
@@ -306,9 +306,7 @@ export default {
       this.selected = newSelected
     },
     setCurrentAccount: function (address) {
-      if (this.wallet.currentAccountAddress !== address) {
-        this.wallet.currentAccountAddress = address
-      }
+      this.wallet.currentAccountAddress = address
     },
     replaceAddresses: function (msg) {
       if (msg) {
@@ -322,10 +320,13 @@ export default {
       return msg
     },
     removeAccount: function (address) {
+      Vue.delete(this.wallet._accounts, address)
       this.wallet.removeAccount(address)
     },
-    createAccount: function () {
-      this.wallet.createAccount(null, false)
+    createAccount: async function () {
+      let newAccount = await this.wallet.createAccount(null, false)
+      delete this.wallet._accounts[newAccount.address]
+      this.$set(this.wallet._accounts, newAccount.address, newAccount)
     },
     changeSelectedVisual: function (newSelected) {
       this.selectedVisual = newSelected
@@ -387,15 +388,17 @@ export default {
       }
     },
     chains: function (newRequests, oldRequests) {
-      if (this.wallet.synced) {
+      if (this.wallet.synced && oldRequests) {
         for (let address in oldRequests) {
-          let newRequestCount = newRequests[address].length - oldRequests[address].length
-          if (newRequestCount > 0) {
-            for (let i = 0; i < newRequestCount; i++) {
-              this.createToast({
-                address: address,
-                request: newRequests[address][i]
-              })
+          if (newRequests[address]) {
+            let newRequestCount = newRequests[address].length - oldRequests[address].length
+            if (newRequestCount > 0) {
+              for (let i = 0; i < newRequestCount; i++) {
+                this.createToast({
+                  address: address,
+                  request: newRequests[address][i]
+                })
+              }
             }
           }
         }

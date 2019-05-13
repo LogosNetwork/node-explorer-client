@@ -1,14 +1,14 @@
 <template>
-  <div v-if="currentAccount">
+  <div v-if="wallet.account">
 
     <b-row class="mb-3">
       <b-col cols="9">
-        <h4>{{currentAccount.label}}</h4>
-        <small><LogosAddress :address="currentAccount.address" /></small>
+        <h4>{{wallet.account.label}}</h4>
+        <small><LogosAddress :address="wallet.account.address" /></small>
       </b-col>
       <b-col cols="3" class="d-flex flex-column m-auto align-items-end">
         <qrcode
-          :value="'lgs:'+currentAccount.address"
+          :value="'lgs:'+wallet.account.address"
           :options="{ size: 70, background: 'transparent' }"
         ></qrcode>
       </b-col>
@@ -234,7 +234,8 @@ export default {
       faArrowDown,
       faHandReceiving,
       faPercentage,
-      faCrown
+      faCrown,
+      wallet: this.$wallet
     }
   },
   components: {
@@ -260,30 +261,24 @@ export default {
     'withdrawLogos': () => import(/* webpackChunkName: "withdrawLogosForm" */'@/components/forge/requestForms/withdrawLogos.vue')
   },
   computed: {
-    forgeTokens: function () {
-      return this.$wallet.tokenAccounts
-    },
-    currentAccount: function () {
-      return this.$wallet.account
-    },
     hasFunds: function () {
-      if (this.currentAccount && this.currentAccount.balance) {
-        return bigInt(this.currentAccount.balance).greater(0)
+      if (this.wallet.account && this.wallet.account.balance) {
+        return bigInt(this.wallet.account.balance).greater(0)
       } else {
         return false
       }
     },
     hasTokenBalance: function () {
-      if (this.currentAccount && this.currentAccount.tokenBalances) {
-        for (let tokenID in this.currentAccount.tokenBalances) {
-          let forgeToken = this.forgeTokens[this.$utils.parseAccount(tokenID)]
+      if (this.wallet.account && this.wallet.account.tokenBalances) {
+        for (let tokenID in this.wallet.account.tokenBalances) {
+          let forgeToken = this.wallet.tokenAccounts[this.$utils.parseAccount(tokenID)]
           if (forgeToken.feeType === 'flat') {
-            if (bigInt(this.currentAccount.tokenBalances[tokenID])
+            if (bigInt(this.wallet.account.tokenBalances[tokenID])
               .minus(bigInt(forgeToken.feeRate)).greater(0)) {
               return true
             }
           } else {
-            if (bigInt(this.currentAccount.tokenBalances[tokenID]).greater(0)) {
+            if (bigInt(this.wallet.account.tokenBalances[tokenID]).greater(0)) {
               return true
             }
           }
@@ -295,12 +290,12 @@ export default {
   },
   methods: {
     tokenPrivileges: function (privilege) {
-      if (this.forgeTokens) {
-        for (let tokenAddress in this.forgeTokens) {
-          let token = this.forgeTokens[tokenAddress]
+      if (this.wallet.tokenAccounts) {
+        for (let tokenAddress in this.wallet.tokenAccounts) {
+          let token = this.wallet.tokenAccounts[tokenAddress]
           for (let controllerAddress in token.controllers) {
             let controller = token.controllers[controllerAddress]
-            if (controller.account === this.currentAccount.address) {
+            if (controller.account === this.wallet.account.address) {
               if (privilege === 'distribute' ||
                 privilege === 'withdraw_logos' ||
                 privilege === 'withdraw_fee' ||
