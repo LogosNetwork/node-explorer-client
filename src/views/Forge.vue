@@ -6,11 +6,11 @@
           <h4 class="mb-0">Accounts</h4>
           <b-button class="font-weight-bolder" variant="link" v-on:click="createAccount">+ New</b-button>
         </div>
-        <div v-if="accounts.length > 0">
+        <div v-if="wallet.accounts.length > 0">
           <b-list-group flush>
             <b-list-group-item
-              v-bind:class="{ active: currentAccount && account.address === currentAccount.address }"
-              v-for="account in accounts" :key="account.address"
+              v-bind:class="{ active: wallet.account && account.address === wallet.account.address }"
+              v-for="account in wallet.accounts" :key="account.address"
               class="d-flex justify-content-between align-items-center mb-2"
               button
               :disabled="!account.synced"
@@ -28,9 +28,6 @@
                       <span class="sr-only">Account Options</span>
                     </template>
                     <b-dropdown-item :href="`/${account.address}`" target="_blank">Open Account Page</b-dropdown-item>
-                    <!-- <b-dropdown-item href="#">Change Label</b-dropdown-item>
-                    <b-dropdown-item href="#">Account Info</b-dropdown-item>
-                    <b-dropdown-item href="#">Copy Account Address</b-dropdown-item> -->
                     <b-dropdown-item v-on:click="removeAccount(account.address)">Remove Account</b-dropdown-item>
                   </b-dropdown>
                 </b-col>
@@ -52,24 +49,14 @@
         <div class="d-flex justify-content-between mt-3 mb-3 align-items-center font-weight-bold">
           <h4 class="mb-0">Tokens</h4>
         </div>
-        <div v-if="tokens.length > 0">
+        <div v-if="hasTokens">
           <b-list-group flush>
             <b-list-group-item
-              v-for="token in tokens" :key="token.address"
+              v-for="token in wallet.tokenAccounts" :key="token.address"
               class="d-flex justify-content-between align-items-center mb-2"
-              v-on:click="setChainAccount(token)"
               button
             >
               <b-row v-if="token.name" :no-gutters="true" class="d-flex flex-wrap align-items-center w-100">
-                <b-col cols="auto" class="mr-2" v-if="token.issuerInfo.image">
-                  <img :alt="`${token.name} image`" class="avatar" :src="token.issuerInfo.image">
-                </b-col>
-                <b-col cols="auto" class="mr-2 defaultIcon" v-else>
-                  <font-awesome-layers class="fa-lg mr-2 align-middle">
-                    <font-awesome-icon :icon="faCircle" />
-                    <font-awesome-icon :icon="faCoins" transform="shrink-6" />
-                  </font-awesome-layers>
-                </b-col>
                 <b-col class="text-overflow text-left text-nowrap text-truncate">
                   <div class="text-truncate">{{token.name}} - ({{token.symbol}})</div>
                   <small><LogosAddress class="text-muted" :inactive="true" :force="true" :address="token.address" /></small>
@@ -81,8 +68,6 @@
                       <span class="sr-only">Token Options</span>
                     </template>
                     <b-dropdown-item :href="`/${token.address}`" target="_blank">Open Token Page</b-dropdown-item>
-                    <!-- <b-dropdown-item href="#">Token Info</b-dropdown-item>
-                    <b-dropdown-item href="#">Copy Token Address</b-dropdown-item> -->
                   </b-dropdown>
                 </b-col>
               </b-row>
@@ -178,18 +163,13 @@
             <div v-if="selected === 'requests'" class="d-flex flex-column flex-grow flex-fill">
               <div class="m-3 text-left">
                 <b-row class="mb-3">
-                  <b-col cols="9" class="d-flex flex-column m-auto align-items-start">
-                    <h4 class="m-0" v-if="currentChainAccount && currentChainAccount.label">{{currentChainAccount.label}}</h4>
-                    <h4 class="m-0" v-else-if="currentChainAccount && currentChainAccount.name">{{currentChainAccount.name}} - {{currentChainAccount.symbol}}</h4>
-                  </b-col>
-                  <b-col cols="3" class="d-flex flex-column m-auto align-items-end">
-                    <b-button v-if="currentChainAccount && currentAccount && currentChainAccount.address !== currentAccount.address" class="font-weight-bolder" variant="link" v-on:click="closeChain()">
-                      <font-awesome-icon size="lg" class="mr-2" :icon="faTimes" />
-                    </b-button>
+                  <b-col cols="12" class="d-flex flex-column m-auto align-items-start">
+                    <h4 class="m-0" v-if="wallet.account && wallet.account.label">{{wallet.account.label}}</h4>
+                    <h4 class="m-0" v-else-if="wallet.account && wallet.account.name">{{wallet.account.name}} - {{wallet.account.symbol}}</h4>
                   </b-col>
                 </b-row>
-                <div v-if="currentChainAccount && requests && requests.length > 0">
-                  <requestList :requests="requests" :address="currentChainAccount.address" :small="true"/>
+                <div v-if="wallet.account && requests && requests.length > 0">
+                  <requestList :requests="requests" :address="wallet.account.address" :small="true"/>
                 </div>
               </div>
             </div>
@@ -240,7 +220,6 @@ export default {
       faCube,
       faCircle,
       faCoins,
-      currentChainAccount: null,
       wallet: this.$wallet,
       selected: 'requests',
       selectedVisual: 'text',
@@ -272,43 +251,33 @@ export default {
       toasts: state => state.toasts,
       lookups: state => state.lookups
     }),
-    forgeTokens: function () {
-      return this.wallet.tokenAccounts
-    },
-    forgeAccounts: function () {
-      return this.wallet.accountsObject
-    },
-    currentAccount: function () {
-      return this.wallet.account
-    },
     chains: function () {
       let requests = {}
-      for (let tokenAddress in this.forgeTokens) {
-        requests[tokenAddress] = this.history(this.forgeTokens[tokenAddress])
+      for (let tokenAddress in this.wallet.tokenAccounts) {
+        requests[tokenAddress] = this.history(this.wallet.tokenAccounts[tokenAddress])
       }
-      for (let address in this.forgeAccounts) {
-        requests[address] = this.history(this.forgeAccounts[address])
+      for (let address in this.wallet.accountsObject) {
+        requests[address] = this.history(this.wallet.accountsObject[address])
       }
       return requests
     },
     requests: function () {
-      return this.history(this.currentChainAccount)
+      return this.history(this.wallet.account)
     },
     renderSidePanel: function () {
-      return (this.currentChainAccount) || (this.selected === 'lookup' && this.lookups && this.lookups.length > 0)
-    },
-    accounts: function () {
-      if (this.forgeAccounts) {
-        return Array.from(Object.values(this.forgeAccounts))
-      } else {
-        return []
-      }
-    },
-    tokens: function () {
-      return Array.from(Object.values(this.forgeTokens))
+      return (this.wallet.account) || (this.selected === 'lookup' && this.lookups && this.lookups.length > 0)
     }
   },
   methods: {
+    hasTokens () {
+      if (!this.wallet || !this.wallet.tokenAccounts) return false
+      for (let prop in this.wallet.tokenAccounts) {
+        if (this.wallet.tokenAccounts.hasOwnProperty(prop)) {
+          return true
+        }
+      }
+      return false
+    },
     handleResize () {
       this.$refs.scrollAffixElement.onScroll()
     },
@@ -330,17 +299,8 @@ export default {
       })
       return deduped
     },
-    setChainAccount: function (account) {
-      if (!this.currentChainAccount || this.currentChainAccount.address !== account.address) {
-        this.currentChainAccount = account
-        window.scrollTo(0, 0)
-      }
-    },
     recordData () {
       this.setWalletData(this.wallet.toJSON())
-    },
-    closeChain: function () {
-      this.setChainAccount(this.currentAccount)
     },
     changeSelected: function (newSelected) {
       this.selected = newSelected
@@ -348,17 +308,15 @@ export default {
     setCurrentAccount: function (address) {
       if (this.wallet.currentAccountAddress !== address) {
         this.wallet.currentAccountAddress = address
-      } else if (this.currentChainAccount && this.currentAccount && this.currentChainAccount.address !== address) {
-        this.setChainAccount(this.currentAccount)
       }
     },
     replaceAddresses: function (msg) {
       if (msg) {
-        for (let account in this.forgeAccounts) {
-          msg = msg.replace(new RegExp(account, 'g'), this.forgeAccounts[account].label)
+        for (let account in this.wallet.accountsObject) {
+          msg = msg.replace(new RegExp(account, 'g'), this.wallet.accountsObject[account].label)
         }
-        for (let account in this.forgeTokens) {
-          msg = msg.replace(new RegExp(account, 'g'), this.forgeTokens[account].name)
+        for (let account in this.wallet.tokenAccounts) {
+          msg = msg.replace(new RegExp(account, 'g'), this.wallet.tokenAccounts[account].name)
         }
       }
       return msg
@@ -382,6 +340,7 @@ export default {
     ])
   },
   mounted: function () {
+    this.wallet.sync()
     window.addEventListener('beforeunload', this.recordData)
     this.initalize({ url: this.mqttHost,
       cb: () => {
@@ -389,21 +348,7 @@ export default {
       }
     })
   },
-  created: function () {
-    this.wallet.sync()
-    if (this.wallet.currentAccountAddress) {
-      this.setChainAccount(this.wallet.account)
-    }
-    if (!this.currentChainAccount && this.currentAccount) {
-      this.currentChainAccount = this.currentAccount
-    }
-  },
   watch: {
-    currentAccount: function (newAccount, oldAccount) {
-      if ((newAccount && oldAccount === null) || (newAccount && oldAccount && newAccount.address !== oldAccount.address)) {
-        this.setChainAccount(newAccount)
-      }
-    },
     rpcHost: function (newRpcHost, oldRpcHost) {
       if (this.proxyURL) {
         this.$Logos.changeServer(this.proxyURL, newRpcHost)
