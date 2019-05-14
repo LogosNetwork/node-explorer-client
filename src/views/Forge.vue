@@ -266,10 +266,8 @@ export default {
     },
     renderSidePanel: function () {
       return (this.wallet.account) || (this.selected === 'lookup' && this.lookups && this.lookups.length > 0)
-    }
-  },
-  methods: {
-    hasTokens () {
+    },
+    hasTokens: function () {
       if (!this.wallet || !this.wallet.tokenAccounts) return false
       for (let prop in this.wallet.tokenAccounts) {
         if (this.wallet.tokenAccounts.hasOwnProperty(prop)) {
@@ -277,7 +275,9 @@ export default {
         }
       }
       return false
-    },
+    }
+  },
+  methods: {
     handleResize () {
       this.$refs.scrollAffixElement.onScroll()
     },
@@ -327,6 +327,11 @@ export default {
       let newAccount = await this.wallet.createAccount(null, false)
       delete this.wallet._accounts[newAccount.address]
       this.$set(this.wallet._accounts, newAccount.address, newAccount)
+      for (let token in this.wallet._tokenAccounts) {
+        let tkAccount = this.wallet._tokenAccounts[token]
+        delete this.wallet._tokenAccounts[token]
+        this.$set(this.wallet._tokenAccounts, tkAccount.address, tkAccount)
+      }
     },
     changeSelectedVisual: function (newSelected) {
       this.selectedVisual = newSelected

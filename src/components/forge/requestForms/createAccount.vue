@@ -94,12 +94,26 @@ export default {
     }
   },
   methods: {
-    generateAccount () {
+    generateAccount: async function () {
       if (this.createAccountForm.privateKey) {
-        this.$wallet.createAccount({ privateKey: this.createAccountForm.privateKey })
+        let newAccount = await this.$wallet.createAccount({ privateKey: this.createAccountForm.privateKey })
+        delete this.$wallet._accounts[newAccount.address]
+        this.$set(this.$wallet._accounts, newAccount.address, newAccount)
+        for (let token in this.$wallet._tokenAccounts) {
+          let tkAccount = this.$wallet._tokenAccounts[token]
+          delete this.$wallet._tokenAccounts[token]
+          this.$set(this.$wallet._tokenAccounts, tkAccount.address, tkAccount)
+        }
       } else {
         this.$wallet.seed = this.localSeed
-        this.$wallet.createAccount()
+        let newAccount = await this.$wallet.createAccount()
+        delete this.$wallet._accounts[newAccount.address]
+        this.$set(this.$wallet._accounts, newAccount.address, newAccount)
+        for (let token in this.$wallet._tokenAccounts) {
+          let tkAccount = this.$wallet._tokenAccounts[token]
+          delete this.$wallet._tokenAccounts[token]
+          this.$set(this.$wallet._tokenAccounts, tkAccount.address, tkAccount)
+        }
       }
     }
   }
