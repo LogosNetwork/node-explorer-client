@@ -399,6 +399,13 @@ export default {
             let newRequestCount = newRequests[address].length - oldRequests[address].length
             if (newRequestCount > 0) {
               for (let i = 0; i < newRequestCount; i++) {
+                if (newRequests[address][i].type === 'issuance') {
+                  for (let token in this.wallet._tokenAccounts) {
+                    let tkAccount = this.wallet._tokenAccounts[token]
+                    delete this.wallet._tokenAccounts[token]
+                    this.$set(this.wallet._tokenAccounts, tkAccount.address, tkAccount)
+                  }
+                }
                 this.createToast({
                   address: address,
                   request: newRequests[address][i]
