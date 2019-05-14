@@ -435,6 +435,7 @@ $bg-white: #FFF;
   left: 0;
   width: 100vw;
   z-index: 2;
+  margin: 0px;
 }
 .scrollContainer {
   margin-top: 70px;
@@ -446,10 +447,12 @@ $bg-white: #FFF;
     margin-left: 265px;
   }
   .scrollContainer {
-    max-width: calc(100vw - 280px);
+    max-width: calc(100vw - 265px);
   }
   .selectors {
     left: 280px;
+    margin-left: -15px;
+    margin-right: -15px;
     width: calc(100vw - 265px);
   }
 }
