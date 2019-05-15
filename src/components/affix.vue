@@ -196,10 +196,6 @@ export default {
       this.affixRect = this.$el.getBoundingClientRect()
       this.affixHeight = this.$el.offsetHeight
       this.relativeElmOffsetTop = this.getOffsetTop(this.relativeElement)
-      if (this.shouldUseScrollAffix && !this.affixIsBiggerThanRelativeElement &&
-        this.currentAffixedHeight + this.affixTopPos >= this.relativeElement.offsetHeight) {
-        window.scrollBy(0, -(this.currentAffixedHeight + this.affixTopPos + this.offset.top))
-      }
     },
 
     handleScroll () {
@@ -280,7 +276,6 @@ export default {
 
     handleScrollAffix () {
       this.setScrollingDirection()
-
       if (this.affixIsBiggerThanRelativeElement) {
         this.setScrollAffixTop()
       } else if (this.screenIsBeforeRelativeElm) {
@@ -301,7 +296,11 @@ export default {
           this.setScrollAffixScrolling()
         }
       }
-
+      if (!this.affixIsBiggerThanRelativeElement &&
+        this.currentAffixedHeight + this.affixTopPos > this.relativeElement.offsetHeight) {
+        window.scrollBy(0, -(this.currentAffixedHeight + this.affixTopPos - this.relativeElement.offsetHeight))
+        this.setScrollAffixUp()
+      }
       this.lastScrollAffixState = this.currentScrollAffix
       this.lastDistanceFromTop = this.topOfScreen
     },
