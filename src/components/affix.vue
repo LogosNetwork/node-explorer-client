@@ -120,14 +120,6 @@ export default {
       return this.topOfScreen + this.scrollContainer.innerHeight
     },
 
-    relativeElmTopPos () {
-      return this.topOfScreen + this.relativeElement.getBoundingClientRect().top
-    },
-
-    relativeElmBottomPos () {
-      return this.topOfScreen + this.relativeElement.getBoundingClientRect().bottom
-    },
-
     screenIsPastAffix () {
       return this.bottomOfScreen >= this.affixBottomPos
     },
@@ -137,11 +129,11 @@ export default {
     },
 
     screenIsBeforeRelativeElm () {
-      return this.topOfScreen <= this.relativeElmTopPos - this.offset.top
+      return this.topOfScreen <= this.relativeElmTopPos() - this.offset.top
     },
 
     screenIsPastRelativeElm () {
-      return this.bottomOfScreen >= this.relativeElmBottomPos + this.offset.bottom
+      return this.bottomOfScreen >= this.relativeElmBottomPos() + this.offset.bottom
     },
 
     screenIsInsideRelativeElm () {
@@ -155,7 +147,15 @@ export default {
     },
 
     affixIsBiggerThanRelativeElement () {
-      return this.affixHeight + this.offset.top >= this.relativeElement.offsetHeight
+      if ((this.currentState && this.currentState === 'affix-top') ||
+        (this.currentScrollAffix && this.currentScrollAffix === 'scrollaffix-top')) {
+        return this.affixHeight + this.offset.top >= this.relativeElement.offsetHeight
+      } else if ((this.currentState && this.currentState === 'affix-bottom') ||
+        (this.currentScrollAffix && this.currentScrollAffix === 'scrollaffix-bottom')) {
+        return this.affixHeight + this.offset.bottom >= this.relativeElement.offsetHeight
+      } else {
+        return this.affixHeight >= this.relativeElement.offsetHeight
+      }
     }
   },
 
@@ -205,6 +205,14 @@ export default {
       })
     },
 
+    relativeElmTopPos () {
+      return this.topOfScreen + this.relativeElement.getBoundingClientRect().top
+    },
+
+    relativeElmBottomPos () {
+      return this.topOfScreen + this.relativeElement.getBoundingClientRect().bottom
+    },
+
     onScroll () {
       if (!this.enabled) {
         this.removeClasses()
@@ -248,12 +256,12 @@ export default {
         }
 
         if (this.topOfScreen >= this.relativeElmOffsetTop - this.offset.top &&
-          this.relativeElmBottomPos - this.offset.bottom >=
+          this.relativeElmBottomPos() - this.offset.bottom >=
           this.topOfScreen + this.topPadding + this.affixHeight + this.offset.top) {
           this.setAffix()
         }
 
-        if (this.relativeElmBottomPos - this.offset.bottom < this.topOfScreen +
+        if (this.relativeElmBottomPos() - this.offset.bottom < this.topOfScreen +
           this.topPadding + this.affixHeight + this.offset.top) {
           this.setAffixBottom()
         }
@@ -368,7 +376,7 @@ export default {
      */
     setScrollAffixBottom () {
       this.currentScrollAffix = 'scrollaffix-bottom'
-      this.$el.style.top = `${this.relativeElmBottomPos - this.affixInitialTop - this.affixHeight}px`
+      this.$el.style.top = `${this.relativeElmBottomPos() - this.affixInitialTop - this.affixHeight}px`
       this.$el.style.bottom = 'auto'
       this.removeClasses()
       this.emitEvent()
