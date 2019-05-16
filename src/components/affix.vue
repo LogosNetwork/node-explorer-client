@@ -269,10 +269,14 @@ export default {
           this.currentScrollAffix = null
           this.lastScrollAffixState = null
           this.removeClasses()
+          this.updateData()
         } else if (mode === 'scrollAffix') {
           this.currentState = null
           this.lastState = null
           this.removeClasses()
+          this.$el.style.top = 'auto'
+          this.$el.style.bottom = 'auto'
+          this.updateData()
           this.initScrollAffix()
         }
       }
