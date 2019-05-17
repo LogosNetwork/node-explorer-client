@@ -214,7 +214,7 @@ export default {
       selected: 'requests',
       selectedVisual: 'text',
       requestsBusy: false,
-      currentAccount: {},
+      currentAccount: null,
       faUser,
       faEllipsisVAlt,
       faSearch,
