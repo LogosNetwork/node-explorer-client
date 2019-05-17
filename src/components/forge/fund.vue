@@ -29,6 +29,9 @@ import { faArrowDown } from '@fortawesome/pro-light-svg-icons'
 
 export default {
   name: 'forgeFund',
+  props: {
+    address: String
+  },
   data () {
     return {
       faArrowDown
@@ -42,16 +45,13 @@ export default {
   computed: {
     ...mapState('settings', {
       requestURL: state => state.requestURL
-    }),
-    currentAccount: function () {
-      return this.$wallet.account
-    }
+    })
   },
   methods: {
     requestFaucet () {
-      if (this.currentAccount.address.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
+      if (this.address.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
         axios.post(`${this.requestURL}/faucet`, {
-          address: this.currentAccount.address
+          address: this.address
         }).then((res) => {
         }).catch((err) => {
           alert(err)

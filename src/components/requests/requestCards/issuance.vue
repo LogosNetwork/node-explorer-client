@@ -4,7 +4,7 @@
       <b-card-title>
         <div class="d-flex justify-content-between">
           <div>
-            Token Issuance
+            Issuance
           </div>
           <div v-if="requestInfo.createdAt" class="timestamp text-right">
             <small>

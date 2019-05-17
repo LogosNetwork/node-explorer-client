@@ -29,9 +29,7 @@ export default {
     }
   },
   mounted () {
-    this.$nextTick(() => {
-      window.addEventListener('resize', this.updateRemains)
-    })
+    window.addEventListener('resize', this.updateRemains)
   },
   beforeDestroy () {
     window.removeEventListener('resize', this.updateRemains)
@@ -101,7 +99,7 @@ export default {
   components: { 'virtual-list': virtualList },
   watch: {
     requests: function (newRequests, oldRequests) {
-      if (newRequests.length !== oldRequests.length) {
+      if (newRequests.length !== oldRequests.length && this.$refs.vlist) {
         this.$refs.vlist.forceRender()
       }
     }

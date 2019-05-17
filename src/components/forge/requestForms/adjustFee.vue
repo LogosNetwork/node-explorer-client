@@ -1,38 +1,6 @@
 <template>
   <div>
     <b-form-group
-      id="adjustFeeToken"
-      label="Select Token"
-      label-size="lg"
-    >
-      <Multiselect
-        id="tokenSelector"
-        v-model="selectedToken"
-        required
-        track-by="address"
-        label="name"
-        :custom-label="nameWithAddress"
-        :options="adjustableTokens"
-        :disabled="adjustableTokens.length <= 1"
-        :multiple="false"
-        placeholder="Search for a token"
-      >
-        <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.address">
-            <strong>{{ option.name }}</strong>  -
-          </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.address" />
-        </template>
-      </Multiselect>
-      <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
-        You must select a token to adjust the token's fee
-      </div>
-      <div v-if="selectedToken && !sufficientBalance" style="display:block" class="invalid-feedback">
-        {{selectedToken.name}} has an insufficient supply of logos to afford the fee for this transaction
-      </div>
-    </b-form-group>
-
-    <b-form-group
       id="tokenFeeType"
       label="Fee Type"
       label-size="lg"
@@ -64,7 +32,7 @@
         placeholder="Enter the fee rate"
       ></b-form-input>
       <b-form-invalid-feedback id="rateError">
-        This is a required field and must be an integer value that is <span v-if='feeType === "flat"'>less than the total supply of {{selectedToken.totalSupply}}</span><span v-if='feeType === "percentage"'>between 0 - 100</span>
+        This is a required field and must be an integer value that is <span v-if='feeType === "flat"'>less than the total supply of {{tokenAccount.totalSupply}}</span><span v-if='feeType === "percentage"'>between 0 - 100</span>
       </b-form-invalid-feedback>
     </b-form-group>
 
@@ -72,7 +40,7 @@
       <b-button
         v-on:click="createAdjustFee()"
         type="submit"
-        :disabled="!sufficientBalance || !selectedToken || !validFeeRate"
+        :disabled="!sufficientBalance || !tokenAccount || !validFeeRate"
         variant="primary"
       >
           Adjust Fee
@@ -85,9 +53,11 @@
 import bigInt from 'big-integer'
 export default {
   name: 'adjustFeeForm',
+  props: {
+    tokenAccount: Object
+  },
   data () {
     return {
-      selectedToken: null,
       feeRate: null,
       feeType: null,
       feeOptions: ['flat', 'percentage']
@@ -101,50 +71,40 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    forgeTokens: function () {
-      return this.$wallet.tokenAccounts
-    },
-    currentAccount: function () {
-      return this.$wallet.account
-    },
     sufficientBalance: function () {
-      if (!this.selectedToken) return null
-      return bigInt(this.selectedToken.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
-    },
-    adjustableTokens: function () {
-      let tokens = []
-      for (let tokenAddress in this.forgeTokens) {
-        for (let controller in this.forgeTokens[tokenAddress].controllers) {
-          if (this.forgeTokens[tokenAddress].controllers[controller].account === this.currentAccount.address) {
-            if (this.forgeTokens[tokenAddress].settings.adjust_fee &&
-            this.forgeTokens[tokenAddress].controllers[controller].privileges.adjust_fee) {
-              tokens.push(this.forgeTokens[tokenAddress])
-            }
-          }
-        }
-      }
-      return tokens
+      if (!this.tokenAccount) return null
+      return bigInt(this.tokenAccount.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
     },
     validFeeRate: function () {
-      if (!this.selectedToken) return false
+      if (!this.tokenAccount) return false
       if (!/^([0-9]+)$/.test(this.feeRate)) return false
       if (this.feeType === 'percentage' && bigInt(this.feeRate).lesserOrEquals(bigInt('100'))) {
         return true
-      } else if (this.feeType === 'flat' && bigInt(this.feeRate).lesserOrEquals(bigInt(this.selectedToken.totalSupply))) {
+      } else if (this.feeType === 'flat' && bigInt(this.feeRate).lesserOrEquals(bigInt(this.tokenAccount.totalSupply))) {
         return true
       }
       return false
+    },
+    adjustableControllers: function () {
+      let controllers = []
+      for (let controller of this.tokenAccount.controllers) {
+        if (this.$wallet.accountsObject[controller.account] && controller.privileges.adjust_fee) {
+          controllers.push(this.$wallet.accountsObject[controller.account])
+        }
+      }
+      return controllers
     }
   },
   methods: {
     createAdjustFee () {
-      if (this.sufficientBalance && this.selectedToken && this.validFeeRate) {
+      if (this.sufficientBalance && this.tokenAccount &&
+        this.validFeeRate && this.adjustableControllers.length > 0) {
         let data = {
-          tokenAccount: this.selectedToken.address,
+          tokenAccount: this.tokenAccount.address,
           feeRate: this.feeRate,
           feeType: this.feeType
         }
-        this.$wallet.account.createAdjustFeeRequest(data)
+        this.adjustableControllers[0].createAdjustFeeRequest(data)
       }
     },
     nameWithAddress ({ name, address }) {
@@ -152,28 +112,15 @@ export default {
     }
   },
   created: function () {
-    if (this.adjustableTokens.length > 0) {
-      this.selectedToken = this.adjustableTokens[0]
-    }
+    this.feeRate = this.tokenAccount.feeRate
+    this.feeType = this.tokenAccount.feeType
   },
   watch: {
-    selectedToken: function (newTk, oldTk) {
-      this.feeRate = newTk.feeRate
-      this.feeType = newTk.feeType
-    },
-    adjustableTokens: {
-      handler: function (newTks, oldTks) {
-        if (newTks.length > 0) {
-          let valid = false
-          for (let token of newTks) {
-            if (this.selectedToken && token.address === this.selectedToken.address) {
-              this.selectedToken = token
-              valid = true
-            }
-          }
-          if (!valid) this.selectedToken = newTks[0]
-        } else {
-          this.selectedToken = null
+    tokenAccount: {
+      handler: function (newTk, oldTk) {
+        if (this.tokenAccount && newTk.address === this.tokenAccount.address) {
+          this.feeRate = newTk.feeRate
+          this.feeType = newTk.feeType
         }
       },
       deep: true

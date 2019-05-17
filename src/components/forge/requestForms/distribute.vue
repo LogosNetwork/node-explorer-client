@@ -1,41 +1,6 @@
 <template>
   <div>
     <b-form-group
-      id="distributeToken"
-      label="Select Token"
-      label-size="lg"
-    >
-      <Multiselect
-        id="destinationSelector"
-        v-model="selectedToken"
-        required
-        track-by="address"
-        label="name"
-        :custom-label="nameWithAddress"
-        :options="distributableTokens"
-        :disabled="distributableTokens.length <= 1"
-        :multiple="false"
-        placeholder="Search for a token"
-      >
-        <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.address">
-            <strong>{{ option.name }}</strong>  -
-          </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.address" />
-        </template>
-      </Multiselect>
-      <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
-        You must select a token to distribute from
-      </div>
-      <div v-if="selectedToken && !sufficientBalance" style="display:block" class="invalid-feedback">
-        {{selectedToken.name}} has an insufficient supply of logos to afford the fee for this transaction
-      </div>
-      <div v-if="selectedToken && !sufficientTokenBalance" style="display:block" class="invalid-feedback">
-        {{selectedToken.name}} has no tokens to distribute
-      </div>
-    </b-form-group>
-
-    <b-form-group
       id="distributeDestination"
       label="Distribute To"
       label-size="lg"
@@ -102,10 +67,12 @@
 import bigInt from 'big-integer'
 export default {
   name: 'distributeForm',
+  props: {
+    tokenAccount: Object
+  },
   data () {
     return {
       accounts: [],
-      selectedToken: null,
       transaction: {
         destination: null,
         amount: ''
@@ -120,26 +87,17 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    forgeAccounts: function () {
-      return this.$wallet.accountsObject
-    },
-    forgeTokens: function () {
-      return this.$wallet.tokenAccounts
-    },
     issuerInfo: function () {
-      if (!this.selectedToken) return null
+      if (!this.tokenAccount) return null
       try {
-        return JSON.parse(this.selectedToken.issuerInfo)
+        return JSON.parse(this.tokenAccount.issuerInfo)
       } catch (e) {
         return {}
       }
     },
-    currentAccount: function () {
-      return this.$wallet.account
-    },
     isValidAmount: function () {
       if (this.transaction.amount === '') return null
-      if (!this.selectedToken) return null
+      if (!this.tokenAccount) return null
       let amountInRaw = null
       if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined' &&
         this.issuerInfo.decimals > 0) {
@@ -152,46 +110,41 @@ export default {
       if (amountInRaw === null) return false
       return (
         bigInt(amountInRaw).greater(0) &&
-        bigInt(this.selectedToken.tokenBalance).greaterOrEquals(bigInt(amountInRaw))
+        bigInt(this.tokenAccount.tokenBalance).greaterOrEquals(bigInt(amountInRaw))
       )
     },
     sufficientBalance: function () {
-      if (!this.selectedToken) return null
-      return bigInt(this.selectedToken.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
+      if (!this.tokenAccount) return null
+      return bigInt(this.tokenAccount.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
     },
     sufficientTokenBalance: function () {
-      if (!this.selectedToken) return null
-      return bigInt(this.selectedToken.tokenBalance).greater(0)
+      if (!this.tokenAccount) return null
+      return bigInt(this.tokenAccount.tokenBalance).greater(0)
     },
     combinedAccounts: function () {
-      return Array.from(Object.values(this.forgeAccounts)).concat(this.accounts)
-    },
-    distributableTokens: function () {
-      let tokens = []
-      for (let tokenAddress in this.forgeTokens) {
-        let token = this.forgeTokens[tokenAddress]
-        for (let controllerAddress in token.controllers) {
-          let controller = token.controllers[controllerAddress]
-          if (controller.account === this.currentAccount.address &&
-            controller.privileges.distribute) {
-            tokens.push(token)
-          }
-        }
-      }
-      return tokens
+      return Array.from(Object.values(this.$wallet.accountsObject)).concat(this.accounts)
     },
     availableToSend: function () {
-      if (this.selectedToken) {
+      if (this.tokenAccount) {
         let amount = null
         if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined') {
-          amount = this.$Logos.convert.fromTo(this.selectedToken.tokenBalance, 0, this.issuerInfo.decimals)
-          return `${amount} ${this.selectedToken.symbol} are available to distribute`
+          amount = this.$Logos.convert.fromTo(this.tokenAccount.tokenBalance, 0, this.issuerInfo.decimals)
+          return `${amount} ${this.tokenAccount.symbol} are available to distribute`
         } else {
-          amount = this.selectedToken.tokenBalance
-          return `${amount} base units of ${this.selectedToken.symbol} are available to distribute`
+          amount = this.tokenAccount.tokenBalance
+          return `${amount} base units of ${this.tokenAccount.symbol} are available to distribute`
         }
       }
       return 'Select a token first'
+    },
+    distributeControllers: function () {
+      let controllers = []
+      for (let controller of this.tokenAccount.controllers) {
+        if (this.$wallet.accountsObject[controller.account] && controller.privileges.distribute) {
+          controllers.push(this.$wallet.accountsObject[controller.account])
+        }
+      }
+      return controllers
     }
   },
   methods: {
@@ -213,16 +166,16 @@ export default {
           amountInBaseUnit = this.transaction.amount
         }
         // TODO check if target account is open & whitelisted & not frozen
-        if (bigInt(this.selectedToken.tokenBalance)
+        if (bigInt(this.tokenAccount.tokenBalance)
           .greaterOrEquals(bigInt(amountInBaseUnit))) {
           let data = {
-            tokenAccount: this.selectedToken.address,
+            tokenAccount: this.tokenAccount.address,
             transaction: {
               destination: this.transaction.destination.address,
               amount: amountInBaseUnit
             }
           }
-          this.$wallet.account.createDistributeRequest(data)
+          this.distributeControllers[0].createDistributeRequest(data)
         }
       }
     },
@@ -238,28 +191,8 @@ export default {
     }
   },
   created: function () {
-    if (this.distributableTokens.length > 0) {
-      this.selectedToken = this.distributableTokens[0]
-    }
-    this.transaction.destination = this.currentAccount
-  },
-  watch: {
-    distributableTokens: {
-      handler: function (newTks, oldTks) {
-        if (newTks.length > 0) {
-          let found = false
-          for (let tkAccount of newTks) {
-            if (this.selectedToken && tkAccount.address === this.selectedToken.address) {
-              this.selectedToken = tkAccount
-              found = true
-            }
-          }
-          if (!found) this.selectedToken = newTks[0]
-        } else {
-          this.selectedToken = null
-        }
-      },
-      deep: true
+    if (this.combinedAccounts.length > 0) {
+      this.transaction.destination = this.combinedAccounts[0]
     }
   }
 }

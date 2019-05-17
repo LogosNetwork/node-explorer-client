@@ -1,37 +1,5 @@
 <template>
   <div>
-    <b-form-group
-      id="updateIssuerInfoToken"
-      label="Select Token"
-      label-size="lg"
-    >
-      <Multiselect
-        id="tokenSelector"
-        v-model="selectedToken"
-        required
-        track-by="address"
-        label="name"
-        :custom-label="nameWithAddress"
-        :options="updatableTokens"
-        :disabled="updatableTokens.length <= 1"
-        :multiple="false"
-        placeholder="Search for a token"
-      >
-        <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.address">
-            <strong>{{ option.name }}</strong>  -
-          </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.address" />
-        </template>
-      </Multiselect>
-      <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
-        You must select a token to update the info
-      </div>
-      <div v-if="selectedToken && !sufficientBalance" style="display:block" class="invalid-feedback">
-        {{selectedToken.name}} has an insufficient supply of logos to afford the fee for this transaction
-      </div>
-    </b-form-group>
-
     <b-form-group id="advancedInputCheckboxGroup">
       <b-form-checkbox v-model="advancedInput">Advanced Custom Input</b-form-checkbox>
     </b-form-group>
@@ -128,9 +96,11 @@ import bigInt from 'big-integer'
 const urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/
 export default {
   name: 'updateIssuerInfoForm',
+  props: {
+    tokenAccount: Object
+  },
   data () {
     return {
-      selectedToken: null,
       advancedInput: false,
       decimals: 0,
       website: '',
@@ -143,20 +113,12 @@ export default {
     'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
     'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
     'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback'),
-    'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
-    'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect'),
     'b-form-checkbox': () => import(/* webpackChunkName: "b-form-checkbox" */'bootstrap-vue/es/components/form-checkbox/form-checkbox')
   },
   computed: {
     ...mapState('forge', {
       updatedIssuerInfo: state => state.tempInfo
     }),
-    forgeTokens: function () {
-      return this.$wallet.tokenAccounts
-    },
-    currentAccount: function () {
-      return this.$wallet.account
-    },
     validDecimal: function () {
       if (this.decimals === '' || this.decimals === null) return null
       return /^([0-9]+)$/.test(this.decimals)
@@ -173,49 +135,46 @@ export default {
       return this.$utils.byteCount(this.updatedIssuerInfo) <= 512
     },
     decimalDescription: function () {
-      if (this.validDecimal && this.selectedToken) {
-        return `With the decimial set to ${this.decimals} the total supply will be ${this.$Logos.convert.fromTo(this.selectedToken.totalSupply, 0, this.decimals)} ${this.selectedToken.symbol}`
-      } else if (this.selectedToken) {
-        return `With no decimial set the total supply will be ${this.selectedToken.totalSupply} ${this.selectedToken.symbol}`
+      if (this.validDecimal && this.tokenAccount) {
+        return `With the decimial set to ${this.decimals} the total supply will be ${this.$Logos.convert.fromTo(this.tokenAccount.totalSupply, 0, this.decimals)} ${this.tokenAccount.symbol}`
+      } else if (this.tokenAccount) {
+        return `With no decimial set the total supply will be ${this.tokenAccount.totalSupply} ${this.tokenAccount.symbol}`
       } else {
         return `Select a token first`
       }
     },
     sufficientBalance: function () {
-      if (!this.selectedToken) return null
-      return bigInt(this.selectedToken.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
+      if (!this.tokenAccount) return null
+      return bigInt(this.tokenAccount.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
     },
-    updatableTokens: function () {
-      let tokens = []
-      for (let tokenAddress in this.forgeTokens) {
-        let token = this.forgeTokens[tokenAddress]
-        for (let controllerAddress in token.controllers) {
-          let controller = token.controllers[controllerAddress]
-          if (this.currentAccount && controller.account === this.currentAccount.address &&
-            controller.privileges.update_issuer_info) {
-            tokens.push(token)
-          }
+    updateableControllers: function () {
+      let controllers = []
+      for (let controller of this.tokenAccount.controllers) {
+        if (this.$wallet.accountsObject[controller.account] && controller.privileges.update_issuer_info) {
+          controllers.push(this.$wallet.accountsObject[controller.account])
         }
       }
-      return tokens
+      return controllers
     }
   },
   methods: {
     updateIssuerInfo () {
-      let issuerInfo = null
-      if (this.advancedInput) {
-        issuerInfo = this.updatedIssuerInfo
-      } else {
-        issuerInfo = JSON.stringify({
-          image: this.image,
-          website: this.website,
-          decimals: this.decimals
+      if (this.updateableControllers.length > 0) {
+        let issuerInfo = null
+        if (this.advancedInput) {
+          issuerInfo = this.updatedIssuerInfo
+        } else {
+          issuerInfo = JSON.stringify({
+            image: this.image,
+            website: this.website,
+            decimals: this.decimals
+          })
+        }
+        this.updateableControllers[0].createUpdateIssuerInfoRequest({
+          tokenAccount: this.tokenAccount.address,
+          issuerInfo: issuerInfo
         })
       }
-      this.$wallet.account.createUpdateIssuerInfoRequest({
-        tokenAccount: this.selectedToken.address,
-        issuerInfo: issuerInfo
-      })
     },
     ...mapActions('forge',
       [
@@ -227,53 +186,27 @@ export default {
     }
   },
   created: function () {
-    if (this.updatableTokens.length > 0) {
-      this.selectedToken = this.updatableTokens[0]
+    let issuerInfo = null
+    try {
+      issuerInfo = JSON.parse(this.tokenAccount.issuerInfo)
+    } catch (e) {
+      issuerInfo = null
     }
-  },
-  watch: {
-    selectedToken: function (newTk, oldTk) {
-      let issuerInfo = null
-      try {
-        issuerInfo = JSON.parse(newTk.issuerInfo)
-      } catch (e) {
-        issuerInfo = null
+    if (issuerInfo) {
+      if (typeof issuerInfo.decimals !== 'undefined') {
+        this.decimals = cloneDeep(issuerInfo.decimals)
       }
-      if (issuerInfo) {
-        if (typeof issuerInfo.decimals !== 'undefined') {
-          this.decimals = cloneDeep(issuerInfo.decimals)
-        }
-        if (typeof issuerInfo.website !== 'undefined') {
-          this.website = cloneDeep(issuerInfo.website)
-        }
-        if (typeof issuerInfo.image !== 'undefined') {
-          this.image = cloneDeep(issuerInfo.image)
-        }
+      if (typeof issuerInfo.website !== 'undefined') {
+        this.website = cloneDeep(issuerInfo.website)
       }
-      if (newTk.issuerInfo) {
-        this.setIssuerInfo(newTk.issuerInfo)
-      } else {
-        this.setIssuerInfo('')
+      if (typeof issuerInfo.image !== 'undefined') {
+        this.image = cloneDeep(issuerInfo.image)
       }
-    },
-    updatableTokens: {
-      handler: function (newDistTks, oldDistTks) {
-        if (newDistTks.length > 0) {
-          let valid = false
-          for (let token of newDistTks) {
-            if (this.selectedToken && token.address === this.selectedToken.address) {
-              this.selectedToken = token
-              valid = true
-            }
-          }
-          if (valid === false) {
-            this.selectedToken = newDistTks[0]
-          }
-        } else {
-          this.selectedToken = null
-        }
-      },
-      deep: true
+    }
+    if (this.tokenAccount.issuerInfo) {
+      this.setIssuerInfo(this.tokenAccount.issuerInfo)
+    } else {
+      this.setIssuerInfo('')
     }
   }
 }

@@ -82,20 +82,14 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    forgeAccounts: function () {
-      return this.$wallet.accountsObject
-    },
-    forgeTokens: function () {
-      return this.$wallet.tokenAccounts
-    },
     currentAccount: function () {
       return this.$wallet.account
     },
     combinedAccounts: function () {
-      let forgeAccounts = cloneDeep(this.forgeAccounts)
+      let forgeAccounts = cloneDeep(this.$wallet.accountsObject)
       let forgeTokens = []
-      for (let token in this.forgeTokens) {
-        forgeTokens.push({ label: `${this.forgeTokens[token].name} (${this.forgeTokens[token].symbol})`, address: token })
+      for (let token in this.$wallet.tokenAccounts) {
+        forgeTokens.push({ label: `${this.$wallet.tokenAccounts[token].name} (${this.$wallet.tokenAccounts[token].symbol})`, address: token })
       }
       if (this.currentAccount) delete forgeAccounts[this.currentAccount.address]
       return Array.from(Object.values(forgeAccounts)).concat(this.accounts).concat(forgeTokens)

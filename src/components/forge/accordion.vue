@@ -40,14 +40,15 @@
 
 <script>
 import Vue from 'vue'
+import { mapState } from 'vuex'
 import { faChevronDown } from '@fortawesome/pro-light-svg-icons'
 
 export default {
   name: 'accordionComponent',
   computed: {
-    currentAccount: function () {
-      return this.$wallet.account
-    },
+    ...mapState('forge', {
+      currentAccountAddress: state => state.currentAccountAddress
+    }),
     background: function () {
       let x = {}
       x[this.bgClass] = true
@@ -96,8 +97,8 @@ export default {
     'b-collapse': () => import(/* webpackChunkName: "b-collapse" */'bootstrap-vue/es/components/collapse/collapse')
   },
   watch: {
-    currentAccount: function (newAccount, oldAccount) {
-      if (newAccount && oldAccount && newAccount.address !== oldAccount.address) {
+    currentAccountAddress: function (newAccount, oldAccount) {
+      if (newAccount && oldAccount && newAccount !== oldAccount) {
         this.disableAnimation = true
         this.showCollapse = false
         Vue.nextTick(() => {

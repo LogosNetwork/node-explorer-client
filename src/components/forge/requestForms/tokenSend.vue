@@ -110,12 +110,6 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    forgeAccounts: function () {
-      return this.$wallet.accountsObject
-    },
-    forgeTokens: function () {
-      return this.$wallet.tokenAccounts
-    },
     issuerInfo: function () {
       if (!this.selectedToken) return null
       try {
@@ -128,7 +122,7 @@ export default {
       return this.$wallet.account
     },
     combinedAccounts: function () {
-      let forgeAccounts = cloneDeep(this.forgeAccounts)
+      let forgeAccounts = cloneDeep(this.$wallet.accountsObject)
       if (this.currentAccount) delete forgeAccounts[this.currentAccount.address]
       return Array.from(Object.values(forgeAccounts)).concat(this.accounts)
     },
@@ -158,7 +152,7 @@ export default {
       let tokens = []
       if (this.currentAccount && this.currentAccount.tokenBalances) {
         for (let tokenID in this.currentAccount.tokenBalances) {
-          let forgeToken = this.forgeTokens[this.$utils.parseAccount(tokenID)]
+          let forgeToken = this.$wallet.tokenAccounts[this.$utils.parseAccount(tokenID)]
           if (forgeToken.feeType === 'flat') {
             if (bigInt(this.currentAccount.tokenBalances[tokenID])
               .minus(bigInt(forgeToken.feeRate)).greater(0)) {

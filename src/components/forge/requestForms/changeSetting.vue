@@ -1,38 +1,6 @@
 <template>
   <div>
     <b-form-group
-      id="changeSettingToken"
-      label="Select Token"
-      label-size="lg"
-    >
-      <Multiselect
-        id="destinationSelector"
-        v-model="selectedToken"
-        required
-        track-by="address"
-        label="name"
-        :custom-label="nameWithAddress"
-        :options="changeableTokens"
-        :disabled="changeableTokens.length <= 1"
-        :multiple="false"
-        placeholder="Search for a token"
-      >
-        <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.address">
-            <strong>{{ option.name }}</strong>  -
-          </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.address" />
-        </template>
-      </Multiselect>
-      <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
-        You must select a token in order to change a setting
-      </div>
-      <div v-if="selectedToken && !sufficientBalance" style="display:block" class="invalid-feedback">
-        {{selectedToken.name}} has an insufficient supply of logos to afford the fee for this transaction
-      </div>
-    </b-form-group>
-
-    <b-form-group
       id="changeableSettings"
       label="Action"
       label-size="lg"
@@ -62,7 +30,7 @@
       <b-button
         v-on:click="createChangeSetting()"
         type="submit"
-        :disabled="!sufficientBalance || !selectedToken || !setting"
+        :disabled="!sufficientBalance || !tokenAccount || !setting || settingsChangeControllers.length === 0"
         variant="primary"
       >
           <span v-if="setting && setting.label">{{setting.label}}</span>
@@ -76,9 +44,11 @@
 import bigInt from 'big-integer'
 export default {
   name: 'changeSettingForm',
+  props: {
+    tokenAccount: Object
+  },
   data () {
     return {
-      selectedToken: null,
       setting: null
     }
   },
@@ -89,56 +59,29 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    forgeAccounts: function () {
-      return this.$wallet.accountsObject
-    },
-    forgeTokens: function () {
-      return this.$wallet.tokenAccounts
-    },
-    currentAccount: function () {
-      return this.$wallet.account
-    },
     sufficientBalance: function () {
-      if (!this.selectedToken) return null
-      return bigInt(this.selectedToken.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
+      if (!this.tokenAccount) return null
+      return bigInt(this.tokenAccount.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
     },
-    changeableTokens: function () {
-      let tokens = []
-      for (let tokenAddress in this.forgeTokens) {
-        let token = this.forgeTokens[tokenAddress]
-        for (let controllerAddress in token.controllers) {
-          let controller = token.controllers[controllerAddress]
-          if (controller.account === this.currentAccount.address) {
-            if (token.settings.modify_issuance &&
-              controller.privileges.change_issuance) {
-              tokens.push(token)
-            } else if (token.settings.modify_revoke &&
-              controller.privileges.change_revoke) {
-              tokens.push(token)
-            } else if (token.settings.modify_freeze &&
-              controller.privileges.change_freeze) {
-              tokens.push(token)
-            } else if (token.settings.modify_adjust_fee &&
-              controller.privileges.change_adjust_fee) {
-              tokens.push(token)
-            } else if (token.settings.modify_whitelist &&
-              controller.privileges.change_whitelist) {
-              tokens.push(token)
-            }
+    settingsChangeControllers: function () {
+      let controllers = []
+      if (this.setting) {
+        for (let controller of this.tokenAccount.controllers) {
+          if (this.$wallet.accountsObject[controller.account] && controller.privileges[`change_${this.setting.action}`]) {
+            controllers.push(this.$wallet.accountsObject[controller.account])
           }
         }
       }
-      return tokens
+      return controllers
     },
     changeableSettings: function () {
       let statuses = []
-      if (this.selectedToken) {
-        for (let controllerAddress in this.selectedToken.controllers) {
-          let controller = this.selectedToken.controllers[controllerAddress]
-          if (controller.account === this.currentAccount.address) {
-            if (this.selectedToken.settings.modify_issuance &&
+      if (this.tokenAccount) {
+        for (let controller of this.tokenAccount.controllers) {
+          if (this.$wallet.accountsObject[controller.account]) {
+            if (this.tokenAccount.settings.modify_issuance &&
               controller.privileges.change_issuance) {
-              if (this.selectedToken.settings.issuance) {
+              if (this.tokenAccount.settings.issuance) {
                 statuses.push({
                   label: 'Disable Issuance',
                   action: 'issuance',
@@ -152,9 +95,9 @@ export default {
                 })
               }
             }
-            if (this.selectedToken.settings.modify_revoke &&
+            if (this.tokenAccount.settings.modify_revoke &&
               controller.privileges.change_revoke) {
-              if (this.selectedToken.settings.revoke) {
+              if (this.tokenAccount.settings.revoke) {
                 statuses.push({
                   label: 'Disable Revoke',
                   action: 'revoke',
@@ -168,9 +111,9 @@ export default {
                 })
               }
             }
-            if (this.selectedToken.settings.modify_freeze &&
+            if (this.tokenAccount.settings.modify_freeze &&
               controller.privileges.change_freeze) {
-              if (this.selectedToken.settings.freeze) {
+              if (this.tokenAccount.settings.freeze) {
                 statuses.push({
                   label: 'Disable Freeze',
                   action: 'freeze',
@@ -184,9 +127,9 @@ export default {
                 })
               }
             }
-            if (this.selectedToken.settings.modify_adjust_fee &&
+            if (this.tokenAccount.settings.modify_adjust_fee &&
               controller.privileges.change_adjust_fee) {
-              if (this.selectedToken.settings.adjust_fee) {
+              if (this.tokenAccount.settings.adjust_fee) {
                 statuses.push({
                   label: 'Disable Fee Adjustments',
                   action: 'adjust_fee',
@@ -200,9 +143,9 @@ export default {
                 })
               }
             }
-            if (this.selectedToken.settings.modify_whitelist &&
+            if (this.tokenAccount.settings.modify_whitelist &&
               controller.privileges.change_whitelist) {
-              if (this.selectedToken.settings.whitelist) {
+              if (this.tokenAccount.settings.whitelist) {
                 statuses.push({
                   label: 'Disable Whitelist',
                   action: 'whitelist',
@@ -224,9 +167,10 @@ export default {
   },
   methods: {
     createChangeSetting () {
-      if (this.sufficientBalance && this.selectedToken && this.setting) {
-        this.$wallet.account.createChangeSettingRequest({
-          tokenAccount: this.selectedToken.address,
+      if (this.sufficientBalance && this.tokenAccount &&
+        this.setting && this.settingsChangeControllers.length > 0) {
+        this.settingsChangeControllers[0].createChangeSettingRequest({
+          tokenAccount: this.tokenAccount.address,
           setting: this.setting.action,
           value: this.setting.value
         })
@@ -237,37 +181,24 @@ export default {
     }
   },
   created: function () {
-    if (this.changeableTokens.length > 0) {
-      this.selectedToken = this.changeableTokens[0]
+    if (this.changeableSettings.length > 0) {
       this.setting = this.changeableSettings[0]
     }
   },
   watch: {
-    changeableTokens: {
-      handler: function (newTks, oldTks) {
-        if (newTks.length > 0) {
-          let foundToken = false
-          for (let token of newTks) {
-            if (this.selectedToken && token.address === this.selectedToken.address) {
-              this.selectedToken = token
-              let foundSetting = false
-              for (let setting of this.changeableSettings) {
-                if (this.setting.action === setting.action) {
-                  this.setting = setting
-                  foundSetting = true
-                }
-              }
-              if (!foundSetting) {
-                this.setting = this.changeableSettings[0]
-              }
-              foundToken = true
+    tokenAccount: {
+      handler: function (newTk, oldTk) {
+        if (this.tokenAccount && newTk.address === this.tokenAccount.address) {
+          let foundSetting = false
+          for (let setting of this.changeableSettings) {
+            if (this.setting.action === setting.action) {
+              this.setting = setting
+              foundSetting = true
             }
           }
-          if (foundToken === false) {
-            this.selectedToken = newTks[0]
+          if (!foundSetting) {
+            this.setting = this.changeableSettings[0]
           }
-        } else {
-          this.selectedToken = null
         }
       },
       deep: true

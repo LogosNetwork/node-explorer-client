@@ -1,38 +1,6 @@
 <template>
   <div>
     <b-form-group
-      id="adjustUserStatusOfToken"
-      label="Select Token"
-      label-size="lg"
-    >
-      <Multiselect
-        id="destinationSelector"
-        v-model="selectedToken"
-        required
-        track-by="address"
-        label="name"
-        :custom-label="nameWithAddress"
-        :options="adjustableTokens"
-        :disabled="adjustableTokens.length <= 1"
-        :multiple="false"
-        placeholder="Search for a token"
-      >
-        <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.address">
-            <strong>{{ option.name }}</strong>  -
-          </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.address" />
-        </template>
-      </Multiselect>
-      <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
-        You must select a token to adjust user's statuses
-      </div>
-      <div v-if="selectedToken && !sufficientBalance" style="display:block" class="invalid-feedback">
-        {{selectedToken.name}} has an insufficient supply of logos to afford the fee for this transaction
-      </div>
-    </b-form-group>
-
-    <b-form-group
       id="adjustedDestination"
       label="Adjustable Account"
       label-size="lg"
@@ -93,7 +61,7 @@
       <b-button
         v-on:click="createAdjustUserStatus()"
         type="submit"
-        :disabled="!sufficientBalance || !selectedToken || !status || !account"
+        :disabled="!sufficientBalance || !tokenAccount || !status || !account"
         variant="primary"
       >
           Adjust User's Status
@@ -106,10 +74,12 @@
 import bigInt from 'big-integer'
 export default {
   name: 'adjustUserStatusForm',
+  props: {
+    tokenAccount: Object
+  },
   data () {
     return {
       accounts: [],
-      selectedToken: null,
       account: null,
       status: null
     }
@@ -121,76 +91,65 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    forgeAccounts: function () {
-      return this.$wallet.accountsObject
-    },
-    forgeTokens: function () {
-      return this.$wallet.tokenAccounts
-    },
-    currentAccount: function () {
-      return this.$wallet.account
-    },
     sufficientBalance: function () {
-      if (!this.selectedToken) return null
-      return bigInt(this.selectedToken.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
+      if (!this.tokenAccount) return null
+      return bigInt(this.tokenAccount.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
     },
     combinedAccounts: function () {
       let forgeTokens = []
-      for (let token in this.forgeTokens) {
-        if (this.selectedToken && this.selectedToken.address !== token) {
-          forgeTokens.push({ label: `${this.forgeTokens[token].name} (${this.forgeTokens[token].symbol})`, address: token })
+      for (let token in this.$wallet.tokenAccounts) {
+        if (this.tokenAccount && this.tokenAccount.address !== token) {
+          forgeTokens.push({ label: `${this.$wallet.tokenAccounts[token].name} (${this.$wallet.tokenAccounts[token].symbol})`, address: token })
         }
       }
-      return Array.from(Object.values(this.forgeAccounts)).concat(this.accounts).concat(forgeTokens)
-    },
-    adjustableTokens: function () {
-      let tokens = []
-      for (let tokenAddress in this.forgeTokens) {
-        for (let controller in this.forgeTokens[tokenAddress].controllers) {
-          if (this.forgeTokens[tokenAddress].controllers[controller].account === this.currentAccount.address) {
-            if (this.forgeTokens[tokenAddress].settings.whitelist &&
-              this.forgeTokens[tokenAddress].controllers[controller].privileges.whitelist) {
-              tokens.push(this.forgeTokens[tokenAddress])
-            } else if (this.forgeTokens[tokenAddress].settings.freeze &&
-              this.forgeTokens[tokenAddress].controllers[controller].privileges.freeze) {
-              tokens.push(this.forgeTokens[tokenAddress])
-            }
-          }
-        }
-      }
-      return tokens
+      return Array.from(Object.values(this.$wallet.accountsObject)).concat(this.accounts).concat(forgeTokens)
     },
     adjustableStatuses: function () {
       let statuses = []
-      if (this.selectedToken) {
-        for (let controller in this.selectedToken.controllers) {
-          if (this.selectedToken.controllers[controller].account === this.currentAccount.address) {
-            if (this.selectedToken.settings.whitelist &&
-              this.selectedToken.controllers[controller].privileges.whitelist) {
+      if (this.tokenAccount) {
+        for (let controller of this.tokenAccount.controllers) {
+          if (this.$wallet.accountsObject[controller.account]) {
+            if (this.tokenAccount.settings.whitelist &&
+              controller.privileges.whitelist) {
               statuses.push({
                 label: 'Whitelist',
-                action: 'whitelisted'
+                action: 'whitelisted',
+                privilege: 'whitelist'
               })
               statuses.push({
                 label: 'Remove from Whitelist',
-                action: 'not_whitelisted'
+                action: 'not_whitelisted',
+                privilege: 'whitelist'
               })
             }
-            if (this.selectedToken.settings.freeze &&
-              this.selectedToken.controllers[controller].privileges.freeze) {
+            if (this.tokenAccount.settings.freeze &&
+              controller.privileges.freeze) {
               statuses.push({
                 label: 'Freeze',
-                action: 'frozen'
+                action: 'frozen',
+                privilege: 'freeze'
               })
               statuses.push({
                 label: 'Un-freeze',
-                action: 'unfrozen'
+                action: 'unfrozen',
+                privilege: 'freeze'
               })
             }
           }
         }
       }
       return statuses
+    },
+    adjustUserStatusControllers: function () {
+      let controllers = []
+      if (this.status) {
+        for (let controller of this.tokenAccount.controllers) {
+          if (this.$wallet.accountsObject[controller.account] && controller.privileges[this.status.privilege]) {
+            controllers.push(this.$wallet.accountsObject[controller.account])
+          }
+        }
+      }
+      return controllers
     }
   },
   methods: {
@@ -202,9 +161,10 @@ export default {
       }
     },
     createAdjustUserStatus () {
-      if (this.sufficientBalance && this.selectedToken && this.status && this.account) {
-        this.$wallet.account.createAdjustUserStatusRequest({
-          tokenAccount: this.selectedToken.address,
+      if (this.sufficientBalance && this.tokenAccount &&
+        this.status && this.account && this.adjustUserStatusControllers.length > 0) {
+        this.adjustUserStatusControllers[0].createAdjustUserStatusRequest({
+          tokenAccount: this.tokenAccount.address,
           account: this.account.address,
           status: this.status.action
         })
@@ -222,31 +182,11 @@ export default {
     }
   },
   created: function () {
-    if (this.adjustableTokens.length > 0) {
-      this.selectedToken = this.adjustableTokens[0]
-    }
     if (this.adjustableStatuses.length > 0) {
       this.status = this.adjustableStatuses[0]
     }
-    this.account = this.currentAccount
-  },
-  watch: {
-    adjustableTokens: {
-      handler: function (newTks, oldTks) {
-        if (newTks.length > 0) {
-          let valid = false
-          for (let token of newTks) {
-            if (this.selectedToken && token.address === this.selectedToken.address) {
-              this.selectedToken = token
-              valid = true
-            }
-          }
-          if (!valid) this.selectedToken = newTks[0]
-        } else {
-          this.selectedToken = null
-        }
-      },
-      deep: true
+    if (this.combinedAccounts.length > 0) {
+      this.account = this.combinedAccounts[0]
     }
   }
 }

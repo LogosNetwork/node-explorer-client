@@ -7,11 +7,13 @@ const state = {
   lookups: [],
   issuerInfo: '',
   tempInfo: '',
+  currentAccountAddress: null,
   walletData: null
 }
 
 const getters = {
-  walletData: state => state.walletData
+  walletData: state => state.walletData,
+  currentAccountAddress: state => state.currentAccountAddress
 }
 
 const parseToast = (request, address, vm, commit) => {
@@ -162,6 +164,9 @@ const actions = {
   setWalletData ({ commit }, data) {
     commit('setWalletData', data)
   },
+  setCurrentAccountAddress ({ commit }, address) {
+    commit('setCurrentAccountAddress', address)
+  },
   addLookup ({ commit }, lookup) {
     commit('addLookup', lookup)
   },
@@ -179,6 +184,9 @@ const mutations = {
   },
   setWalletData (state, data) {
     state.walletData = data
+  },
+  setCurrentAccountAddress (state, address) {
+    state.currentAccountAddress = address
   },
   addLookup (state, lookup) {
     state.lookups.unshift(lookup)

@@ -1,14 +1,15 @@
 <template>
-  <div v-if="wallet.account">
+  <div v-if="account">
 
     <b-row class="mb-3">
       <b-col cols="9">
-        <h4>{{wallet.account.label}}</h4>
-        <small><LogosAddress :address="wallet.account.address" /></small>
+        <h4 v-if="account.label">{{account.label}}</h4>
+        <h4 v-else-if="account.name">{{account.name}} - ({{account.symbol}})</h4>
+        <small><LogosAddress :address="account.address" /></small>
       </b-col>
       <b-col cols="3" class="d-flex flex-column m-auto align-items-end">
         <qrcode
-          :value="'lgs:'+wallet.account.address"
+          :value="'lgs:'+account.address"
           :options="{ size: 70, background: 'transparent' }"
         ></qrcode>
       </b-col>
@@ -16,6 +17,7 @@
     <div v-if="hasFunds">
 
       <accordion
+        v-if="!isTokenAccount"
         bgClass="bg-success"
         accordionGroup="accordion"
         :slotMinHeight="290"
@@ -23,11 +25,11 @@
         title="Send Logos"
         subtitle="Send logos to another account."
       >
-        <send/>
+        <send :account="account" />
       </accordion>
 
       <accordion
-        v-if="hasTokenBalance"
+        v-if="canSendTokens"
         bgClass="bg-primary"
         accordionGroup="accordion"
         :slotMinHeight="388"
@@ -35,10 +37,11 @@
         title="Send Tokens"
         subtitle="Send tokens to another account."
       >
-        <tokenSend/>
+        <tokenSend :account="account" />
       </accordion>
 
       <accordion
+        v-if="!isTokenAccount"
         bgClass="bg-info"
         accordionGroup="accordion"
         :slotMinHeight="1702"
@@ -46,155 +49,155 @@
         title="Issue a Token"
         subtitle="Create and issue your token."
       >
-        <issuance/>
+        <issuance :account="account" />
       </accordion>
 
       <accordion
         v-if="tokenPrivileges('issuance')"
         bgClass="bg-secondary"
         accordionGroup="accordion"
-        :slotMinHeight="290"
+        :slotMinHeight="195"
         :requestIcon="faMagic"
         title="Mint Additional Tokens"
         subtitle="Increases the total supply of a token."
       >
-        <issueAdditional/>
+        <issueAdditional :tokenAccount="account" />
       </accordion>
 
       <accordion
         v-if="tokenPrivileges('change')"
         bgClass="bg-warning"
         accordionGroup="accordion"
-        :slotMinHeight="269"
+        :slotMinHeight="174"
         :requestIcon="faExchange"
         title="Change Token Setting"
         subtitle="Change the settings of the given token."
       >
-        <changeSetting/>
+        <changeSetting :tokenAccount="account" />
       </accordion>
 
       <accordion
         v-if="tokenPrivileges('modify')"
         bgClass="bg-danger"
         accordionGroup="accordion"
-        :slotMinHeight="292"
+        :slotMinHeight="174"
         :requestIcon="faLockAlt"
         title="Immute Token Setting"
         subtitle="Permanently immute a setting of the given token."
       >
-        <immuteSetting/>
+        <immuteSetting :tokenAccount="account" />
       </accordion>
 
       <accordion
         v-if="tokenPrivileges('revoke')"
         bgClass="bg-success"
         accordionGroup="accordion"
-        :slotMinHeight="480"
+        :slotMinHeight="385"
         :requestIcon="faMask"
         title="Revoke Token from User"
         subtitle="Remove tokens from a one account and send them to another."
       >
-        <revoke/>
+        <revoke :tokenAccount="account" />
       </accordion>
 
       <accordion
         v-if="tokenPrivileges('adjustUser')"
         bgClass="bg-primary"
         accordionGroup="accordion"
-        :slotMinHeight="364"
+        :slotMinHeight="272"
         :requestIcon="faUserEdit"
         title="Adjust User Token Setting"
         subtitle="Freeze, Un-Freeze, Whitelist, or Un-Whitelist a user."
       >
-        <adjustUserStatus/>
+        <adjustUserStatus :tokenAccount="account" />
       </accordion>
 
       <accordion
         v-if="tokenPrivileges('adjust_fee')"
         bgClass="bg-info"
         accordionGroup="accordion"
-        :slotMinHeight="385"
+        :slotMinHeight="290"
         :requestIcon="faPercentage"
         title="Adjust Token Fee"
         subtitle="Change the token fee for the given token."
       >
-        <adjustFee/>
+        <adjustFee :tokenAccount="account" />
       </accordion>
 
       <accordion
         v-if="tokenPrivileges('update_issuer_info')"
         bgClass="bg-secondary"
         accordionGroup="accordion"
-        :slotMinHeight="394"
+        :slotMinHeight="299"
         :requestIcon="faEdit"
         title="Update Token Info"
         subtitle="Change the token information of the given token."
       >
-        <updateIssuerInfo/>
+        <updateIssuerInfo :tokenAccount="account" />
       </accordion>
 
       <accordion
         v-if="tokenPrivileges('update_controller')"
         bgClass="bg-warning"
         accordionGroup="accordion"
-        :slotMinHeight="295"
+        :slotMinHeight="200"
         :requestIcon="faCrown"
         title="Update Controllers"
         subtitle="Add, remove, or change a controller's privileges"
       >
-        <updateController/>
+        <updateController :tokenAccount="account" />
       </accordion>
 
       <accordion
         v-if="tokenPrivileges('burn')"
         bgClass="bg-danger"
         accordionGroup="accordion"
-        :slotMinHeight="290"
+        :slotMinHeight="195"
         :requestIcon="faFire"
         title="Burn Tokens"
         subtitle="Remove some tokens from the total supply."
       >
-        <burn/>
+        <burn :tokenAccount="account" />
       </accordion>
 
       <accordion
         v-if="tokenPrivileges('distribute')"
         bgClass="bg-success"
         accordionGroup="accordion"
-        :slotMinHeight="385"
+        :slotMinHeight="290"
         :requestIcon="faArrowDown"
         title="Distribute Tokens"
         subtitle="Send tokens from the token account to a user's account."
       >
-        <distribute/>
+        <distribute :tokenAccount="account" />
       </accordion>
 
       <accordion
         v-if="tokenPrivileges('withdraw_fee')"
         bgClass="bg-primary"
         accordionGroup="accordion"
-        :slotMinHeight="385"
+        :slotMinHeight="290"
         :requestIcon="faHandReceiving"
         title="Withdraw Fee"
         subtitle="Withdraw the token balance to a user's account."
       >
-        <withdrawFee/>
+        <withdrawFee :tokenAccount="account" />
       </accordion>
 
       <accordion
         v-if="tokenPrivileges('withdraw_logos')"
         bgClass="bg-info"
         accordionGroup="accordion"
-        :slotMinHeight="385"
+        :slotMinHeight="290"
         :requestIcon="faLambda"
         title="Withdraw Logos"
         subtitle="Withdraw the Logos balance of the token account to a user's account."
       >
-        <withdrawLogos/>
+        <withdrawLogos :tokenAccount="account" />
       </accordion>
     </div>
     <div v-else>
-      <fund/>
+      <fund :address="account.address" />
     </div>
   </div>
   <div v-else>
@@ -218,6 +221,9 @@ import { faLambda, faCoins, faPlus, faMagic, faExchange, faLockAlt, faMask, faUs
 
 export default {
   name: 'Requests',
+  props: {
+    account: Object
+  },
   data () {
     return {
       faLambda,
@@ -234,8 +240,7 @@ export default {
       faArrowDown,
       faHandReceiving,
       faPercentage,
-      faCrown,
-      wallet: this.$wallet
+      faCrown
     }
   },
   components: {
@@ -262,23 +267,23 @@ export default {
   },
   computed: {
     hasFunds: function () {
-      if (this.wallet.account && this.wallet.account.balance) {
-        return bigInt(this.wallet.account.balance).greater(0)
+      if (this.account && this.account.balance) {
+        return bigInt(this.account.balance).greater(0)
       } else {
         return false
       }
     },
-    hasTokenBalance: function () {
-      if (this.wallet.account && this.wallet.account.tokenBalances) {
-        for (let tokenID in this.wallet.account.tokenBalances) {
-          let forgeToken = this.wallet.tokenAccounts[this.$utils.parseAccount(tokenID)]
+    canSendTokens: function () {
+      if (!this.isTokenAccount && this.account && this.account.tokenBalances) {
+        for (let tokenID in this.account.tokenBalances) {
+          let forgeToken = this.$wallet.tokenAccounts[this.$utils.parseAccount(tokenID)]
           if (forgeToken.feeType === 'flat') {
-            if (bigInt(this.wallet.account.tokenBalances[tokenID])
+            if (bigInt(this.account.tokenBalances[tokenID])
               .minus(bigInt(forgeToken.feeRate)).greater(0)) {
               return true
             }
           } else {
-            if (bigInt(this.wallet.account.tokenBalances[tokenID]).greater(0)) {
+            if (bigInt(this.account.tokenBalances[tokenID]).greater(0)) {
               return true
             }
           }
@@ -286,50 +291,51 @@ export default {
       } else {
         return false
       }
+    },
+    isTokenAccount: function () {
+      return Boolean(this.account.name)
     }
   },
   methods: {
     tokenPrivileges: function (privilege) {
-      if (this.wallet.tokenAccounts) {
-        for (let tokenAddress in this.wallet.tokenAccounts) {
-          let token = this.wallet.tokenAccounts[tokenAddress]
-          for (let controllerAddress in token.controllers) {
-            let controller = token.controllers[controllerAddress]
-            if (controller.account === this.wallet.account.address) {
-              if (privilege === 'distribute' ||
-                privilege === 'withdraw_logos' ||
-                privilege === 'withdraw_fee' ||
-                privilege === 'burn' ||
-                privilege === 'update_controller' ||
-                privilege === 'update_issuer_info') {
-                return controller.privileges[privilege]
-              } else {
-                if (privilege === 'adjust_fee' ||
-                  privilege === 'revoke' ||
-                  privilege === 'issuance') {
-                  return controller.privileges[privilege] && token.settings[privilege]
-                } else if (privilege === 'adjustUser') {
-                  return (
-                    (controller.privileges.whitelist && token.settings.whitelist) ||
-                    (controller.privileges.freeze && token.settings.freeze)
-                  )
-                } else if (privilege === 'change') {
-                  return (
-                    (controller.privileges.change_issuance && token.settings.modify_issuance) ||
-                    (controller.privileges.change_revoke && token.settings.modify_revoke) ||
-                    (controller.privileges.change_freeze && token.settings.modify_freeze) ||
-                    (controller.privileges.change_adjust_fee && token.settings.modify_adjust_fee) ||
-                    (controller.privileges.change_whitelist && token.settings.modify_whitelist)
-                  )
-                } else if (privilege === 'modify') {
-                  return (
-                    (controller.privileges.change_modify_issuance && token.settings.modify_issuance) ||
-                    (controller.privileges.change_modify_revoke && token.settings.modify_revoke) ||
-                    (controller.privileges.change_modify_freeze && token.settings.modify_freeze) ||
-                    (controller.privileges.change_modify_adjust_fee && token.settings.modify_adjust_fee) ||
-                    (controller.privileges.change_modify_whitelist && token.settings.modify_whitelist)
-                  )
-                }
+      if (this.isTokenAccount) {
+        let token = this.account
+        for (let controllerAddress in token.controllers) {
+          let controller = token.controllers[controllerAddress]
+          if (this.$wallet.accountsObject[controller.account]) {
+            if (privilege === 'distribute' ||
+              privilege === 'withdraw_logos' ||
+              privilege === 'withdraw_fee' ||
+              privilege === 'burn' ||
+              privilege === 'update_controller' ||
+              privilege === 'update_issuer_info') {
+              return controller.privileges[privilege]
+            } else {
+              if (privilege === 'adjust_fee' ||
+                privilege === 'revoke' ||
+                privilege === 'issuance') {
+                return controller.privileges[privilege] && token.settings[privilege]
+              } else if (privilege === 'adjustUser') {
+                return (
+                  (controller.privileges.whitelist && token.settings.whitelist) ||
+                  (controller.privileges.freeze && token.settings.freeze)
+                )
+              } else if (privilege === 'change') {
+                return (
+                  (controller.privileges.change_issuance && token.settings.modify_issuance) ||
+                  (controller.privileges.change_revoke && token.settings.modify_revoke) ||
+                  (controller.privileges.change_freeze && token.settings.modify_freeze) ||
+                  (controller.privileges.change_adjust_fee && token.settings.modify_adjust_fee) ||
+                  (controller.privileges.change_whitelist && token.settings.modify_whitelist)
+                )
+              } else if (privilege === 'modify') {
+                return (
+                  (controller.privileges.change_modify_issuance && token.settings.modify_issuance) ||
+                  (controller.privileges.change_modify_revoke && token.settings.modify_revoke) ||
+                  (controller.privileges.change_modify_freeze && token.settings.modify_freeze) ||
+                  (controller.privileges.change_modify_adjust_fee && token.settings.modify_adjust_fee) ||
+                  (controller.privileges.change_modify_whitelist && token.settings.modify_whitelist)
+                )
               }
             }
           }

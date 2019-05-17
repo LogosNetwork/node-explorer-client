@@ -1,38 +1,6 @@
 <template>
   <div>
     <b-form-group
-      id="revokeToken"
-      label="Select Token"
-      label-size="lg"
-    >
-      <Multiselect
-        id="tokenSelector"
-        v-model="selectedToken"
-        required
-        track-by="address"
-        label="name"
-        :custom-label="nameWithAddress"
-        :options="revokableTokens"
-        :disabled="revokableTokens.length <= 1"
-        :multiple="false"
-        placeholder="Search for a token"
-      >
-        <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.address">
-            <strong>{{ option.name }}</strong>  -
-          </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.address" />
-        </template>
-      </Multiselect>
-      <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
-        You must select a token to issue a revoke from
-      </div>
-      <div v-if="selectedToken && !sufficientBalance" style="display:block" class="invalid-feedback">
-        {{selectedToken.name}} has an insufficient supply of logos to afford the fee for this transaction
-      </div>
-    </b-form-group>
-
-    <b-form-group
       id="revokeSource"
       label="Revoke tokens from"
       label-size="lg"
@@ -45,7 +13,7 @@
         track-by="label"
         label="label"
         :custom-label="labelWithAddress"
-        :options="combinedAccounts"
+        :options="sourceAccounts"
         :multiple="false"
         :taggable="true"
         @tag="addSourceAccount"
@@ -58,8 +26,8 @@
           <LogosAddress :inactive="true" :force="true" :address="option.address" />
         </template>
       </Multiselect>
-      <div v-if="validSource === false" style="display:block" class="invalid-feedback">
-        You must select an account that has a balance with the selected token
+      <div v-if="!validSource" style="display:block" class="invalid-feedback">
+        You must select an account that has a {{this.tokenAccount.symbol}} balance
       </div>
     </b-form-group>
 
@@ -130,10 +98,12 @@
 import bigInt from 'big-integer'
 export default {
   name: 'revokeForm',
+  props: {
+    tokenAccount: Object
+  },
   data () {
     return {
       accounts: [],
-      selectedToken: null,
       source: null,
       transaction: {
         destination: null,
@@ -149,38 +119,29 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    forgeAccounts: function () {
-      return this.$wallet.accountsObject
-    },
-    forgeTokens: function () {
-      return this.$wallet.tokenAccounts
-    },
     issuerInfo: function () {
-      if (!this.selectedToken) return null
+      if (!this.tokenAccount) return null
       try {
-        return JSON.parse(this.selectedToken.issuerInfo)
+        return JSON.parse(this.tokenAccount.issuerInfo)
       } catch (e) {
         return {}
       }
     },
-    currentAccount: function () {
-      return this.$wallet.account
-    },
     sufficientBalance: function () {
-      if (!this.selectedToken) return null
-      return bigInt(this.selectedToken.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
+      if (!this.tokenAccount) return null
+      return bigInt(this.tokenAccount.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
     },
     validSource: function () {
       if (!this.source) return false
       if (!this.source.tokenBalances) return false
-      if (!this.selectedToken) return null
-      return (this.source.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.address)])
+      if (!this.tokenAccount) return null
+      return (this.source.tokenBalances[this.$utils.keyFromAccount(this.tokenAccount.address)])
     },
     isValidAmount: function () {
       if (!this.source) return null
-      if (!this.selectedToken) return null
+      if (!this.tokenAccount) return null
       if (this.transaction.amount === '') return null
-      let tokenBalance = this.source.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.address)]
+      let tokenBalance = this.source.tokenBalances[this.$utils.keyFromAccount(this.tokenAccount.address)]
       let amountInRaw = null
       if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined' &&
         this.issuerInfo.decimals > 0) {
@@ -197,36 +158,38 @@ export default {
       )
     },
     combinedAccounts: function () {
-      return Array.from(Object.values(this.forgeAccounts)).concat(this.accounts)
+      return Array.from(Object.values(this.$wallet.accountsObject)).concat(this.accounts)
     },
-    revokableTokens: function () {
-      let tokens = []
-      for (let tokenAddress in this.forgeTokens) {
-        let token = this.forgeTokens[tokenAddress]
-        if (token.settings.revoke) {
-          for (let controllerAddress in token.controllers) {
-            let controller = token.controllers[controllerAddress]
-            if (controller.account === this.currentAccount.address &&
-              controller.privileges.revoke) {
-              tokens.push(token)
-            }
-          }
+    sourceAccounts: function () {
+      let accounts = []
+      for (let account of this.combinedAccounts) {
+        if (account.tokenBalances[this.$utils.keyFromAccount(this.tokenAccount.address)]) {
+          accounts.push(account)
         }
       }
-      return tokens
+      return accounts
     },
     availableToRevoke: function () {
-      if (this.selectedToken && this.validSource) {
+      if (this.tokenAccount && this.validSource) {
         let amount = null
         if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined') {
-          amount = this.$Logos.convert.fromTo(this.source.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.address)], 0, this.issuerInfo.decimals)
-          return `${amount} ${this.selectedToken.symbol} are available to revoke`
+          amount = this.$Logos.convert.fromTo(this.source.tokenBalances[this.$utils.keyFromAccount(this.tokenAccount.address)], 0, this.issuerInfo.decimals)
+          return `${amount} ${this.tokenAccount.symbol} are available to revoke`
         } else {
-          amount = this.source.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.address)]
-          return `${amount} base units of ${this.selectedToken.name} are available to revoke`
+          amount = this.source.tokenBalances[this.$utils.keyFromAccount(this.tokenAccount.address)]
+          return `${amount} base units of ${this.tokenAccount.name} are available to revoke`
         }
       }
-      return 'Select a token and source first'
+      return 'Select a source first'
+    },
+    revokeableControllers: function () {
+      let controllers = []
+      for (let controller of this.tokenAccount.controllers) {
+        if (this.$wallet.accountsObject[controller.account] && controller.privileges.revoke) {
+          controllers.push(this.$wallet.accountsObject[controller.account])
+        }
+      }
+      return controllers
     }
   },
   methods: {
@@ -270,9 +233,8 @@ export default {
     },
     createRevoke () {
       // TODO check if destination account is open & whitelisted & not frozen
-
       let data = {
-        tokenAccount: this.selectedToken.address,
+        tokenAccount: this.tokenAccount.address,
         source: this.source.address,
         transaction: {
           destination: this.transaction.destination.address
@@ -283,19 +245,7 @@ export default {
       } else {
         data.transaction.amount = this.transaction.amount
       }
-      this.$wallet.account.createRevokeRequest(data)
-      let kfa = this.$utils.keyFromAccount(this.selectedToken.address)
-      for (let account of this.accounts) {
-        if (account.label === account.address) {
-          if (account.address === data.source) {
-            account.tokenBalances[kfa] = bigInt(account.tokenBalances[kfa]).minus(bigInt(data.transaction.amount))
-            this.source = account
-          } else if (account.address === data.transaction.destination) {
-            account.tokenBalances[kfa] = bigInt(account.tokenBalances[kfa]).plus(bigInt(data.transaction.amount))
-            this.transaction.destination = account
-          }
-        }
-      }
+      this.revokeableControllers[0].createRevokeRequest(data)
     },
     nameWithAddress ({ name, address }) {
       return `${name} — ${address.substring(0, 9)}...${address.substring(59, 64)}`
@@ -309,30 +259,11 @@ export default {
     }
   },
   created: function () {
-    if (this.revokableTokens.length > 0) {
-      this.selectedToken = this.revokableTokens[0]
+    if (this.combinedAccounts.length > 0) {
+      this.transaction.destination = this.combinedAccounts[0]
     }
-    this.transaction.destination = this.currentAccount
-  },
-  watch: {
-    revokableTokens: {
-      handler: function (newDistTks, oldDistTks) {
-        if (newDistTks.length > 0) {
-          let valid = false
-          for (let token of newDistTks) {
-            if (this.selectedToken && token.address === this.selectedToken.address) {
-              this.selectedToken = token
-              valid = true
-            }
-          }
-          if (valid === false) {
-            this.selectedToken = newDistTks[0]
-          }
-        } else {
-          this.selectedToken = null
-        }
-      },
-      deep: true
+    if (this.sourceAccounts.length > 0) {
+      this.source = this.sourceAccounts[0]
     }
   }
 }

@@ -9,7 +9,7 @@
         <div v-if="wallet.accounts.length > 0">
           <b-list-group flush>
             <b-list-group-item
-              v-bind:class="{ active: wallet.account && account.address === wallet.account.address }"
+              v-bind:class="{ active: currentAccount && account.address === currentAccount.address }"
               v-for="account in wallet.accounts" :key="account.address"
               class="d-flex justify-content-between align-items-center mb-2"
               button
@@ -52,9 +52,11 @@
         <div v-if="hasTokens">
           <b-list-group flush>
             <b-list-group-item
+              v-bind:class="{ active: currentAccount && token.address === currentAccount.address }"
               v-for="token in wallet.tokenAccounts" :key="token.address"
               class="d-flex justify-content-between align-items-center mb-2"
               button
+              v-on:click="setCurrentAccount(token.address)"
             >
               <b-row v-if="token.name" :no-gutters="true" class="d-flex flex-wrap align-items-center w-100">
                 <b-col class="text-overflow text-left text-nowrap text-truncate">
@@ -137,15 +139,15 @@
         </b-row>
         <b-row class="scrollContainer">
           <b-col col :xl="renderSidePanel ? 7 : 12" class="d-flex flex-column">
-            <b-row class="actionSelector flex-grow flex-fill">
-              <b-col class="m-3 text-left overflow-hidden">
-                <affix ref="scrollAffixElement" v-if="renderSidePanel" class="scrollaffix-sidebar" :offset="{ top: 124, bottom: 30 }" relative-element-selector="#sidePanel" :scroll-affix="true">
+            <b-row class="actionSelector">
+              <b-col class="m-3 text-left">
+                <affix ref="scrollAffixElement" v-if="renderSidePanel" class="scrollaffix-sidebar" :offset="{ top: 124, bottom: 16 }" relative-element-selector="#sidePanel" :scroll-affix="true">
                   <resize-observer @notify="handleResize" />
                   <div v-if="selected === 'lookup'">
                     <Lookups />
                   </div>
                   <div v-else-if="selected === 'requests'">
-                    <Requests />
+                    <Requests :account="currentAccount" />
                   </div>
                 </affix>
                 <div v-else>
@@ -153,27 +155,27 @@
                     <Lookups />
                   </div>
                   <div v-else-if="selected === 'requests'">
-                    <Requests />
+                    <Requests :account="currentAccount" />
                   </div>
                 </div>
               </b-col>
             </b-row>
           </b-col>
-          <b-col id="sidePanel" v-if="renderSidePanel" col xl="5" class="flex-column d-none d-xl-flex chainViewer">
-            <div v-if="selected === 'requests'" class="d-flex flex-column flex-grow flex-fill">
+          <b-col v-if="renderSidePanel" col xl="5" class="flex-column d-none d-xl-flex chainViewer">
+            <div id="sidePanel" v-if="selected === 'requests'" class="d-flex flex-column">
               <div class="m-3 text-left">
                 <b-row class="mb-3">
                   <b-col cols="12" class="d-flex flex-column m-auto align-items-start">
-                    <h4 class="m-0" v-if="wallet.account && wallet.account.label">{{wallet.account.label}}</h4>
-                    <h4 class="m-0" v-else-if="wallet.account && wallet.account.name">{{wallet.account.name}} - {{wallet.account.symbol}}</h4>
+                    <h4 class="m-0" v-if="currentAccount && currentAccount.label">{{currentAccount.label}}</h4>
+                    <h4 class="m-0" v-else-if="currentAccount && currentAccount.name">{{currentAccount.name}} - {{currentAccount.symbol}}</h4>
                   </b-col>
                 </b-row>
-                <div v-if="wallet.account && requests && requests.length > 0">
-                  <requestList :requests="requests" :address="wallet.account.address" :small="true"/>
+                <div v-if="currentAccount">
+                  <requestList :requests="history(currentAccount)" :address="currentAccount.address" :small="true"/>
                 </div>
               </div>
             </div>
-            <div v-if="selected === 'lookup'" class="d-flex flex-column flex-grow flex-fill">
+            <div id="sidePanel" v-else-if="selected === 'lookup'" class="d-flex flex-column">
               <div class="m-3 text-left">
                 <div v-if="lookups && lookups.length > 0">
                   <div v-for="(lookup, index) in lookups" :key="index">
@@ -214,6 +216,7 @@ export default {
       selected: 'requests',
       selectedVisual: 'text',
       requestsBusy: false,
+      currentAccount: {},
       faUser,
       faEllipsisVAlt,
       faSearch,
@@ -249,7 +252,8 @@ export default {
     }),
     ...mapState('forge', {
       toasts: state => state.toasts,
-      lookups: state => state.lookups
+      lookups: state => state.lookups,
+      currentAccountAddress: state => state.currentAccountAddress
     }),
     chains: function () {
       let requests = {}
@@ -261,11 +265,8 @@ export default {
       }
       return requests
     },
-    requests: function () {
-      return this.history(this.wallet.account)
-    },
     renderSidePanel: function () {
-      return (this.wallet.account) || (this.selected === 'lookup' && this.lookups && this.lookups.length > 0)
+      return (this.currentAccount) || (this.selected === 'lookup' && this.lookups && this.lookups.length > 0)
     },
     hasTokens: function () {
       if (!this.wallet || !this.wallet.tokenAccounts) return false
@@ -282,6 +283,7 @@ export default {
       this.$refs.scrollAffixElement.onScroll()
     },
     history (account) {
+      if (!account.chain || !account.receiveChain) return []
       let myRequests = account.chain.concat(account.receiveChain)
       myRequests.sort((a, b) => {
         if (bigInt(a.timestamp).greater(bigInt(b.timestamp))) {
@@ -306,7 +308,13 @@ export default {
       this.selected = newSelected
     },
     setCurrentAccount: function (address) {
-      this.wallet.currentAccountAddress = address
+      if (this.wallet.accountsObject[address]) {
+        this.wallet.currentAccountAddress = address
+        this.currentAccount = this.wallet.accountsObject[address]
+      } else if (this.wallet.tokenAccounts[address]) {
+        this.currentAccount = this.wallet.tokenAccounts[address]
+      }
+      this.setCurrentAccountAddress(this.currentAccount.address)
     },
     replaceAddresses: function (msg) {
       if (msg) {
@@ -338,7 +346,8 @@ export default {
     },
     ...mapActions('forge', [
       'setWalletData',
-      'createToast'
+      'createToast',
+      'setCurrentAccountAddress'
     ]),
     ...mapActions('mqtt', [
       'initalize',
@@ -347,6 +356,12 @@ export default {
   },
   mounted: function () {
     this.wallet.sync()
+    if (this.currentAccountAddress) {
+      this.setCurrentAccount(this.currentAccountAddress)
+    } else {
+      this.setCurrentAccount(this.wallet.currentAccountAddress)
+    }
+
     window.addEventListener('beforeunload', this.recordData)
     this.initalize({ url: this.mqttHost,
       cb: () => {
@@ -355,6 +370,9 @@ export default {
     })
   },
   watch: {
+    currentAccount: function (newAccount, oldAccount) {
+      window.scrollTo(0, 0)
+    },
     rpcHost: function (newRpcHost, oldRpcHost) {
       if (this.proxyURL) {
         this.$Logos.changeServer(this.proxyURL, newRpcHost)
@@ -458,11 +476,8 @@ $bg-white: #FFF;
 }
 @media (min-width: 1200px) {
   .affix {
-    width: calc((100vw - 387px) * 7 / 12)
+    width: calc((100% - 265px) * 0.5833333 - 62px)
   }
-}
-.scrollaffix-sidebar:not(.affix) {
-  min-height: calc(100vh - 172px);
 }
 .list-group-flush > .list-group-item {
   border-top: 0;
@@ -542,27 +557,27 @@ label.btn-link.active {
 }
 </style>
 <style lang="scss">
-  .collapsedForm:not(.card-body) {
-    padding: 0;
-    padding-bottom: 1.25rem;
-  }
-  .collapsedForm {
-    border-top:1px solid rgba(0, 0, 0, 0.075);
-    margin-left: 1.25rem;
-    margin-right: 1.25rem;
-  }
-  .iconHolder {
-    width: 52px;
-    height: 52px;
-  }
-  .accordionCard > .btn-link:hover,
-  .accordionCard > .btn-link:focus {
-    text-decoration: none;
-  }
-  .accordionCard {
-    -webkit-transition: all .3s;
-    -o-transition: all .3s;
-    transition: all .3s;
-    border: 0px;
-  }
+.collapsedForm:not(.card-body) {
+  padding: 0;
+  padding-bottom: 1.25rem;
+}
+.collapsedForm {
+  border-top:1px solid rgba(0, 0, 0, 0.075);
+  margin-left: 1.25rem;
+  margin-right: 1.25rem;
+}
+.iconHolder {
+  width: 52px;
+  height: 52px;
+}
+.accordionCard > .btn-link:hover,
+.accordionCard > .btn-link:focus {
+  text-decoration: none;
+}
+.accordionCard {
+  -webkit-transition: all .3s;
+  -o-transition: all .3s;
+  transition: all .3s;
+  border: 0px;
+}
 </style>

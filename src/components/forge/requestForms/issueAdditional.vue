@@ -1,38 +1,6 @@
 <template>
   <div>
     <b-form-group
-      id="issueAdditionalToken"
-      label="Select Token"
-      label-size="lg"
-    >
-      <Multiselect
-        id="tokenSelector"
-        v-model="selectedToken"
-        required
-        track-by="address"
-        label="name"
-        :custom-label="nameWithAddress"
-        :options="issuableTokens"
-        :disabled="issuableTokens.length <= 1"
-        :multiple="false"
-        placeholder="Search for a token"
-      >
-        <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.address">
-            <strong>{{ option.name }}</strong>  -
-          </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.address" />
-        </template>
-      </Multiselect>
-      <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
-        You must select a token to mint additional tokens
-      </div>
-      <div v-if="selectedToken && !sufficientBalance" style="display:block" class="invalid-feedback">
-        {{selectedToken.name}} has an insufficient supply of logos to afford the fee for this transaction
-      </div>
-    </b-form-group>
-
-    <b-form-group
       id="additionalAmount"
       label="Amount"
       label-size="lg"
@@ -56,7 +24,7 @@
       <b-button
         v-on:click="createIssueAdditional()"
         type="submit"
-        :disabled="!sufficientBalance || !selectedToken || !amount || !isValidAmount"
+        :disabled="!sufficientBalance || !tokenAccount || !amount || !isValidAmount"
         variant="primary"
       >
           Mint Tokens
@@ -70,37 +38,31 @@ import bigInt from 'big-integer'
 import cloneDeep from 'lodash.clonedeep'
 export default {
   name: 'issueAdditionalForm',
+  props: {
+    tokenAccount: Object
+  },
   data () {
     return {
-      selectedToken: null,
-      amount: null
+      amount: ''
     }
   },
   components: {
     'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
     'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
-    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback'),
-    'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
-    'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
+    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback')
   },
   computed: {
-    forgeTokens: function () {
-      return this.$wallet.tokenAccounts
-    },
     issuerInfo: function () {
-      if (!this.selectedToken) return null
+      if (!this.tokenAccount) return null
       try {
-        return JSON.parse(this.selectedToken.issuerInfo)
+        return JSON.parse(this.tokenAccount.issuerInfo)
       } catch (e) {
         return {}
       }
     },
-    currentAccount: function () {
-      return this.$wallet.account
-    },
     isValidAmount: function () {
       if (this.amount === '') return null
-      if (!this.selectedToken) return null
+      if (!this.tokenAccount) return null
       let amountInRaw = null
       if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined' &&
         this.issuerInfo.decimals > 0) {
@@ -113,44 +75,38 @@ export default {
       if (amountInRaw === null) return false
       return (
         bigInt(amountInRaw).greater(0) &&
-        bigInt(this.$utils.MAXUINT128).minus(bigInt(this.selectedToken.totalSupply)).greaterOrEquals(bigInt(amountInRaw))
+        bigInt(this.$utils.MAXUINT128).minus(bigInt(this.tokenAccount.totalSupply)).greaterOrEquals(bigInt(amountInRaw))
       )
     },
     sufficientBalance: function () {
-      if (!this.selectedToken) return null
-      return bigInt(this.selectedToken.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
+      if (!this.tokenAccount) return null
+      return bigInt(this.tokenAccount.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
     },
     availableToIssue: function () {
-      if (this.selectedToken) {
-        let amountInRaw = bigInt(this.$utils.MAXUINT128).minus(bigInt(this.selectedToken.totalSupply))
+      if (this.tokenAccount) {
+        let amountInRaw = bigInt(this.$utils.MAXUINT128).minus(bigInt(this.tokenAccount.totalSupply))
         if (this.issuerInfo && typeof this.issuerInfo.decimals !== 'undefined') {
           amountInRaw = this.$Logos.convert.fromTo(amountInRaw, 0, this.issuerInfo.decimals)
-          return `You can mint an additional ${amountInRaw} ${this.selectedToken.symbol}`
+          return `You can mint ${amountInRaw} ${this.tokenAccount.symbol}`
         } else {
-          return `You can mint an additional ${amountInRaw} base units of ${this.selectedToken.symbol}`
+          return `You can mint ${amountInRaw} base units of ${this.tokenAccount.symbol}`
         }
       }
       return 'Select a token first'
     },
-    issuableTokens: function () {
-      let tokens = []
-      for (let tokenAddress in this.forgeTokens) {
-        let token = this.forgeTokens[tokenAddress]
-        for (let controllerAddress in token.controllers) {
-          let controller = token.controllers[controllerAddress]
-          if (controller.account === this.currentAccount.address) {
-            if (token.settings.issuance && controller.privileges.issuance) {
-              tokens.push(token)
-            }
-          }
+    mintableControllers: function () {
+      let controllers = []
+      for (let controller of this.tokenAccount.controllers) {
+        if (this.$wallet.accountsObject[controller.account] && controller.privileges.issuance) {
+          controllers.push(this.$wallet.accountsObject[controller.account])
         }
       }
-      return tokens
+      return controllers
     }
   },
   methods: {
     createIssueAdditional () {
-      if (this.sufficientBalance && this.selectedToken && this.amount && this.isValidAmount) {
+      if (this.sufficientBalance && this.tokenAccount && this.amount && this.isValidAmount) {
         let amountInRaw = cloneDeep(this.amount)
         if (amountInRaw && this.issuerInfo &&
           typeof this.issuerInfo.decimals !== 'undefined' &&
@@ -158,40 +114,14 @@ export default {
           amountInRaw = this.$Logos.convert.fromTo(amountInRaw, this.issuerInfo.decimals, 0)
         }
         let data = {
-          tokenAccount: this.selectedToken.address,
+          tokenAccount: this.tokenAccount.address,
           amount: amountInRaw
         }
-        this.$wallet.account.createIssueAdditionalRequest(data)
+        this.mintableControllers[0].createIssueAdditionalRequest(data)
       }
     },
     nameWithAddress ({ name, address }) {
       return `${name} — ${address.substring(0, 9)}...${address.substring(59, 64)}`
-    }
-  },
-  created: function () {
-    if (this.issuableTokens.length > 0) {
-      this.selectedToken = this.issuableTokens[0]
-    }
-  },
-  watch: {
-    issuableTokens: {
-      handler: function (newTks, oldTks) {
-        if (newTks.length > 0) {
-          let valid = false
-          for (let token of newTks) {
-            if (this.selectedToken && token.address === this.selectedToken.address) {
-              this.selectedToken = token
-              valid = true
-            }
-          }
-          if (valid === false) {
-            this.selectedToken = newTks[0]
-          }
-        } else {
-          this.selectedToken = null
-        }
-      },
-      deep: true
     }
   }
 }

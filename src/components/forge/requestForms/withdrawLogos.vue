@@ -1,38 +1,6 @@
 <template>
   <div>
     <b-form-group
-      id="withdrawFeeToken"
-      label="Select Token"
-      label-size="lg"
-    >
-      <Multiselect
-        id="tokenSelector"
-        v-model="selectedToken"
-        required
-        track-by="address"
-        label="name"
-        :custom-label="nameWithAddress"
-        :options="withdrawableTokens"
-        :disabled="withdrawableTokens.length <= 1"
-        :multiple="false"
-        placeholder="Search for a token"
-      >
-        <template slot="singleLabel" slot-scope="{ option }">
-          <span v-if="option.name !== option.address">
-            <strong>{{ option.name }}</strong>  -
-          </span>
-          <LogosAddress :inactive="true" :force="true" :address="option.address" />
-        </template>
-      </Multiselect>
-      <div v-if="!selectedToken" style="display:block" class="invalid-feedback">
-        You must select a token to withdraw from
-      </div>
-      <div v-if="selectedToken && !sufficientBalance" style="display:block" class="invalid-feedback">
-        {{selectedToken.name}} has an insufficient supply of logos to afford the fee for this transaction
-      </div>
-    </b-form-group>
-
-    <b-form-group
       id="withdrawLogosDestination"
       label="Send the logos to"
       label-size="lg"
@@ -100,10 +68,12 @@ import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 export default {
   name: 'withdrawFeeForm',
+  props: {
+    tokenAccount: Object
+  },
   data () {
     return {
       accounts: [],
-      selectedToken: null,
       transaction: {
         destination: null,
         amount: ''
@@ -118,55 +88,40 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
-    forgeAccounts: function () {
-      return this.$wallet.accountsObject
-    },
-    forgeTokens: function () {
-      return this.$wallet.tokenAccounts
-    },
-    currentAccount: function () {
-      return this.$wallet.account
-    },
     isValidAmount: function () {
       if (this.transaction.amount === '') return null
-      if (!this.selectedToken) return null
+      if (!this.tokenAccount) return null
       if (!/^([0-9]+(?:[.][0-9]*)?|\.[0-9]+)$/.test(this.transaction.amount)) return false
       let requestedAmount = this.$Logos.convert.toReason(this.transaction.amount, 'LOGOS')
-      let availableAmount = bigInt(this.selectedToken.balance).minus(this.$utils.minimumFee)
+      let availableAmount = bigInt(this.tokenAccount.balance).minus(this.$utils.minimumFee)
       return (
         bigInt(requestedAmount).greater(0) &&
         availableAmount.greaterOrEquals(bigInt(requestedAmount))
       )
     },
     sufficientBalance: function () {
-      if (!this.selectedToken) return null
-      return bigInt(this.selectedToken.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
+      if (!this.tokenAccount) return null
+      return bigInt(this.tokenAccount.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
     },
     combinedAccounts: function () {
-      let forgeAccounts = cloneDeep(this.forgeAccounts)
-      return Array.from(Object.values(forgeAccounts)).concat(this.accounts)
-    },
-    withdrawableTokens: function () {
-      let tokens = []
-      for (let tokenAddress in this.forgeTokens) {
-        let token = this.forgeTokens[tokenAddress]
-        for (let controllerAddress in token.controllers) {
-          let controller = token.controllers[controllerAddress]
-          if (controller.account === this.currentAccount.address &&
-            controller.privileges.withdraw_logos) {
-            tokens.push(token)
-          }
-        }
-      }
-      return tokens
+      return Array.from(Object.values(this.$wallet.accountsObject)).concat(this.accounts)
     },
     availableToWithdraw: function () {
-      if (this.selectedToken) {
-        let amount = bigInt(this.selectedToken.balance).minus(this.$utils.minimumFee).toString()
+      if (this.tokenAccount) {
+        let amount = bigInt(this.tokenAccount.balance).minus(this.$utils.minimumFee).toString()
         amount = this.$Logos.convert.fromReason(amount, 'LOGOS')
         return `${amount} Logos is available to withdraw`
       }
       return 'Select a token first'
+    },
+    withdrawLogosControllers: function () {
+      let controllers = []
+      for (let controller of this.tokenAccount.controllers) {
+        if (this.$wallet.accountsObject[controller.account] && controller.privileges.withdraw_logos) {
+          controllers.push(this.$wallet.accountsObject[controller.account])
+        }
+      }
+      return controllers
     }
   },
   methods: {
@@ -180,17 +135,18 @@ export default {
     createWithdrawLogos () {
       if (this.isValidAmount &&
         this.sufficientBalance &&
-        this.transaction.destination) {
+        this.transaction.destination &&
+        this.withdrawLogosControllers.length > 0) {
         let amountInRaw = cloneDeep(this.transaction.amount)
         amountInRaw = this.$Logos.convert.toReason(amountInRaw, 'LOGOS')
         let data = {
-          tokenAccount: this.selectedToken.address,
+          tokenAccount: this.tokenAccount.address,
           transaction: {
             destination: this.transaction.destination.address,
             amount: amountInRaw
           }
         }
-        this.$wallet.account.createWithdrawLogosRequest(data)
+        this.withdrawLogosControllers[0].createWithdrawLogosRequest(data)
       }
     },
     nameWithAddress ({ name, address }) {
@@ -205,30 +161,8 @@ export default {
     }
   },
   created: function () {
-    if (this.withdrawableTokens.length > 0) {
-      this.selectedToken = this.withdrawableTokens[0]
-    }
-    this.transaction.destination = this.currentAccount
-  },
-  watch: {
-    withdrawableTokens: {
-      handler: function (newDistTks, oldDistTks) {
-        if (newDistTks.length > 0) {
-          let valid = false
-          for (let token of newDistTks) {
-            if (this.selectedToken && token.address === this.selectedToken.address) {
-              this.selectedToken = token
-              valid = true
-            }
-          }
-          if (valid === false) {
-            this.selectedToken = newDistTks[0]
-          }
-        } else {
-          this.selectedToken = null
-        }
-      },
-      deep: true
+    if (this.combinedAccounts.length > 0) {
+      this.transaction.destination = this.combinedAccounts[0]
     }
   }
 }
