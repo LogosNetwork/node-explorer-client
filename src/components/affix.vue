@@ -225,24 +225,6 @@ export default {
     },
 
     onScroll () {
-      console.log(`******************************`)
-      console.log(`affixIsBiggerThanRelativeElement ${this.affixIsBiggerThanRelativeElement}`)
-      console.log(`Prev Scroll Affix ${this.lastScrollAffixState}`)
-      console.log(`Affixed Height ${this.affixHeight}`)
-      console.log(`Rel Height ${this.relativeElement.offsetHeight}`)
-      console.log(this.relativeElmRect)
-      console.log(`Rel Offset: ${this.relativeElmOffsetTop}`)
-      console.log(`Rel Top Pos: ${this.relativeElmTopPos}`)
-      console.log(`Rel Bot Pos: ${this.relativeElmBottomPos}`)
-      console.log(`Top of screen: ${this.topOfScreen}`)
-      console.log(`Affix Rect Top: ${this.affixRect.top}`)
-      console.log(`Affixed Top Pos ${this.topOfScreen - this.affixRect.top}`)
-      console.log(`Affixed Bot Pos ${this.affixBottomPos}`)
-      console.log(`Top Offset: ${this.topPadding + this.offset.top}`)
-      console.log(`Bot Offset: ${this.offset.bottom}`)
-      console.log(`Affix Initial Top: ${this.affixInitialTop}`)
-      console.log(`Affix is below relative elm: ${this.affixIsBelowRelativeElm}`)
-      console.log(`Bottom of screen: ${this.bottomOfScreen}`)
       if (!this.enabled) {
         this.removeClasses()
 
@@ -269,16 +251,13 @@ export default {
           this.currentScrollAffix = null
           this.lastScrollAffixState = null
           this.removeClasses()
-          this.updateData()
         } else if (mode === 'scrollAffix') {
           this.currentState = null
           this.lastState = null
           this.removeClasses()
-          this.$el.style.top = 'auto'
-          this.$el.style.bottom = 'auto'
-          this.updateData()
           this.initScrollAffix()
         }
+        this.updateData()
       }
     },
 
@@ -309,8 +288,6 @@ export default {
       this.setScrollingDirection()
       if (this.affixIsBiggerThanRelativeElement) {
         this.setScrollAffixTop()
-      } else if (this.affixIsBelowRelativeElm) {
-        this.repositionAffixedContent()
       } else if (this.screenIsBeforeRelativeElm) {
         this.setScrollAffixTop()
       } else if (this.screenIsPastRelativeElm) {
@@ -329,7 +306,7 @@ export default {
           this.setScrollAffixScrolling()
         }
       }
-      console.log(`Current Scroll Affix: ${this.currentScrollAffix}`)
+
       this.lastScrollAffixState = this.currentScrollAffix
       this.lastDistanceFromTop = this.topOfScreen
     },
@@ -476,18 +453,6 @@ export default {
         this.removeClasses()
         this.$el.classList.add('affix-bottom')
       }
-    },
-
-    /**
-     * Scrolls the window up to fit the affixed content.
-     */
-    repositionAffixedContent () {
-      let diff = this.affixBottomPos - this.relativeElmBottomPos
-      window.scrollBy(0, -diff)
-      this.updateData()
-      this.setScrollAffixUp()
-      this.scrollingUp = false
-      this.scrollingDown = true
     },
 
     /**
