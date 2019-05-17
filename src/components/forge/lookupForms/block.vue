@@ -74,7 +74,7 @@ export default {
     ),
     createLookup (type, val) {
       this.info = {
-        title: `${type.charAt(0).toUpperCase() + type.slice(1)} Information`,
+        title: `${type.charAt(0).toUpperCase() + type.slice(1)} Info`,
         type: `${type}`,
         time: Date.now(),
         params: [

@@ -1,6 +1,6 @@
 <template>
   <b-container fluid class="d-flex">
-    <b-row class="flex-grow flex-fill">
+    <b-row class="flex-grow flex-fill overflow-hidden">
       <b-col cols="auto" class="accountPanel d-none d-sm-block">
         <div class="d-flex justify-content-between mt-3 mb-3 align-items-center font-weight-bold">
           <h4 class="mb-0">Accounts</h4>
@@ -88,7 +88,7 @@
           </b-list-group>
         </div>
       </b-col>
-      <b-col class="forge">
+      <b-col class="forge overflow-hidden">
         <b-row class="selectors">
           <b-col col :xl="renderSidePanel ? 7 : 12" class="d-flex flex-column">
             <b-row class="actionToggle">
@@ -139,37 +139,35 @@
         </b-row>
         <b-row class="scrollContainer">
           <b-col col :xl="renderSidePanel ? 7 : 12" class="d-flex flex-column">
-            <b-row class="actionSelector">
-              <b-col class="m-3 text-left">
-                <affix ref="scrollAffixElement" v-if="renderSidePanel" class="scrollaffix-sidebar" :offset="{ top: 124, bottom: 16 }" relative-element-selector="#sidePanel" :scroll-affix="true">
-                  <resize-observer @notify="handleResize" />
-                  <div v-if="selected === 'lookup'">
-                    <Lookups />
-                  </div>
-                  <div v-else-if="selected === 'requests'">
-                    <Requests :account="currentAccount" />
-                  </div>
-                </affix>
-                <div v-else>
-                  <div v-if="selected === 'lookup'">
-                    <Lookups />
-                  </div>
-                  <div v-else-if="selected === 'requests'">
-                    <Requests :account="currentAccount" />
-                  </div>
+            <div class="m-3 text-left">
+              <affix ref="scrollAffixElement" v-if="renderSidePanel" class="scrollaffix-sidebar" :offset="{ top: 124, bottom: 16 }" relative-element-selector="#sidePanel" :scroll-affix="true">
+                <resize-observer @notify="handleResize" />
+                <div v-if="selected === 'lookup'">
+                  <Lookups />
                 </div>
-              </b-col>
-            </b-row>
+                <div v-else-if="selected === 'requests'">
+                  <Requests :account="currentAccount" />
+                </div>
+              </affix>
+              <div v-else>
+                <div v-if="selected === 'lookup'">
+                  <Lookups />
+                </div>
+                <div v-else-if="selected === 'requests'">
+                  <Requests :account="currentAccount" />
+                </div>
+              </div>
+            </div>
           </b-col>
           <b-col v-if="renderSidePanel" col xl="5" class="flex-column d-none d-xl-flex chainViewer">
             <div id="sidePanel" v-if="selected === 'requests'" class="d-flex flex-column">
               <div class="m-3 text-left">
-                <b-row class="mb-3">
-                  <b-col cols="12" class="d-flex flex-column m-auto align-items-start">
+                <div class="mb-3">
+                  <div class="d-flex flex-column m-auto align-items-start">
                     <h4 class="m-0" v-if="currentAccount && currentAccount.label">{{currentAccount.label}}</h4>
                     <h4 class="m-0" v-else-if="currentAccount && currentAccount.name">{{currentAccount.name}} - {{currentAccount.symbol}}</h4>
-                  </b-col>
-                </b-row>
+                  </div>
+                </div>
                 <div v-if="currentAccount">
                   <requestList :requests="history(currentAccount)" :address="currentAccount.address" :small="true"/>
                 </div>
@@ -315,6 +313,7 @@ export default {
         this.currentAccount = this.wallet.tokenAccounts[address]
       }
       this.setCurrentAccountAddress(this.currentAccount.address)
+      this.changeSelected('requests')
     },
     replaceAddresses: function (msg) {
       if (msg) {
@@ -458,25 +457,25 @@ $bg-white: #FFF;
 .scrollContainer {
   margin-top: 70px;
   min-height: calc(100vh - 124px);
-  max-width: 100vw
+  width: 100%;
 }
 @media (min-width: 576px) {
   .forge {
     margin-left: 265px;
   }
   .scrollContainer {
-    max-width: calc(100vw - 265px);
+    width: calc(100% + 30px);
   }
   .selectors {
     left: 280px;
     margin-left: -15px;
     margin-right: -15px;
-    width: calc(100vw - 265px);
+    width: calc(100% - 265px);
   }
 }
 @media (min-width: 1200px) {
   .affix {
-    width: calc((100% - 265px) * 0.5833333 - 62px)
+    width: calc((100% - 265px) * 0.5833333 - 62px);
   }
 }
 .list-group-flush > .list-group-item {
@@ -517,9 +516,6 @@ label.btn-link.active {
   z-index: 1;
   -webkit-box-shadow: 0 0.125rem 0rem rgba(0, 0, 0, 0.075) !important;
   box-shadow: 0 0.125rem 0rem rgba(0, 0, 0, 0.075) !important;
-}
-.actionSelector {
-  background: $bg-primary;
 }
 .chainToggle {
   background: $bg-secondary;

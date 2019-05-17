@@ -120,7 +120,7 @@ export default {
         this.$Logos.accounts.info(address).then((val) => {
           if (!val.error) {
             this.info = {
-              title: `Account Information`,
+              title: `Account Info`,
               type: `accountInfo`,
               time: Date.now(),
               params: [

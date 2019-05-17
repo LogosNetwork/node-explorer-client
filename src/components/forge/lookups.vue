@@ -1,5 +1,10 @@
 <template>
   <div>
+    <b-row class="mb-3">
+      <b-col cols="12">
+        <h4>Lookup Information</h4>
+      </b-col>
+    </b-row>
     <accordion
       bgClass="bg-info"
       accordionGroup="lookupAccordion"
@@ -27,7 +32,7 @@
       accordionGroup="lookupAccordion"
       :slotMinHeight="197"
       :requestIcon="faCube"
-      title="Block & Request Information"
+      title="Block & Request Info"
       subtitle="Info on a Request, Request Block, Micro Epoch, or Epoch with a given hash."
     >
       <block/>
