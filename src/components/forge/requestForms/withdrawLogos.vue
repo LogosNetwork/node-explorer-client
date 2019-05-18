@@ -16,7 +16,7 @@
         :options="combinedAccounts"
         :multiple="false"
         :taggable="true"
-        @tag="addAccount"
+        @tag="addWithdrawAccount"
         placeholder="Search or add an account"
       >
         <template slot="singleLabel" slot-scope="{ option }">
@@ -64,6 +64,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 export default {
@@ -73,7 +74,6 @@ export default {
   },
   data () {
     return {
-      accounts: [],
       transaction: {
         destination: null,
         amount: ''
@@ -88,6 +88,9 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
+    ...mapState('forge', {
+      accounts: state => state.accounts
+    }),
     isValidAmount: function () {
       if (this.transaction.amount === '') return null
       if (!this.tokenAccount) return null
@@ -125,11 +128,25 @@ export default {
     }
   },
   methods: {
-    addAccount (newAddress) {
+    ...mapActions('forge',
+      [
+        'addAccount'
+      ]
+    ),
+    accountExists (newAddress) {
+      let fullAccountList = this.combinedAccounts.concat(Array.from(Object.values(this.$wallet.tokenAccounts)))
+      for (let account of fullAccountList) {
+        if (account.address === newAddress) return true
+      }
+      return false
+    },
+    addWithdrawAccount (newAddress) {
       if (newAddress.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
         let newAccount = { label: newAddress, address: newAddress }
-        this.accounts.push(newAccount)
-        this.transaction.destination = newAccount
+        if (!this.accountExists(newAddress)) {
+          this.addAccount(newAccount)
+          this.transaction.destination = newAccount
+        }
       }
     },
     createWithdrawLogos () {

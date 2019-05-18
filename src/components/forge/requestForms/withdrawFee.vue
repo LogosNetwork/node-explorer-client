@@ -16,7 +16,7 @@
         :options="combinedAccounts"
         :multiple="false"
         :taggable="true"
-        @tag="addAccount"
+        @tag="addWithdrawAccount"
         placeholder="Search or add an account"
       >
         <template slot="singleLabel" slot-scope="{ option }">
@@ -65,6 +65,7 @@
 
 <script>
 import bigInt from 'big-integer'
+import { mapActions, mapState } from 'vuex'
 export default {
   name: 'withdrawFeeForm',
   props: {
@@ -87,6 +88,9 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
+    ...mapState('forge', {
+      accounts: state => state.accounts
+    }),
     issuerInfo: function () {
       if (!this.tokenAccount) return null
       try {
@@ -147,11 +151,25 @@ export default {
     }
   },
   methods: {
-    addAccount (newAddress) {
+    ...mapActions('forge',
+      [
+        'addAccount'
+      ]
+    ),
+    accountExists (newAddress) {
+      let fullAccountList = this.combinedAccounts.concat(Array.from(Object.values(this.$wallet.tokenAccounts)))
+      for (let account of fullAccountList) {
+        if (account.address === newAddress) return true
+      }
+      return false
+    },
+    addWithdrawAccount (newAddress) {
       if (newAddress.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
         let newAccount = { label: newAddress, address: newAddress }
-        this.accounts.push(newAccount)
-        this.transaction.destination = newAccount
+        if (!this.accountExists(newAddress)) {
+          this.addAccount(newAccount)
+          this.transaction.destination = newAccount
+        }
       }
     },
     createWithdrawFee () {

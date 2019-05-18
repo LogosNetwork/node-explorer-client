@@ -71,6 +71,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 import bigInt from 'big-integer'
 export default {
   name: 'adjustUserStatusForm',
@@ -79,7 +80,6 @@ export default {
   },
   data () {
     return {
-      accounts: [],
       account: null,
       status: null
     }
@@ -91,18 +91,15 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
+    ...mapState('forge', {
+      accounts: state => state.accounts
+    }),
     sufficientBalance: function () {
       if (!this.tokenAccount) return null
       return bigInt(this.tokenAccount.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
     },
     combinedAccounts: function () {
-      let forgeTokens = []
-      for (let token in this.$wallet.tokenAccounts) {
-        if (this.tokenAccount && this.tokenAccount.address !== token) {
-          forgeTokens.push({ label: `${this.$wallet.tokenAccounts[token].name} (${this.$wallet.tokenAccounts[token].symbol})`, address: token })
-        }
-      }
-      return Array.from(Object.values(this.$wallet.accountsObject)).concat(this.accounts).concat(forgeTokens)
+      return Array.from(Object.values(this.$wallet.accountsObject)).concat(this.accounts)
     },
     adjustableStatuses: function () {
       let statuses = []
@@ -153,11 +150,25 @@ export default {
     }
   },
   methods: {
+    ...mapActions('forge',
+      [
+        'addAccount'
+      ]
+    ),
+    accountExists (newAddress) {
+      let fullAccountList = this.combinedAccounts.concat(Array.from(Object.values(this.$wallet.tokenAccounts)))
+      for (let account of fullAccountList) {
+        if (account.address === newAddress) return true
+      }
+      return false
+    },
     addDestiantionAccount (newAddress) {
       if (newAddress.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
         let newAccount = { label: newAddress, address: newAddress }
-        this.accounts.push(newAccount)
-        this.account = newAccount
+        if (!this.accountExists(newAddress)) {
+          this.addAccount(newAccount)
+          this.account = newAccount
+        }
       }
     },
     createAdjustUserStatus () {

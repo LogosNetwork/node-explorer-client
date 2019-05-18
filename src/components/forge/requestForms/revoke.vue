@@ -95,6 +95,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 import bigInt from 'big-integer'
 export default {
   name: 'revokeForm',
@@ -103,7 +104,6 @@ export default {
   },
   data () {
     return {
-      accounts: [],
       source: null,
       transaction: {
         destination: null,
@@ -119,6 +119,9 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
+    ...mapState('forge', {
+      accounts: state => state.accounts
+    }),
     issuerInfo: function () {
       if (!this.tokenAccount) return null
       try {
@@ -193,6 +196,18 @@ export default {
     }
   },
   methods: {
+    ...mapActions('forge',
+      [
+        'addAccount'
+      ]
+    ),
+    accountExists (newAddress) {
+      let fullAccountList = this.combinedAccounts.concat(Array.from(Object.values(this.$wallet.tokenAccounts)))
+      for (let account of fullAccountList) {
+        if (account.address === newAddress) return true
+      }
+      return false
+    },
     addDestinationAccount (newAddress) {
       if (newAddress.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
         this.$Logos.accounts.info(newAddress).then(val => {
@@ -207,8 +222,10 @@ export default {
               data.tokenBalances[token] = val.tokens[token].balance
             }
           }
-          this.accounts.push(data)
-          this.transaction.destination = data
+          if (!this.accountExists(newAddress)) {
+            this.addAccount(data)
+            this.transaction.destination = data
+          }
         })
       }
     },
@@ -226,8 +243,10 @@ export default {
               data.tokenBalances[token] = val.tokens[token].balance
             }
           }
-          this.accounts.push(data)
-          this.source = data
+          if (!this.accountExists(newAddress)) {
+            this.addAccount(data)
+            this.source = data
+          }
         })
       }
     },

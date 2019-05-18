@@ -17,7 +17,7 @@
         :options="combinedAccounts"
         :multiple="false"
         :taggable="true"
-        @tag="addAccount"
+        @tag="addControllerAccount"
         placeholder="Search or add an account"
       >
         <template slot="singleLabel" slot-scope="{ option }">
@@ -148,6 +148,8 @@ import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 import { faQuestionCircle } from '@fortawesome/pro-light-svg-icons'
 import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
+import { mapActions, mapState } from 'vuex'
+
 Vue.directive('b-tooltip', vBTooltip)
 export default {
   name: 'updateControllerForm',
@@ -157,7 +159,6 @@ export default {
   data () {
     return {
       faQuestionCircle,
-      accounts: [],
       controllerAccount: null,
       action: null,
       defaultPrivileges: {
@@ -195,6 +196,9 @@ export default {
     'b-form-checkbox': () => import(/* webpackChunkName: "b-form-checkbox" */'bootstrap-vue/es/components/form-checkbox/form-checkbox')
   },
   computed: {
+    ...mapState('forge', {
+      accounts: state => state.accounts
+    }),
     sufficientBalance: function () {
       if (!this.tokenAccount) return null
       return bigInt(this.tokenAccount.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
@@ -233,6 +237,7 @@ export default {
           if (forgeAccounts[value.account]) delete forgeAccounts[value.account]
         })
       }
+      // TODO Remove duplicate Controllers from local account edge case?
       forgeAccounts = Array.from(Object.values(forgeAccounts))
       return tokenControllers.concat(forgeAccounts).concat(this.accounts)
     },
@@ -247,17 +252,25 @@ export default {
     }
   },
   methods: {
-    addAccount (newAddress) {
+    ...mapActions('forge',
+      [
+        'addAccount'
+      ]
+    ),
+    accountExists (newAddress) {
+      let fullAccountList = this.combinedAccounts.concat(Array.from(Object.values(this.$wallet.tokenAccounts)))
+      for (let account of fullAccountList) {
+        if (account.address === newAddress) return true
+      }
+      return false
+    },
+    addControllerAccount (newAddress) {
       if (newAddress.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
-        for (let value of this.combinedAccounts) {
-          if (newAddress === value.address) {
-            this.controllerAccount = value
-            return false
-          }
-        }
         let newAccount = { label: newAddress, address: newAddress }
-        this.accounts.push(newAccount)
-        this.controllerAccount = newAccount
+        if (!this.accountExists(newAddress)) {
+          this.addAccount(newAccount)
+          this.controllerAccount = newAccount
+        }
         return true
       }
       return false

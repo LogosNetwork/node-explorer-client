@@ -69,13 +69,12 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'accountHistoryLookupForm',
   data () {
     return {
-      accounts: [],
       address: null,
       count: 5,
       info: null,
@@ -96,6 +95,9 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
+    ...mapState('forge', {
+      accounts: state => state.accounts
+    }),
     forgeAccounts: function () {
       return this.$wallet.accountsObject
     },
@@ -120,19 +122,30 @@ export default {
   methods: {
     ...mapActions('forge',
       [
-        'addLookup'
+        'addLookup',
+        'addAccount'
       ]
     ),
+    accountExists (newAddress) {
+      for (let account of this.combinedAccounts) {
+        if (account.address === newAddress) return true
+      }
+      return false
+    },
     addAddress (newAddress) {
       if (/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/.test(newAddress)) {
         let newAccount = { label: newAddress, address: newAddress }
-        this.accounts.push(newAccount)
-        this.address = newAccount
+        if (!this.accountExists(newAddress)) {
+          this.addAccount(newAccount)
+          this.address = newAccount
+        }
       } else if (/^[0-9A-F]{64}$/i.test(newAddress)) {
         newAddress = this.$utils.accountFromHexKey(newAddress)
         let newAccount = { label: newAddress, address: newAddress }
-        this.accounts.push(newAccount)
-        this.address = newAccount
+        if (!this.accountExists(newAddress)) {
+          this.addAccount(newAccount)
+          this.address = newAccount
+        }
       }
     },
     parseInput () {

@@ -64,6 +64,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 import bigInt from 'big-integer'
 export default {
   name: 'distributeForm',
@@ -72,7 +73,6 @@ export default {
   },
   data () {
     return {
-      accounts: [],
       transaction: {
         destination: null,
         amount: ''
@@ -87,6 +87,9 @@ export default {
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
+    ...mapState('forge', {
+      accounts: state => state.accounts
+    }),
     issuerInfo: function () {
       if (!this.tokenAccount) return null
       try {
@@ -148,11 +151,25 @@ export default {
     }
   },
   methods: {
+    ...mapActions('forge',
+      [
+        'addAccount'
+      ]
+    ),
+    accountExists (newAddress) {
+      let fullAccountList = this.combinedAccounts.concat(Array.from(Object.values(this.$wallet.tokenAccounts)))
+      for (let account of fullAccountList) {
+        if (account.address === newAddress) return true
+      }
+      return false
+    },
     addDestiantionAccount (newAddress) {
       if (newAddress.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
         let newAccount = { label: newAddress, address: newAddress }
-        this.accounts.push(newAccount)
-        this.transaction.destination = newAccount
+        if (!this.accountExists(newAddress)) {
+          this.addAccount(newAccount)
+          this.transaction.destination = newAccount
+        }
       }
     },
     createDistribute () {

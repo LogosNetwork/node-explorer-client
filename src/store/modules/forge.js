@@ -7,6 +7,7 @@ const state = {
   lookups: [],
   issuerInfo: '',
   tempInfo: '',
+  accounts: [],
   currentAccountAddress: null,
   walletData: null
 }
@@ -167,6 +168,12 @@ const actions = {
   setCurrentAccountAddress ({ commit }, address) {
     commit('setCurrentAccountAddress', address)
   },
+  setAccounts ({ commit }, accounts) {
+    commit('setAccounts', accounts)
+  },
+  addAccount ({ commit }, account) {
+    commit('addAccount', account)
+  },
   addLookup ({ commit }, lookup) {
     commit('addLookup', lookup)
   },
@@ -176,6 +183,12 @@ const actions = {
 }
 
 const mutations = {
+  setAccounts (state, accounts) {
+    state.accounts = accounts
+  },
+  addAccount (state, account) {
+    state.accounts.push(account)
+  },
   setIssuerInfo (state, info) {
     state.issuerInfo = info
   },
