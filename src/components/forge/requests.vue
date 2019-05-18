@@ -293,7 +293,7 @@ export default {
       }
     },
     isTokenAccount: function () {
-      return Boolean(this.account.name)
+      return this.account.type === 'TokenAccount'
     }
   },
   methods: {
