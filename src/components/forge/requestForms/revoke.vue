@@ -166,7 +166,7 @@ export default {
     sourceAccounts: function () {
       let accounts = []
       for (let account of this.combinedAccounts) {
-        if (account.tokenBalances[this.$utils.keyFromAccount(this.tokenAccount.address)]) {
+        if (account.tokenBalances && account.tokenBalances[this.$utils.keyFromAccount(this.tokenAccount.address)]) {
           accounts.push(account)
         }
       }

@@ -73,7 +73,6 @@ export default {
   },
   data () {
     return {
-      accounts: [],
       transaction: {
         destination: null,
         amount: ''
