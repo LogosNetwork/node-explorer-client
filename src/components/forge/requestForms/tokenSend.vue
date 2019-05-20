@@ -52,6 +52,9 @@
           <LogosAddress :inactive="true" :force="true" :address="option.address" />
         </template>
       </Multiselect>
+      <div v-if="validDestination === false" style="display:block" class="invalid-feedback">
+        {{invalidDestinationError}}
+      </div>
     </b-form-group>
 
     <b-form-group
@@ -78,7 +81,7 @@
         v-on:click="createTokenSend()"
         type="submit"
         variant="primary"
-        :disabled="!isValidAmount || !transaction.destination || !selectedToken"
+        :disabled="!isValidAmount || !transaction.destination || !selectedToken || !validDestination"
       >
         Send Tokens
       </b-button>
@@ -95,6 +98,8 @@ export default {
   name: 'sendForm',
   data () {
     return {
+      validDestination: null,
+      invalidDestinationError: '',
       selectedToken: null,
       transaction: {
         destination: null,
@@ -194,6 +199,47 @@ export default {
         'addAccount'
       ]
     ),
+    isValidDestination: async function (account) {
+      this.validDestination = null
+      this.invalidDestinationError = ''
+      if (this.selectedToken) {
+        let address = account.address
+        let accountInfo = await this.$Logos.accounts.info(address)
+        if (!accountInfo) {
+          this.validDestination = false
+          this.invalidDestinationError = 'Unable to validate this account.'
+          return
+        }
+        if (accountInfo.error && accountInfo.error === 'failed to get account') {
+          this.validDestination = false
+          this.invalidDestinationError = 'This account must be opened first before sending tokens to it.'
+          return
+        }
+        if (accountInfo.error && accountInfo.error === 'Bad account number') {
+          this.validDestination = false
+          this.invalidDestinationError = 'This is not a valid address.'
+          return
+        }
+        if (accountInfo.type !== 'LogosAccount') {
+          this.validDestination = false
+          this.invalidDestinationError = 'You cannot send tokens to TokenAccounts.'
+          return
+        }
+        let tokenInfo = null
+        if (accountInfo.tokens && accountInfo.tokens.hasOwnProperty(this.selectedToken.tokenID)) {
+          tokenInfo = accountInfo.tokens[this.selectedToken.tokenID]
+        }
+        if (this.selectedToken.settings.whitelist && (!tokenInfo || tokenInfo.whitelisted !== 'true')) {
+          this.validDestination = false
+          this.invalidDestinationError = 'This account has not been whitelisted.'
+        } else if (tokenInfo && tokenInfo.frozen === 'true') {
+          this.validDestination = false
+          this.invalidDestinationError = 'This account is frozen and cannot receive or send tokens.'
+        } else {
+          this.validDestination = true
+        }
+      }
+    },
     accountExists (newAddress) {
       let fullAccountList = this.combinedAccounts.concat(Array.from(Object.values(this.$wallet.tokenAccounts)))
       for (let account of fullAccountList) {
@@ -220,7 +266,6 @@ export default {
         } else {
           amountInBaseUnit = this.transaction.amount
         }
-        // Check if target account is open?
         if (this.selectedToken.feeType === 'flat') {
           if (bigInt(this.currentAccount.tokenBalances[this.$utils.keyFromAccount(this.selectedToken.address)])
             .minus(bigInt(this.selectedToken.feeRate))
@@ -267,6 +312,12 @@ export default {
     }
   },
   watch: {
+    selectedToken: function (newTk, oldTk) {
+      this.isValidDestination(this.transaction.destination)
+    },
+    'transaction.destination': function (newDest, oldDest) {
+      this.isValidDestination(this.transaction.destination)
+    },
     sendableTokens: {
       handler: function (newTks, oldTks) {
         if (newTks.length > 0) {

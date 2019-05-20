@@ -29,6 +29,9 @@
       <div v-if="!transaction.destination" style="display:block" class="invalid-feedback">
         You must select an account to withdraw the fees to
       </div>
+      <div v-if="validDestination === false" style="display:block" class="invalid-feedback">
+        {{invalidDestinationError}}
+      </div>
     </b-form-group>
 
     <b-form-group
@@ -54,7 +57,7 @@
       <b-button
         v-on:click="createWithdrawFee()"
         type="submit"
-        :disabled="!isValidAmount || !sufficientBalance || !sufficientTokenFeeBalance || !transaction.destination"
+        :disabled="!isValidAmount || !sufficientBalance || !sufficientTokenFeeBalance || !transaction.destination || !validDestination"
         variant="primary"
       >
           Withdraw Fees
@@ -73,6 +76,8 @@ export default {
   },
   data () {
     return {
+      validDestination: null,
+      invalidDestinationError: '',
       transaction: {
         destination: null,
         amount: ''
@@ -171,6 +176,47 @@ export default {
         }
       }
     },
+    isValidDestination: async function (account) {
+      this.validDestination = null
+      this.invalidDestinationError = ''
+      if (this.tokenAccount) {
+        let address = account.address
+        let accountInfo = await this.$Logos.accounts.info(address)
+        if (!accountInfo) {
+          this.validDestination = false
+          this.invalidDestinationError = 'Unable to validate this account.'
+          return
+        }
+        if (accountInfo.error && accountInfo.error === 'failed to get account') {
+          this.validDestination = false
+          this.invalidDestinationError = 'This account must be opened first before sending tokens to it.'
+          return
+        }
+        if (accountInfo.error && accountInfo.error === 'Bad account number') {
+          this.validDestination = false
+          this.invalidDestinationError = 'This is not a valid address.'
+          return
+        }
+        if (accountInfo.type !== 'LogosAccount') {
+          this.validDestination = false
+          this.invalidDestinationError = 'You cannot send tokens to TokenAccounts.'
+          return
+        }
+        let tokenInfo = null
+        if (accountInfo.tokens && accountInfo.tokens.hasOwnProperty(this.tokenAccount.tokenID)) {
+          tokenInfo = accountInfo.tokens[this.tokenAccount.tokenID]
+        }
+        if (this.tokenAccount.settings.whitelist && (!tokenInfo || tokenInfo.whitelisted !== 'true')) {
+          this.validDestination = false
+          this.invalidDestinationError = 'This account has not been whitelisted.'
+        } else if (tokenInfo && tokenInfo.frozen === 'true') {
+          this.validDestination = false
+          this.invalidDestinationError = 'This account is frozen and cannot receive or send tokens.'
+        } else {
+          this.validDestination = true
+        }
+      }
+    },
     createWithdrawFee () {
       if (this.isValidAmount &&
         this.sufficientBalance &&
@@ -207,6 +253,11 @@ export default {
   created: function () {
     if (this.combinedAccounts.length > 0) {
       this.transaction.destination = this.combinedAccounts[0]
+    }
+  },
+  watch: {
+    'transaction.destination': function (newDest, oldDest) {
+      this.isValidDestination(this.transaction.destination)
     }
   }
 }
