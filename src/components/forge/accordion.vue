@@ -32,7 +32,7 @@
     </b-button>
     <b-collapse v-bind:class="{ hideTransition: disableAnimation }" v-model="showCollapse" @hide="updateSlot()" @show="updateSlot()" :id="`collapse_${type}`" accordion="accordion" role="tabpanel">
       <b-card-body v-bind:style="{ minHeight: slotMinHeight + 'px' }" class="collapsedForm">
-        <slot v-if="loadSlot" v-show="showSlot"></slot>
+        <slot v-if="loadSlot && showSlot" v-show="showSlot"></slot>
       </b-card-body>
     </b-collapse>
   </b-card>
@@ -64,16 +64,18 @@ export default {
       loadSlot: false,
       showSlot: false,
       disableAnimation: false,
-      faChevronDown
+      faChevronDown,
+      timeout: null
     }
   },
   methods: {
     updateSlot: function () {
       if (this.showCollapse === false) {
-        setTimeout(() => {
+        this.timeout = setTimeout(() => {
           this.showSlot = false
         }, 300)
       } else {
+        clearTimeout(this.timeout)
         this.showSlot = true
         this.loadSlot = true
       }

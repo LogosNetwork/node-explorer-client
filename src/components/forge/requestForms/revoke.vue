@@ -330,12 +330,6 @@ export default {
   watch: {
     'transaction.destination': function (newDest, oldDest) {
       this.isValidDestination(this.transaction.destination)
-    },
-    tokenAccount: {
-      handler: function (newTk, oldTk) {
-        this.isValidDestination(this.transaction.destination)
-      },
-      deep: true
     }
   }
 }

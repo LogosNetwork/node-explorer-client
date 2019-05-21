@@ -309,11 +309,8 @@ export default {
     }
   },
   watch: {
-    selectedToken: {
-      handler: function (newTk, oldTk) {
-        this.isValidDestination(this.transaction.destination)
-      },
-      deep: true
+    selectedToken: function (newTk, oldTk) {
+      this.isValidDestination(this.transaction.destination)
     },
     'transaction.destination': function (newDest, oldDest) {
       this.isValidDestination(this.transaction.destination)

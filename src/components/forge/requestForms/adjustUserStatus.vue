@@ -64,7 +64,8 @@
         :disabled="!sufficientBalance || !tokenAccount || !status || !account"
         variant="primary"
       >
-          Adjust User's Status
+          <span v-if="status && status.label">{{status.label}} Account</span>
+          <span v-else>Adjust User's Status</span>
       </b-button>
     </div>
   </div>
