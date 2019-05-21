@@ -30,6 +30,9 @@
       <div v-if="!controllerAccount" style="display:block" class="invalid-feedback">
         You must select an account add, remove, or modifiy
       </div>
+      <div v-if="validDestination === false" style="display:block" class="invalid-feedback">
+        {{invalidDestinationError}}
+      </div>
     </b-form-group>
 
     <b-form-group
@@ -132,7 +135,7 @@
       <b-button
         v-on:click="createUpdateController()"
         type="submit"
-        :disabled="!tokenAccount || !controllerAccount || !action || !privileges"
+        :disabled="!tokenAccount || !controllerAccount || !action || !privileges || !validDestination"
         variant="primary"
       >
           <span v-if="action && action.label">{{action.label}}</span>
@@ -158,6 +161,8 @@ export default {
   },
   data () {
     return {
+      validDestination: null,
+      invalidDestinationError: '',
       faQuestionCircle,
       controllerAccount: null,
       action: null,
@@ -275,6 +280,30 @@ export default {
       }
       return false
     },
+    isValidDestination: async function (account) {
+      this.validDestination = null
+      this.invalidDestinationError = ''
+      if (this.tokenAccount && account && account.address) {
+        let address = account.address
+        let accountInfo = await this.$Logos.accounts.info(address)
+        if (!accountInfo) {
+          this.validDestination = false
+          this.invalidDestinationError = 'Unable to validate this account.'
+          return
+        }
+        if (accountInfo.error && accountInfo.error === 'Bad account number') {
+          this.validDestination = false
+          this.invalidDestinationError = 'This is not a valid address.'
+          return
+        }
+        if (accountInfo.type !== 'LogosAccount') {
+          this.validDestination = false
+          this.invalidDestinationError = 'TokenAccounts cannot be a token controller.'
+          return
+        }
+        this.validDestination = true
+      }
+    },
     createUpdateController () {
       if (this.updateControllerControllers.length > 0) {
         let data = {
@@ -342,16 +371,15 @@ export default {
     }
   },
   watch: {
-    controllerAccount: {
-      handler: function (newAccount, oldAccount) {
-        if (newAccount !== null) {
-          if (!newAccount.privileges) {
-            this.privileges = this.defaultPrivileges
-          } else {
-            this.privileges = cloneDeep(newAccount.privileges)
-          }
-          this.action = this.actionOptions[0]
+    controllerAccount: function (newAccount, oldAccount) {
+      if (newAccount !== null) {
+        this.isValidDestination(newAccount)
+        if (!newAccount.privileges) {
+          this.privileges = this.defaultPrivileges
+        } else {
+          this.privileges = cloneDeep(newAccount.privileges)
         }
+        this.action = this.actionOptions[0]
       }
     }
   }

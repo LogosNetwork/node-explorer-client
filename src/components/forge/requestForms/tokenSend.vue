@@ -311,9 +311,12 @@ export default {
   watch: {
     selectedToken: function (newTk, oldTk) {
       this.isValidDestination(this.transaction.destination)
+      this.transaction.amount = ''
     },
     'transaction.destination': function (newDest, oldDest) {
-      this.isValidDestination(this.transaction.destination)
+      if (this.transaction.destination !== null) {
+        this.isValidDestination(this.transaction.destination)
+      }
     },
     sendableTokens: {
       handler: function (newTks, oldTks) {

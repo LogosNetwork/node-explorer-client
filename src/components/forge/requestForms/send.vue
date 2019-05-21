@@ -25,6 +25,9 @@
           <LogosAddress :inactive="true" :force="true" :address="option.address" />
         </template>
       </Multiselect>
+      <div v-if="validDestination === false" style="display:block" class="invalid-feedback">
+        {{invalidDestinationError}}
+      </div>
     </b-form-group>
 
     <b-form-group
@@ -51,7 +54,7 @@
         v-on:click="createSend()"
         type="submit"
         variant="primary"
-        :disabled="!isValidAmount || !sendForm.to"
+        :disabled="!isValidAmount || !sendForm.to || !validDestination"
       >
         Create Send
       </b-button>
@@ -68,6 +71,8 @@ export default {
   name: 'sendForm',
   data () {
     return {
+      validDestination: null,
+      invalidDestinationError: '',
       sendForm: {
         to: null,
         amount: ''
@@ -141,6 +146,25 @@ export default {
         }
       }
     },
+    isValidDestination: async function (account) {
+      this.validDestination = null
+      this.invalidDestinationError = ''
+      if (this.tokenAccount && account && account.address) {
+        let address = account.address
+        let accountInfo = await this.$Logos.accounts.info(address)
+        if (!accountInfo) {
+          this.validDestination = false
+          this.invalidDestinationError = 'Unable to validate this account.'
+          return
+        }
+        if (accountInfo.error && accountInfo.error === 'Bad account number') {
+          this.validDestination = false
+          this.invalidDestinationError = 'This is not a valid address.'
+          return
+        }
+        this.validDestination = true
+      }
+    },
     createSend () {
       if (this.sendForm.to && this.sendForm.to.address.match(/^lgs_[13456789abcdefghijkmnopqrstuwxyz]{60}$/) !== null) {
         let amount = this.$Logos.convert.toReason(this.sendForm.amount, 'LOGOS')
@@ -183,6 +207,11 @@ export default {
         }
       } else {
         this.sendForm.to = null
+      }
+    },
+    'sendForm.to': function (newDest, oldDest) {
+      if (this.sendForm.to !== null) {
+        this.isValidDestination(this.sendForm.to)
       }
     },
     currentAccount: function (newAccount, oldAccount) {

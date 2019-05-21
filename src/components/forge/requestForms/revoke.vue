@@ -329,7 +329,9 @@ export default {
   },
   watch: {
     'transaction.destination': function (newDest, oldDest) {
-      this.isValidDestination(this.transaction.destination)
+      if (this.transaction.destination !== null) {
+        this.isValidDestination(this.transaction.destination)
+      }
     }
   }
 }

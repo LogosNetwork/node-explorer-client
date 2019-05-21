@@ -29,6 +29,9 @@
       <div v-if="!account" style="display:block" class="invalid-feedback">
         You must select an account to adjust the status of
       </div>
+      <div v-if="validDestination === false" style="display:block" class="invalid-feedback">
+        {{invalidDestinationError}}
+      </div>
     </b-form-group>
 
     <b-form-group
@@ -61,7 +64,7 @@
       <b-button
         v-on:click="createAdjustUserStatus()"
         type="submit"
-        :disabled="!sufficientBalance || !tokenAccount || !status || !account"
+        :disabled="!sufficientBalance || !tokenAccount || !status || !account || !validDestination"
         variant="primary"
       >
           <span v-if="status && status.label">{{status.label}} Account</span>
@@ -81,6 +84,8 @@ export default {
   },
   data () {
     return {
+      validDestination: null,
+      invalidDestinationError: '',
       account: null,
       status: null
     }
@@ -184,6 +189,30 @@ export default {
         }
       }
     },
+    isValidDestination: async function (account) {
+      this.validDestination = null
+      this.invalidDestinationError = ''
+      if (this.tokenAccount && account && account.address) {
+        let address = account.address
+        let accountInfo = await this.$Logos.accounts.info(address)
+        if (!accountInfo) {
+          this.validDestination = false
+          this.invalidDestinationError = 'Unable to validate this account.'
+          return
+        }
+        if (accountInfo.error && accountInfo.error === 'Bad account number') {
+          this.validDestination = false
+          this.invalidDestinationError = 'This is not a valid address.'
+          return
+        }
+        if (accountInfo.type !== 'LogosAccount') {
+          this.validDestination = false
+          this.invalidDestinationError = 'TokenAccounts cannot have their status set.'
+          return
+        }
+        this.validDestination = true
+      }
+    },
     createAdjustUserStatus () {
       if (this.sufficientBalance && this.tokenAccount &&
         this.status && this.account && this.adjustUserStatusControllers.length > 0) {
@@ -216,6 +245,11 @@ export default {
   watch: {
     adjustableStatuses: function (newStatus, oldStatus) {
       if (this.adjustableStatuses.length > 0) this.status = this.adjustableStatuses[0]
+    },
+    account: function (newAccount, oldAccount) {
+      if (this.account !== null) {
+        this.isValidDestination(this.account)
+      }
     }
   }
 }

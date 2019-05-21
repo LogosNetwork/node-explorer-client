@@ -29,6 +29,9 @@
       <div v-if="!transaction.destination" style="display:block" class="invalid-feedback">
         You must select an account to withdraw the logos to
       </div>
+      <div v-if="validDestination === false" style="display:block" class="invalid-feedback">
+        {{invalidDestinationError}}
+      </div>
     </b-form-group>
 
     <b-form-group
@@ -54,7 +57,7 @@
       <b-button
         v-on:click="createWithdrawLogos()"
         type="submit"
-        :disabled="!isValidAmount || !sufficientBalance || !transaction.destination"
+        :disabled="!isValidAmount || !sufficientBalance || !transaction.destination || !validDestination"
         variant="primary"
       >
           Withdraw Logos
@@ -74,6 +77,8 @@ export default {
   },
   data () {
     return {
+      validDestination: null,
+      invalidDestinationError: '',
       transaction: {
         destination: null,
         amount: ''
@@ -149,6 +154,30 @@ export default {
         }
       }
     },
+    isValidDestination: async function (account) {
+      this.validDestination = null
+      this.invalidDestinationError = ''
+      if (this.tokenAccount && account && account.address) {
+        let address = account.address
+        let accountInfo = await this.$Logos.accounts.info(address)
+        if (!accountInfo) {
+          this.validDestination = false
+          this.invalidDestinationError = 'Unable to validate this account.'
+          return
+        }
+        if (accountInfo.error && accountInfo.error === 'Bad account number') {
+          this.validDestination = false
+          this.invalidDestinationError = 'This is not a valid address.'
+          return
+        }
+        if (accountInfo.type !== 'LogosAccount') {
+          this.validDestination = false
+          this.invalidDestinationError = 'TokenAccounts cannot be the target of a withdraw logos request.'
+          return
+        }
+        this.validDestination = true
+      }
+    },
     createWithdrawLogos () {
       if (this.isValidAmount &&
         this.sufficientBalance &&
@@ -180,6 +209,13 @@ export default {
   created: function () {
     if (this.combinedAccounts.length > 0) {
       this.transaction.destination = this.combinedAccounts[0]
+    }
+  },
+  watch: {
+    'transaction.destination': function (newDest, oldDest) {
+      if (this.transaction.destination !== null) {
+        this.isValidDestination(this.transaction.destination)
+      }
     }
   }
 }
