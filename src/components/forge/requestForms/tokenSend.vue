@@ -202,7 +202,7 @@ export default {
     isValidDestination: async function (account) {
       this.validDestination = null
       this.invalidDestinationError = ''
-      if (this.selectedToken) {
+      if (this.selectedToken && account && account.address) {
         let address = account.address
         let accountInfo = await this.$Logos.accounts.info(address)
         if (!accountInfo) {
@@ -225,16 +225,13 @@ export default {
           this.invalidDestinationError = 'You cannot send tokens to TokenAccounts.'
           return
         }
-        let tokenInfo = null
-        if (accountInfo.tokens && accountInfo.tokens.hasOwnProperty(this.selectedToken.tokenID)) {
-          tokenInfo = accountInfo.tokens[this.selectedToken.tokenID]
-        }
-        if (this.selectedToken.settings.whitelist && (!tokenInfo || tokenInfo.whitelisted !== 'true')) {
+        let tokenInfo = this.selectedToken.getAccountStatus(account.address)
+        if (this.selectedToken.settings.whitelist && tokenInfo.whitelisted === false) {
           this.validDestination = false
           this.invalidDestinationError = 'This account has not been whitelisted.'
-        } else if (tokenInfo && tokenInfo.frozen === 'true') {
+        } else if (tokenInfo.frozen === true) {
           this.validDestination = false
-          this.invalidDestinationError = 'This account is frozen and cannot receive or send tokens.'
+          this.invalidDestinationError = `This account is frozen and cannot receive or send ${this.selectedToken.symbol}.`
         } else {
           this.validDestination = true
         }
@@ -312,8 +309,11 @@ export default {
     }
   },
   watch: {
-    selectedToken: function (newTk, oldTk) {
-      this.isValidDestination(this.transaction.destination)
+    selectedToken: {
+      handler: function (newTk, oldTk) {
+        this.isValidDestination(this.transaction.destination)
+      },
+      deep: true
     },
     'transaction.destination': function (newDest, oldDest) {
       this.isValidDestination(this.transaction.destination)

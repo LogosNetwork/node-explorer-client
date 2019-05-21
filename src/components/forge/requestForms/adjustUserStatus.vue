@@ -94,6 +94,10 @@ export default {
     ...mapState('forge', {
       accounts: state => state.accounts
     }),
+    currentAccountStatus: function () {
+      if (!this.account) return null
+      return this.tokenAccount.getAccountStatus(this.account.address)
+    },
     sufficientBalance: function () {
       if (!this.tokenAccount) return null
       return bigInt(this.tokenAccount.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
@@ -108,29 +112,37 @@ export default {
           if (this.$wallet.accountsObject[controller.account]) {
             if (this.tokenAccount.settings.whitelist &&
               controller.privileges.whitelist) {
-              statuses.push({
-                label: 'Whitelist',
-                action: 'whitelisted',
-                privilege: 'whitelist'
-              })
-              statuses.push({
-                label: 'Remove from Whitelist',
-                action: 'not_whitelisted',
-                privilege: 'whitelist'
-              })
+              if (!this.currentAccountStatus || this.currentAccountStatus.whitelisted === false) {
+                statuses.push({
+                  label: 'Whitelist',
+                  action: 'whitelisted',
+                  privilege: 'whitelist'
+                })
+              }
+              if (this.currentAccountStatus && this.currentAccountStatus.whitelisted === true) {
+                statuses.push({
+                  label: 'Remove from Whitelist',
+                  action: 'not_whitelisted',
+                  privilege: 'whitelist'
+                })
+              }
             }
             if (this.tokenAccount.settings.freeze &&
               controller.privileges.freeze) {
-              statuses.push({
-                label: 'Freeze',
-                action: 'frozen',
-                privilege: 'freeze'
-              })
-              statuses.push({
-                label: 'Un-freeze',
-                action: 'unfrozen',
-                privilege: 'freeze'
-              })
+              if (!this.currentAccountStatus || this.currentAccountStatus.frozen === false) {
+                statuses.push({
+                  label: 'Freeze',
+                  action: 'frozen',
+                  privilege: 'freeze'
+                })
+              }
+              if (this.currentAccountStatus && this.currentAccountStatus.frozen === true) {
+                statuses.push({
+                  label: 'Un-freeze',
+                  action: 'unfrozen',
+                  privilege: 'freeze'
+                })
+              }
             }
           }
         }
@@ -198,6 +210,11 @@ export default {
     }
     if (this.combinedAccounts.length > 0) {
       this.account = this.combinedAccounts[0]
+    }
+  },
+  watch: {
+    adjustableStatuses: function (newStatus, oldStatus) {
+      if (this.adjustableStatuses.length > 0) this.status = this.adjustableStatuses[0]
     }
   }
 }

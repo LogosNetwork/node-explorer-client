@@ -179,7 +179,7 @@ export default {
     isValidDestination: async function (account) {
       this.validDestination = null
       this.invalidDestinationError = ''
-      if (this.tokenAccount) {
+      if (this.tokenAccount && account && account.address) {
         let address = account.address
         let accountInfo = await this.$Logos.accounts.info(address)
         if (!accountInfo) {
@@ -202,16 +202,13 @@ export default {
           this.invalidDestinationError = 'You cannot send tokens to TokenAccounts.'
           return
         }
-        let tokenInfo = null
-        if (accountInfo.tokens && accountInfo.tokens.hasOwnProperty(this.tokenAccount.tokenID)) {
-          tokenInfo = accountInfo.tokens[this.tokenAccount.tokenID]
-        }
-        if (this.tokenAccount.settings.whitelist && (!tokenInfo || tokenInfo.whitelisted !== 'true')) {
+        let tokenInfo = this.tokenAccount.getAccountStatus(account.address)
+        if (this.tokenAccount.settings.whitelist && tokenInfo.whitelisted === false) {
           this.validDestination = false
           this.invalidDestinationError = 'This account has not been whitelisted.'
-        } else if (tokenInfo && tokenInfo.frozen === 'true') {
+        } else if (tokenInfo.frozen === true) {
           this.validDestination = false
-          this.invalidDestinationError = 'This account is frozen and cannot receive or send tokens.'
+          this.invalidDestinationError = `This account is frozen and cannot receive or send ${this.tokenAccount.symbol}.`
         } else {
           this.validDestination = true
         }
@@ -258,6 +255,12 @@ export default {
   watch: {
     'transaction.destination': function (newDest, oldDest) {
       this.isValidDestination(this.transaction.destination)
+    },
+    tokenAccount: {
+      handler: function (newTk, oldTk) {
+        this.isValidDestination(this.transaction.destination)
+      },
+      deep: true
     }
   }
 }
