@@ -113,7 +113,7 @@ export default {
     },
 
     affixBottomPos () {
-      return this.affixRect.bottom + this.topOfScreen + this.offset.bottom
+      return Math.round(this.affixRect.bottom) + this.topOfScreen + this.offset.bottom
     },
 
     bottomOfScreen () {
@@ -141,7 +141,11 @@ export default {
     },
 
     affixIsBelowRelativeElm () {
-      return this.affixBottomPos > this.relativeElmBottomPos
+      if (this.currentScrollAffix === 'scrollaffix-scrolling') {
+        return this.affixBottomPos > this.relativeElmBottomPos - this.offset.bottom
+      } else {
+        return this.affixBottomPos > this.relativeElmBottomPos
+      }
     },
 
     screenIsPastRelativeElm () {
@@ -171,6 +175,7 @@ export default {
       currentScrollAffix: null,
       topOfScreen: null,
       lastDistanceFromTop: null,
+      lastAffixDistanceFromBottom: null,
       nextScrollAffixPos: null,
       scrollingUp: null,
       scrollingDown: null,
@@ -289,8 +294,6 @@ export default {
     },
 
     handleScrollAffix () {
-      console.log(`Current Distance From Bottom: ${this.affixBottomPos}`)
-      console.log(`Last Distance From Bottom: ${this.lastDistanceFromBottom}`)
       this.setScrollingDirection()
       if (this.affixIsBiggerThanRelativeElement) {
         this.setScrollAffixTop()
@@ -317,7 +320,11 @@ export default {
 
       this.lastScrollAffixState = this.currentScrollAffix
       this.lastDistanceFromTop = this.topOfScreen
-      this.nextScrollAffixPos = `${(Math.floor(this.affixRect.top) + this.topOfScreen) - this.affixInitialTop}px`
+      if (this.lastScrollAffixState !== 'scrollaffix-scrolling') {
+        this.lastAffixDistanceFromBottom = Math.floor(this.affixBottomPos)
+      }
+      this.updateData()
+      this.nextScrollAffixPos = Math.floor(this.affixRect.top) + this.topOfScreen - this.affixInitialTop
     },
 
     /**
@@ -342,8 +349,8 @@ export default {
      */
     setScrollAffixScrolling () {
       this.currentScrollAffix = 'scrollaffix-scrolling'
-      if (this.nextScrollAffixPos === null) this.nextScrollAffixPos = `${(Math.floor(this.affixRect.top) + this.topOfScreen) - this.affixInitialTop}px`
-      this.$el.style.top = this.nextScrollAffixPos
+      if (this.nextScrollAffixPos === null) this.nextScrollAffixPos = Math.floor(this.affixRect.top) + this.topOfScreen - this.affixInitialTop
+      this.$el.style.top = `${this.nextScrollAffixPos}px`
       this.$el.style.bottom = 'auto'
       this.removeClasses()
       this.emitEvent()
@@ -469,10 +476,9 @@ export default {
      * Scrolls the window up to fit the affixed content.
      */
     repositionAffixedContent () {
-      console.log(this.lastDistanceFromBottom - this.affixBottomPos)
-      window.scrollBy(0, this.lastDistanceFromBottom - this.affixBottomPos)
-      this.updateData()
-      this.setScrollAffixDown()
+      let diff = this.lastAffixDistanceFromBottom - this.affixBottomPos - this.offset.bottom
+      this.nextScrollAffixPos = Math.floor(this.affixRect.top) + this.topOfScreen - this.affixInitialTop + diff
+      this.setScrollAffixScrolling()
     },
 
     /**
