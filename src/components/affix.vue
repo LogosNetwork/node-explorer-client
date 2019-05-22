@@ -267,6 +267,8 @@ export default {
         } else if (mode === 'scrollAffix') {
           this.currentState = null
           this.lastState = null
+          this.nextScrollAffixPos = null
+          this.lastAffixDistanceFromBottom = null
           this.removeClasses()
           this.$el.style.top = 'auto'
           this.$el.style.bottom = 'auto'
@@ -332,7 +334,6 @@ export default {
       if (this.lastScrollAffixState !== 'scrollaffix-scrolling') {
         this.lastAffixDistanceFromBottom = Math.floor(this.affixBottomPos)
       }
-      this.updateData()
       this.nextScrollAffixPos = Math.floor(this.affixRect.top) + this.topOfScreen - this.affixInitialTop
     },
 
