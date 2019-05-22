@@ -143,17 +143,15 @@ export default {
     affixIsBelowRelativeElm () {
       if (this.currentScrollAffix === 'scrollaffix-scrolling') {
         return this.affixBottomPos > this.relativeElmBottomPos - this.offset.bottom
-      } else {
-        return this.affixBottomPos > this.relativeElmBottomPos
       }
+      return this.affixBottomPos > this.relativeElmBottomPos
     },
 
     affixIsAboveBottomOfScreen () {
       if (this.currentScrollAffix === 'scrollaffix-scrolling') {
         return this.bottomOfScreen - this.offset.bottom > this.affixBottomPos
-      } else {
-        return this.bottomOfScreen > this.affixBottomPos
       }
+      return this.bottomOfScreen > this.affixBottomPos
     },
 
     screenIsPastRelativeElm () {
@@ -486,7 +484,7 @@ export default {
      * Scrolls the window up to fit the affixed content.
      */
     repositionAffixedContent () {
-      let diff = this.lastAffixDistanceFromBottom - this.affixBottomPos - this.offset.bottom
+      const diff = this.lastAffixDistanceFromBottom - this.affixBottomPos - this.offset.bottom
       this.nextScrollAffixPos = Math.floor(this.affixRect.top) + this.topOfScreen - this.affixInitialTop + diff
       this.setScrollAffixScrolling()
     },
