@@ -149,7 +149,7 @@ export default {
     isValidDestination: async function (account) {
       this.validDestination = null
       this.invalidDestinationError = ''
-      if (this.tokenAccount && account && account.address) {
+      if (account && account.address) {
         let address = account.address
         let accountInfo = await this.$Logos.accounts.info(address)
         if (!accountInfo) {
