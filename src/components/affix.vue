@@ -148,6 +148,14 @@ export default {
       }
     },
 
+    affixIsAboveBottomOfScreen () {
+      if (this.currentScrollAffix === 'scrollaffix-scrolling') {
+        return this.bottomOfScreen - this.offset.bottom > this.affixBottomPos
+      } else {
+        return this.bottomOfScreen > this.affixBottomPos
+      }
+    },
+
     screenIsPastRelativeElm () {
       return this.bottomOfScreen >= this.relativeElmBottomPos + this.offset.bottom
     },
@@ -238,7 +246,6 @@ export default {
       }
 
       this.updateData()
-
       if (this.shouldUseScrollAffix()) {
         this.setMode('scrollAffix')
         this.handleScrollAffix()
@@ -313,6 +320,8 @@ export default {
           this.setScrollAffixUp()
         } else if (this.screenIsPastAffix && this.scrollingDown) {
           this.setScrollAffixDown()
+        } else if (this.affixIsAboveBottomOfScreen) {
+          this.repositionAffixedContent()
         } else if (shouldSetAffixScrolling) {
           this.setScrollAffixScrolling()
         }
