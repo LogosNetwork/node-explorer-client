@@ -4,10 +4,13 @@
       <b-row class="text-left">
         <b-col cols="12" class="mb-5">
           <h3 class="text-left" v-t="'tokens'"></h3>
-          <div v-infinite-scroll="getMoreTokens" infinite-scroll-distance="500" name="list" is="transition-group">
+          <div v-infinite-scroll="getMoreTokens" v-if="tokens && tokens.length > 0" infinite-scroll-distance="500" name="list" is="transition-group">
             <div v-for="token in tokens" :key='token.token_id'>
               <tokenCard :tokenInfo="token" class="mb-3"/>
             </div>
+          </div>
+          <div v-else class="text-center">
+            <p>No Tokens have been created yet.</p>
           </div>
         </b-col>
       </b-row>

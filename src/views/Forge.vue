@@ -312,7 +312,9 @@ export default {
       } else if (this.wallet.tokenAccounts[address]) {
         this.currentAccount = this.wallet.tokenAccounts[address]
       }
-      this.setCurrentAccountAddress(this.currentAccount.address)
+      if (this.currentAccount) {
+        this.setCurrentAccountAddress(this.currentAccount.address)
+      }
       this.changeSelected('requests')
     },
     replaceAddresses: function (msg) {
@@ -371,6 +373,11 @@ export default {
   watch: {
     currentAccount: function (newAccount, oldAccount) {
       window.scrollTo(0, 0)
+    },
+    'wallet.account': function (newAccount, oldAccount) {
+      if (this.currentAccount === null) {
+        this.setCurrentAccount(newAccount.address)
+      }
     },
     rpcHost: function (newRpcHost, oldRpcHost) {
       if (this.proxyURL) {

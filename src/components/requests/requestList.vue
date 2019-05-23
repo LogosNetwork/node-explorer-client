@@ -8,6 +8,7 @@
     :variable="getItemHeight"
     :pagemode="true"
   />
+  <p class="text-center" v-else>This account is unopened</p>
 </template>
 <script>
 import Request from '@/components/requests/request.vue'
