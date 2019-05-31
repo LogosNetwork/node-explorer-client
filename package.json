@@ -11,8 +11,8 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.18",
     "@fortawesome/pro-light-svg-icons": "^5.8.2",
     "@fortawesome/vue-fontawesome": "^0.1.6",
-    "@logosnetwork/logos-rpc-client": "^1.1.28",
-    "@logosnetwork/logos-webwallet-sdk": "^0.2.11",
+    "@logosnetwork/logos-rpc-client": "^1.1.29",
+    "@logosnetwork/logos-webwallet-sdk": "^0.2.13",
     "@xkeshi/vue-qrcode": "^1.0.0",
     "axios": "^0.18.0",
     "big-integer": "^1.6.43",
@@ -41,9 +41,9 @@
     "vuex-persist": "^2.0.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.7.0",
-    "@vue/cli-plugin-eslint": "^3.7.0",
-    "@vue/cli-service": "^3.7.0",
+    "@vue/cli-plugin-babel": "^3.8.0",
+    "@vue/cli-plugin-eslint": "^3.8.0",
+    "@vue/cli-service": "^3.8.0",
     "@vue/eslint-config-standard": "^3.0.5",
     "lint-staged": "^7.3.0",
     "node-sass": "^4.12.0",
