@@ -99,7 +99,7 @@ export default {
       accounts: state => state.accounts
     }),
     forgeAccounts: function () {
-      return this.$wallet.accountsObject
+      return this.$wallet.accounts
     },
     forgeTokens: function () {
       return this.$wallet.tokenAccounts

@@ -166,7 +166,7 @@ export default {
       )
     },
     combinedAccounts: function () {
-      return Array.from(Object.values(this.$wallet.accountsObject)).concat(this.accounts)
+      return Array.from(Object.values(this.$wallet.accounts)).concat(this.accounts)
     },
     sourceAccounts: function () {
       let accounts = []
@@ -193,8 +193,8 @@ export default {
     revokeableControllers: function () {
       let controllers = []
       for (let controller of this.tokenAccount.controllers) {
-        if (this.$wallet.accountsObject[controller.account] && controller.privileges.revoke) {
-          controllers.push(this.$wallet.accountsObject[controller.account])
+        if (this.$wallet.accounts[controller.account] && controller.privileges.revoke) {
+          controllers.push(this.$wallet.accounts[controller.account])
         }
       }
       return controllers

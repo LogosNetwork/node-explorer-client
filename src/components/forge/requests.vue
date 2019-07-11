@@ -276,7 +276,7 @@ export default {
     canSendTokens: function () {
       if (!this.isTokenAccount && this.account && this.account.tokenBalances) {
         for (let tokenID in this.account.tokenBalances) {
-          let forgeToken = this.$wallet.tokenAccounts[this.$utils.parseAccount(tokenID)]
+          let forgeToken = this.$wallet.tokenAccounts[this.$utils.accountFromHexKey(tokenID)]
           if (forgeToken.feeType === 'flat') {
             if (bigInt(this.account.tokenBalances[tokenID])
               .minus(bigInt(forgeToken.feeRate)).greater(0)) {
@@ -302,7 +302,7 @@ export default {
         let token = this.account
         for (let controllerAddress in token.controllers) {
           let controller = token.controllers[controllerAddress]
-          if (this.$wallet.accountsObject[controller.account]) {
+          if (this.$wallet.accounts[controller.account]) {
             if (privilege === 'distribute' ||
               privilege === 'withdraw_logos' ||
               privilege === 'withdraw_fee' ||

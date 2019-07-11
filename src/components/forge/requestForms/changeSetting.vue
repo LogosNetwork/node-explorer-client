@@ -67,8 +67,8 @@ export default {
       let controllers = []
       if (this.setting) {
         for (let controller of this.tokenAccount.controllers) {
-          if (this.$wallet.accountsObject[controller.account] && controller.privileges[`change_${this.setting.action}`]) {
-            controllers.push(this.$wallet.accountsObject[controller.account])
+          if (this.$wallet.accounts[controller.account] && controller.privileges[`change_${this.setting.action}`]) {
+            controllers.push(this.$wallet.accounts[controller.account])
           }
         }
       }
@@ -78,7 +78,7 @@ export default {
       let statuses = []
       if (this.tokenAccount) {
         for (let controller of this.tokenAccount.controllers) {
-          if (this.$wallet.accountsObject[controller.account]) {
+          if (this.$wallet.accounts[controller.account]) {
             if (this.tokenAccount.settings.modify_issuance &&
               controller.privileges.change_issuance) {
               if (this.tokenAccount.settings.issuance) {

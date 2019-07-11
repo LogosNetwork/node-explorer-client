@@ -109,13 +109,13 @@ export default {
       return bigInt(this.tokenAccount.balance).greaterOrEquals(bigInt(this.$utils.minimumFee))
     },
     combinedAccounts: function () {
-      return Array.from(Object.values(this.$wallet.accountsObject)).concat(this.accounts)
+      return Array.from(Object.values(this.$wallet.accounts)).concat(this.accounts)
     },
     adjustableStatuses: function () {
       let statuses = []
       if (this.tokenAccount) {
         for (let controller of this.tokenAccount.controllers) {
-          if (this.$wallet.accountsObject[controller.account]) {
+          if (this.$wallet.accounts[controller.account]) {
             if (this.tokenAccount.settings.whitelist &&
               controller.privileges.whitelist) {
               if (!this.currentAccountStatus || this.currentAccountStatus.whitelisted === false) {
@@ -159,8 +159,8 @@ export default {
       let controllers = []
       if (this.status) {
         for (let controller of this.tokenAccount.controllers) {
-          if (this.$wallet.accountsObject[controller.account] && controller.privileges[this.status.privilege]) {
-            controllers.push(this.$wallet.accountsObject[controller.account])
+          if (this.$wallet.accounts[controller.account] && controller.privileges[this.status.privilege]) {
+            controllers.push(this.$wallet.accounts[controller.account])
           }
         }
       }

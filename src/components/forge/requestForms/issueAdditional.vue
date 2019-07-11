@@ -97,8 +97,8 @@ export default {
     mintableControllers: function () {
       let controllers = []
       for (let controller of this.tokenAccount.controllers) {
-        if (this.$wallet.accountsObject[controller.account] && controller.privileges.issuance) {
-          controllers.push(this.$wallet.accountsObject[controller.account])
+        if (this.$wallet.accounts[controller.account] && controller.privileges.issuance) {
+          controllers.push(this.$wallet.accounts[controller.account])
         }
       }
       return controllers

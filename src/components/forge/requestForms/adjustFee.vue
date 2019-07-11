@@ -88,8 +88,8 @@ export default {
     adjustableControllers: function () {
       let controllers = []
       for (let controller of this.tokenAccount.controllers) {
-        if (this.$wallet.accountsObject[controller.account] && controller.privileges.adjust_fee) {
-          controllers.push(this.$wallet.accountsObject[controller.account])
+        if (this.$wallet.accounts[controller.account] && controller.privileges.adjust_fee) {
+          controllers.push(this.$wallet.accounts[controller.account])
         }
       }
       return controllers

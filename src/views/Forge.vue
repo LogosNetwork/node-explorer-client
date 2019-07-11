@@ -6,7 +6,7 @@
           <h4 class="mb-0">Accounts</h4>
           <b-button class="font-weight-bolder" variant="link" v-on:click="createAccount">+ New</b-button>
         </div>
-        <div v-if="wallet.accounts.length > 0">
+        <div v-if="Object.values(wallet.accounts).length > 0">
           <b-list-group flush>
             <b-list-group-item
               v-bind:class="{ active: currentAccount && account.address === currentAccount.address }"
@@ -258,8 +258,8 @@ export default {
       for (let tokenAddress in this.wallet.tokenAccounts) {
         requests[tokenAddress] = this.history(this.wallet.tokenAccounts[tokenAddress])
       }
-      for (let address in this.wallet.accountsObject) {
-        requests[address] = this.history(this.wallet.accountsObject[address])
+      for (let address in this.wallet.accounts) {
+        requests[address] = this.history(this.wallet.accounts[address])
       }
       return requests
     },
@@ -306,9 +306,9 @@ export default {
       this.selected = newSelected
     },
     setCurrentAccount: function (address) {
-      if (this.wallet.accountsObject[address]) {
+      if (this.wallet.accounts[address]) {
         this.wallet.currentAccountAddress = address
-        this.currentAccount = this.wallet.accountsObject[address]
+        this.currentAccount = this.wallet.accounts[address]
       } else if (this.wallet.tokenAccounts[address]) {
         this.currentAccount = this.wallet.tokenAccounts[address]
       }
@@ -319,8 +319,8 @@ export default {
     },
     replaceAddresses: function (msg) {
       if (msg) {
-        for (let account in this.wallet.accountsObject) {
-          msg = msg.replace(new RegExp(account, 'g'), this.wallet.accountsObject[account].label)
+        for (let account in this.wallet.accounts) {
+          msg = msg.replace(new RegExp(account, 'g'), this.wallet.accounts[account].label)
         }
         for (let account in this.wallet.tokenAccounts) {
           msg = msg.replace(new RegExp(account, 'g'), this.wallet.tokenAccounts[account].name)

@@ -100,8 +100,8 @@ export default {
     burnableControllers: function () {
       let controllers = []
       for (let controller of this.tokenAccount.controllers) {
-        if (this.$wallet.accountsObject[controller.account] && controller.privileges.burn) {
-          controllers.push(this.$wallet.accountsObject[controller.account])
+        if (this.$wallet.accounts[controller.account] && controller.privileges.burn) {
+          controllers.push(this.$wallet.accounts[controller.account])
         }
       }
       return controllers

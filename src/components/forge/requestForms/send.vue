@@ -94,7 +94,7 @@ export default {
       return this.$wallet.account
     },
     combinedAccounts: function () {
-      let forgeAccounts = cloneDeep(this.$wallet.accountsObject)
+      let forgeAccounts = cloneDeep(this.$wallet.accounts)
       let forgeTokens = []
       for (let token in this.$wallet.tokenAccounts) {
         forgeTokens.push({ label: `${this.$wallet.tokenAccounts[token].name} (${this.$wallet.tokenAccounts[token].symbol})`, address: token })

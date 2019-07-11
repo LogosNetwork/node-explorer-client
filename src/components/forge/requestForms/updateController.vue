@@ -230,7 +230,7 @@ export default {
       }
     },
     combinedAccounts: function () {
-      let forgeAccounts = cloneDeep(this.$wallet.accountsObject)
+      let forgeAccounts = cloneDeep(this.$wallet.accounts)
       let tokenControllers = []
       if (this.tokenAccount && this.tokenAccount.controllers) {
         this.tokenAccount.controllers.forEach((value, i) => {
@@ -249,8 +249,8 @@ export default {
     updateControllerControllers: function () {
       let controllers = []
       for (let controller of this.tokenAccount.controllers) {
-        if (this.$wallet.accountsObject[controller.account] && controller.privileges.update_controller) {
-          controllers.push(this.$wallet.accountsObject[controller.account])
+        if (this.$wallet.accounts[controller.account] && controller.privileges.update_controller) {
+          controllers.push(this.$wallet.accounts[controller.account])
         }
       }
       return controllers

@@ -130,7 +130,7 @@ export default {
       return this.$wallet.account
     },
     combinedAccounts: function () {
-      let forgeAccounts = cloneDeep(this.$wallet.accountsObject)
+      let forgeAccounts = cloneDeep(this.$wallet.accounts)
       if (this.currentAccount) delete forgeAccounts[this.currentAccount.address]
       return Array.from(Object.values(forgeAccounts)).concat(this.accounts)
     },
@@ -160,7 +160,7 @@ export default {
       let tokens = []
       if (this.currentAccount && this.currentAccount.tokenBalances) {
         for (let tokenID in this.currentAccount.tokenBalances) {
-          let forgeToken = this.$wallet.tokenAccounts[this.$utils.parseAccount(tokenID)]
+          let forgeToken = this.$wallet.tokenAccounts[this.$utils.accountFromHexKey(tokenID)]
           if (forgeToken.feeType === 'flat') {
             if (bigInt(this.currentAccount.tokenBalances[tokenID])
               .minus(bigInt(forgeToken.feeRate)).greater(0)) {

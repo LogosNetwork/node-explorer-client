@@ -465,7 +465,7 @@ export default {
   },
   computed: {
     forgeAccounts: function () {
-      return this.$wallet.accountsObject
+      return this.$wallet.accounts
     },
     currentAccount: function () {
       return this.$wallet.account

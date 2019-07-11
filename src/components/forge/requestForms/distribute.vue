@@ -130,7 +130,7 @@ export default {
       return bigInt(this.tokenAccount.tokenBalance).greater(0)
     },
     combinedAccounts: function () {
-      return Array.from(Object.values(this.$wallet.accountsObject)).concat(this.accounts)
+      return Array.from(Object.values(this.$wallet.accounts)).concat(this.accounts)
     },
     availableToSend: function () {
       if (this.tokenAccount) {
@@ -148,8 +148,8 @@ export default {
     distributeControllers: function () {
       let controllers = []
       for (let controller of this.tokenAccount.controllers) {
-        if (this.$wallet.accountsObject[controller.account] && controller.privileges.distribute) {
-          controllers.push(this.$wallet.accountsObject[controller.account])
+        if (this.$wallet.accounts[controller.account] && controller.privileges.distribute) {
+          controllers.push(this.$wallet.accounts[controller.account])
         }
       }
       return controllers
