@@ -27,7 +27,15 @@ export default {
       }
     }
     if (store.getters['settings/proxyURL']) {
-      walletOptions.rpc.proxy = store.getters['settings/proxyURL']
+      if (walletOptions.rpc) {
+        walletOptions.rpc.proxy = store.getters['settings/proxyURL']
+      } else {
+        walletOptions = {
+          rpc: {
+            proxy: store.getters['settings/proxyURL']
+          }
+        }
+      }
     }
     this.installed = true
     Vue.prototype.$wallet = new LogosWallet.Wallet(walletOptions)
