@@ -243,7 +243,7 @@ export default {
         })
       }
       // TODO Remove duplicate Controllers from local account edge case?
-      forgeAccounts = Array.from(Object.values(forgeAccounts))
+      forgeAccounts = Object.values(forgeAccounts)
       return tokenControllers.concat(forgeAccounts).concat(this.accounts)
     },
     updateControllerControllers: function () {
@@ -263,7 +263,7 @@ export default {
       ]
     ),
     accountExists (newAddress) {
-      let fullAccountList = this.combinedAccounts.concat(Array.from(Object.values(this.$wallet.tokenAccounts)))
+      let fullAccountList = this.combinedAccounts.concat(Object.values(this.$wallet.tokenAccounts))
       for (let account of fullAccountList) {
         if (account.address === newAddress) return true
       }

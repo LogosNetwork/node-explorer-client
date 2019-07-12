@@ -129,7 +129,7 @@ export default {
       return bigInt(this.tokenAccount.tokenFeeBalance).greater(0)
     },
     combinedAccounts: function () {
-      return Array.from(Object.values(this.$wallet.accounts)).concat(this.accounts)
+      return Object.values(this.$wallet.accounts).concat(this.accounts)
     },
     availableToWithdraw: function () {
       if (this.tokenAccount) {
@@ -161,7 +161,7 @@ export default {
       ]
     ),
     accountExists (newAddress) {
-      let fullAccountList = this.combinedAccounts.concat(Array.from(Object.values(this.$wallet.tokenAccounts)))
+      let fullAccountList = this.combinedAccounts.concat(Object.values(this.$wallet.tokenAccounts))
       for (let account of fullAccountList) {
         if (account.address === newAddress) return true
       }

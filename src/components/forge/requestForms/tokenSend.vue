@@ -132,7 +132,7 @@ export default {
     combinedAccounts: function () {
       let forgeAccounts = cloneDeep(this.$wallet.accounts)
       if (this.currentAccount) delete forgeAccounts[this.currentAccount.address]
-      return Array.from(Object.values(forgeAccounts)).concat(this.accounts)
+      return Object.values(forgeAccounts).concat(this.accounts)
     },
     isValidAmount: function () {
       if (this.transaction.amount === '') return null
@@ -238,7 +238,7 @@ export default {
       }
     },
     accountExists (newAddress) {
-      let fullAccountList = this.combinedAccounts.concat(Array.from(Object.values(this.$wallet.tokenAccounts)))
+      let fullAccountList = this.combinedAccounts.concat(Object.values(this.$wallet.tokenAccounts))
       for (let account of fullAccountList) {
         if (account.address === newAddress) return true
       }

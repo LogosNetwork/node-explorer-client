@@ -471,7 +471,7 @@ export default {
       return this.$wallet.account
     },
     combinedAccounts: function () {
-      return Array.from(Object.values(this.forgeAccounts)).concat(this.accounts)
+      return Object.values(this.forgeAccounts).concat(this.accounts)
     },
     validName: function () {
       return this.$utils.isAlphanumericExtended(this.tokenOptions.name) && this.$utils.byteCount(this.tokenOptions.name) <= 32

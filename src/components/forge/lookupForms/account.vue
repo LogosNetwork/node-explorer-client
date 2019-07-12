@@ -86,7 +86,7 @@ export default {
       for (let token in this.forgeTokens) {
         forgeTokens.push({ label: `${this.forgeTokens[token].name} (${this.forgeTokens[token].symbol})`, address: token })
       }
-      return Array.from(Object.values(this.forgeAccounts)).concat(this.accounts).concat(forgeTokens)
+      return Object.values(this.forgeAccounts).concat(this.accounts).concat(forgeTokens)
     },
     validKeyOrAddress () {
       if (this.address === null) return null

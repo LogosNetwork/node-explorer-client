@@ -100,7 +100,7 @@ export default {
         forgeTokens.push({ label: `${this.$wallet.tokenAccounts[token].name} (${this.$wallet.tokenAccounts[token].symbol})`, address: token })
       }
       if (this.currentAccount) delete forgeAccounts[this.currentAccount.address]
-      return Array.from(Object.values(forgeAccounts)).concat(this.accounts).concat(forgeTokens)
+      return Object.values(forgeAccounts).concat(this.accounts).concat(forgeTokens)
     },
     availableToSend: function () {
       return this.$Logos.convert.fromReason(bigInt(this.currentAccount.balance).minus(bigInt(this.$utils.minimumFee)).toString(), 'LOGOS')
