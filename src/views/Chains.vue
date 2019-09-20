@@ -137,15 +137,16 @@ import Vue from 'vue'
 import orderBy from 'lodash.orderby'
 import { faChevronDown } from '@fortawesome/pro-light-svg-icons'
 import VueMoment from 'vue-moment'
+import { BTabs, BTab, BFormSelect } from 'bootstrap-vue'
 Vue.use(VueMoment)
 Vue.use(infiniteScroll)
 export default {
   name: 'explore',
   components: {
     'codepad': () => import(/* webpackChunkName: "Codepad" */ '@/components/codepad.vue'),
-    'b-tabs': () => import(/* webpackChunkName: "b-tabs" */'bootstrap-vue/es/components/tabs/tabs'),
-    'b-tab': () => import(/* webpackChunkName: "b-tab" */'bootstrap-vue/es/components/tabs/tab'),
-    'b-form-select': () => import(/* webpackChunkName: "b-form-select" */'bootstrap-vue/es/components/form-select/form-select')
+    BTabs,
+    BTab,
+    BFormSelect
   },
   computed: {
     ...mapState('settings', {

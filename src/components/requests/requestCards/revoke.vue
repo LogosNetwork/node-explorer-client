@@ -44,6 +44,7 @@
 <script>
 import { faMask, faArrowDown } from '@fortawesome/pro-light-svg-icons'
 import token from '@/components/requests/token.vue'
+import { BCardBody, BCardTitle, BCardSubTitle, BCardText, BListGroup, BListGroupItem } from 'bootstrap-vue'
 
 export default {
   name: 'revoke',
@@ -61,12 +62,12 @@ export default {
     }
   },
   components: {
-    'b-card-body': () => import(/* webpackChunkName: "b-card-body" */'bootstrap-vue/es/components/card/card-body'),
-    'b-card-title': () => import(/* webpackChunkName: "b-card-title" */'bootstrap-vue/es/components/card/card-title'),
-    'b-card-subtitle': () => import(/* webpackChunkName: "b-card-subtitle" */'bootstrap-vue/es/components/card/card-sub-title'),
-    'b-card-text': () => import(/* webpackChunkName: "b-card-text" */'bootstrap-vue/es/components/card/card-text'),
-    'b-list-group': () => import(/* webpackChunkName: "b-list-group" */'bootstrap-vue/es/components/list-group/list-group'),
-    'b-list-group-item': () => import(/* webpackChunkName: "b-list-group-item" */'bootstrap-vue/es/components/list-group/list-group-item'),
+    BCardBody,
+    BCardTitle,
+    BCardSubTitle,
+    BCardText,
+    BListGroup,
+    BListGroupItem,
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'token': token
   }

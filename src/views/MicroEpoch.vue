@@ -90,6 +90,8 @@
 import { mapActions, mapState } from 'vuex'
 import Vue from 'vue'
 import VueMoment from 'vue-moment'
+import { BTable } from 'bootstrap-vue'
+
 Vue.use(VueMoment)
 
 let fields = [
@@ -99,7 +101,7 @@ let fields = [
 export default {
   components: {
     'codepad': () => import(/* webpackChunkName: "Codepad" */'@/components/codepad.vue'),
-    'b-table': () => import(/* webpackChunkName: "b-table" */'bootstrap-vue/es/components/table/table')
+    BTable
   },
   computed: {
     ...mapState('microEpoch', {

@@ -46,19 +46,17 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import axios from 'axios'
 import { mapActions, mapState } from 'vuex'
 import { QrcodeStream } from 'vue-qrcode-reader'
 import { faQrcode } from '@fortawesome/pro-light-svg-icons'
-import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
-Vue.directive('b-tooltip', vBTooltip)
+import { BFormInput } from 'bootstrap-vue'
 
 export default {
   name: 'Facuet',
   components: {
     QrcodeStream,
-    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input')
+    BFormInput
   },
   computed: {
     ...mapState('settings', {

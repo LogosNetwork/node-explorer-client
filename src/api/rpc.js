@@ -9,7 +9,7 @@ export default {
       return
     }
     let rpcOptions = {
-      url: store.getters['settings/rpcHost']
+      url: `http://${store.getters['settings/rpcHost']}:${store.getters['settings/rpcPort']}`
     }
     if (store.getters['settings/proxyURL']) {
       rpcOptions.proxyURL = store.getters['settings/proxyURL']

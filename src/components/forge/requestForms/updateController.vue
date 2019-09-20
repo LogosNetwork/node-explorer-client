@@ -146,14 +146,12 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 import { faQuestionCircle } from '@fortawesome/pro-light-svg-icons'
-import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
 import { mapActions, mapState } from 'vuex'
+import { BFormGroup, BFormInput, BFormInvalidFeedback, BFormCheckbox, BFormCheckboxGroup } from 'bootstrap-vue'
 
-Vue.directive('b-tooltip', vBTooltip)
 export default {
   name: 'updateControllerForm',
   props: {
@@ -193,12 +191,13 @@ export default {
     }
   },
   components: {
-    'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
-    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
+    BFormGroup,
+    BFormInput,
+    BFormInvalidFeedback,
+    BFormCheckboxGroup,
+    BFormCheckbox,
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
-    'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect'),
-    'b-form-checkbox-group': () => import(/* webpackChunkName: "b-form-checkbox-group" */'bootstrap-vue/es/components/form-checkbox/form-checkbox-group'),
-    'b-form-checkbox': () => import(/* webpackChunkName: "b-form-checkbox" */'bootstrap-vue/es/components/form-checkbox/form-checkbox')
+    'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   computed: {
     ...mapState('forge', {

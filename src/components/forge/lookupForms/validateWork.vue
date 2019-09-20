@@ -58,6 +58,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+import { BFormGroup, BFormInput, BFormInvalidFeedback } from 'bootstrap-vue'
 
 export default {
   name: 'validateWorkForm',
@@ -69,9 +70,9 @@ export default {
     }
   },
   components: {
-    'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
-    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
-    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback'),
+    BFormGroup,
+    BFormInput,
+    BFormInvalidFeedback,
     'codepad': () => import(/* webpackChunkName: "Codepad" */ '@/components/codepad.vue')
   },
   computed: {

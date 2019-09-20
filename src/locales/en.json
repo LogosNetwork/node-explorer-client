@@ -11,6 +11,7 @@
   "amount": "Amount",
   "chains": "Chains",
   "blockchains": "Blockchains",
+  "contributors": "Contributors",
   "request_blocks": "Request Blocks",
   "request_block": "Request Block",
   "micro_epochs": "Micro Epochs",

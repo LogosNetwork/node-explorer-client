@@ -323,12 +323,11 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import bigInt from 'big-integer'
 import cloneDeep from 'lodash.clonedeep'
 import { faQuestionCircle } from '@fortawesome/pro-light-svg-icons'
-import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
-Vue.directive('b-tooltip', vBTooltip)
+import { BFormGroup, BFormInput, BFormInvalidFeedback, BFormCheckbox, BFormCheckboxGroup } from 'bootstrap-vue'
+
 const urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/
 export default {
   name: 'issueTokenForm',
@@ -452,13 +451,13 @@ export default {
     }
   },
   components: {
-    'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
-    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
-    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback'),
+    BFormGroup,
+    BFormInput,
+    BFormInvalidFeedback,
+    BFormCheckboxGroup,
+    BFormCheckbox,
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
-    'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect'),
-    'b-form-checkbox-group': () => import(/* webpackChunkName: "b-form-checkbox-group" */'bootstrap-vue/es/components/form-checkbox/form-checkbox-group'),
-    'b-form-checkbox': () => import(/* webpackChunkName: "b-form-checkbox" */'bootstrap-vue/es/components/form-checkbox/form-checkbox')
+    'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },
   created: function () {
     this.tokenOptions.controllers[0].account = this.currentAccount

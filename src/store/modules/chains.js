@@ -20,7 +20,7 @@ const actions = {
   loadRequestBlocks: ({ state, commit, rootState }, data) => {
     let index = data.index
     let cb = data.cb
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let rpcClient = new Logos({ url: `http://${rootState.settings.rpcHost}:${rootState.settings.rpcPort}`, proxyURL: rootState.settings.proxyURL, debug: true })
     let savedRequestBlocks = [...state.requestBlocks]
     let status = 'success'
     let lastCreatedAt = null
@@ -81,7 +81,7 @@ const actions = {
     }
   },
   loadMicroEpochs: ({ state, commit, rootState }, cb) => {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let rpcClient = new Logos({ url: `http://${rootState.settings.rpcHost}:${rootState.settings.rpcPort}`, proxyURL: rootState.settings.proxyURL, debug: true })
     let savedMicroEpochs = [...state.microEpochs]
     let status = 'success'
     let lastHash = null
@@ -115,7 +115,7 @@ const actions = {
     })
   },
   loadEpochs: ({ state, commit, rootState }, cb) => {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let rpcClient = new Logos({ url: `http://${rootState.settings.rpcHost}:${rootState.settings.rpcPort}`, proxyURL: rootState.settings.proxyURL, debug: true })
     let savedEpochs = [...state.epochs]
     let status = 'success'
     let lastHash = null

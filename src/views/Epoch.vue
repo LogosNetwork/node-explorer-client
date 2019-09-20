@@ -91,6 +91,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import Vue from 'vue'
+import { BTable } from 'bootstrap-vue'
 import VueMoment from 'vue-moment'
 Vue.use(VueMoment)
 
@@ -103,7 +104,7 @@ let fields = [
 export default {
   components: {
     'codepad': () => import(/* webpackChunkName: "Codepad" */ '@/components/codepad.vue'),
-    'b-table': () => import(/* webpackChunkName: "b-table" */'bootstrap-vue/es/components/table/table')
+    BTable
   },
   computed: {
     ...mapState('epoch', {

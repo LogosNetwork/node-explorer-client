@@ -91,6 +91,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import { BFormGroup, BFormInput, BFormInvalidFeedback, BFormCheckbox } from 'bootstrap-vue'
 import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
 const urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/
@@ -110,10 +111,10 @@ export default {
   },
   components: {
     'codepad': () => import(/* webpackChunkName: "Codepad" */'@/components/codepad.vue'),
-    'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
-    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
-    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback'),
-    'b-form-checkbox': () => import(/* webpackChunkName: "b-form-checkbox" */'bootstrap-vue/es/components/form-checkbox/form-checkbox')
+    BFormGroup,
+    BFormInput,
+    BFormInvalidFeedback,
+    BFormCheckbox
   },
   computed: {
     ...mapState('forge', {

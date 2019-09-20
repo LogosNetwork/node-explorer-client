@@ -17,9 +17,9 @@
             <b-card-title>
               {{title}}
             </b-card-title>
-            <b-card-subtitle>
+            <b-card-sub-title>
               {{subtitle}}
-            </b-card-subtitle>
+            </b-card-sub-title>
           </b-col>
           <b-col cols="auto">
             <div class="iconHolder text-muted rounded d-flex align-items-center justify-content-center">
@@ -42,6 +42,7 @@
 import Vue from 'vue'
 import { mapState } from 'vuex'
 import { faChevronDown } from '@fortawesome/pro-light-svg-icons'
+import { BCardBody, BCardTitle, BCardSubTitle, BCollapse } from 'bootstrap-vue'
 
 export default {
   name: 'accordionComponent',
@@ -93,10 +94,10 @@ export default {
     subtitle: String
   },
   components: {
-    'b-card-body': () => import(/* webpackChunkName: "b-card-body" */'bootstrap-vue/es/components/card/card-body'),
-    'b-card-title': () => import(/* webpackChunkName: "b-card-title" */'bootstrap-vue/es/components/card/card-title'),
-    'b-card-subtitle': () => import(/* webpackChunkName: "b-card-subtitle" */'bootstrap-vue/es/components/card/card-sub-title'),
-    'b-collapse': () => import(/* webpackChunkName: "b-collapse" */'bootstrap-vue/es/components/collapse/collapse')
+    BCardBody,
+    BCardTitle,
+    BCardSubTitle,
+    BCollapse
   },
   watch: {
     currentAccountAddress: function (newAccount, oldAccount) {

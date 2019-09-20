@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="tokenInfo">
     <div v-if="tokenInfo.pending !== true">
       <b-card-text v-on:click.stop>
         <span v-if="size && tokenInfo.issuerInfo && tokenInfo.issuerInfo.image"><img :alt="`${tokenInfo.name} currency image`" v-bind:style="{ width: size + 'px', height: size + 'px' }" class="avatar mr-2" :src="tokenInfo.issuerInfo.image"></span>
@@ -11,10 +11,10 @@
         <b-link v-if="!inactive" :title="tokenInfo.name" :to="'/'+tokenInfo.tokenAccount">{{tokenInfo.name}} - {{tokenInfo.symbol}}</b-link>
         <span v-if="inactive">{{tokenInfo.name}} - {{tokenInfo.symbol}}</span>
       </b-card-text>
-      <b-card-text v-if="origin">
+      <b-card-text v-if="originAddress">
         <font-awesome-icon size="lg" class="text-info mr-2 align-middle faIcon" :icon="faUserCircle" />
         <strong class="mr-2">Controller:</strong>
-        <LogosAddress class="mr-2" :address="origin" :force="small" />
+        <LogosAddress class="mr-2" :address="originAddress" :force="small" />
       </b-card-text>
     </div>
     <div v-if="tokenInfo.pending === true">
@@ -27,6 +27,9 @@
 
 <script>
 import { faCoins, faCircle, faUserCircle } from '@fortawesome/pro-light-svg-icons'
+import { BCardText } from 'bootstrap-vue'
+import { Utils } from '@logosnetwork/logos-webwallet-sdk'
+
 export default {
   name: 'token',
   data () {
@@ -47,9 +50,14 @@ export default {
     }
   },
   components: {
-    'b-card-text': () => import(/* webpackChunkName: "b-card-text" */'bootstrap-vue/es/components/card/card-text'),
+    BCardText,
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'font-awesome-layers': () => import(/* webpackChunkName: "FontAwesomeLayers" */'@fortawesome/vue-fontawesome').then(({ FontAwesomeLayers }) => FontAwesomeLayers)
+  },
+  computed: {
+    originAddress () {
+      return this.origin ? Utils.accountFromHexKey(this.origin) : null
+    }
   }
 }
 </script>

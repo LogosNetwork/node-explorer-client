@@ -33,6 +33,7 @@
 
 <script>
 import Vue from 'vue'
+import { BCardBody, BCardTitle, BCardText } from 'bootstrap-vue'
 import VueMoment from 'vue-moment'
 Vue.use(VueMoment)
 
@@ -42,9 +43,9 @@ export default {
     tokenInfo: Object
   },
   components: {
-    'b-card-body': () => import(/* webpackChunkName: "b-card-body" */'bootstrap-vue/es/components/card/card-body'),
-    'b-card-title': () => import(/* webpackChunkName: "b-card-title" */'bootstrap-vue/es/components/card/card-title'),
-    'b-card-text': () => import(/* webpackChunkName: "b-card-text" */'bootstrap-vue/es/components/card/card-text'),
+    BCardBody,
+    BCardTitle,
+    BCardText,
     'token': () => import(/* webpackChunkName: "token" */'@/components/requests/token.vue')
   }
 }

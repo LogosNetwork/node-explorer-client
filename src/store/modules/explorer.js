@@ -2,7 +2,7 @@ import Logos from '@logosnetwork/logos-rpc-client'
 import axios from 'axios'
 import cloneDeep from 'lodash.clonedeep'
 import bigInt from 'big-integer'
-import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
+import { Utils } from '@logosnetwork/logos-webwallet-sdk'
 const state = {
   requests: [],
   error: null,
@@ -34,7 +34,7 @@ const pullTokenInfo = (tokenAccount, rpcClient, commit) => {
 
 const handleRequests = (request, rpcClient, commit, state) => {
   if (request.token_id) {
-    let tokenAccount = LogosWallet.Utils.accountFromHexKey(request.token_id)
+    let tokenAccount = Utils.accountFromHexKey(request.token_id)
     if (state.tokens[tokenAccount]) {
       request.tokenInfo = state.tokens[tokenAccount]
     } else {
@@ -102,7 +102,7 @@ const handleRequests = (request, rpcClient, commit, state) => {
 
 const actions = {
   getRequests ({ commit, rootState, state }, cb) {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let rpcClient = new Logos({ url: `http://${rootState.settings.rpcHost}:${rootState.settings.rpcPort}`, proxyURL: rootState.settings.proxyURL, debug: true })
     let savedRequests = [...state.requests]
     let lastCreatedAt = null
     if (savedRequests && savedRequests.length > 0) {
@@ -139,7 +139,7 @@ const actions = {
       })
   },
   getLatestMicroEpoch: ({ commit, rootState }) => {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let rpcClient = new Logos({ url: `http://${rootState.settings.rpcHost}:${rootState.settings.rpcPort}`, proxyURL: rootState.settings.proxyURL, debug: true })
     rpcClient.microEpochs.history(1).then(val => {
       if (val) {
         if (!val.error) {
@@ -153,7 +153,7 @@ const actions = {
     })
   },
   getLatestEpoch ({ commit, rootState }) {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let rpcClient = new Logos({ url: `http://${rootState.settings.rpcHost}:${rootState.settings.rpcPort}`, proxyURL: rootState.settings.proxyURL, debug: true })
     rpcClient.epochs.history(1).then(val => {
       if (val) {
         if (!val.error) {
@@ -168,7 +168,7 @@ const actions = {
     })
   },
   getRequestType ({ rootState }, data) {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let rpcClient = new Logos({ url: `http://${rootState.settings.rpcHost}:${rootState.settings.rpcPort}`, proxyURL: rootState.settings.proxyURL, debug: true })
     rpcClient.requests.info(data.hash, false).then((val) => {
       if (!val.error) {
         data.cb('request')
@@ -197,12 +197,12 @@ const actions = {
   },
   addRequest ({ commit, rootState, state }, request) {
     let requestData = cloneDeep(request)
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let rpcClient = new Logos({ url: `http://${rootState.settings.rpcHost}:${rootState.settings.rpcPort}`, proxyURL: rootState.settings.proxyURL, debug: true })
 
     // Add token data
     let tokenAccount = null
     if (requestData.token_id) {
-      tokenAccount = LogosWallet.Utils.accountFromHexKey(requestData.token_id)
+      tokenAccount = Utils.accountFromHexKey(requestData.token_id)
       if (state.tokens[tokenAccount]) {
         requestData.tokenInfo = state.tokens[tokenAccount]
       } else {

@@ -1,5 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
-import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
+import { Utils } from '@logosnetwork/logos-webwallet-sdk'
 import axios from 'axios'
 const state = {
   tokens: [],
@@ -24,7 +24,7 @@ const actions = {
     })
       .then((res) => {
         for (let token of res.data.data.tokens) {
-          token.tokenAccount = LogosWallet.Utils.accountFromHexKey(token.token_id)
+          token.tokenAccount = Utils.accountFromHexKey(token.token_id)
           try {
             token.issuerInfo = JSON.parse(token.issuer_info)
           } catch (e) {

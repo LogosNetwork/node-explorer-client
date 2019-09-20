@@ -5,14 +5,16 @@ if (process.env.NODE_ENV === 'production') {
     requestURL: '',
     rpcProxy: 'https://pla.bs',
     mqttHost: 'wss:pla.bs:8443',
-    rpcHost: 'http://3.215.28.211:55000'
+    rpcHost: '3.215.28.211',
+    rpcPort: '55000'
   }
 } else {
   config = {
-    requestURL: 'http://localhost:3000',
+    requestURL: 'https://pla.bs',
     rpcProxy: 'https://pla.bs',
-    mqttHost: 'ws:localhost:8883',
-    rpcHost: 'http://172.1.1.100:55000'
+    mqttHost: 'wss:pla.bs:8443',
+    rpcHost: '3.215.28.211',
+    rpcPort: '55000'
   }
 }
 

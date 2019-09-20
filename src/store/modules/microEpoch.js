@@ -19,7 +19,7 @@ const actions = {
     } else {
       searchHashes = [hash]
     }
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let rpcClient = new Logos({ url: `http://${rootState.settings.rpcHost}:${rootState.settings.rpcPort}`, proxyURL: rootState.settings.proxyURL, debug: true })
     rpcClient.microEpochs.get(searchHashes).then(val => {
       if (val) {
         if (!val.error) {

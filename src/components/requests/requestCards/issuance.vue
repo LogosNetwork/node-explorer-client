@@ -23,7 +23,7 @@
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item>
-        <strong>Token Account: </strong><LogosAddress :address="requestInfo.tokenInfo.tokenAccount" :force="small" />
+        <strong>Token Account: </strong><LogosAddress v-if="requestInfo.tokenInfo && requestInfo.tokenInfo.tokenAccount" :address="requestInfo.tokenInfo.tokenAccount" :force="small" />
       </b-list-group-item>
       <b-list-group-item>
         <strong>Issued By: </strong><LogosAddress :address="requestInfo.origin" :force="small" />
@@ -43,11 +43,11 @@
         </span>
       </b-list-group-item>
       <b-list-group-item>
-        <span v-if="requestInfo.fee_type.toLowerCase() === 'flat'">
-          <strong>Fee Rate: </strong>{{requestInfo.fee_rate}} base units of {{requestInfo.symbol}}
+        <span v-if="feeType === 'flat'">
+          <strong>Fee Rate: </strong>{{feeRate}} base units of {{requestInfo.symbol}}
         </span>
-        <span v-if="requestInfo.fee_type.toLowerCase() === 'percentage'">
-          <strong>Fee Rate: </strong>{{requestInfo.fee_rate}}%
+        <span v-if="feeType === 'percentage'">
+          <strong>Fee Rate: </strong>{{feeRate}}%
         </span>
       </b-list-group-item>
       <b-list-group-item v-if="requestInfo.settings.length > 0">
@@ -76,6 +76,7 @@
 
 <script>
 import token from '@/components/requests/token.vue'
+import { BCardBody, BCardTitle, BCardSubTitle, BCardText, BListGroup, BListGroupItem } from 'bootstrap-vue'
 
 export default {
   name: 'issuance',
@@ -87,15 +88,23 @@ export default {
     }
   },
   components: {
-    'b-card-body': () => import(/* webpackChunkName: "b-card-body" */'bootstrap-vue/es/components/card/card-body'),
-    'b-card-title': () => import(/* webpackChunkName: "b-card-title" */'bootstrap-vue/es/components/card/card-title'),
-    'b-card-subtitle': () => import(/* webpackChunkName: "b-card-subtitle" */'bootstrap-vue/es/components/card/card-sub-title'),
-    'b-card-text': () => import(/* webpackChunkName: "b-card-text" */'bootstrap-vue/es/components/card/card-text'),
-    'b-list-group': () => import(/* webpackChunkName: "b-list-group" */'bootstrap-vue/es/components/list-group/list-group'),
-    'b-list-group-item': () => import(/* webpackChunkName: "b-list-group-item" */'bootstrap-vue/es/components/list-group/list-group-item'),
+    BCardBody,
+    BCardTitle,
+    BCardSubTitle,
+    BCardText,
+    BListGroup,
+    BListGroupItem,
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'token': token,
     'codepad': () => import(/* webpackChunkName: "Codepad" */ '@/components/codepad.vue')
+  },
+  computed: {
+    feeRate () {
+      return this.requestInfo.feeRate ? this.requestInfo.feeRate : this.requestInfo.fee_rate
+    },
+    feeType () {
+      return this.requestInfo.feeType ? this.requestInfo.feeType.toLowerCase() : this.requestInfo.fee_type.toLowerCase()
+    }
   }
 }
 </script>

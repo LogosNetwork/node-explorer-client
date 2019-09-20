@@ -42,6 +42,8 @@
 
 <script>
 import bigInt from 'big-integer'
+import { BFormGroup, BFormInput } from 'bootstrap-vue'
+
 export default {
   name: 'changeSettingForm',
   props: {
@@ -53,8 +55,8 @@ export default {
     }
   },
   components: {
-    'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
-    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
+    BFormGroup,
+    BFormInput,
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')
   },

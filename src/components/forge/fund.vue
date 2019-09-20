@@ -12,9 +12,9 @@
             <b-card-title>
               Fund this account
             </b-card-title>
-            <b-card-subtitle>
+            <b-card-sub-title>
               Send Logos from the testnet faucet to this account.
-            </b-card-subtitle>
+            </b-card-sub-title>
           </b-col>
         </b-row>
       </b-card-body>
@@ -26,6 +26,7 @@
 import { mapState } from 'vuex'
 import axios from 'axios'
 import { faArrowDown } from '@fortawesome/pro-light-svg-icons'
+import { BCardBody, BCardTitle, BCardSubTitle } from 'bootstrap-vue'
 
 export default {
   name: 'forgeFund',
@@ -38,9 +39,9 @@ export default {
     }
   },
   components: {
-    'b-card-body': () => import(/* webpackChunkName: "b-card-body" */'bootstrap-vue/es/components/card/card-body'),
-    'b-card-title': () => import(/* webpackChunkName: "b-card-title" */'bootstrap-vue/es/components/card/card-title'),
-    'b-card-subtitle': () => import(/* webpackChunkName: "b-card-subtitle" */'bootstrap-vue/es/components/card/card-sub-title')
+    BCardBody,
+    BCardTitle,
+    BCardSubTitle
   },
   computed: {
     ...mapState('settings', {

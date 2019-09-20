@@ -55,9 +55,9 @@ export default {
   computed: {
     request: function () {
       if (this.requestInfo.constructor.name !== 'Object') {
-        let request = JSON.parse(this.requestInfo.toJSON())
-        if (request.token_id) {
-          let tokenAddress = this.$utils.accountFromHexKey(request.token_id)
+        let request = this.requestInfo
+        if (request.tokenID) {
+          let tokenAddress = this.$utils.accountFromHexKey(request.tokenID)
           let tokenAccount = this.$wallet.tokenAccounts[tokenAddress]
           request.tokenInfo = {
             name: tokenAccount.name,
@@ -71,7 +71,7 @@ export default {
           }
           if (this.requestInfo.constructor.name === 'Issuance') {
             try {
-              request.prettyInfo = JSON.stringify(JSON.parse(request.issuer_info), null, 2)
+              request.prettyInfo = JSON.stringify(JSON.parse(request.issuerInfo), null, 2)
             } catch (e) {
               request.prettyInfo = request.issuer_info
             }

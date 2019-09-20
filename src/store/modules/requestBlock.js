@@ -1,5 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
-import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
+import { Utils } from '@logosnetwork/logos-webwallet-sdk'
 import bigInt from 'big-integer'
 
 const state = {
@@ -15,7 +15,7 @@ const getters = {
 
 const actions = {
   getRequestBlock: ({ commit, rootState }, hash) => {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let rpcClient = new Logos({ url: `http://${rootState.settings.rpcHost}:${rootState.settings.rpcPort}`, proxyURL: rootState.settings.proxyURL, debug: true })
     commit('setHash', hash)
     let searchHashes = null
     if (hash.indexOf(',') !== -1) {
@@ -47,7 +47,7 @@ const actions = {
                 request.type === 'issue_additional' || request.type === 'withdraw_fee' ||
                 request.type === 'update_controller' || request.type === 'revoke' ||
                 request.type === 'immute_setting' || request.type === 'withdraw_logos') {
-                let tokenAddress = LogosWallet.Utils.accountFromHexKey(request.token_id)
+                let tokenAddress = Utils.accountFromHexKey(request.token_id)
                 rpcClient.accounts.info(tokenAddress).then(data => {
                   data.tokenAccount = tokenAddress
                   try {

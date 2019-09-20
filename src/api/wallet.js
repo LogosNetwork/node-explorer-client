@@ -1,7 +1,7 @@
-import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
+import { Wallet, Utils } from '@logosnetwork/logos-webwallet-sdk'
 import store from '../store'
 
-export { LogosWallet }
+export { Wallet }
 
 export default {
   install (Vue) {
@@ -10,7 +10,7 @@ export default {
     }
     let walletOptions = {}
     if (store.getters['forge/walletData']) {
-      walletOptions = JSON.parse(store.getters['forge/walletData'])
+      walletOptions = JSON.parse(JSON.stringify(store.getters['forge/walletData']))
       walletOptions.mqtt = store.getters['settings/mqttHost']
       walletOptions.validateSync = false
       walletOptions.tokenSync = true
@@ -21,9 +21,10 @@ export default {
         mqtt: store.getters['settings/mqttHost']
       }
     }
-    if (store.getters['settings/delegates']) {
+    if (store.getters['settings/rpcHost'] && store.getters['settings/rpcPort']) {
       walletOptions.rpc = {
-        delegates: Object.values(store.getters['settings/delegates'])
+        nodeURL: store.getters['settings/rpcHost'],
+        nodePort: store.getters['settings/rpcPort']
       }
     }
     if (store.getters['settings/proxyURL']) {
@@ -38,7 +39,7 @@ export default {
       }
     }
     this.installed = true
-    Vue.prototype.$wallet = new LogosWallet.Wallet(walletOptions)
-    Vue.prototype.$utils = LogosWallet.Utils
+    Vue.prototype.$wallet = new Wallet(walletOptions)
+    Vue.prototype.$utils = Utils
   }
 }

@@ -9,7 +9,8 @@
         <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
         <b-collapse is-nav id="nav_collapse">
           <b-navbar-nav class="ml-auto">
-            <b-nav-item to="/" exact-active-class="is-active">{{ $t('explore') }}</b-nav-item>
+            <b-nav-item to="/contributors" exact-active-class="is-active">{{ $t('contributors') }}</b-nav-item>
+            <b-nav-item to="/explore" exact-active-class="is-active">{{ $t('explore') }}</b-nav-item>
             <b-nav-item to="/chains" exact-active-class="is-active">{{ $t('chains') }}</b-nav-item>
             <b-nav-item to="/tokens" exact-active-class="is-active">{{ $t('tokens') }}</b-nav-item>
             <b-nav-item to="/faucet" exact-active-class="is-active">{{ $t('faucet') }}</b-nav-item>
@@ -29,18 +30,20 @@
 
 <script>
 import { faLambda } from '@fortawesome/pro-light-svg-icons'
+import { BNavbar, BNavbarBrand, BNavbarToggle, BNavbarNav, BNavItem, BCollapse } from 'bootstrap-vue'
+
 export default {
   name: 'Nav',
   props: {
     dark: String
   },
   components: {
-    'b-navbar': () => import(/* webpackChunkName: "b-navbar" */'bootstrap-vue/es/components/navbar/navbar'),
-    'b-navbar-brand': () => import(/* webpackChunkName: "b-navbar-brand" */'bootstrap-vue/es/components/navbar/navbar-brand'),
-    'b-navbar-toggle': () => import(/* webpackChunkName: "b-navbar-toggle" */'bootstrap-vue/es/components/navbar/navbar-toggle'),
-    'b-navbar-nav': () => import(/* webpackChunkName: "b-navbar-nav" */'bootstrap-vue/es/components/navbar/navbar-nav'),
-    'b-nav-item': () => import(/* webpackChunkName: "b-nav-item" */'bootstrap-vue/es/components/nav/nav-item'),
-    'b-collapse': () => import(/* webpackChunkName: "b-collapse" */'bootstrap-vue/es/components/collapse/collapse')
+    BNavbar,
+    BNavbarBrand,
+    BNavbarToggle,
+    BNavbarNav,
+    BNavItem,
+    BCollapse
   },
   data () {
     return {

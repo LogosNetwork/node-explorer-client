@@ -1,7 +1,7 @@
 import Logos from '@logosnetwork/logos-rpc-client'
 import bigInt from 'big-integer'
 import cloneDeep from 'lodash.clonedeep'
-import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
+import { Utils } from '@logosnetwork/logos-webwallet-sdk'
 import Vue from 'vue'
 
 const state = {
@@ -128,7 +128,7 @@ const pullTokenInfo = (tokenAccount, rpcClient, commit) => {
 
 const parseRequests = (request, rpcClient, commit, state) => {
   if (request.token_id) {
-    let tokenAccount = LogosWallet.Utils.accountFromHexKey(request.token_id)
+    let tokenAccount = Utils.accountFromHexKey(request.token_id)
     if (state.tokens[tokenAccount]) {
       request.tokenInfo = state.tokens[tokenAccount]
       commit('addRequest', handleRequest(request))
@@ -150,7 +150,7 @@ const parseRequests = (request, rpcClient, commit, state) => {
 
 const actions = {
   getRequests ({ commit, state, rootState }, cb) {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let rpcClient = new Logos({ url: `http://${rootState.settings.rpcHost}:${rootState.settings.rpcPort}`, proxyURL: rootState.settings.proxyURL, debug: true })
     rpcClient.accounts.history(state.account, state.count, false, state.lastHash).then(requests => {
       if (requests) {
         if (!requests.error) {
@@ -177,7 +177,7 @@ const actions = {
     })
   },
   getAccountInfo: ({ state, commit, rootState }, account) => {
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let rpcClient = new Logos({ url: `http://${rootState.settings.rpcHost}:${rootState.settings.rpcPort}`, proxyURL: rootState.settings.proxyURL, debug: true })
     commit('setAccount', account)
     rpcClient.accounts.info(account).then(val => {
       if (val) {
@@ -187,7 +187,7 @@ const actions = {
             Object.entries(val.tokens).forEach(entry => {
               let tokenID = entry[0]
               let tokenAccountInfo = entry[1]
-              let tokenAccount = LogosWallet.Utils.accountFromHexKey(tokenID)
+              let tokenAccount = Utils.accountFromHexKey(tokenID)
               if (state.tokens[tokenAccount]) {
                 tokenAccountInfo.tokenInfo = state.tokens[tokenAccount]
                 balances[tokenAccount] = tokenAccountInfo
@@ -227,7 +227,7 @@ const actions = {
           }
           commit('setAccountType', val.type)
           if (val.representative_block && val.representative_block !== '0000000000000000000000000000000000000000000000000000000000000000') {
-            commit('setRepresentative', LogosWallet.Utils.accountFromHexKey(val.representative_block))
+            commit('setRepresentative', Utils.accountFromHexKey(val.representative_block))
           }
         } else {
           commit('setError', val.error)
@@ -250,13 +250,13 @@ const actions = {
   },
   addRequest ({ state, commit, rootState, dispatch }, request) {
     let requestData = cloneDeep(request)
-    let rpcClient = new Logos({ url: rootState.settings.rpcHost, proxyURL: rootState.settings.proxyURL, debug: true })
+    let rpcClient = new Logos({ url: `http://${rootState.settings.rpcHost}:${rootState.settings.rpcPort}`, proxyURL: rootState.settings.proxyURL, debug: true })
 
     // Add token data
     let tokenAccount = null
     if (state.type === 'TokenAccount' || requestData.token_id) {
       if (requestData.token_id) {
-        tokenAccount = LogosWallet.Utils.accountFromHexKey(requestData.token_id)
+        tokenAccount = Utils.accountFromHexKey(requestData.token_id)
       } else {
         tokenAccount = state.account
       }
@@ -542,7 +542,7 @@ const actions = {
       } else if (requestData.type === 'revoke') {
         if (state.account === requestData.transaction.destination || state.account === requestData.source) {
           let newRawTokenBalance = bigInt(0)
-          let tokenAccount = LogosWallet.Utils.accountFromHexKey(requestData.token_id)
+          let tokenAccount = Utils.accountFromHexKey(requestData.token_id)
           if (state.tokenBalances[tokenAccount]) newRawTokenBalance = bigInt(state.tokenBalances[tokenAccount].balance)
           if (state.account === requestData.transaction.destination) {
             newRawTokenBalance.plus(bigInt(requestData.transaction.amount))

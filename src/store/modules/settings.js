@@ -1,9 +1,8 @@
 import config from '../../../config'
-import axios from 'axios'
 
 const state = {
   rpcHost: config.rpcHost,
-  delegates: null,
+  rpcPort: config.rpcPort,
   proxyURL: config.rpcProxy,
   mqttHost: config.mqttHost,
   requestURL: config.requestURL
@@ -11,21 +10,13 @@ const state = {
 
 const getters = {
   rpcHost: state => state.rpcHost,
-  delegates: state => state.delegates,
+  rpcPort: state => state.rpcPort,
   proxyURL: state => state.proxyURL,
   mqttHost: state => state.mqttHost,
   requestURL: state => state.requestURL
 }
 
 const actions = {
-  loadDelegates ({ commit, state }) {
-    if (!state.delegates) {
-      axios.get(`${state.requestURL}/delegates`).then(res => {
-        commit('setDelegates', res.data)
-        commit('setRpcHost', `http://${res.data['0']}:55000`)
-      })
-    }
-  }
 }
 
 const mutations = {
@@ -35,8 +26,8 @@ const mutations = {
   setProxyURL (state, address) {
     state.proxyURL = address
   },
-  setDelegates (state, delegates) {
-    state.delegates = delegates
+  setRpcPort (state, port) {
+    state.rpcPort = port
   },
   setMqttHost (state, address) {
     state.mqttHost = address

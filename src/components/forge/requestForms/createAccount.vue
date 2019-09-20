@@ -57,6 +57,7 @@
 
 <script>
 import cloneDeep from 'lodash.clonedeep'
+import { BFormGroup, BFormInput, BFormInvalidFeedback, BFormCheckbox } from 'bootstrap-vue'
 
 export default {
   name: 'createAccountForm',
@@ -70,10 +71,10 @@ export default {
     }
   },
   components: {
-    'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
-    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
-    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback'),
-    'b-form-checkbox': () => import(/* webpackChunkName: "b-form-checkbox" */'bootstrap-vue/es/components/form-checkbox/form-checkbox')
+    BFormGroup,
+    BFormInput,
+    BFormInvalidFeedback,
+    BFormCheckbox
   },
   created: function () {
     if (this.seed) {

@@ -4,16 +4,10 @@ import router from './router'
 import i18n from './i18n'
 import store from './store/index'
 import './assets/css/shame.scss'
-import BContainer from 'bootstrap-vue/es/components/layout/container'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import BRow from 'bootstrap-vue/es/components/layout/row'
-import BCol from 'bootstrap-vue/es/components/layout/col'
-import BLink from 'bootstrap-vue/es/components/link/link'
-import BCard from 'bootstrap-vue/es/components/card/card'
-import BButton from 'bootstrap-vue/es/components/button/button'
 import LogosAddress from '@/components/LogosAddress.vue'
+import { VBModal, VBTooltip, BContainer, BRow, BCol, BLink, BCard, BButton } from 'bootstrap-vue'
 
-store.dispatch('settings/loadDelegates')
 Vue.config.productionTip = false
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('b-container', BContainer)
@@ -23,6 +17,8 @@ Vue.component('b-link', BLink)
 Vue.component('b-button', BButton)
 Vue.component('b-card', BCard)
 Vue.component('LogosAddress', LogosAddress)
+Vue.directive('b-modal', VBModal)
+Vue.directive('b-tooltip', VBTooltip)
 new Vue({
   router,
   i18n,

@@ -402,12 +402,9 @@ import { mapActions, mapState } from 'vuex'
 import infiniteScroll from 'vue-infinite-scroll'
 import axios from 'axios'
 import { faSpinner, faCoins, faCrown, faUserCircle, faMagic, faLockAlt, faMask, faSnowflake, faListAlt, faArrowDown, faFire, faEdit, faHandReceiving, faPercentage, faLambda } from '@fortawesome/pro-light-svg-icons'
-import vBModal from 'bootstrap-vue/es/directives/modal/modal'
-import vBTooltip from 'bootstrap-vue/es/directives/tooltip/tooltip'
 import VueMoment from 'vue-moment'
+import { BCardBody, BCardTitle, BCardText, BListGroup, BListGroupItem, BModal } from 'bootstrap-vue'
 Vue.use(VueMoment)
-Vue.directive('b-modal', vBModal)
-Vue.directive('b-tooltip', vBTooltip)
 Vue.use(infiniteScroll)
 
 export default {
@@ -442,13 +439,13 @@ export default {
   components: {
     'qrcode': () => import(/* webpackChunkName: "vue-qrcode" */ '@xkeshi/vue-qrcode'),
     'request': () => import(/* webpackChunkName: "RequestWrapper" */ '@/components/requests/request.vue'),
-    'b-card-body': () => import(/* webpackChunkName: "b-card-body" */ 'bootstrap-vue/es/components/card/card-body'),
-    'b-card-title': () => import(/* webpackChunkName: "b-card-title" */ 'bootstrap-vue/es/components/card/card-title'),
-    'b-card-text': () => import(/* webpackChunkName: "b-card-text" */ 'bootstrap-vue/es/components/card/card-text'),
-    'b-list-group': () => import(/* webpackChunkName: "b-list-group" */ 'bootstrap-vue/es/components/list-group/list-group'),
+    BCardBody,
+    BCardTitle,
+    BCardText,
+    BListGroup,
+    BListGroupItem,
+    BModal,
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */ '@/components/LogosAddress.vue'),
-    'b-list-group-item': () => import(/* webpackChunkName: "b-list-group-item" */ 'bootstrap-vue/es/components/list-group/list-group-item'),
-    'b-modal': () => import(/* webpackChunkName: "b-modal" */ 'bootstrap-vue/es/components/modal/modal'),
     'TokenSettings': () => import(/* webpackChunkName: "TokenSettings" */ '@/components/requests/tokenSettings.vue'),
     'token': () => import(/* webpackChunkName: "token" */ '@/components/requests/token.vue')
   },

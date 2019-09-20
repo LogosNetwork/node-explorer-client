@@ -1,5 +1,5 @@
 import Logos from '@logosnetwork/logos-rpc-client'
-import LogosWallet from '@logosnetwork/logos-webwallet-sdk'
+import { Utils } from '@logosnetwork/logos-webwallet-sdk'
 import bigInt from 'big-integer'
 
 const state = {
@@ -18,11 +18,10 @@ const getters = {
 }
 
 const parseToast = (request, address, vm, commit) => {
-  request = JSON.parse(request.toJSON())
   let tokenInfo = null
   let issuerInfo = null
-  if (request.token_id) {
-    tokenInfo = vm.$wallet.tokenAccounts[LogosWallet.Utils.accountFromHexKey(request.token_id)]
+  if (request.tokenID) {
+    tokenInfo = vm.$wallet.tokenAccounts[Utils.accountFromHexKey(request.tokenID)]
     try {
       issuerInfo = JSON.parse(tokenInfo.issuerInfo)
     } catch (e) {
@@ -87,9 +86,9 @@ const parseToast = (request, address, vm, commit) => {
       }
     } else {
       if (balanceChange.greater(bigInt('0'))) {
-        toast.message = `${address} recieved ${balanceChange.toString()} base units of ${request.token_id}`
+        toast.message = `${address} recieved ${balanceChange.toString()} base units of ${request.tokenID}`
       } else {
-        toast.message = `${address} sent ${balanceChange.abs().toString()} base units of ${request.token_id}`
+        toast.message = `${address} sent ${balanceChange.abs().toString()} base units of ${request.tokenID}`
       }
     }
   } else if (request.type === 'issuance') {

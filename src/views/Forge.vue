@@ -201,6 +201,8 @@ import bigInt from 'big-integer'
 import 'vue-resize/dist/vue-resize.css'
 import requestList from '@/components/requests/requestList.vue'
 import requests from '@/components/forge/requests.vue'
+import { BListGroup, BListGroupItem, BDropdown, BDropdownItem } from 'bootstrap-vue'
+
 Vue.use(Toasted, {
   iconPack: 'fontawesome'
 })
@@ -228,10 +230,10 @@ export default {
     }
   },
   components: {
-    'b-list-group': () => import(/* webpackChunkName: "b-list-group" */'bootstrap-vue/es/components/list-group/list-group'),
-    'b-list-group-item': () => import(/* webpackChunkName: "b-list-group-item" */'bootstrap-vue/es/components/list-group/list-group-item'),
-    'b-dropdown': () => import(/* webpackChunkName: "b-dropdown" */'bootstrap-vue/es/components/dropdown/dropdown'),
-    'b-dropdown-item': () => import(/* webpackChunkName: "b-dropdown-item" */'bootstrap-vue/es/components/dropdown/dropdown-item'),
+    BListGroup,
+    BListGroupItem,
+    BDropdown,
+    BDropdownItem,
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'Lookups': () => import(/* webpackChunkName: "ForgeLookups" */'@/components/forge/lookups.vue'),
     'Requests': requests,

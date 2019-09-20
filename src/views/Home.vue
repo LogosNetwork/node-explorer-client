@@ -1,15 +1,15 @@
 <template>
   <div id="primary">
     <b-container class="pt-5">
-        <h1>404</h1>
-        <p>Page not found!</p>
+      <h5 class="text-left d-block d-sm-none">Logos Network</h5>
+      <h2 class="d-none d-sm-block">Logos Network</h2>
     </b-container>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'notFound'
+  name: 'home'
 }
 </script>
 

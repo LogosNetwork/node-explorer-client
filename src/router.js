@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+const Home = () => import(/* webpackChunkName: "Home" */ './views/Home.vue')
+const Contributors = () => import(/* webpackChunkName: "Home" */ './views/Contributors.vue')
 const Explore = () => import(/* webpackChunkName: "Explore" */ './views/Explore.vue')
 const Chains = () => import(/* webpackChunkName: "Chains" */ './views/Chains.vue')
 const Governance = () => import(/* webpackChunkName: "Governance" */ './views/Governance.vue')
@@ -20,6 +22,16 @@ const router = new Router({
   routes: [
     {
       path: '/',
+      name: 'home',
+      component: Home
+    },
+    {
+      path: '/contributors',
+      name: 'contributors',
+      component: Contributors
+    },
+    {
+      path: '/explore',
       name: 'explore',
       component: Explore
     },

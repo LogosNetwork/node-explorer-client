@@ -50,6 +50,8 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import { BFormGroup, BFormInput } from 'bootstrap-vue'
+
 export default {
   name: 'accountLookupForm',
   data () {
@@ -65,8 +67,8 @@ export default {
     }
   },
   components: {
-    'b-form-group': () => import(/* webpackChunkName: "b-form-group" */'bootstrap-vue/es/components/form-group/form-group'),
-    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
+    BFormGroup,
+    BFormInput,
     'codepad': () => import(/* webpackChunkName: "Codepad" */ '@/components/codepad.vue'),
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'Multiselect': () => import(/* webpackChunkName: "Multiselect" */'vue-multiselect')

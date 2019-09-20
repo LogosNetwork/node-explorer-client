@@ -58,7 +58,7 @@ export default {
       } else if (request.type === 'token_send') {
         return 144 + request.transactions.length * 49
       } else if (request.type === 'issuance') {
-        let myRequest = JSON.parse(request.toJSON())
+        let myRequest = JSON.parse(JSON.stringify(request))
         let defaultHeight = 637
         let settingsHeight = 0
         let controllersHeight = 0
@@ -74,7 +74,7 @@ export default {
         }
         return defaultHeight + settingsHeight + controllersHeight
       } else if (request.type === 'update_controller') {
-        let myRequest = JSON.parse(request.toJSON())
+        let myRequest = JSON.parse(JSON.stringify(request))
         if (myRequest.controller.privileges.length > 0) {
           return 259 + myRequest.controller.privileges.length * 24
         } else {

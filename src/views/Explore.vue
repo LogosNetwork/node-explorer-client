@@ -99,6 +99,7 @@ import { mapActions, mapState } from 'vuex'
 import Vue from 'vue'
 import infiniteScroll from 'vue-infinite-scroll'
 import VueMoment from 'vue-moment'
+import { BForm, BFormInput, BFormInvalidFeedback } from 'bootstrap-vue'
 Vue.use(VueMoment)
 Vue.use(infiniteScroll)
 
@@ -126,9 +127,9 @@ export default {
   name: 'explore',
   components: {
     'request': () => import(/* webpackChunkName: "RequestWrapper" */ '@/components/requests/request.vue'),
-    'b-form': () => import(/* webpackChunkName: "b-form" */'bootstrap-vue/es/components/form/form'),
-    'b-form-input': () => import(/* webpackChunkName: "b-form-input" */'bootstrap-vue/es/components/form-input/form-input'),
-    'b-form-invalid-feedback': () => import(/* webpackChunkName: "b-form-invalid-feedback" */'bootstrap-vue/es/components/form/form-invalid-feedback')
+    BForm,
+    BFormInput,
+    BFormInvalidFeedback
   },
   data () {
     return {
