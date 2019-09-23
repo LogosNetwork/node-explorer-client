@@ -27,7 +27,7 @@
                 </b-button>
               </div>
             </div>
-            <small id="addressHelp" class="form-text text-muted">If you don't have an address you should download our iPhone app or visit the workbench to generate a keypair.</small>
+            <small id="addressHelp" class="form-text"><span class="text-muted">If you don't have an address you should generate an account from the</span><b-link to="/forge"> forge.</b-link></small>
           </div>
           <button type="submit" v-on:click="requestFaucet()" class="btn btn-primary">Send me some Logos</button>
           <div v-if="startTime !== null && finalTime !== null" class="mt-3">

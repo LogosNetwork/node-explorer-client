@@ -55,6 +55,9 @@ body {
   color:#525f7f;
   background:#F5F5F5;
 }
+.tooltip:not(.fade) {
+  opacity: 0.9;
+}
 code {
   color: theme-color("danger")
 }

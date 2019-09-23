@@ -220,7 +220,6 @@ export default {
       selectedVisual: 'text',
       requestsBusy: false,
       currentAccount: null,
-      showInfo: true,
       faUser,
       faEllipsisVAlt,
       faSearch,
