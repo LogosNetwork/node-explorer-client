@@ -9,8 +9,9 @@
         <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
         <b-collapse is-nav id="nav_collapse">
           <b-navbar-nav class="ml-auto">
+            <b-nav-item to="/" exact-active-class="is-active">{{ $t('home') }}</b-nav-item>
             <b-nav-item to="/contributors" exact-active-class="is-active">{{ $t('contributors') }}</b-nav-item>
-            <b-nav-item to="/explore" exact-active-class="is-active">{{ $t('explore') }}</b-nav-item>
+            <b-nav-item to="/explorer" exact-active-class="is-active">{{ $t('explorer') }}</b-nav-item>
             <b-nav-item to="/chains" exact-active-class="is-active">{{ $t('chains') }}</b-nav-item>
             <b-nav-item to="/tokens" exact-active-class="is-active">{{ $t('tokens') }}</b-nav-item>
             <b-nav-item to="/faucet" exact-active-class="is-active">{{ $t('faucet') }}</b-nav-item>

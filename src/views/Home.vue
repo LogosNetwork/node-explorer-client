@@ -21,22 +21,31 @@
       <b-button
         class="ml-3 mt-3"
         variant="outline-primary"
-        href="https://github.com/LogosNetwork/logos-core/wiki"
+        href="https://logosnetwork.atlassian.net/wiki/spaces/LOGOS/pages/274071553/Logos+-+Notes+to+future+developers"
         target="_blank"
+        disabled
       >
-        Design Docs
+        Getting Started
       </b-button>
       <b-button
         class="ml-3 mt-3"
         variant="outline-primary"
-        href="https://logosnetwork.atlassian.net/wiki/spaces/LOGOS/pages/274071553/Logos+-+Notes+to+future+developers"
+        href="https://github.com/LogosNetwork/logos-core/wiki/Design-Documents"
         target="_blank"
+        disabled
       >
-        Deployment Docs
+        Design Docs
       </b-button>
       <div class="text-left mt-5">
         <h2>Overview</h2>
-        <p>Logos is a high performance scalable cryptocurrency designed for real time payments. Our novel consensus, Axios PBFT, provides decentralization, fast settlement times, high throughput, and transaction immuatability</p>
+        <p>Logos is a high performance scalable cryptocurrency designed for real time payments. Our novel consensus, Axios PBFT, provides decentralization, fast settlement times, high throughput, and transaction immuatability.</p>
+        <p>
+          <b-button
+            to="/forge"
+          >
+            Try it out!
+          </b-button>
+        </p>
         <!-- <h3>Parallelization / Concurrency</h3>
         <p>
           In order to achieve this performance we focus on paralleizing our consensus so that multiple rounds of concensus can take place at the same time.

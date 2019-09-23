@@ -142,6 +142,9 @@
             <div class="m-3 text-left">
               <affix ref="scrollAffixElement" v-if="renderSidePanel" class="scrollaffix-sidebar" :offset="{ top: 124, bottom: 16 }" relative-element-selector="#sidePanel" :scroll-affix="true">
                 <resize-observer @notify="handleResize" />
+                <b-alert v-model="showInfo" variant="success" dismissible>
+                  Connected to 32 delegate provisioned testnet
+                </b-alert>
                 <div v-if="selected === 'lookup'">
                   <Lookups />
                 </div>
@@ -201,7 +204,7 @@ import bigInt from 'big-integer'
 import 'vue-resize/dist/vue-resize.css'
 import requestList from '@/components/requests/requestList.vue'
 import requests from '@/components/forge/requests.vue'
-import { BListGroup, BListGroupItem, BDropdown, BDropdownItem } from 'bootstrap-vue'
+import { BListGroup, BListGroupItem, BDropdown, BDropdownItem, BAlert } from 'bootstrap-vue'
 
 Vue.use(Toasted, {
   iconPack: 'fontawesome'
@@ -217,6 +220,7 @@ export default {
       selectedVisual: 'text',
       requestsBusy: false,
       currentAccount: null,
+      showInfo: true,
       faUser,
       faEllipsisVAlt,
       faSearch,
@@ -234,6 +238,7 @@ export default {
     BListGroupItem,
     BDropdown,
     BDropdownItem,
+    BAlert,
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'Lookups': () => import(/* webpackChunkName: "ForgeLookups" */'@/components/forge/lookups.vue'),
     'Requests': requests,
@@ -253,7 +258,8 @@ export default {
     ...mapState('forge', {
       toasts: state => state.toasts,
       lookups: state => state.lookups,
-      currentAccountAddress: state => state.currentAccountAddress
+      currentAccountAddress: state => state.currentAccountAddress,
+      showInfo: state => state.showInfo
     }),
     chains: function () {
       let requests = {}
@@ -279,6 +285,11 @@ export default {
     }
   },
   methods: {
+    ...mapActions('forge',
+      [
+        'setShowInfo'
+      ]
+    ),
     handleResize () {
       this.$refs.scrollAffixElement.onScroll()
     },

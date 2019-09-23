@@ -1,6 +1,7 @@
 {
   "name": "Logos Network",
   "explore": "Explore",
+  "explorer": "Explorer",
   "workbench": "Workbench",
   "node": "Node",
   "from": "From",
@@ -9,6 +10,7 @@
   "forge": "Forge",
   "logos_faucet": "Logos Faucet",
   "amount": "Amount",
+  "home": "Home",
   "chains": "Chains",
   "blockchains": "Blockchains",
   "contributors": "Contributors",

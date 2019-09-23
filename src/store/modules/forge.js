@@ -9,7 +9,8 @@ const state = {
   tempInfo: '',
   accounts: [],
   currentAccountAddress: null,
-  walletData: null
+  walletData: null,
+  showInfo: true
 }
 
 const getters = {
@@ -178,6 +179,9 @@ const actions = {
   },
   createToast ({ commit }, request) {
     parseToast(request.request, request.address, this._vm, commit)
+  },
+  setShowInfo ({ commit }, val) {
+    commit('setShowInfo', val)
   }
 }
 
@@ -209,6 +213,9 @@ const mutations = {
   },
   addToast (state, toast) {
     state.toasts.push(toast)
+  },
+  setShowInfo (state, val) {
+    state.showInfo = val
   }
 }
 

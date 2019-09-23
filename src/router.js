@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 const Home = () => import(/* webpackChunkName: "Home" */ './views/Home.vue')
 const Contributors = () => import(/* webpackChunkName: "Home" */ './views/Contributors.vue')
-const Explore = () => import(/* webpackChunkName: "Explore" */ './views/Explore.vue')
+const Explorer = () => import(/* webpackChunkName: "Explorer" */ './views/Explorer.vue')
 const Chains = () => import(/* webpackChunkName: "Chains" */ './views/Chains.vue')
 const Governance = () => import(/* webpackChunkName: "Governance" */ './views/Governance.vue')
 const Tokens = () => import(/* webpackChunkName: "Tokens" */ './views/Tokens.vue')
@@ -31,9 +31,9 @@ const router = new Router({
       component: Contributors
     },
     {
-      path: '/explore',
-      name: 'explore',
-      component: Explore
+      path: '/explorer',
+      name: 'explorer',
+      component: Explorer
     },
     {
       path: '/chains',

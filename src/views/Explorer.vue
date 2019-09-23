@@ -124,7 +124,7 @@ Vue.directive('highlight', {
   }
 })
 export default {
-  name: 'explore',
+  name: 'explorer',
   components: {
     'request': () => import(/* webpackChunkName: "RequestWrapper" */ '@/components/requests/request.vue'),
     BForm,

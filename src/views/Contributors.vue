@@ -17,9 +17,8 @@
           >
             <img :src="`/team/${contributor.image}`" class="card-img-top" :alt="`${contributor.name}'s photo`">
             <b-card-body class="text-center">
-              <h5 class="card-title mb-0">{{ contributor.name }}</h5>
-              <div class="card-text text-black-50">{{ contributor.title }}</div>
-              <div class="text-left">
+              <h5 class="card-title">{{ contributor.name }}</h5>
+              <div>
                 <a
                   v-if="contributor.github"
                   :href="contributor.github"
@@ -39,6 +38,10 @@
                 </a>
               </div>
             </b-card-body>
+            <!--
+              Also big thanks to Gregory Tsipenyuk, Roger Doss, Kerry Zochowski, Doug Wallace, Joe Alie, Yuliya Belyayeva, Max Chambers, Alex Broudy, and Cole Kennelly.
+              Each of these individuals helped us on this Journey.
+            -->
           </b-card>
         </b-col>
       </b-row>
@@ -57,67 +60,53 @@ export default {
       faGithub,
       contributors: [
         {
-          name: 'Carl Hua',
-          image: 'carl.jpeg',
-          title: 'Logos Engineering Lead',
+          name: 'Michael Zochowski',
+          image: 'mcz.jpeg',
+          title: 'Chief Executive Officer',
           github: 'https://www.github.com/carlhua',
-          linkedin: 'https://www.linkedin.com/in/carl-hua-4b309113/'
+          linkedin: 'https://www.linkedin.com/in/michaelzochowski/'
         },
         {
           name: 'Carl Hua',
           image: 'carl.jpeg',
-          title: 'Logos Engineering Lead',
+          title: 'Chief Technical Officer',
           github: 'https://www.github.com/carlhua',
           linkedin: 'https://www.linkedin.com/in/carl-hua-4b309113/'
         },
         {
-          name: 'Carl Hua',
-          image: 'carl.jpeg',
-          title: 'Logos Engineering Lead',
-          github: 'https://www.github.com/carlhua',
-          linkedin: 'https://www.linkedin.com/in/carl-hua-4b309113/'
+          name: 'Peng Wang',
+          image: 'peng.png',
+          title: 'Senior Software Engineer',
+          github: 'https://github.com/peng-pl',
+          linkedin: 'https://www.linkedin.com/in/peng-wang-087b5223/'
         },
         {
-          name: 'Carl Hua',
-          image: 'carl.jpeg',
-          title: 'Logos Engineering Lead',
-          github: 'https://www.github.com/carlhua',
-          linkedin: 'https://www.linkedin.com/in/carl-hua-4b309113/'
+          name: 'Devon White',
+          image: 'devon.jpeg',
+          title: 'Software Engineer',
+          github: 'https://github.com/undertome',
+          linkedin: 'https://www.linkedin.com/in/devon-white-95954257/'
         },
         {
-          name: 'Carl Hua',
-          image: 'carl.jpeg',
-          title: 'Logos Engineering Lead',
-          github: 'https://www.github.com/carlhua',
-          linkedin: 'https://www.linkedin.com/in/carl-hua-4b309113/'
+          name: 'Shangyan Li',
+          image: 'shangyan.jpeg',
+          title: 'Software Engineer',
+          github: 'https://github.com/ShangyanLi',
+          linkedin: 'https://www.linkedin.com/in/shangyan-li-3582456b/'
         },
         {
-          name: 'Carl Hua',
-          image: 'carl.jpeg',
-          title: 'Logos Engineering Lead',
-          github: 'https://www.github.com/carlhua',
-          linkedin: 'https://www.linkedin.com/in/carl-hua-4b309113/'
+          name: 'CJ Cobb',
+          image: 'cj.jpeg',
+          title: 'Software Engineer',
+          github: 'https://github.com/cjcobb23',
+          linkedin: 'https://www.linkedin.com/in/cj-cobb-57b27b58/'
         },
         {
-          name: 'Carl Hua',
-          image: 'carl.jpeg',
-          title: 'Logos Engineering Lead',
-          github: 'https://www.github.com/carlhua',
-          linkedin: 'https://www.linkedin.com/in/carl-hua-4b309113/'
-        },
-        {
-          name: 'Carl Hua',
-          image: 'carl.jpeg',
-          title: 'Logos Engineering Lead',
-          github: 'https://www.github.com/carlhua',
-          linkedin: 'https://www.linkedin.com/in/carl-hua-4b309113/'
-        },
-        {
-          name: 'Carl Hua',
-          image: 'carl.jpeg',
-          title: 'Logos Engineering Lead',
-          github: 'https://www.github.com/carlhua',
-          linkedin: 'https://www.linkedin.com/in/carl-hua-4b309113/'
+          name: 'Stephen Gu',
+          image: 'stephen.jpeg',
+          title: 'Software Engineer',
+          github: 'https://github.com/stephengu',
+          linkedin: 'https://www.linkedin.com/in/stephengu/'
         },
         {
           name: 'Tyler Storm',
@@ -125,6 +114,12 @@ export default {
           title: 'Full Stack Software Engineer',
           github: 'https://www.github.com/stormtv',
           linkedin: 'https://www.linkedin.com/in/stormtv/'
+        },
+        {
+          name: 'Dmitry Cherukhin',
+          image: 'd.jpg',
+          title: 'Software Engineer',
+          github: 'https://github.com/p2peer'
         }
       ]
     }
