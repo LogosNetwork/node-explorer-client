@@ -19,6 +19,11 @@ const vuexLocal = new VuexPersistence({
 })
 Vue.use(Vuex)
 
+if (!localStorage.getItem('resetStorageForFlatted')) {
+  localStorage.clear()
+  localStorage.setItem('resetStorageForFlatted', true)
+}
+
 export default new Vuex.Store({
   modules: {
     mqtt,
