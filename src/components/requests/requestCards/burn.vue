@@ -18,7 +18,7 @@
           </div>
         </div>
       </b-card-title>
-      <token :tokenInfo="requestInfo.tokenInfo" :origin="requestInfo.origin" :small="small" />
+      <token :tokenInfo="requestInfo.tokenInfo" :origin="originAccount" :small="small" />
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item>
@@ -59,6 +59,11 @@ export default {
     BListGroup,
     BListGroupItem,
     'token': token
+  },
+  computed: {
+    originAccount () {
+      return this.requestInfo.originAccount ? this.requestInfo.originAccount : this.requestInfo.origin
+    }
   }
 }
 </script>

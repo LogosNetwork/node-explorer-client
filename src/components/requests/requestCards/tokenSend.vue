@@ -3,10 +3,10 @@
     <b-card-body>
       <b-card-title>
         <div class="d-flex justify-content-between">
-          <div v-if="account && requestInfo.origin !== account">
+          <div v-if="account && originAccount !== account">
             Token Recieve
           </div>
-          <div v-if="!account || (account && requestInfo.origin === account)">
+          <div v-if="!account || (account && originAccount === account)">
             Token Send
           </div>
           <div v-if="requestInfo.createdAt" class="timestamp text-right">
@@ -24,7 +24,7 @@
       <token :tokenInfo="requestInfo.tokenInfo" :small="small" />
       <b-card-text class="mt-3">
         <font-awesome-icon :icon="faPaperPlane" class="text-danger mr-2"/>
-        <LogosAddress class="mr-2" :address="requestInfo.origin" :force="small" />
+        <LogosAddress class="mr-2" :address="originAccount" :force="small" />
         <span class="mr-2">sent</span>
         <span v-if="requestInfo.totalAmountInToken" class="text-danger mr-2">{{requestInfo.totalAmountInToken}}</span>
         <span v-if="typeof requestInfo.totalAmountInToken === 'undefined'" class="text-danger mr-2">{{requestInfo.totalAmount}}</span>
@@ -74,6 +74,11 @@ export default {
     BListGroupItem,
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue'),
     'token': token
+  },
+  computed: {
+    originAccount () {
+      return this.requestInfo.originAccount ? this.requestInfo.originAccount : this.requestInfo.origin
+    }
   }
 }
 </script>

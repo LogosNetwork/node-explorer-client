@@ -3,10 +3,10 @@
     <b-card-body>
       <b-card-title>
         <div class="d-flex justify-content-between">
-          <div v-if="account && requestInfo.origin !== account">
+          <div v-if="account && originAccount !== account">
             Recieve
           </div>
-          <div v-if="!account || (account && requestInfo.origin === account)">
+          <div v-if="!account || (account && originAccount === account)">
             Send
           </div>
           <div v-if="requestInfo.createdAt" class="timestamp text-right">
@@ -23,7 +23,7 @@
       </b-card-title>
       <b-card-text>
         <font-awesome-icon :icon="faPaperPlane" class="text-danger mr-2"/>
-        <LogosAddress class="mr-2" :address="requestInfo.origin" :force="small" />
+        <LogosAddress class="mr-2" :address="originAccount" :force="small" />
         <span class="mr-2">sent</span>
         <span class="text-danger">{{requestInfo.totalAmountLogos}} Logos</span>
       </b-card-text>
@@ -67,6 +67,11 @@ export default {
     BListGroup,
     BListGroupItem,
     'LogosAddress': () => import(/* webpackChunkName: "LogosAddress" */'@/components/LogosAddress.vue')
+  },
+  computed: {
+    originAccount () {
+      return this.requestInfo.originAccount ? this.requestInfo.originAccount : this.requestInfo.origin
+    }
   }
 }
 </script>

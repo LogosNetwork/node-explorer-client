@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <vue-headful
-      title="Logos Node Explorer"
+      title="Logos Network"
       description="Access detailed information on the logos network and interface with the logos network"
       lang="en-US"
       ogLocale="en_US"

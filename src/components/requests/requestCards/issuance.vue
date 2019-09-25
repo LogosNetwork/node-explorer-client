@@ -26,7 +26,7 @@
         <strong>Token Account: </strong><LogosAddress v-if="requestInfo.tokenInfo && requestInfo.tokenInfo.tokenAccount" :address="requestInfo.tokenInfo.tokenAccount" :force="small" />
       </b-list-group-item>
       <b-list-group-item>
-        <strong>Issued By: </strong><LogosAddress :address="requestInfo.origin" :force="small" />
+        <strong>Issued By: </strong><LogosAddress :address="originAccount" :force="small" />
       </b-list-group-item>
       <b-list-group-item>
         <strong>Name: </strong>{{requestInfo.name}}
@@ -35,12 +35,7 @@
         <strong>Symbol: </strong>{{requestInfo.symbol}}
       </b-list-group-item>
       <b-list-group-item>
-        <span v-if="typeof requestInfo.totalSupplyInToken !== 'undefined'">
-          <strong>Total Supply: </strong>{{requestInfo.totalSupplyInToken}} {{requestInfo.symbol}}
-        </span>
-        <span v-if="typeof requestInfo.totalSupplyInToken === 'undefined'">
-          <strong>Total Supply: </strong>{{requestInfo.total_supply}} {{requestInfo.symbol}}
-        </span>
+        <strong>Total Supply: </strong>{{totalSupply}} {{requestInfo.symbol}}
       </b-list-group-item>
       <b-list-group-item>
         <span v-if="feeType === 'flat'">
@@ -104,6 +99,18 @@ export default {
     },
     feeType () {
       return this.requestInfo.feeType ? this.requestInfo.feeType.toLowerCase() : this.requestInfo.fee_type.toLowerCase()
+    },
+    originAccount () {
+      return this.requestInfo.originAccount ? this.requestInfo.originAccount : this.requestInfo.origin
+    },
+    totalSupply () {
+      if (typeof this.requestInfo.totalSupplyInToken !== 'undefined') {
+        return this.requestInfo.totalSupplyInToken
+      } else if (typeof this.requestInfo.totalSupply !== 'undefined') {
+        return this.requestInfo.totalSupply
+      } else {
+        return this.requestInfo.total_supply
+      }
     }
   }
 }

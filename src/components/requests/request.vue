@@ -56,6 +56,7 @@ export default {
     request: function () {
       if (this.requestInfo.constructor.name !== 'Object') {
         let request = this.requestInfo
+        console.log(request)
         if (request.tokenID) {
           let tokenAddress = this.$utils.accountFromHexKey(request.tokenID)
           let tokenAccount = this.$wallet.tokenAccounts[tokenAddress]

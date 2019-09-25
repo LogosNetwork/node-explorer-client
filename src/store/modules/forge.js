@@ -49,7 +49,7 @@ const parseToast = (request, address, vm, commit) => {
   if (request.type === 'send') {
     let balanceChange = bigInt(0)
     for (let trans of request.transactions) {
-      if (request.origin === address) {
+      if (request.originAccount === address) {
         balanceChange = balanceChange.minus(trans.amount)
       }
       if (trans.destination === address) {
@@ -67,7 +67,7 @@ const parseToast = (request, address, vm, commit) => {
   } else if (request.type === 'token_send') {
     let balanceChange = bigInt(0)
     for (let trans of request.transactions) {
-      if (request.origin === address) {
+      if (request.originAccount === address) {
         balanceChange = balanceChange.minus(trans.amount)
       }
       if (trans.destination === address) {
@@ -95,7 +95,7 @@ const parseToast = (request, address, vm, commit) => {
   } else if (request.type === 'issuance') {
     toast.message = `${address} Issued a new token ${request.name} - (${request.symbol})`
   } else if (request.type === 'distribute') {
-    if (request.origin === address) {
+    if (request.originAccount === address) {
       if (issuerInfo && typeof issuerInfo.decimals !== 'undefined') {
         toast.message = `${address} distributed ${Logos.convert.fromTo(request.transaction.amount, 0, issuerInfo.decimals)} ${tokenInfo.symbol} to ${request.transaction.destination}`
       } else {
@@ -109,7 +109,7 @@ const parseToast = (request, address, vm, commit) => {
       }
     }
   } else if (request.type === 'adjust_user_status') {
-    if (request.origin === address) {
+    if (request.originAccount === address) {
       toast.message = `${address} set the status of ${request.account} to ${request.status}`
     } else {
       toast.message = `${request.account} status was set to ${request.status}`
@@ -126,30 +126,30 @@ const parseToast = (request, address, vm, commit) => {
     toast.message = `${address} has locked the ${request.setting} setting to ${tokenInfo.settings[request.setting]} for ${tokenInfo.name}`
   } else if (request.type === 'revoke') {
     if (request.amountInToken) {
-      toast.message = `${request.origin} revoked ${request.amountInToken} ${tokenInfo.symbol} from ${request.source} to ${request.transaction.destination}`
+      toast.message = `${request.originAccount} revoked ${request.amountInToken} ${tokenInfo.symbol} from ${request.source} to ${request.transaction.destination}`
     } else {
-      toast.message = `${request.origin} revoked ${request.transaction.amount} base units of ${tokenInfo.symbol} from ${request.source} to ${request.transaction.destination}`
+      toast.message = `${request.originAccount} revoked ${request.transaction.amount} base units of ${tokenInfo.symbol} from ${request.source} to ${request.transaction.destination}`
     }
   } else if (request.type === 'adjust_fee') {
-    toast.message = `${request.origin} changed the fee of ${tokenInfo.name} to ${request.fee_type} with a fee rate of ${request.fee_type === 'percentage' ? `${request.fee_rate}% of the transaction amount` : `${request.fee_rate} base units of ${tokenInfo.symbol}`}`
+    toast.message = `${request.originAccount} changed the fee of ${tokenInfo.name} to ${request.fee_type} with a fee rate of ${request.fee_type === 'percentage' ? `${request.fee_rate}% of the transaction amount` : `${request.fee_rate} base units of ${tokenInfo.symbol}`}`
   } else if (request.type === 'burn') {
     if (request.amountInToken) {
-      toast.message = `${request.origin} burned ${request.amountInToken} ${tokenInfo.symbol}`
+      toast.message = `${request.originAccount} burned ${request.amountInToken} ${tokenInfo.symbol}`
     } else {
-      toast.message = `${request.origin} burned ${request.amount} base units of ${tokenInfo.symbol}`
+      toast.message = `${request.originAccount} burned ${request.amount} base units of ${tokenInfo.symbol}`
     }
   } else if (request.type === 'withdraw_fee') {
     if (request.transaction.amountInToken) {
-      toast.message = `${request.origin} withdrew ${request.transaction.amountInToken} ${tokenInfo.symbol} to ${request.transaction.destination}`
+      toast.message = `${request.originAccount} withdrew ${request.transaction.amountInToken} ${tokenInfo.symbol} to ${request.transaction.destination}`
     } else {
-      toast.message = `${request.origin} withdrew ${request.amount} base units of ${tokenInfo.symbol} to ${request.transaction.destination}`
+      toast.message = `${request.originAccount} withdrew ${request.amount} base units of ${tokenInfo.symbol} to ${request.transaction.destination}`
     }
   } else if (request.type === 'withdraw_logos') {
-    toast.message = `${request.origin} withdrew ${request.transaction.amountInLogos} Logos to ${request.transaction.destination}`
+    toast.message = `${request.originAccount} withdrew ${request.transaction.amountInLogos} Logos to ${request.transaction.destination}`
   } else if (request.type === 'update_issuer_info') {
-    toast.message = `${request.origin} updated the token information of ${tokenInfo.name}`
+    toast.message = `${request.originAccount} updated the token information of ${tokenInfo.name}`
   } else if (request.type === 'update_controller') {
-    toast.message = `${request.origin} updated ${request.controller.account} controller privileges for ${tokenInfo.name}`
+    toast.message = `${request.originAccount} updated ${request.controller.account} controller privileges for ${tokenInfo.name}`
   }
   toast.request = request
   commit('addToast', toast)

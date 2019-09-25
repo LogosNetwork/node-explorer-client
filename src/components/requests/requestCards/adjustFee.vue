@@ -18,18 +18,18 @@
           </div>
         </div>
       </b-card-title>
-      <token :tokenInfo="requestInfo.tokenInfo" :origin="requestInfo.origin" :small="small" />
+      <token :tokenInfo="requestInfo.tokenInfo" :origin="originAccount" :small="small" />
     </b-card-body>
     <b-list-group flush>
       <b-list-group-item>
-        <strong>Fee Type: </strong>{{requestInfo.fee_type}}
+        <strong>Fee Type: </strong>{{feeType}}
       </b-list-group-item>
       <b-list-group-item>
-        <span v-if="requestInfo.fee_type.toLowerCase() === 'flat'">
-          <strong>Fee Rate: </strong>{{requestInfo.fee_rate}} base units of {{requestInfo.tokenInfo.symbol}}
+        <span v-if="feeType === 'flat'">
+          <strong>Fee Rate: </strong>{{feeRate}} base units of {{requestInfo.tokenInfo.symbol}}
         </span>
-        <span v-if="requestInfo.fee_type.toLowerCase() === 'percentage'">
-          <strong>Fee Rate: </strong>{{requestInfo.fee_rate}}%
+        <span v-if="feeType === 'percentage'">
+          <strong>Fee Rate: </strong>{{feeRate}}%
         </span>
       </b-list-group-item>
     </b-list-group>
@@ -57,6 +57,17 @@ export default {
     BListGroup,
     BListGroupItem,
     'token': token
+  },
+  computed: {
+    feeRate () {
+      return this.requestInfo.feeRate ? this.requestInfo.feeRate : this.requestInfo.fee_rate
+    },
+    feeType () {
+      return this.requestInfo.feeType ? this.requestInfo.feeType.toLowerCase() : this.requestInfo.fee_type.toLowerCase()
+    },
+    originAccount () {
+      return this.requestInfo.originAccount ? this.requestInfo.originAccount : this.requestInfo.origin
+    }
   }
 }
 </script>
