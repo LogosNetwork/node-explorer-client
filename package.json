@@ -24,7 +24,7 @@
     "lodash.orderby": "^4.6.0",
     "mqtt": "^3.0.0",
     "mqtt-regex": "^1.0.5",
-    "prismjs": "^1.17.1",
+    "prismjs": "^1.21.0",
     "vue": "^2.6.10",
     "vue-affix": "^0.5.2",
     "vue-headful": "^2.0.1",
